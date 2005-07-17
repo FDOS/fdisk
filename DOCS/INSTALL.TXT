@@ -1,0 +1,47 @@
+INSTALL
+
+This file needs updated.
+
+Pre-requesits:
+
+1.  Compile CATS and copy the catdb.lib file to the \source\fdisk directory.
+2.  Copy the bootnorm.asm file to the \source\fdisk directory.
+3.  Copy the booteasy.asm file to the \source\fdisk directory.
+
+How to install the program from the source code:
+
+To compile the source code you need:
+1.  Borland Turbo C++ 3.0 or compatible.
+2.  The included source code and header file for fdisk.exe.
+3.  A PC running some form of DOS.  (Probably greater than MS-DOS 4.0.)
+
+Instructions:
+
+Note:  I used Borland Turbo C++ 3.0 as a compiler, the instructions will
+       vary depending upon the compiler used.
+
+1.  Run the GUI version of Borland Turbo C++ 3.0 by typing "tc"
+2.  Make sure that your compiler is set to at least the "large" memory
+    model.
+3.  Go under "Project" on the menu bar at the top of the screen and open
+    the fdisk.prj project file.
+4.  Go under "Compile" on the menu bar and select "Build all."
+5.  Exit from the compiler and you will have the executable.
+
+OR
+
+1.  Place all of the source code in one subdirectory.
+2.  From the command line, type "make all".
+3.  After compiling and linking, you should have the fdisk.exe file.
+
+Optional:
+Include the "part.ini" file in a directory in the PATH to give
+the program enhanced partition type lookup capability.
+
+Include the "fdisk.ini" file in a directory in the PATH to be able
+to set some commonly used options.
+
+Use the APACK program, by Jeorgen Ibsen, to turn the executable into a 
+small, packed executable.  The command to do so is "apack -x fdisk.exe
+fdiska.exe"  Then delete the fdisk.exe file and rename the fdiska.exe
+to fdisk.exe.

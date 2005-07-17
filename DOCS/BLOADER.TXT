@@ -1,0 +1,27 @@
+BOOT LOADER INFORMATION:
+
+Licensing of the boot loader code which came with BootEasy:
+
+The bootloader code that I used was written by Serge Vakulenko.  I found
+his BootEasy program in a distribution of FreeBSD.  There was no licensing
+information that came along with the program; but, since the program
+is with a FreeBSD distribution, it is logical to assume that it has at 
+least the license that FreeBSD has.  This would enable me to re-use, modify,
+and re-distribute his code at my convienience.
+
+I also tried unsuccessfully to contact the author to confirm the licensing.
+
+In conclusion, I am proceeding under the assumption that the license is a
+FreeBSD license and using the BootEasy boot loader code as a replacement
+for the MS-DOS boot loader code.  For more information on FreeBSD licensing,
+please go to http://www.freebsd.org
+
+Brief bootloader instructions:
+
+When booting the PC with the BootEasy bootloader, you will get a screen
+that lists the function key to press next to the operating system to boot.
+Just hit the function key next to the desired installed operating system.
+After you have booted the first time, the bootloader will wait for user
+intervention for about 5 seconds; then, it will boot to the last operating
+system that was booted.  The BootEasy bootloader will allow booting to 
+multiple operating systems.

@@ -1,0 +1,14 @@
+Begin3
+Title:          Fdisk
+Version:        1.2.0
+Entered-date:   03 March 2003 
+Description:    Fixed disk tool - create partitions.
+Keywords:       freedos
+Author:         Brian E. Reifsnyder, reifsnyderb@mindspring.com
+Maintained-by:  Brian E. Reifsnyder, reifsnyderb@mindspring.com
+Primary-site:   http://www.23cc.com/free-fdisk
+Alternate-site: www.freedos.org
+Original-site:  www.freedos.org
+Platforms:      dos
+Copying-policy: GNU GPL
+End

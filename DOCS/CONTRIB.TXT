@@ -1,0 +1,17 @@
+CONTRIB.TXT
+
+Thanks to the following people for contributing:
+
+Name:                   Contributed:
+Phil Brutsche           part.dat idea and null pointer error bug fix
+Roland Ronquist         ideas, advice, and testing
+John Price              information on how to modify the program to run on
+                          an 8086/8088
+Ralf Quint              information on how to break the source into sections,
+                          some code changes, and helped me find information
+                          on how to add LBA support
+Phil Marek              new command-line parsing code and a variable fix                           
+                          in pdiskio.cpp
+Jim Hall                makefile
+Tom Ehlert              program size reduction, code simplifications,
+                        new bootloader, bug fixes

@@ -1,0 +1,70 @@
+FAQ.TXT
+
+Frequently asked questions:
+
+1.  What does Free FDISK do?
+
+        Free FDISK partitions a hard disk in order to create space for file
+        systems.  Please see http://www.fdisk.com for more information.
+
+2.  Why doesn't Free FDISK display my 8.2GB (or greater) hard disk correctly?
+
+	Using a text editor, make sure that the VERSION statement in the
+        fdisk.ini file is set to one of the following:
+
+		VERSION=W95       Supports large hard disks without
+                                  FAT32 partitions.
+                VERSION=W95B      Supports large hard disks with FAT32
+                                  partitions.
+		VERSION=W98       Same as VERSION=W95B
+	
+	Also make sure that the fdisk.ini file is located in the same
+	directory (folder) as Free FDISK.
+
+        Optionally:  Set the FFD_VERSION statement in the environment to one of
+                     the versions listed above by adding a "SET" statement to the
+                     c:\autoexec.bat file.  i.e.  SET FFD_VERSION=W98
+
+3.  I have a monochrome monitor and there are blank areas on the screen, how
+    do I fix this?
+
+	Using a text editor, change the MONO statement in the fdisk.ini file
+        to MONO=ON.
+
+        Optionally:  Set the FFD_MONO statement in the environment to ON.
+                     i.e.  SET FFD_MONO=ON
+
+4.  I have Windows 95, Windows 98, or Windows 98 Second Edition and Free FDISK
+    does not display any or all of my drives or partitions.  What do I need to
+    do to fix this problem?
+
+	Using a text editor, make sure that the VERSION statement in the
+        fdisk.ini file is set to one of the following:
+
+		VERSION=W95       Supports large hard disks without
+                                  FAT32 partitions.
+                VERSION=W95B      Supports large hard disks with FAT32
+                                  partitions.
+		VERSION=W98       Same as VERSION=W95B
+	
+        Optionally:  Set the FFD_VERSION statement in the environment to one of
+                     the versions listed above by adding a "SET" statement to the
+                     c:\autoexec.bat file.  i.e.  SET FFD_VERSION=W98
+
+	Also make sure that the fdisk.ini file is located in the same
+	directory (folder) as Free FDISK.
+
+7.  Where can I find instructions on how to use Free FDISK?
+
+        Check out the web site at http://www.fdisk.com.
+
+6.  How do I report a bug?
+
+        Please send all bug reports to reifsnyderb@mindspring.com and
+        please describe in detail exactly how to reproduce the bug.  Also,
+        please describe what hardware you are running Free FDISK on.  Any
+        bug reports with a description similar to "it doesn't work" will be
+        deleted.
+
+        Optionally, you can report a bug at http://www.freedos.org.
+

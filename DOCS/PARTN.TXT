@@ -1,0 +1,10 @@
+Note regarding partn.htm:
+
+The partn.htm document was included, in the Free FDISK documentation, with
+permission from the author, Chris Lattner.  More partition, and operating
+system, information can be found at his web site at
+http://www.nondot.org/sabre/os.
+
+
+
+
