@@ -1,0 +1,47 @@
+This is the INSTALL file
+
+
+To compile the libraries and the gencat program using Borland C 3.1:
+
+ make -fmakefile.bc all
+
+or if you have TurboC:
+
+ make -fmakefile.tc all
+
+You will see some warnings about unused variables when catgets.c is
+compiled, but this is expected.  You can ignore those warnings.
+
+
+To compile the test programs using Borland C 3.1:
+
+ make -fmakefile.bc test
+
+or if you have TurboC:
+
+ make -fmakefile.tc test
+
+
+To test, make sure you have set NLSPATH and LANG to their correct
+values.  As an example, set NLSPATH to the location of the 'nls'
+directory, and set LANG to the value 'pig'.  Then run CATS.EXE to see
+what happens!
+
+Note that the output from CATS2.EXE is totally independent of the
+NLSPATH and LANG settings.  That's because it uses a hard-coded
+filename for the language catalog.
+
+To test the gencat program, use the NLS\cats.msg file.  This should
+produce output that can then be written to a Cats file (such as
+"cats.en") and loaded into your program.  Run the gencat program like
+this:
+
+  GENCAT ..\NLS\CATS.MSG >..\NLS\CATS.EN
+
+or:
+
+  GENCAT -o ..\NLS\CATS.EN ..\NLS\CATS.MSG
+
+Type this for help in running GENCAT:
+
+  GENCAT -?

@@ -1,0 +1,46 @@
+#This is a Make File for Turbo C 2.01/C++ 1.01
+# Version 1.0
+# by Jonathan Helmus (jjhelmus@mtu.edu)
+# adapted from Jim Hall's makefile.bc  
+# 
+
+# set the macros: 
+
+CC=tcc
+CFLAGS=-I..\include -ml  
+RM=del
+
+# build targets:
+
+all: catdb.lib 
+
+catdb.lib: db.obj catgets.obj get_line.obj
+   
+   tlib catdb.lib +db.obj +catgets.obj +get_line.obj
+
+# compile targets:
+
+db.obj: db.c
+   $(CC) $(CFLAGS) -c db.c 
+
+catgets.obj: catgets.c 
+   $(CC) $(CFLAGS) -c catgets.c
+
+get_line.obj: get_line.c
+   $(CC) $(CFLAGS) -c get_line.c
+
+# clean up:
+
+clean:
+ 
+ $(RM) *.map
+ $(RM) *.bak
+ $(RM) *.obj
+
+clobber: 
+ 
+ $(RM) *.map
+ $(RM) *.bak
+ $(RM) *.obj
+ $(RM) *.lib
+

@@ -1,0 +1,46 @@
+# This is a Makefile for Borland C/C++ 3.1
+# by Jim Hall <jhall@freedos.org>
+
+# Set the memory model:
+
+MEMMODEL=m
+
+# Compiler macros:
+
+CC=bcc
+CFLAGS=-I..\include -DNDEBUG -m$(MEMMODEL)
+LINT=lint
+RM=del
+
+# File macros:
+
+SOURCES=db.c catgets.c get_line.c
+OBJECTS=$(SOURCES:.c=.obj)
+
+# Build targets:
+
+all: libs
+
+# libs
+
+libs: catdb.lib
+
+catdb.lib: $(OBJECTS)
+	tlib $@ +db.obj +catgets.obj +get_line.obj
+
+
+# lint
+
+lint:
+	$(LINT) $(CFLAGS) $(SOURCES)
+
+
+# clean up
+
+clean realclean:
+	-$(RM) *.map
+	-$(RM) *.bak
+	-$(RM) *.obj
+
+distclean: realclean
+	-$(RM) *.lib

@@ -1,0 +1,199 @@
+
+This started out as a reply to Aitor's email to me.  But the topics
+seem to be appropriate to bring up to here.
+
+Sorry that it's a little long.  :)
+
+
+Aitor Santamaría wrote:
+> 
+> Hi!
+> 
+> > I'm also hoping in a 4.0 release to switch over to using plain UNIX
+> > `cat' files, the raw files before they are translated into binary
+> > catalogs using `gencat'.
+> 
+> Ok, I hope to see an example to fully understand what you mean...
+> 
+
+Oops.  I should have said `msg' files were the raw files.  `cat' files
+are the binary catalogs, which are the output of `gencat'.
+
+Here's a quick description of what a `cat' file is under UNIX.  I'll add
+this to the set of docs for Cats when I make the 4.0 release.
+
+
+Under UNIX, if you want your program to support multiple languages, you
+use the catopen/catgets/catclose set of functions.  These are the same
+functions that I have implemented under Cats for DOS.
+
+The big difference is that under UNIX, catopen will open a binary
+catalog file.  Under Cats, catopen will open a text file.
+
+Under UNIX, you generate a binary catalog file (`cat' file) using the
+`gencat' program.  This turns a message file (`msg' file) into a binary
+cat file.  The msg file is pretty straightforward, and maps fairly
+directly to the text file that I use for Cats.  Here's an example
+template.msg file:
+
+$
+$       template.msg
+$
+$       message catalog for template example
+$
+
+$ Module: template.c
+$
+
+$set 1
+$ General application messages
+1 Template
+2 Template Open
+3 Template Save As
+4 Template Help
+
+$set 2
+$ These messages are used in the main window of the template example.
+1 File
+2 Open...
+3 Save As...
+4 Print
+5 Clear
+6 Exit
+7 Help
+8 Overview...
+
+
+
+The rules for a msg file are simple: you can have lines of pretty much
+any length, and you can wrap them across lines using `\' as the last
+character on a line (this may be a bad assumption for DOS).  Comment
+lines are marked with `$', although directives for gencat can also be
+set off with `$' as well.  Some versions of `gencat' will ignore blank
+lines - others will complain but will do the job.
+
+Remember, under Cats, your input lines cannot be over something like 80
+chars.  You still have comments (this feature is not well documented) if
+you put `#' in col 1 on a line.
+
+Once you have a msg file, you turn it into a binary cat file using the
+`gencat' program:
+
+  gencat -o template.cat template.msg
+
+The general usage of GNU `gencat' is:
+
+Usage: gencat [OPTION...] -o OUTPUT-FILE [INPUT-FILE]...
+  or:  gencat [OPTION...] [OUTPUT-FILE [INPUT-FILE]...]
+
+  -H, --header=NAME          Create C header file NAME containing symbol
+                             definitions
+      --new                  Do not use existing catalog, force new
+output file
+                            
+  -o, --output=NAME          Write output to file NAME
+  -?, --help                 Give this help list
+      --usage                Give a short usage message
+  -V, --version              Print program version
+
+
+
+I'm a big person on UNIX/DOS portability.  I write a fair amount of
+programs under DOS and under UNIX, both, so of course I like to have the
+same capabilities under both platforms.  It makes porting applications
+between DOS & UNIX a lot easier on me.
+
+Let's say I have a UNIX program that already uses catgets to support
+multiple languages.  Then I probably have invested a fair amount of
+effort in creating good msg files for each language that I support.  I
+can port this application to DOS fairly easily using Cats, but to use
+the msg files under Cats I must first convert them to Cats format.  So I
+wrote a conversion utility.  I can convert the template.msg (above) into
+this:
+
+1.1:Template
+1.2:Template Open
+1.3:Template Save As
+1.4:Template Help
+2.1:File
+2.2:Open...
+2.3:Save As...
+2.4:Print
+2.5:Clear
+2.6:Exit
+2.7:Help
+2.8:Overview...
+
+
+Of course, I just lost my comments, but that's a limitation of the
+conversion tool, not with Cats.  :)
+
+I also don't support any other directives than `$set'.  I think there
+are only three of these kinds of directives:
+
+ set N
+ defines a message set numbered N (starts at 1)
+
+ delset
+ deletes the message set N
+
+ quote C
+ sets the quote character to C
+
+
+I have another tool that turns a Cats input file into msg format.  It
+just uses `$set'.
+
+
+It's this msg file format that I would like to use in version 4 of
+Cats.  The big benefit being that you don't need to run `gencat' to
+create a message catalog file - if you have a msg file, that's all you
+need!
+
+
+Of course, now that I go through the logic with someone else, it occurs
+to me that my Cats input file more appropriately maps to a `cat'
+catalog.  That is, it might be easier for someone porting a UNIX program
+to DOS to keep the `gencat' step.  So perhaps I should rename my
+msg-to-cats converter to simply `gencat', and give it the same usage as
+UNIX `gencat'?
+
+Then I think the build steps when porting a UNIX program to DOS would
+be:
+
+1. build (using `make')
+
+2. generate message catalog files (using `gencat')
+
+3. install the message catalog files
+
+
+Compare this to just building the app under your native UNIX:
+
+1. build (using `make')
+
+2. generate message catalog files (using `gencat')
+
+3. install the message catalog files
+
+
+So the only thing I would need to add to Cats would be support for
+really long lines, which I can pull out of my msg2cats.c converter
+program.
+
+Hmmm... that's much easier to implement!  :)  And it keeps the Cats
+input file much simpler, which makes for faster parsing at load-time.
+
+Then the logic to support `$delset' and `$quote' could be added to
+`gencat'.
+
+
+
+Okay, that's the direction I think I just talked myself into: adding
+long line support to Cats, and turn msg2cats.c into gencat.c.  The next
+steps after that will be to better support the UNIX options for
+gencat.c, but I guess I'll add those only as people complain about those
+shortcomings.  No point in adding support for something people may not
+actually use.  :)
+
+-jh

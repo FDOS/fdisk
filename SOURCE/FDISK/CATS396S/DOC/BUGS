@@ -1,0 +1,51 @@
+This is the BUGS file for the Cats library
+
+*  Really should do a check beforehand in lib/catgets.c to see if the
+   user has set LANG and NLSPATH, and go with some defaults if they
+   are not there.  Defaults might be LANG=EN and NLSPATH=C:\FDOS\NLS
+
+*  Cats only supports one catalog file open at a time. Therefore, you
+   might be tempted to open one file, do your work, close it, then open
+   another file. The problem is that Cats does not clear the contents of
+   the hash when you close a catalog. Therefore, if you loaded message
+   1.2 from the first catalog, but Cats couldn't load your second
+   catalog, and you try to grab message 1.2 from the second catalog
+   ... you get the 1.2 message from the first catalog. Does that make
+   sense? I'll try to put together a better description of the bug and
+   create a new release of Cats, but since no one has reported this bug,
+   I'm assuming most (all?) developers so far are only opening one
+   catalog in the run of the host program. So no one has probably seen
+   this bug come up.
+
+* The LANG variable can be either xx-YY or xx.  The Cats library can
+  read either.  Steffen Kaiser also makes this suggestion:
+  >I made some sort of thoughts about this problem in the past for various
+  >projects, the only somewhat suiteable method I found was this:
+  >+ Imagine a function like this: int fileopen(char *fnam, int mode)
+  >+ By default this functions simply calls open(fnam, mode), but on failure
+  >the path of 'fnam' is extracted, then opened, and on success the first
+  >line is read from it, then it is closed and the filename of fnam is
+  >appended and the open() call is retried.
+  >
+  >This method allows the following scenario:
+  >%NLS%\en-US
+  >%NLS%\en-UK
+  >%NLS%\en\LC_MESSAGES
+  >
+  >where "en-US" and "en-UK" are files containing:
+  >%NLS%\en
+  >
+  >and "LC_MESSAGES" is the file the messages are located in.
+  >
+  >"%NLS%" should be the absolute pathname, though.
+  >
+  >This method does not simulate symlinks, but offers some options with
+  >little overhead.
+  >
+  >For INI files I had implemented a similiar idea, where there is a general
+  >token, e.g. "#!chain to file = <filename>", and whenever the file parser
+  >hits such line, the currently opened file is closed and <filename> is
+  >opened, so the file parser can go on without any hassle, thus, minimum
+  >overhead, if the token is the very first line, however.
+
+* Reading the file on an as-needed basis (MCLoadBySet) does not work.

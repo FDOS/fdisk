@@ -1,0 +1,58 @@
+#This is a Make File for Turbo C 2.01/C++ 1.01
+# Version 1.0
+# by Jonathan Helmus (jjhelmus@mtu.edu)
+# adapted from Jim Hall's makefile.bc  
+ 
+
+# macros:
+
+CC=tcc
+CFLAGS=-I..\include -ml
+LDFLAGS=
+LDLIBS=..\lib\catdb.lib
+RM=del
+
+# build targets:
+
+all: gencat.exe
+
+gencat.exe: gencat.obj getopt.obj index.obj
+   $(CC) $(CFLAGS) $(LDFLAGS) gencat.obj getopt.obj index.obj $(LDLIBS)
+
+test: cats.exe cats2.exe strings.exe init.exe
+
+#compile targets:
+
+cats.exe: cats.c
+   $(CC) $(CFLAGS) $(LDFLAGS) cats.c $(LDLIBS)
+
+cats2.exe: cats2.c
+   $(CC) $(CFLAGS) $(LDFLAGS) cats2.c $(LDLIBS)
+
+strings.exe: strings.c
+   $(CC) $(CFLAGS) $(LDFLAGS) strings.c $(LDLIBS)
+
+init.exe: init.c
+   $(CC) $(CFLAGS) $(LDFLAGS) init.c $(LDLIBS)
+
+gencat.obj: gencat.c
+   $(CC) $(CFLAGS) -c gencat.c 
+
+getopt.obj: getopt.c
+   $(CC) $(CFLAGS) -c getopt.c
+
+index.obj: index.c
+   $(CC) $(CFLAGS) -c index.c
+
+# clean up
+
+clean:
+   $(RM) *.map
+   $(RM) *.tds
+   $(RM) *.obj
+
+clobber:
+   $(RM) *.map
+   $(RM) *.tds
+   $(RM) *.obj
+   $(RM) *.exe

@@ -1,0 +1,15 @@
+BUGS.TXT
+
+Known Bugs:
+
+	Severity:	Description:
+
+        Low             BootEasy does not work properly.  Do not use it.
+                        This will be fixed in the near future.
+
+                        Note:  This bug as been assigned a low severity
+                               because it appears that BootEasy is not
+                               used very often and Free FDISK now has an
+                               open-source bootloader that boots the active
+                               partition.
+

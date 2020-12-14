@@ -1,0 +1,306 @@
+NEWS.TXT
+
+News:
+
+Current Stable Production Release:  1.2.1
+Current Beta Release:  1.3.1
+
+Note:  For any changes prior to version 1.0, please see history.txt.
+
+Current Version:
+-----------------------------------------------------------------------------
+Version 1.3.1   The MBR is no longer automatically written if the expected                
+11/04/2008      MBR is not found.  The MBR is now only written by using
+                the command line switches.
+
+                Various warnings have been cleaned up in order to fix the 
+                command-line compile.  One fix to the makefile remains.
+
+                Error handling has been added in order to accomodate hard 
+                disk and/or controller errors.
+
+Future changes planned for Version 2.0.0:
+-----------------------------------------------------------------------------
+TO-DO:          Complete addition of international language support. 
+
+Future changes planned for Version 1.8.0:
+-----------------------------------------------------------------------------
+TO-DO:
+
+Future changes planned for Version 1.6.0:
+-----------------------------------------------------------------------------
+TO-DO:          Increased the extended partition buffer size by 1 to support
+                24 extended partitions.
+
+Future changes planned for Version 1.4.0:
+-----------------------------------------------------------------------------
+TO-DO:          Investigate the possibility of resetting the boot sector
+                bytes 510 and 511 to 0x00 instead of filling the boot
+                boot sector(s) with 0xf6 when creating a partition.  This
+                would make a file system easier to repair if a drive was
+                accidentally fdisked.
+
+TO-DO:          Fixed a bug that prevented option 5 from being displayed,
+?????           on the main menu, when more than one physical drive exists.
+
+TO-DO:          Continued adding support for international languages.
+
+TO-DO:          Check for fdisk functionality if the only hard disk is on
+                the second IDE controller.
+
+TO-DO           Fixed the ported BootEasy code.  
+
+TO-DO:          Regression Testing
+                        1.  Maxtor 245MB hard disk (7245AT)
+                        2.  Fujitsu 20GB hard disk (MPF3204AT)
+                        3.  Western Digital 180GB hard disk (WD1800JB)
+
+TO-DO:          Fix drive label modification issues.
+
+TO-DO           Fix partition start and end corruption problems with
+                some non-dos partition types.
+
+Future changes planned for Version 1.3.2:
+-----------------------------------------------------------------------------
+TO-DO           Change the int 0x13 extension determination code.
+
+                Add the partition id bytes.
+
+Version History:
+-----------------------------------------------------------------------------
+Version 1.3.0   Bug fixes provided by H. Peter Anvin in order to fix a
+7/17/2003       problem with the interrupt 0x13 extensions detection code.
+
+Version 1.2.1   Some clean-ups of help screens.
+04/06/2003
+                Fixed a bug that prevented all FAT32 boot sector information
+                from being erased when a new partition is created that starts
+                at the exact same location as an old FAT32 partition.
+
+Version 1.2.0   Improved the algorithms that calculate the partition size by
+03/04/2003      percentage, when utilizing the command-line.
+
+                Improved the command-line help screens.
+
+                Fixed the bug that prevented the deletion of non-dos
+                partition types.
+
+Version 1.1.4   Replaced the Delete_Logical_Drive() function with the code
+BETA RELEASE    from version 1.01 and modified the function to work with the
+12/11/2002      new partition buffer structure.  The function that this code
+                replaces caused massive drive corruption.
+
+                Verified that the creation of partitions, by percentage
+                within the interactive user interface, now results in
+                partitions that have the same size as those from "other"
+                partition management utilities.
+
+                Fixed the bug that prevented non-dos logical drives from
+                being displayed with the /dump and /info command-line option.
+
+                Maximum 2GB FAT16 partition size is now 2047MB, for
+                reasons of compatibility.  4GB FAT16 partitions now have
+                a maximum size of 4095MB, also for reasons of compatibility.
+
+                Extensive testing was performed with the following hard
+                drive:  Fujitsu 20GB hard disk (MPF3204AT)
+
+Version 1.1.3   Usage percentages, within the interactive user interface,
+BETA RELEASE    are now displayed correctly and add up to 100%.
+12/10/2002
+                The Determine_Free_Space() code from version 1.01 has been
+                modified to work with the new partition buffer structures
+                and merged into the code.  This has been done do to reports
+                of partition overlapping problems that people have been
+                experiencing with the newer beta releases.  Since the
+                old Determine_Free_Space() function has been proven to work
+                without any partition overlaps, it was easier to merge that
+                function as opposed to fixing the new function.
+                                                               
+Version 1.1.2   Modified the partitioning algorithms and free space
+BETA RELEASE    computations, to create partitions, so that they are 100%
+11/30/2002      compatible with "other" partitioning utilities when creating
+                partitions by size.  Similar modifications still need to be
+                made when creating partitions by percentage.
+
+                Fixed a bug with the /auto switch that appears when there is
+                still free space left on the hard drive after 24 partitions
+                have been created.  Before this bug was fixed, a buffer
+                overflow was possible on larger hard disks.  The program
+                would keep attempting to create partitions even after Z:
+                was passed because it was formerly programmed to keep
+                creating partitions until all space was used.  In order to
+                fix this problem, Determine_Drive_Letters() has been
+                modified so that it now returns the ASCII code for the last
+                logical drive letter created.
+
+                Fixed a major drive lettering bug in the
+                Determine_Drive_Letters() function.
+
+                The /REBOOT command-line option now calls the
+                Write_Partition_Tables() function.  If no changes have been
+                made, this function simply returns.
+
+                Fixed a bug that resulted in the /LOG command-line option
+                creating the wrong partition type.
+
+                Some regression testing was performed with the following
+                hard drives while setting the version emulation to 4 and 98:
+                        1.  Maxtor 245MB hard disk (7245AT)
+
+Version 1.1.1   The versioning numbers have been slightly modified.  The
+BETA RELEASE    version number format is now x.y.z.  Where x is the major
+11/10/2002      version number, y is the minor version number, and z is the
+                release number.  If y is an even number, the release is
+                considered stable.  Otherwise, if y is an odd number, the
+                release is a beta version.
+
+                Cleaned up some source code.
+
+                Removed "FreeDOS MBR" message from normal MBR.
+
+                Fixed a bug that caused the partition tables to be written
+                twice when exiting the interactive user interface.
+
+                Continued adding support for international languages.
+
+                Fixed a bug that resulted in an incorrect maximum number of
+                hard disks being reported by the
+                Get_Hard_Drive_Parameters() function.
+
+                Fixed an overflow bug that erased ext int 0x13 flag
+                information by writing 0's to next hard disk's buffer.
+                This bug tended to nullify support for > 8GB hard disks when
+                they were not the first and only hard disk available.
+
+                Hard disk partition information displayed by the /status
+                command and via option 5 of the interactive user interface
+                now supports sizes up to 999,999 MB.
+
+                Modified the introductory warning message, for large disk
+                support, that stated that FreeDOS will be unable to access
+                FAT32 partitions.  Since FreeDOS is now able to access FAT32
+                partitions, FreeDOS has been removed from the warning
+                message.
+
+                Fixed usage percentage displayed for logical drives in the
+                extended partition.
+
+                Fixed logical drive usage percentage displayed when using
+                the /dump switch from the CLI (command line interface).
+
+                Restored original command-line parsing code.  The new code
+                limited the capability to stack command line switches on
+                one command line.
+
+                Restored original environment scanning and fdisk.ini parsing
+                code.  The new code did not properly scan the environment
+                and, when compressed, did not reduce the size of the
+                executable any appreciable size.
+
+                All changes prior to Version 1.0 are now recorded in
+                history.txt.
+
+                There is now a util directory that will contain all batch
+                files necessary to simplify maintenance.
+
+                \util\makezip.bat is a modified mkzip.bat file, created by
+                Tom Ehlert, that creates the distribution zip file.
+
+                \util\devprep.bat prepares Free FDISK for development by
+                preparing CATS and the bootloaders.
+
+                \util\zipprep.bat copies the fdisk.exe file into the
+                \program directory and prepares the source tree for
+                being zipped.
+
+Version 1.10    This release and all future releases of Free FDISK will be
+BETA RELEASE    identifiable as production or beta software by the tenths
+7/24/2002       place of the version number.  For example, version 1.1
+                would be a beta release, version 1.2 would be a production
+                release, version 1.313a would be a beta release, etc.
+
+                Started utilizing CATS 3.96 for international language
+                support.  International language support will be completed
+                in a future release.
+
+                Tom Ehlert has ported BootEasy to NASM.  The bootcode.h file
+                is no longer used.
+
+                Added a define statement, and additional code, that can
+                be used to turn on various text messages indicating that
+                a release is a beta version.
+
+                The /MBR switch writes the standard boot loader and the
+                /BMBR switch writes the BootEasy boot loader.
+
+Version 1.04    Not a public release.
+7/10/2002
+                Bug fixes for version 1.03, submitted by Tom Ehlert.
+
+Version 1.03    Not a public release.
+6/20/2002
+                More changes submitted by Tom Ehlert. 
+
+                A new bootloader has been written, by Tom Ehlert, that
+                boots the active partition.
+
+Version 1.02    Not a public release.
+4/11/2002
+                Floating point variables have been removed, by Tom Ehlert.
+                As a result, the size of the compressed executable has been
+                reduced by approximately 10k.
+
+                Tom Ehlert has also modified the help system such that if
+                the help information has been redirected to a file, the
+                /nopause switch is no longer necessary to prevent the
+                redirected text from being paused.
+
+                Miscellaneous code modifications and optimizations
+                by Tom Ehlert.
+
+                Tom Ehlert has also cleaned up some of the source code
+                through the use of pointers to structures instead of
+                utilizing the raw structures.
+
+Version 1.01    Due to the danger of the /CLEAR and /CLEARALL commands,
+4/9/2002        the drive number is now a required parameter with these two
+                commands.  If the drive number is not entered, the program
+                will abort.  If the program aborts, an error level 9 is
+                returned.
+
+                The program will now abort if a size >0 is not specified
+                when using the /PRI, /PRIO, /LOG, LOGO, and /EXT commands.
+                If the program aborts, an error level 9 is returned.
+
+                Added the CHECKEXTRA option to the fdisk.ini file.  By
+                disabling this feature, Free FDISK will no longer check
+                for an extra cylinder of drive space past the reported
+                end of the drive.  This option was added to accomodate
+                hard drives with a flaw in the firmware and defaults to ON.
+
+Version 1.01    Not a public release
+Pre 1
+3/22/2002       Fixed a bug that resulted in FAT32 partitions being formatted
+                at a former partition size and not at the current partition
+                size.  This was due to the backup boot sector not being
+                cleared when the drive was repartitioned.
+
+                Fixed many "one-off" bugs in the Determine_Free_Space()
+                function.
+
+                Modified the partition creation functions to more
+                aggressively utilize all of the space on a hard disk.
+
+Version 1.0     Fixed a bug that resulted in option 5, on the main menu, not
+11/20/2001      being displayed if a second drive is being emulated.
+                
+                Fixed a bug that created partitions that were larger than the
+                allowed size, for the partition type.
+
+                Fixed a bug that resulted in an incorrect size, of an
+                emulated drive, being displayed when the version <= 6.
+
+                Fixed a bug that displayed an incorrect maximum available
+                space if 4 GB FAT 16 partition support was enabled.
+

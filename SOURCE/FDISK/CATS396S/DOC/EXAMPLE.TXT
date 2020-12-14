@@ -1,0 +1,195 @@
+EXAMPLE: SOFTWARE PORTABILITY USING "CATS"
+
+One of the major strengths of the "Cats" library is that it emulates
+the UNIX catgets() functions fairly well.  One of the intentional side
+effects of this emulation is that software that uses UNIX catgets()
+becomes immediately portable to the DOS platform using "Cats".
+
+By way of example, here is a program that should be familiar to all
+programmers.  It is the venerable "Hello world" program.
+
+____________________________________________________________________
+PART ONE: APPLICATION ON UNIX
+
+This program will simply print the text "Hello world", and then quit.
+We have added international language support to this program, so that
+if your primary language is something other than English, we try to
+print a message that is readable to you.
+
+Here's the source code for hello.c:
+
+ #include <stdio.h>
+ 
+ #include <features.h>
+ #include <nl_types.h>
+ 
+ int
+ main (void)
+ {
+   nl_catd cat;
+   char *s;
+ 
+   cat = catopen ("hello", 0);
+ 
+   s = catgets (cat, 1, 1, "Hello world");
+   printf ("-->%s\n", s);
+ 
+   catclose (cat);
+   exit (0);
+ }
+
+For sake of this example, let us say that the application was first
+developed on UNIX using catgets().  Under our UNIX development
+environment, we compile the application using our native tools:
+
+ $ make
+ gcc -Wall   -c -o hello.o hello.c
+ gcc -Wall -o hello hello.o
+
+Then, we generate the message catalogs.  Our program does not generate
+a lot of text, so the .msg file is very small.  Here is the
+hello_en.msg file that defines the ouput for the English language:
+
+ $set 1
+ 1 Hello world
+
+
+The .msg files are then "compiled" into binary message catalog files
+using the UNIX "gencat" program:
+
+ $ gencat -o hello.en hello_en.msg
+ $ gencat -o hello.es hello_es.msg
+ $ gencat -o hello.pig hello_pig.msg
+
+Now that we have a set of "compiled" message catalogs, and a program
+that will read then, we need to set the NLSPATH to only point to the
+message catalogs we just created.  The message catalogs we generated
+above were in the /home/jhall/src/hello/nls directory:
+
+ $ NLSPATH=/home/jhall/src/hello/nls/%N.%L      
+ $ export NLSPATH
+
+Now, run the "hello" application with different language definitions.
+Note we have a sample catalog for English, Spanish, and another for
+Pig Latin:
+
+ $ LANG=en ./hello
+ -->Hello world
+ 
+ $ LANG=es ./hello
+ -->Hola mundo
+ 
+ $ LANG=pig ./hello
+ -->Ellohay orldway
+
+We'll also do one for a language (German) where we don't have a
+catalog, and the output should be in English (default):
+
+ $ LANG=de ./hello 
+ -->Hello world
+
+____________________________________________________________________
+PART ONE: APPLICATION ON DOS
+
+To port this application to DOS, we only need to make a small change.
+All I did was change the #include statements to be conditional on the
+operating system.  In this exampe, I assume either UNIX or DOS, but
+your applicaton may be portable to more than just those two platforms,
+or you may have specific dependencies on the different flavors of
+UNIX:
+
+ #include <stdio.h>
+ 
+ #ifdef unix
+ #include <features.h>
+ #include <nl_types.h>
+ #else /* assume DOS */
+ #include "catgets.h"
+ #endif
+ 
+ int
+ main (void)
+ {
+   nl_catd cat;
+   char *s;
+ 
+   cat = catopen ("hello", 0);
+ 
+   s = catgets (cat, 1, 1, "Hello world");
+   printf ("-->%s\n", s);
+ 
+   catclose (cat);
+   exit (0);
+ }
+
+Once that change is made, just compile the application under DOS, and
+link with the "Cats" library:
+
+ D:\src\hello>make -f makefile.bc
+ MAKE Version 5.2  Copyright (c) 1987, 2000 Borland
+         bcc -ID:\src\cats\include /c hello.c
+ Borland C++ 5.5 for Win32 Copyright (c) 1993, 2000 Borland
+ hello.c:
+ Warning W8065 hello.c 24: Call to function 'exit' with no prototype in function main
+ Warning W8070 hello.c 25: Function should return a value in function main
+         bcc -ID:\src\cats\include hello.obj D:\src\cats\lib\catdb.lib
+ Borland C++ 5.5 for Win32 Copyright (c) 1993, 2000 Borland
+ Turbo Incremental Link 5.00 Copyright (c) 1997, 2000 Borland
+
+Of course, to print any meaningful output, our program will need to
+have a message catalog.  The "Cats" library uses a very simple message
+catalog syntax.  Looking at one of the language catalog files
+(hello.pig) it now is only one line:
+
+ 1.1:Ellohay orldway
+
+Having set up your NLSPATH variable to point to the location of your
+"Cats" message catalogs, you may run the program under DOS> Here are
+the sample runs from "hello world" program.  Note the output should be
+identical to that under UNIX:
+
+ D:\src\hello>set lang=en
+ 
+ D:\src\hello>hello
+ -->Hello world
+ 
+ D:\src\hello>set lang=es
+ 
+ D:\src\hello>hello
+ -->Hola mundo
+ 
+ D:\src\hello>set lang=pig
+ 
+ D:\src\hello>hello
+ -->Ellohay orldway
+ 
+ D:\src\hello>set lang=de
+ 
+ D:\src\hello>hello
+ -->Hello world
+
+____________________________________________________________________
+PART THREE: APPLICATION BACK TO UNIX
+
+Of course, any good software port will remain compilable on the
+original platform.  I've copied the DOS port of "hello.c" back to my
+UNIX development box, and recompiled.  Note that the program compiles
+without warning or errors:
+
+ $ make
+ gcc -Wall   -c -o hello.o hello.c
+ gcc -Wall -o hello hello.o
+
+And the output is just the same as it was before:
+
+ $ LANG=en ./hello
+ -->Hello world
+ 
+ $ LANG=es ./hello
+ -->Hola mundo
+ 
+ $ LANG=pig ./hello
+ -->Ellohay orldway
+ 
+ $ LANG=de ./hello
+ -->Hello world

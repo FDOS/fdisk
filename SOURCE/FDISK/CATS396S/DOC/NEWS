@@ -1,0 +1,225 @@
+This is the NEWS (history) file for the Cats library:
+
+* 3.9.6
+  Small fixes by Martin Str=94mberg <ams@ludd.luth.se> to remove the
+  errors when building Cats.
+
+* 3.9.5
+  Applied a Makefile patch by Jonathan Helmus, to support Turbo C 2.01
+  and Turbo C++ 1.01.  Now building Cats with Turbo C is as easy as:
+  'make -fmakefile.tc all'!
+
+* 3.9.4
+  Applied two changes by Jeremy Davis, one is to correct a minor
+  bug that results in not all directories specified by the NLSPATH
+  environment variable being searched, the other is to add support for 
+  C escape sequences in the stored catalogs (normally catalogs are
+  stored as binary files and gencats performs the conversion, here 
+  catalogs are text files so catread does the necessary conversions).
+
+* 3.9.3
+  Applied a fix by Jeremy Davis in the fix_ext function in catgets.c.
+  The buffer is declared local and then returned, it should be static,
+  otherwise fix_ext is returning a pointer to memory it no longer owns.
+
+* 3.9.2
+  Applies the remainder of patch by Jeremy Davis to always include a
+  leading dot on the ext, even if the local implementation of fnmerge
+  does not.
+
+* 3.9
+  Applied part of a patch by Jeremy Davis to use fnmerge rather than
+  _makepath to create paths.  This also seems to provide a leading dot
+  in the extension if it is not there.
+
+* 3.8
+  Applied several fixes supplied by Jeremy Davis so that if the env.
+  variables %NLSPATH% or %LANG% are not set, catopen() returns failure
+  since it won't be able to locate the cat file.  This prevents Cats
+  causing abends when compiled with non-Borland C compilers.
+
+* 3.71
+  Jeremy Davis fixed my implementation of the C++ wrapper.
+   No other changes.
+
+* 3.7
+  Applied several suggestions by Jeremy Davis <PerditionC@attglobal.net>:
+   - in lib/catgets.c, changed all fnmerge() to _makepath() so that
+     Cats will compile on TC3 and VC5, so its usable under DOS & Win32.
+   - in lib/*.c and src/gencat.c, added the wrapper:
+#ifdef __cplusplus
+ extern "C" { }
+#endif
+
+* 3.6
+  This update to the Cats library fixes the -o option in the gencat.c
+  program.  So now we have a problem that more or less approximates
+  the UNIX "gencat" program, so UNIX developers who are porting
+  software to DOS will not need to do much to update their Makefiles.
+  Version 3.6 does not fix the recognized bug in Cats:
+
+    Cats only supports one catalog file open at a time. Therefore, you
+    might be tempted to open one file, do your work, close it, then open
+    another file. The problem is that Cats does not clear the contents of
+    the hash when you close a catalog. Therefore, if you loaded message
+    1.2 from the first catalog, but Cats couldn't load your second
+    catalog, and you try to grab message 1.2 from the second catalog
+    ... you get the 1.2 message from the first catalog. Does that make
+    sense? I'll try to put together a better description of the bug and
+    create a new release of Cats, but since no one has reported this bug,
+    I'm assuming most (all?) developers so far are only opening one
+    catalog in the run of the host program. So no one has probably seen
+    this bug come up.
+
+* 3.5
+  I have done some cleanup to the Cats library in this release.  Most
+  importantly, I have removed the deprecated functions, so db.c will
+  compile without warnings.  The following functions are deprecated:
+  db_init, db_free, db_compare.  Also, gencat.c now supports getopt.
+  This is still not perfect, as the -o option is not (yet) supported.
+  This will come in a later release.  There is also a new sample
+  program under the SRC directory, called INIT.C.  This demonstrates
+  how to use the db structure from Cats to support ini files.  Use the
+  ini file INIT.INI.
+
+* 3.4
+  The big change is lib/catgets.c now supports long lines!  Other
+  (mostly minor) changes since Cats 3.3: The sample programs should no
+  longer generate warnings when compiled using a Borland compiler.
+  Also, added a new sample program strings.c that shows how to read a
+  static file (\STRINGS.CAT) for the message catalog.
+
+* 3.3
+  This is a new release of "Cats", which happens to be released on the
+  same day as 3.2.  I have incorporated the "gencat" program into this
+  release, but I have not yet incorporated get_line() into the Cats
+  library.  I'll do that in the next release.  However, the "gencat"
+  program should help those users who are porting software from UNIX.
+  "gencat" is not entirely UNIX compliant yet on the command line
+  options, but I will start adding that compatibility very soon.  This
+  version of "gencat" is really a very slightly modified msg2cats.c
+
+* 3.2
+  Okay, I have taken a major step with this release, despite the fact
+  that the library itself has not changed.  I have stopped using my
+  local CVS repository to track changes in "Cats".  Hopefully, I
+  haven't just taken a nasty turn here - I clearly recognize the need
+  to use some kind of source control, but I don't think it is
+  necessary for a project this small.  "Cats" is not big, and it
+  really was getting to be a pain to wait until I was able to login to
+  my machine at home to check in my new changes before I could make a
+  new release.  So I hope the tradeoff here is that I can make more
+  frequent releases, which is definitely a big plus!
+
+  That said, the only changes in this 3.2 release are more
+  documentation.  I have taken a copy of the "cats-howto.txt" from the
+  Cats web site and placed it under the DOC directory.  That should
+  make using "Cats" more approachable to the new user.  I have also
+  created an example on using "Cats" in this release, which shows how
+  to use "Cats" to keep software portable between DOS and UNIX.
+
+* 3.1 (VER_3_1)
+  Yes, I've started a new way to track the version number of the Cats
+  library.  This also shows the CVS tag that I use, so that bit in
+  parens is actually for my benefit, not yours.  :)  I have made a big
+  change in how Cats seeks out catalog files.  Most importantly, Cats
+  now supports a semicolon-delimited NLSPATH environment variable.
+  This may not be the best implementation, but it seems to be tight
+  code.  I think the new method will meet with better approval than
+  the rather primitive method I used in earlier releases.  Cats uses
+  three rules to locate a message catalog file:
+
+   Rule #1: %NLSPATH%\%LANG%\cat
+   Rule #2: %NLSPATH%\cat.%LANG%
+   Rule #3: if LANG looks to be in format "en-uk" then %NLSPATH%\cat.EN
+
+  Note that in Rule #2, %LANG% might be more than three characters
+  long, but fnmerge will happily truncate that for me.
+
+* (3.00) Cats is now released under the terms of the GNU LGPL (Lesser
+  GPL, formerly the Library GPL.)  I did this because the Cats library
+  should be available to all FreeDOS programmers, not just those who
+  choose to release under the GNU GPL license.  (That said, I prefer
+  the GNU GPL for my programs, and I encourage you to use it also.)
+  IANAL, but my reading of the GNU LGPL means that any changes you
+  make to the Cats library will remain free under the GNU LGPL or GPL,
+  yet any program not under the GNU GPL will be able to link with
+  Cats.  Yes, even static linking is permitted with the GNU LGPL!
+  Programmers will want to pay strict attention to section 3 of the
+  GNU LGPL.  However, I don't think this will be a problem for any
+  programmer who releases code under a free and "open source"
+  license.  This may be an issue for proprietary, "closed source"
+  programs, but I guess I don't care too much about them!
+
+* (2.02) I didn't remove db_init() and db_free() from lib/catgets.c.
+  This fixes that error.  Note that this is just more clean-up, and
+  does not change the functionality at all, because I included the
+  compatibility functions.  Looks like even I can benefit from my own
+  helpfulness!
+
+* (2.01) Oops.  I didn't build this before I made a release.  This is
+  a fix to lib/catgets.c so it will build properly, and to
+  src/makefile.bc so it will build the foo2.exe test program.
+
+* (2.0) Replaced the back-end db storage system with a hash.  This is
+  much more efficient.  Also, this makes it easier to code.  Note that
+  this will require some changes to any programs that were using the
+  underlying db storage system directly (you shouldn't have been doing
+  that, anyway.)  Specifically, these functions were deprecated:
+
+   db_init()    - sets the initial size of the db array
+   db_free()	- free the memory associated with the db array
+   db_compare() - no one should have been using this anyway!
+
+  If your program used these functions, you will be happy to know that
+  compatibility functions were put in that "fake" a successful return.
+  So you don't have to re-write your program right now, but you will
+  want to remove your dependencies on these very soon now.
+
+  Also, the db_insert() function has changed in release 2.0.  Instead
+  of returning an "int", it now returns "db_t *".
+
+* (1.8) Added a hack to make a compromise between those who want to
+  use 2-letter language codes, such as LANG=en, and those who want to
+  use the long country codes, such as LANG=en-UK. If a 2-letter code,
+  then Cats keeps it.  If longer than that, and it is of the form
+  "xx-YY" then I chop it off at the "-". Else, I just truncate to 3
+  characters to make a file ext.  This bit should work fine.  (Also
+  renamed NLS\CATS.X to NLS\CATS.XX, so I could do better testing.)
+
+* (1.7) fixed the bug in the BUGGY_CODE.  It now seems to work the
+  way it is intended.  Removed the UNIX Makefiles, since this has
+  been DOS-only for a while now.
+
+* (1.6) added code that defines the catalog file in terms of NLSPATH
+  and LANG as %NLSPATH%\%LANG%\cat (was %NLSPATH%\cat.%LANG%).  I have
+  not tested this new code, so I protected it in a '#ifdef BUGGY_CODE'
+  block.  To test it yourself, do a '-DBUGGY_CODE' when you compile.
+
+* (1.5) updated catgets.c so that any message catalog string that has
+  '#' as the *first* character on the line is ignored (a comment.)  I
+  didn't test-compile this, but it should work out okay.
+
+* (1.4) implemented MCLoadBySet and MCLoadAll as symbolic constants in
+  catgets.h, so that now your UNIX programs that use these constants
+  will work without changes.
+
+* (1.3) catopen() now opens a file if 'name' contains a directory
+  separator ('\' for DOS) and opens a system-wide catalog file
+  otherwise. Currently, catopen() will assume 'name' is the base name
+  of a message catalog file, and uses NLSPATH and LANG to open the
+  correct file. Most programs would probably open a catalog called
+  "myprog" and there would be a corresponding "myprog.en" available for
+  English and "myprog.de" for German.
+
+* (1.2) now uses NLSPATH as a directory that contains the message
+  catalog files, and LANG as the country abbreviation.  catopen() now
+  looks for the message catalog as %NLSPATH%\name.%LANG%
+
+* (1.1) first release that compiles cleanly on DOS systems.  Renamed
+  my dcatgets() to catgets(), etc., so that I now provide a UNIX-like
+  catgets() library for DOS.
+
+* (1.0) first release: a simple in-memory key-value database.  It is
+  only capable of inserting values and fetching them.  You are not
+  able to delete entries once they are there.

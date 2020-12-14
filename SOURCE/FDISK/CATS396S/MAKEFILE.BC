@@ -1,0 +1,29 @@
+# this is a Makefile for Borland C
+
+all: gencat
+
+gencat: libs
+	cd src
+	$(MAKE) -fmakefile.bc all
+	cd ..
+
+libs:
+	cd lib
+	$(MAKE) -fmakefile.bc all
+	cd ..
+
+test: libs
+	cd src
+	$(MAKE) -fmakefile.bc $@
+	cd ..
+
+
+# clean up:
+
+clean realclean distclean:
+	cd lib
+	$(MAKE) -fmakefile.bc $@
+	cd ..
+	cd src
+	$(MAKE) -fmakefile.bc $@
+	cd ..

@@ -1,0 +1,56 @@
+FILELIST.TXT
+
+File Listing:
+
+This text file is a list of files and their descriptions that should be in
+this zip file.
+
+filename:        description:
+
+bloader.txt      Information on the bootloader that is used.
+boot.asm         The source assemble code for the bootloader.
+bootcode.h       A header file for that contains the bootcode.
+bugs.txt         Listing of known bugs in the program.
+cmd.c            Source code for command-line options processing functions.
+cmd.h            The header file for cmd.c.
+contrib.txt      Listing of people who have contributed to this program.
+faq.txt          Answers to frequently asked questions.
+fdisk.exe        The Free FDISK executable.
+fdisk.ini        The optional initialization file for Free FDISK.  If this
+                 file is not present then the program will use it's default
+                 settings.  For more information, please view/modify
+                 fdisk.ini with a text editor.
+fdiskpt.ini      The partition type lookup table for fdisk.exe.  This file
+                 can optionally be included in the same directory as
+                 fdisk.exe to give the program the capability to display
+                 what type of non-dos partition in on the hard disk(s).
+                 This file can be modified with a text editor.
+fdisk.lsm        Brief program description.
+fdisk.prj        The project file for the source code.
+fdiskio.c        Free FDISK specific disk input/output functions.
+fdiskio.h        Header file for fdiskio.c
+filelist.txt     This file.
+help.txt         Brief instructions explaining operation of this program.  
+                 Most of the information in the help.txt file can be
+                 displayed by entering fdisk /?.
+helpscr.c        Help screen function.
+helpscr.h        Header file for helpscr.c.
+install.txt      Brief instructions on compiling the program.
+kbdinput.c       Keyboard input handler code.
+kbdinput.h       Header file for kbdinput.c.
+license.txt      Information pertaining to the program's license.
+main.c           The main section of source code for Free FDISK.
+main.h           The header file for main.c.
+makefile         The makefile for command-line compling of Free FDISK.
+news.txt         The file containing the history of this program.
+pcompute.c       Partition calculation functions.
+pcompute.h       Header file for pcompute.c.
+pdiskio.c        Physical disk access module.  This module can be easilly modified
+                 for use in other programs.
+pdiskio.h        Header file for pdiskio.h.
+readme.txt       Misc. information regarding this program.  Please read this
+                 file.
+userint1.c       First user-interface module.
+userint1.h       Header file for userint1.c.
+userint2.c       Second user-interface module.
+userint2.h       Header file for userint2.c.

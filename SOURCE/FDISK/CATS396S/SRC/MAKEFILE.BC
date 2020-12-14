@@ -1,0 +1,58 @@
+# This is a Makefile for Borland C/C++ 3.1
+# by Jim Hall <jhall@freedos.org>
+
+# Set the memory model (must match LIB\MAKEFILE.BC)
+
+MEMMODEL=l
+
+# Compiler macros:
+
+CC=bcc
+CFLAGS=-I..\include -DNDEBUG -m$(MEMMODEL)
+LDFLAGS=
+LDLIBS=..\lib\catdb.lib
+LINT=lint
+RM=del
+
+# File macros:
+
+TESTS=cats.exe cats2.exe strings.exe init.exe
+
+
+# Build targets:
+
+all: gencat.exe
+
+gencat.exe: gencat.obj getopt.obj index.obj
+	$(CC) $(CFLAGS) $(LDFLAGS) gencat.obj getopt.obj index.obj $(LDLIBS)
+
+test: $(TESTS)
+
+cats.exe: cats.obj
+	$(CC) $(CFLAGS) $(LDFLAGS) cats.obj $(LDLIBS)
+
+cats2.exe: cats2.obj
+	$(CC) $(CFLAGS) $(LDFLAGS) cats2.obj $(LDLIBS)
+
+strings.exe: strings.obj
+	$(CC) $(CFLAGS) $(LDFLAGS) strings.obj $(LDLIBS)
+
+init.exe: init.obj
+	$(CC) $(CFLAGS) $(LDFLAGS) init.obj $(LDLIBS)
+
+
+# lint
+
+lint:
+	$(LINT) $(CFLAGS) $(SOURCES)
+
+
+# clean up
+
+clean realclean:
+	-$(RM) *.map
+	-$(RM) *.tds
+	-$(RM) *.obj
+
+distclean: realclean
+	-$(RM) *.exe

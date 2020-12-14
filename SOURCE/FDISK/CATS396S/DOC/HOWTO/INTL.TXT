@@ -1,0 +1,515 @@
+		   International Support mini-HOWTO
+
+			  2.2.3 - 2002-0407
+		      Jim Hall, <jhall@freedos.org>
+
+_____________________________________________________________________
+0. ABOUT INTERNATIONAL SUPPORT
+
+Most programmers never think about their programs being used by users
+in other countries, or that the program would be unusable by someone
+who does not speak English.  By the true nature of hackers, programs
+are first written to fill a personal need.  To extend a program to
+support multiple languages is something that many programmers never
+consider.
+
+However, adding international support to your program makes it more
+useful.  Now, your program becomes accessible to more people than just
+those who speak your native tongue.
+
+But how to add international support to your programs?  This mini-
+HOWTO intends to show you what you need to do to add international
+support (also called "internationalization" or i18n) easily to your
+projects.
+
+Internationalization (for the end-user) is provided in traditional DOS
+systems in two ways:
+
+1. Keyboard support (KEYB or XKEYB) to add keyboard definitions for
+   international keyboards.
+
+2. Code page support (CHCP) to change to a code page that specifically
+   supports your language characters, if the default code page does not.
+
+These two methods are not enough for most applications.  A third
+method was defined by ANSI C and POSIX to assist application
+developers write programs that support internationalization:
+
+3. setlocale() to set the locale for your programs.  This affects
+   things like printf() and strcoll()
+
+But this does not help your program produce messages in a language
+that an international user can understand.  To do that, you need a
+fourth method:
+
+4. message catalogs
+
+There are several ways to do this (MSGLIB and "Cats" are only two of
+them.)  The "Cats" interface is documented here.
+
+_____________________________________________________________________
+1. KEYBOARD
+
+(content needed)
+
+_____________________________________________________________________
+2. CODE PAGE
+
+(content needed)
+
+_____________________________________________________________________
+3. LOCALE
+
+A locale is a set of language and cultural rules.  These cover aspects
+such as language for messages, different character sets, lexigraphic
+conventions, numerical formatting, etc.  A program needs to be able to
+determine its locale and act accordingly to be portable to different
+cultures.
+
+Locale is defined by ANSI C and POSIX, and is not implemented by
+"Cats".  This information is provided only for completeness.
+
+The locale consists of two basic interfaces:
+
+  setlocale() to set your program's idea of its locale
+
+  localeconv() get information about number formatting
+
+The function setlocale() has the following usage:
+
+  char *
+  setlocale (int category, char *locale);
+
+setlocale() sets the locale category to the new locale, and returns
+the value of the previous locale.
+
+There are different categories for local information a program might
+need (declared as macros.)  Using them as the "category" argument to
+the setlocale() function, it is possible to set one of these to the
+desired locale:
+
+  LC_ALL for all of the locale.
+  
+  LC_COLLATE for the functions strcoll() and strxfrm().
+  
+  LC_CTYPE for the character classification and conversion routines.
+  
+  LC_MONETARY for localeconv().
+  
+  LC_NUMERIC for the decimal character.
+  
+  LC_TIME for strftime().  NULL if the request cannot not be honored.
+  This string may be allocated in static storage.
+
+If the "locale" argument to setlocale() is null, the default locale is
+(on many systems) determined using the following rules:
+
+1.  The environment variable LC_ALL, if available
+
+2.  If an environment variable with the same name as one of the
+    categories above exists, its value is used for that category.
+
+3.  The environment variable LANG, if available
+
+Be aware that Borland C 3.1 (DOS) only supports the "C" locale, so
+invoking setlocale() will have no effect.  Other compilers may or may
+not support multiple locales, or may "fake it" like BC31 does.  Check
+your compiler's documentation.
+
+Now, let's use setlocale() in a program.  In this example, we have a
+program that needs to print the value "1.5" to the user.  In the
+English locale, you use a decimal point (".") to separate the integer
+from the fractional part of the number.  In another locale (say,
+Spanish) you use a comma (",") as the separator.  Making a call to
+setlocale() makes this transparent to the program:
+
+  /* lc.c */
+
+  #include <stdio.h>
+  #include <locale.h>                     /* setlocale */
+  
+  int
+  main (void)
+  {
+    float x;
+    x = 1.5;
+  
+    setlocale (LC_NUMERIC, "");
+    printf ("%5.2f\n", x);
+  
+    exit (0);
+  }
+
+On a system that fully supports setlocale(), the output might look
+like this:
+
+  C:\>lc
+   1.50
+  
+-or-
+
+  C:\>SET LANG=es
+  C:\>lc
+   1,50
+
+A program may be made portable to all locales by calling
+setlocale(LC_ALL, "" ) after program initialization.
+
+_____________________________________________________________________
+4. MESSAGE CATALOGS
+
+A long time ago, I had written an implementation of UNIX catgets()
+based on an in-memory key-value database.  This library is called
+"Cats" (message CATalog System), a DOS implementation of catgets().
+"Cats" is available at http://www.freedos.org/jhall/cats/
+
+For those who don't know about the UNIX catgets() function, you just
+use it to return a pointer to a localized string based on a message
+number.  All your program's messages are stored in a file, with
+message numbers and set numbers.  "Hello world" might be message 1 in
+set 1.  Your copyright statement might be message 2 in set 1.
+"Failure writing to drive A:" might be message 4 in set 7.
+
+Before you use catgets() you must first open a message catalog file.
+You do this with the catopen() function:
+
+  nl_catd
+  catopen (char *catalog_file, int flags);
+
+"Cats" assumes environment variables to point to the location of the
+message catalogs, so that "Cats" uses the environment variables when
+you call catopen().  If the "catalog_file" parameter does not contain
+a directory separator ("\"), then NLSPATH is the directory in which
+you keep your message catalogs, and LANG is the country code
+abbreviation.  This is similar to the UNIX implemenation.
+
+The "flags" parameter is ignored in this implementation of "Cats".
+The "flag" argument is used (on UNIX systems) to indicate the type of
+loading desired. This should be either MCLoadBySet or MCLoadAll, and
+control if only the required set from the catalog is loaded into
+memory on an as-needed basis or if catopen() should load the entire
+catalog into memory.
+
+catopen() returns a message catalog descriptor of type nl_catd on
+success.  On failure, it returns -1.  "Cats" can only have one message
+catalog open at a time.
+
+Once you have a message catalog available, you use catgets() like
+this:
+
+  char *
+  catgets (nl_catd catalog, int msg_set, int msg_num,
+	   char *default);
+
+That is, you tell catgets() to retrieve a message for you from the
+message catalog based on a set number and message number.  catgets()
+returns a pointer to that string.  If catgets can't find the
+set/message, it returns the default string that you passed it.
+
+The best way to learn how to use "Cats" is to download the library,
+and look at the sample programs in src/
+
+Here's a sample C program to show you how to use it:
+
+  /* fail.c */
+
+  #include <stdio.h>
+  #include "catgets.h"			/* catopen/catgets */
+
+  int
+  main (void)
+  {
+    char *s;
+    nl_catd cat;			/* catalog descriptor */
+  
+    cat = catopen ("fail", MCLoadAll);  /* MCLoadAll is ignored */
+  
+    s = catgets (cat, 7, 4, "Failure writing to drive A:");
+    printf ("%s\n");
+  
+    catclose (cat);
+    exit (0);
+  }
+
+The above sample program would have this execution:
+
+  C:\>fail
+  Failure writing to drive A:
+
+-or-
+
+  C:\>SET LANG=es
+  C:\>fail
+  Incidente que escribe a A:
+
+My message catalogs are simple ascii, and look like this:
+
+(File=FAIL.EN)
+
+  1.1:Hello world
+  7.4:Failure writing to drive A:
+
+-or-
+
+(File=FAIL.ES)
+
+  1.1:Hola mundo
+  7.4:Incidente que escribe a A:
+
+Since message catalogs are plain ascii files, it will be easy for a
+user to take one "catalog" and create a translation that can
+*immediately* be used by another user (i.e. you don't need to
+"re-compile" the message catalog before you use it.)
+
+
+*********************************************************************
+			      APPENDICES
+*********************************************************************
+
+_____________________________________________________________________
+A. OTHER SOURCES OF INFORMATION: MSGLIB
+
+Steffen also has a version of MSGLIB that does much the same thing as
+"Cats", but uses binary ("compiled") message catalogs.  Steffen Kaiser
+writes this about MSGLIB:
+
+  This is an offspring of the internationalization debate back in 1994
+  or 1995.
+  
+  The current release to be used is located at:
+  ftp://ftp-fd.inf.fh-rhein-sieg.de/pub/local/ALPHA/msglib.zip
+  
+  A non-Alpha release is at:
+  ftp://ftp-fd.inf.fh-rhein-sieg.de/pub/local/msglib31.zip
+  
+  It does support locally stored message strings only (see below for
+  details).
+  
+  MSGLIB is desgined to overcome three problems:
+  
+  1.  where to retrieve the message strings from (msg retriever),
+  
+  2.  to tweak the message string that the function to display a string
+      looks the same regardless what language is choosen (msg
+      interpreter),
+  
+  3.  to attach a semantic when display a message (msg visualisor).
+  
+  Parts 1 and 2 can be independed on each other; part 3 joins both
+  together.  That means one could use the msg retriever stand-alone.
+  
+  The msg retriever currently supports two methods, a third is currently
+  started, but postponed.
+  
+  Method #1 stores all msg strings statically in the program code. This
+  was the easiest method to implement.
+  
+  Method #2 reads the msg strings from a file, what can be a stand-alone
+  file, attached to the executable, even embedded into any data
+  file. The "recommended" way (that means the way shown in exmples makes
+  no use of the latter ability).
+  
+  Method #3 joins methods #1 and #2 together and tries to read a
+  requested msg string from a file, on failure use an internally stored
+  one -- this would be the same as the HP-style "catgets()".
+  
+  Currently MSGLIB does support the catgets() function already.
+  
+  But I never thought that to address a msg string by a number a good
+  thing.  Instead the user of MSGLIB assigns a symbol to the message,
+  like "E_noMem" or "M_red". Regardless what method of the msg rertiever
+  is in use, the statement:
+  
+    char *p;
+    
+    p = msgLock(E_noMem);
+  
+  makes sure that 'p' is pointing to the msg string stored in memory. To
+  free resources one just calls:
+  
+    msgUnlock(E_noMem);
+  
+  -or-
+  
+    msgUnlockString(p);
+  
+  Method #2 of the msg retriever also supports that two or more
+  languages are packed together into the same binary msg catalogue. When
+  the msg retriever scans the msg catalogue the first time, it
+  identifies the most fitting language. Because of lack of other source,
+  I'll choosed the country ID as my language ID, however, a language ID
+  is just a number and the only thing to change is the function that
+  creates this number from the system resources.
+  
+  One thing not mentioned so far is that msg strings are viewable with
+  certain codepages only. So besides the language ID MSGLIB associates a
+  codepage ID with each msg string, which must match strickly. (Not
+  included with any released version, yet.)
+  
+  The msg catalogues themselves have been designed to be useable for
+  other stuff as well, just like the resource block in S Windows. The
+  msg catalogue consists of a series of individual chunks, which are
+  linked together so that one program need not know the internal format
+  of each chunk, but can concentrate to pick the ones necessary for
+  itself.
+  
+  The basic idea was to split msg strings into two categories: local and
+  global.
+  
+  So often used msg strings are declared as "global" and are
+  automatically available to all programs using MSGLIB without to write
+  them down into the local msg catalogue. So the programmer can
+  concentrate on just the program.
+  
+  The other three parts of MSGLIB are described in the included
+  documentation (Postscript file). Within this doc there is a list of
+  all functions and a very short description of them. (I really can't
+  remember why the msg retriever is not described there?)
+  
+  I haven't received much response about MSGLIB, yet, so don't feel
+  guilty if you don't like MSGLIB; however, it would be a pity if the
+  missing/bad documentation or a "can't get this stuff to work" notion
+  prevent an examination or critic.
+  
+  Why is MSGLIB currently postponed?  I was struck by the problem that
+  the command line passed to the message compiler became too short, in
+  fact the last time I shortend the filenames to bare minimum to keep
+  the compiler working. So I decided to make a command line and
+  configuration file parser that takes away this ever-annoying problem
+  from me. It is currently found in the pre-release of SUPPL (all that
+  cfg*.c files); though it stagnates a bit, too, because I'm currently
+  making all the missing docs besides comments in the source code for
+  SUPPL (er, a thing most programmers really hate I've learnt in the
+  past).
+
+Examples of programs using MSGLIB31 are SWSUBST and ASSIGN.
+
+_____________________________________________________________________
+B. LANGUAGE/COUNTRY CODES
+
+Steffen Kaiser writes this about language/country codes:
+
+  Defined in the context of internet/WWW/HTML are:
+  
+  * ISO-639 defines 2-letter codes for languages, though, there are not
+    many.  These codes are also used by the locale implementation of
+    most traditional Unix systems.
+    (http://jargo.itim.mi.cnr.it/documentazione/iso639_codes.html)
+  
+  * ISO-3166 describes country codes, 2-letter, 3-letter and numerical
+    format.
+    (http://jargo.itim.mi.cnr.it/documentazione/iso3166_codes.html)
+  
+  * For bibliographic purpose, a 3-letter code has been invented, I came
+    across these ones a while back, but cannot remember where; I guess
+    it was in the description of the computer index of some large
+    library. But I found this ones: http://www.sil.org/ethnologue/names/
+  
+    This index is sort of reversed, you need to know the correct and
+    full name of the language and this index maps it to a 3-letter code;
+    yeah, interessting how many officially registered different variants
+    of "German" exist.
+  
+  The bibliographic codes are invented to be complete and even differ
+  among (wider known) dialects of a language.
+  
+  There exists two "officially" used ways to express a language, one
+  derives the code from the English word fo this language (what can be
+  expressed with 7-bit ASCII symbols then) and one derived from the word
+  used by language itself and then transcripted into Latin characters on
+  order to be expressable with 7-bit ASCII.
+
+The "Cats" library doesn't really assume anything about the language
+code, except that it must be three or fewer letters.  (In short, this
+is because the message catalog is located by using the NLSPATH and
+LANG environment variables.  The LANG environment variable defines the
+language code, which is implemented as the file extension for the
+message catalog.)
+
+_____________________________________________________________________
+FURTHER READING:
+
+Useful Links regarding software internationalization 
+
+- http://dmoz.org/Computers/Software/Globalization/Internationalization/
+  - The Open Directory Project (at the dmoz site), whose goal is to
+  produce the most comprehensive directory of the web, by relying on a
+  vast army of volunteer editors.
+
+- http://www.lib.ox.ac.uk/internet/news/faq/by_category.internationalization.html
+  - Oxford's I18n FAQ
+
+- http://www.unicode.org/ - UNICODE
+
+- http://www.w3.org/International/ - World Wide Web consortium:
+  Non-western Character sets, Languages, and Writing Systems
+
+- http://anubis.dkuug.dk/maits/i18n - Standards for
+  Internationalization
+
+- http://www.microsoft.com/globaldev - Microsoft's Software
+  Globalization Information
+
+- http://www.microsoft.com/win32dev/uiguide/uigui445.htm - Microsoft's
+  I18n Guidelines
+
+- http://gatekeeper.dec.com/pub/DEC/DECinfo/DTJ/v5n3/THE_XOPEN_INTERNATIONALIZATIO_01jan1994DTJB03SC.txt
+  - THE X/OPEN INTERNATIONALIZATION MODEL
+
+- http://cns-web.bu.edu/pub/djohnson/web_files/i18n/i18n.html -
+  Concepts of C/UNIX Internationalization (paper by Dave Johnson, Boston
+  University)
+
+- http://java.sun.com:80/products/jdk/1.1/docs/guide/intl/index.html -
+  Java I18n info from Sun
+
+- http://www.ibm.com/java/education/globalapps/ - IBM's Java Global
+  Application Guide
+
+- http://www.ibm.com/java/education/international-text/index.html -
+  More from IBM on internationalized text in Java 1.2
+
+- http://www.digital.com/info/DTJB00/ - Digital Equipment technical
+  paper on I18n (Feb. 1994)
+
+- http://www.cis.ohio-state.edu/hypertext/faq/usenet/internationalization/iso-8859-1-charset/faq.html
+  - ISO 8859-1 National Character Set FAQ
+
+- http://www.stri.is/TC304/EURO/default.html - Information and
+  Communication Technologies European Localization Requirements
+
+- http://www.gnu.org/manual/glibc-2.0.6/html_chapter/libc_19.html -
+  GNU manual on setting the locale
+
+- http://www.gnu.org/manual/gettext-0.10.35/text/gettext.txt and
+  http://www.gnu.org/manual/gettext/html_node/gettext_44.html - GNU
+  manual about 'gettext' (GNU's library for retrieving localized
+  strings from a message catalog.)  Lots of info about
+  internationalication and localization (including a discussion of
+  what the two mean).
+
+- http://www.cs.ruu.nl/wais/html/na-dir/internationalization/programming-faq.html
+  - Introduction to i18n programming.  A MUST-READ!
+
+- http://www.leb.net/archives/reader/csi/0039.html - Programming for
+  Internationalization FAQ
+
+- http://www.iso.ch/cate/cat.html - ISO Standards 
+
+- http://www.czyborra.com/ - Unicode on Unix 
+
+- http://www.hut.fi/u/jkorpela/chars.html - A tutorial on character
+  code issues
+
+- http://www.w3.org/MarkUp/html-spec/charset-harmful.html - Character
+  sets considered harmful
+
+- http://www.iro.umontreal.ca/~pinard/recode/ - GNU recode 
+
+_____________________________________________________________________
+HISTORY
+
+Version 1.0 was the FreeDOS International Support Mini-HOWTO, but I
+have changed this document to be more specific to the "Cats" library.
+I will include the other information at the end as a "Other Sources of
+Information."

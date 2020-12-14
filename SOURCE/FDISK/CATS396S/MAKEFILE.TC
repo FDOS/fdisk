@@ -1,0 +1,38 @@
+# this is a Makefile for Tubro C 2.01/C++ 1.01
+
+all: gencat
+
+gencat: libs
+   cd src
+   make -fmakefile.tc all
+   cd ..
+
+libs:
+   cd lib
+   make -fmakefile.tc all
+   cd ..
+
+test: libs
+   cd src
+   make -fmakefile.tc test
+   cd ..
+
+
+# clean up:
+
+clean:
+   cd lib
+   make -fmakefile.tc clean
+   cd ..
+   cd src
+   make -fmakefile.tc clean
+   cd ..
+
+clobber:
+
+   cd lib
+   make -fmakefile.tc clobber
+   cd ..
+   cd src
+   make -fmakefile.tc clobber
+   cd ..

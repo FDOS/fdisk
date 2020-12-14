@@ -1,0 +1,1134 @@
+HISTORY.TXT
+
+History prior to Version 1.0:
+-----------------------------------------------------------------------------
+Version 1.0     Added the ALLOW_4GB_FAT16 statement to the fdisk.ini file.
+Release         Setting this to TRUE allows 4GB FAT16 partitions to be
+Candidate 2     created.
+9/21/2001
+                Changed the FD VERSION to default to W95.  This brings Free
+                FDISK up to date with the latest FreeDOS kernel without FAT32.
+
+                Added 77-79 as QNX partition types. 
+
+                Renamed the part.ini file to fdiskpt.ini.
+
+                Added an /XO command line option, to allow you to
+                run the Interactive User Interface with extended options
+                without having to modify the environment or the fdisk.ini
+                file.
+
+                Added an /MONO command line option that allows the user to
+                run Free FDISK in monochrome mode without having to modify
+                the environment or the fdisk.ini file.
+
+                Modified the command line support such that multiple switches
+                can be used before the Interactive User Interface is started.
+
+                Added the /XO and /MONO options to the online help screens.               
+
+                Changed the disk drive letter determination code such that
+                the first active partition is assigned as C: drive.
+
+                Changed the code that determines the hard disk parameters
+                such that it first determines the number of hard drives
+                available and only scans up to that number.  If an error
+                is encountered, it will stop scanning hard disks.  This
+                should fix a problem that has been reported where some
+                BIOS's do not always report an error if a hard drive doesn't
+                exist.
+
+                Added a /CLEARALL command line option that replaces the
+                /CLEAR option.  The /CLEARALL option clears the entire
+                MBR/Partition Table sector.
+
+                The /CLEAR option now only removes the partition tables.  It
+                leaves the MBR intact.
+
+                Changed the online help to reflect the changes to /CLEAR and
+                addition of /CLEARALL
+
+                Fixed some bugs in the command-line processing system.
+
+                The /MODIFY command-line command will now modify partitions
+                in the extended partition table...it should have done this
+                before; but, it didn't.
+
+                The hidden partitions, with the hide/unhide functions are
+                now located starting at an offset of 0x10.
+
+                Removed the FDISK hidden partition types from the fdiskpt.ini
+                file.
+
+                The list partition types screen now displays "Press Any Key
+                to continue" in order to continue listing partition types.
+
+                The "/?" command-line function, without the /nopause switch,
+                no longer accesses the hard drives.
+
+Version 1.0 	Fixed several "one-off" type bugs that resulted in partition
+Release		table errors.
+Candidate 1
+2/12/2001       Fixed a problem that resulted in a "syntax error" message
+		being displayed when the drive number is entered on the
+		command line.
+
+                Empty partition table slots no longer have values in the 
+                head and sector fields, on LBA drives.
+
+                Fixed the sizing problem for FAT12 partitions.
+
+	        Add documentation for the /MOVE and /SWAP commands to the
+		help screens.
+
+                Fixed the bug that sometimes causes a divide by 0 error, when 
+                attempting to delete a non-dos partition, in the extended
+                partition table.
+
+                Minor bug fixes.
+
+                Debugging code and functions can now be excluded, when 
+                compiling Free FDISK.  See the main.h file, for details.
+                This release has been compiled without debugging code.
+
+Version 0.99B   Added the /MOVE:<source_partition#>,<dest_partition#>
+11/6/2000       command.  This command moves the partition information from
+		one slot to another, in the primary partition table.
+
+                Added the /SWAP:<partition#>,<partition#> command.  This
+		command exchanges the partition information between 2 slots,
+		in the primary partition table.
+
+                Fixed a bug that prevented the last command, in the command
+		line, from being processed under some circumstances.
+
+                Removed the Calculate_Partition_Ending_Cylinder() function.  
+                Partitions are now created by the number of cylinders in
+		order to simplify calculations.
+
+                Added a function to compute the number of cylinders in a
+		given space.  (long Number_Of_Cylinders(unsigned long size);  )
+
+                Tweaked the Determine_Free_Space() function in order to fine 
+                tune the computed space available in the primary partition
+                table.  
+
+                The bug that caused tiny, 1 cylinder long, free spaces on the
+                hard disk has been fixed as a result of the above 2 changes.
+
+                Some clean-up of the source code.
+
+                Simplified the pdiskio.c library so that it is easier to add
+                to other programs.
+
+                Minor user interface changes.
+
+Version 0.99A   Fixed a bug that returned a syntax error when trying to 
+8/25/2000       delete partitions from the command line, under some 
+                circumstances.
+
+                Fixed a bug which allowed only FAT16 partitions to be 
+                displayed in the extended partition, while using the /INFO
+                command.
+
+                Now properly displays values for hard drives over 64GB in 
+                size.
+
+                Changed source files to .C extensions.
+
+                Cleaned up source code.
+
+                With the exception of pdiskio.c, the source code has been
+                broken up into sections less than 64kb in size.
+
+                Modified the makefile, sent to me by Jim Hall, to work with
+                my compiler and the changes I make made to the source code
+                modules.  If you have Borland Turbo C++ 3.0, you can now
+                compile Free FDISK my typing "make all" from the command
+                line.
+
+                Changed the default for SET_ANY_ACT to TRUE. 
+
+Version 0.99    Fixed a minor bug that computed the size of an LBA accessed
+7/18/2000       hard disk to be slightly larger than what it actually is.
+
+                If drive C: is located in the extended partition table it is
+                now possible to delete it.
+
+                Changed the default VERSION to W98.
+
+                Minor changes to the information flags displayed at the top
+                of the screen when XO=ON.
+
+                Added an information flag (when XO=ON) to indicate whether
+                the partition lookup table is internal or external.
+
+                Added an EIPTLT option to the fdisk.ini file to allow a user
+                to select whether or not the Enhanced Internal Partition
+                Type Lookup Table is desired.  The Enhanced Internal
+                Partition Lookup Table will be added for the next release
+                of Free FDISK.
+
+Version 0.99    Removed the automatic version checking code including the 
+Release         AUTO_VER and the VERSION_CHK statements in the fdisk.ini
+Candidate 1     file.
+6/27/2000
+                Modified the Get_Hard_Drive_Parameters() function to correct
+                the bug that caused Free FDISK to obtain incorrect hard
+                disk geometry information on some PC's.
+
+                Added the capability to set the FLAG_SECTOR value, in the
+                fdisk.ini file, to 0 to disable the sector flagging feature.
+
+                If the FLAG_SECTOR value, in the fdisk.ini file, is set to 
+                256 then the last sector in the first cylinder will be used 
+                as the flag sector.
+
+                Fixed a bug that caused the program to enter an infinite
+                loop while reading the environment.
+
+Version 0.98    Re-added all the command line functions listed in the help.txt
+Final Release   file.
+4/18/2000
+                Added the capability to process multiple command line arguments
+                with the limit of 20 switches and the drive number on a command
+                line.  
+                  i.e.  "fdisk 2 /clear /pri:20 /spec:18 /pri:100 /ext:100,100
+                        /log:20 /log:20 /log:50,100 /log:100,100"  Works with
+                        drive 2, clears the partition table, creates a 20MB
+                        diagnostic partition, creates a 100MB FAT partition, 
+                        creates an extended partition that uses up the rest of the
+                        available space, creates 2 20MB logical drives, creates a
+                        logical drive that uses 50% of the available space left in
+                        the extended partition, and creates a logical drive that
+                        uses up the rest of the space in the extended partition.
+                  Note:  Only one drive can be modified per command line. 
+                        
+                Added the "D_CMD_ARG" debugging function to the fdisk.ini to
+                help debug the command line functions. 
+
+                Updated the help screens.
+
+                If the command-line functions are used, the drive number no
+                longer has to be the second argument on the command line.  The
+                drive number (if used) can now be anywhere on the line.  If no
+                drive number is entered, Free FDISK defaults to the first hard
+                disk.
+
+                Removed the remains of the old command line parsing code.
+
+                Modified the flag functions such that each flag has 64 different
+                possible values.  The error levels returned by /testflag has
+                also changed as follows:
+                  20             Flag is not set to tested value
+                  21             Flag is set to tested value
+                  30-94          Flag value + 30.
+                The syntax of used for the /testflag function determines whether
+                a "true or false" (error levels 21 and 20) type response or an
+                actual flag value (error levels 30-94) is returned. 
+
+                Fixed a bug that requires that the delete key needs pressed
+                before "M" is pressed, at the main menu, if "A" has been 
+                previously pressed...and vice versa.  The was only a problem
+                when "XO" was enabled in the fdisk.ini file.
+
+                If LBA partitions are detected on the hard disk and the
+                VERSION emulation is not set to support the partition type(s)
+                detected, Free FDISK displays a screen asking if the user wants
+                the VERSION changed appropriately for this session.  If the
+                VERSION is not changed to support LBA, LBA partitions exist,
+                and a partition is created drive corruption may result.  
+
+                Added the AUTO_VER statement to the fdisk.ini file.  If AUTO_VER
+                is set to "ON", LBA partitions are found on a hard disk, and the
+                VERSION set does not support LBA, Free FDISK will automatically 
+                increase the VERSION to W95 to support LBA partition types.  If
+                AUTO_VER is set to "OFF", and the above conditions apply, the
+                user will be asked if Free FDISK can change the VERSION.
+
+                Added the VERSION_CHK statement to the fdisk.ini file.  If this
+                statement is set to "ON" then Free FDISK will check for LBA
+                partitions on the drive and (depending upon the setting for
+                AUTO_VER) attempt to determine whether the VERSION should be
+                changed to W95.  If the VERSION_CHK statement is set to "OFF"
+                then Free FDISK will use the VERSION set in the fdisk.ini file,
+                the VERSION set in the environment, or the default VERSION
+                setting.
+
+                Fixed a bug that, on some computers, displayed option 5 on the
+                main menu when there was only one hard disk.
+
+                Further modularized the source code to allow the easy re-use of
+                the interrupt 0x13 functions (including LBA support) and the 
+                partition table accessing functions.
+
+                Added a header file, for each code module, to simplify source
+                code maintenance.
+
+                Added the capability to force the total C/H/S values for a hard
+                disk by adding the values to the fdisk.ini file.  See the 
+                documentation in the fdisk.in file for details.
+
+                Minor changes to the interactive user interface.
+
+Version 0.98    Added code to pre-enter default values when creating  
+Pre 2           partitions.
+3/3/2000 
+                Now checks for the LANG= setting in the environment.  At this
+                time, the program does not make use of this setting.
+
+                Now displays the Free FDISK version number when VERSION=FD
+                in the fdisk.ini file.
+
+                Re-Wrote the command-line parsing routine.  Some commands still
+                have to be added.  Please see the help.txt file for details.
+                The descriptions of command-line options displayed when the
+                help screens are displayed are currently incorrect and will
+                be corrected in the final release of version 0.98.
+
+                Many command-line options have been changed--all command-line
+                options now have a uniform structure.
+
+                Fixed a bug that occasionally caused Free FDISK to terminate
+                stating that there is a problem with a line of the part.ini
+                file when no problem exists.  
+
+                "TRUE" and "FALSE" can be used in place of "ON" and "OFF"
+                in the fdisk.ini file or in the environment settings.
+
+                Re-added support for the D_LBA option in the fdisk.ini file.  This
+                option will assist in the debugging of problems that appear to be
+                related to interrupt 0x13 extension issues.
+
+                Added the capability to delete non-dos partitions in the
+                extended partition table.  This option has to be enabled in 
+                the fdisk.ini file by setting the DEL_ND_LOG option to 
+                TRUE.  It also is available if Free FDISK is used in the
+                extended options mode.
+ 
+                Added an optional option to abort Free FDISK without saving
+                changes if the user changes his or her mind.  This has to be
+                enabled in the fdisk.ini file.  It also appears if Free FDISK
+                is used in the extended options mode.
+
+                Fixed a bug that incorrectly read the volume label of FAT32 
+                partitions from the same location as FAT12/16 partitions.
+
+                Adjusted the user interface for the modification of 
+                partitions, when using "extended options," so that it is more 
+                user friendly.
+
+                Added all MBR handling functions to the interactive user
+                interface when XO is set to ON in the fdisk.ini file.
+
+                Created an option to list all possible partition ID codes
+                and descriptions while in the partition modification screen
+                when Free FDISK is in extended options mode.       
+
+                Changed the Clear_Screen() function to code written by
+                Ralf Quint.  
+
+                Changed the Determine_Color_Video_Support() function to code
+                written by Ralf Quint.
+
+                Added a COLOR statement to the fdisk.ini file.  This allows
+                users some capability to change the screen colors.
+
+                Minor bug fixes.
+
+                Added the SET_ANY_ACT statement to the fdisk.ini file.  This
+                setting overrides the partition type checking, that is
+                performed when the user tries to set a partition active, with
+                the result being that the user can make any primary partition
+                active.  The default for this option is FALSE.  If Free
+                FDISK is executed in extended options mode then this option 
+                defaults to TRUE.   
+
+                Fixed a bug that prevented some DOS partition types from
+                being set active.
+
+                Added the capability to modify the attributes of the logical
+                drives in the extended partition when using the "extended
+                options."
+
+                Added support for the /PRIO switch.  This command forces
+                Free FDISK to create FAT-16 partitions from the command 
+                prompt.  This switch only applies if the fdisk.ini file
+                has the VERSION set to W95B or W98.
+
+                Added support to scan the environment for configuration 
+                settings.  The configuration settings in the environment
+                are the same as those in the fdisk.ini file, except that 
+                "FFD_" is placed before the environment settings, and debugging
+                options are not supported.  
+                i.e.  SET FFD_VERSION=W95B
+                Note:  The configuration settings set in the environment
+                will override the settings in the fdisk.ini file. 
+
+                Removed all destructive partition resizing capability.
+
+Version 0.98    Fixed a bug that resulted in the partitions overlapping in 
+Pre 1           the primary partition table, by one cylinder, under certain
+1/15/2000       circumstances.
+                
+                Fixed an obscure bug in the Determine_Free_Space() function
+                that, in very rare cases, would result in overlapping
+                partitions when creating partitions.
+
+                3rd Re-write of the function that computes the ending 
+                cylinder of a partition when a partition is created.
+
+                Tested and works under MS-Windows 98 2nd Edition.
+
+                Added support for LBA partitions and hard drives > 8.2GB.
+                
+                Floating point emulation is now compiled in the code in 
+                order to utilize numbers up to 64 bits in size.
+
+                Increased some variable sizes so they can handle values
+                that are computed with larger capacity hard disks.
+
+                Non-DOS partitions are now displayed in the extended
+                partition table.
+
+                Now allows the user to enter partition sizes with up to 5
+                digits, when creating partitions or logical drives, if
+                VERSION is set equal to W95, W95B, or W98 in the fdisk.ini
+                file.
+
+                Added a D_Read_S option in the fdisk.ini file.  If this
+                option is set to "ON" the partition table area of the
+                sectors that are read will also be displayed to the screen.
+
+                Fixed many misc. minor bugs and made some minor user
+                interface changes.
+
+                Added a "FD" version that is set in the fdisk.ini file with
+                "VERSION=FD."  This version defaults to version 6 with the
+                exception that "FreeDOS" is displayed in place of
+                "Free FDISK."
+
+                Made adjustments of partition sizing algorithms to ensure
+                that the partition attributes comply with PowerQuest's
+                Partition Magic 5.0.
+
+                Fixed a bug that allowed the user, while using the 
+                interactive setup, to attempt to create another primary
+                partition when 4 primary partitions already exist.  Also,
+                users can no longer attempt to create primary partitions
+                when there is not any space available.
+
+                Fixed a bug that allowed the user, while using the
+                interactive setup, to attempt to create logical drives
+                when there is not any space available.
+ 
+                From the interactive setup, no longer allows the user to
+                create more than one extended partition.
+
+                Changed the messages displayed when exiting Free FDISK if
+                changes to any partitions were made.
+
+                The "Delete Primary DOS Partition" screen is no longer 
+                accessable if there are not any primary partitions. 
+
+                Removed functionality for the D_LBA statement in the
+                fdisk.ini file.  (Wasn't really used.)
+
+                Combined all the screen clearing routines into 
+                the Clear_Screen() function.  
+
+                The source code has now been divided up into smaller
+                fragments in order for the code to exceed the 64k in size.
+
+                Shortened many of the long variable names in the source code.
+
+Version 0.97    The drive numbering for the "/PRI" command now starts with 1.
+Final Release
+12/11/1999      Removed the skeleton for 64 bit math.  It is not needed until
+                hard disks exceed 128GB in size.
+
+                Added the "/SETFLAG [drive# flag#]", 
+                "/TESTFLAG [drive# flag#]", and "/CLEARFLAG [drive# flag#]"      
+                commands.  Up to 64 flags can be set, tested, and cleared...
+                the range for flag# is 1 to 64.  If drive# and flag# are not
+                used then the default drive# is 1 and the default flag# is 1.
+
+                Fixed a bug that incorrectly displayed the description
+                field in the "/DUMP" function.
+
+                Added code to prevent more than 1024 cylinders from being
+                utilized to create partitions unless int 0x13 extensions
+                are being used.  (In the case of LBA, the cylinders, heads,
+                and sectors are irrelevant.)
+
+                When VERSION is set to 4, the user can no longer delete
+                Non-DOS partitions from the interactive setup.
+
+                Added more code to support interrupt 0x13 extensions.
+
+                Added a "FLAG_SECTOR" setting to the fdisk.ini file.  This
+                setting allows the user to adjust to which sector the flags
+                are stored.  This may be useful if a special MBR is used
+                that has multiple sectors.  The default value is 2.
+
+                Fixed a bug that incorrectly displayed FAT32 and LBA 
+                partition types as Non-DOS under some circumstances.  These
+                partition types are now displayed correctly when the 
+                appropriate VERSION is set in the fdisk.ini file.
+
+                Added code to display drive letters for LBA partition types
+                when the proper VERSION is set in the fdisk.ini file.
+
+                Minor user interface changes.
+
+                When a partition is created, the first sector on that 
+                partition is now filled with 0xf6.
+
+Version 0.97    Re-added support for the part.ini file.  The file was
+Pre 5           formally named "part.dat."
+9/23/1999
+                The part.ini file was re-formatted to work with Free FDISK 
+                versions >=0.97 Pre 5.
+                
+                Removed all dynamically allocated variables.  Because of this
+                change, error level 6 is now unassigned.
+
+                Added the "Free" and "Usage" information to the "/STATUS"
+                screen and the "Change current fixed disk drive" menu.
+                
+                Fixed a bug that would allow FAT16 partitions larger than 
+                2048 MB to be created if Free FDISK was emulating W95B or W98 
+                and the user answered "N" to large disk support.
+
+                Fixed a bug that would create FAT32 partitions smaller than
+                2048 MB and larger than 512 MB even if the user did not want
+                FAT32 partitions.
+
+                If more logical drives exist than can be displayed in a 
+                single column, in options 4 or 5, then a second column is
+                created on the screen to display the remaining logical drives.
+
+                No longer allows the user to create a logical drive past Z:.
+        
+                Re-added support, in the "/N" command line option,
+                for the creation of partitions by percentage of free
+                disk space.
+        
+                Added a D_LBA statement in the fdisk.ini file for debugging
+                all functions that have been written specifically for LBA
+                support.  
+
+                Added the "/X" command line switch.  This will force Free
+                FDISK to not create LBA partitions.
+                
+                Updated the help screens to reflect all the new and/or changed
+                commands.
+
+                Added a "/NOPAUSE" switch to the "/?" switch to allow Free 
+                FDISK to scroll the help screens without pausing.  This
+                allows the help screens to easilly be re-directed to a file.
+
+                Created a small internal partition type lookup table in the
+                event that the part.ini file is not available.
+
+                Misc. minor bug fixes.
+
+                If there aren't any hard disks and a disk is not emulated,
+                Free FDISK will terminate with an error.  Error level 6 is
+                now assigned as "No hard drive present."
+
+                Re-added the "/D" command line option.  (Does not, at this
+                time, delete logical drives in the extended partition.)
+
+                Updated the "help.txt" file.
+
+                Added a message to inform the user if a command line function
+                was attempted that is not implemented at this time.  Returns
+                errorlevel 10.
+
+Version 0.97    Users can no longer try to set partitions active in the 
+Pre 4           interactive user interface if the only partition available
+9/12/1999       to set active is set active.
+                
+                Corrected the bug that allows non-existant partitions
+                to be set active in the interactive setup.
+
+                The message that no partitions are startable no longer 
+                appears if there aren't any partitions on the hard drive.
+
+                Now Free FDISK no longer tries to display partition 
+                information if there aren't any partitions, instead it 
+                displays "No partitions defined."
+
+                Now asks the users to confirm deletion of a logical drive.
+
+                General "look and feel" changes.
+
+                Re-added all the extended options support.        
+                
+                When extended options support is enabled Free FDISK will
+                now allow a user to destructively re-size a partition. 
+
+                Re-added the "/I" and the "/DUMP" command line options.
+
+                The error levels returned from executing Free FDISK have
+                been organized as follows:
+                  0    Normal program completion, no errors
+                  1    Syntax error
+                  3    Error in the fdisk.ini file
+                  4    Error in the part.dat file
+                  5    Non-existant hard disk
+                  6    Buffer allocation failure
+                  7    Hard disk is already partitioned.  (This is only
+                       returned if the "/A" function is used and there are
+                       already partitions other than a Compaq Diagnostic
+                       Partition on the hard disk.)
+                  8    Error reading from or writing to the boot.mbr file.
+                  9    Miscellaneous error. It is best to examine
+                       the output printed to the screen from Free FDISK to
+                       determine the exact cause of the problem.
+                  20   Flag has been set (see /SETFLAG, /TESTFLAG, and
+                       /CLEARFLAG for details)
+                  21   Flag has not been set (see errorlevel 20, above)
+
+                Added a D_PATH statement in the fdisk.ini file to display
+                the path of the program.  
+
+                Now searches the directory Free FDISK is located in for 
+                the fdisk.ini, part.dat, and boot.mbr files before the
+                PATH in the environment is searched.
+
+                Fixed some minor misc. bugs and added some error trapping
+                to the interactive user interface.
+        
+                Added confirmation questions for deletion of partitions.
+
+                Re-added support for FAT-32 partitions.
+
+Version 0.97    Now checks for the existence of interrupt 0x13 extensions if
+Pre 3           VERSION is set to at least W95 in the fdisk.ini file.  Does
+9/4/1999        not, at this time, make use of interrupt 0x13 extensions.
+
+                Has a debugging option added to emulate a 6.2 GB hard disk.
+                See the fdisk.ini file for details.
+
+                Thanks go to John Price for assisting me in fixing a bug
+                that prevented larger drive sizes of sub 8.2 GB drives from
+                being computed properly.
+
+                Added the skeleton of a function to do 64 bit math for 
+                future support of hard drives greater than 8.2GB.
+
+                Re-added the "/N" function.  Creating partitions by 
+                percentage is not yet supported at the command line, though.
+
+                Re-added code to create partitions by percentage of disk
+                space.
+                
+                Fixed a bug that caused incorrect calculations of free
+                areas on the hard disk.  The bug was caused because 
+                unsigned variables are always considered positive values 
+                when compared with each other using > and < operators.
+
+                Fixed a bug that caused incorrect calculations of the
+                locations of free space in the extended partition.
+
+                After an extended partition is created the program now
+                will go straight to the user interface for creating
+                logical drives.
+
+                The user interface for creating logical drives will
+                loop until all the available space is used or the 
+                user exists back to the menu.
+
+                Re-added the "/A" command line function and support for
+                automatic drive partitioning.
+
+                Added a REBOOT setting in the fdisk.ini file.  If this
+                is set to ON and changes were made to a hard disk, then the 
+                system will reboot upon exiting the program.  The default 
+                setting is off because I do not like programs automatically
+                rebooting my system...but somebody may like this feature.
+
+                Added a "/REBOOT" command line function to allow Free FDISK
+                to cold start a PC.  
+
+Version 0.97    Re-added the "/AMBR", "/CMBR", "/M", "/MBR", "/RMBR", and 
+Pre 2           "/SMBR" command line options.
+8/30/1999
+                Created the "/ACTIVATE drive# partition#" command to set a 
+                partition active from the command line.  This will replace
+                part of the functionallity of the "/T" function.
+
+                Created the "/DEACTIVATE [drive#]" command to completely 
+                clear all of the active flags on a physical drive.  This
+                replaces part of the functionallity of the "/T" function.
+
+                Fixed a bug that would corrupt the master boot code when
+                writing the partition tables to a hard disk.
+
+                Fixed a bug that would write an incorrect number of sectors
+                for the partition size in the extended partition tables.
+
+                Fixed a bug that prevented the last partition table for the 
+                last logical drive on the disk from being written.
+
+                Added the menu functions to create and delete logical drives.
+
+                Added code in the Input() function to handle the keyboard 
+                entry of a single character.
+
+                Removed some global variables that are no longer in use.
+
+                Cleaned up or removed some of the left over dead source code 
+                remaining from version 0.96.
+
+                Added some code to prevent users from performing illegal
+                operations while using the interactive setup.  (i.e.  Trying
+                to delete a non-existant Extended DOS Partition.)  Other
+                illegal operations may still be possible at this time.
+
+                Added code to handle logical drives in the extended 
+                partition.
+                
+                Fixed a bug that incorrectly calculated the relative sector
+                fields in the partition table for primary partitions that
+                do not start at Cyl. 0, Head 1, Sect. 1.
+
+                Fixed a few other misc. bugs.
+                
+                Volume labels, file system types, and drive letters are
+                now displayed for the logical drives.
+
+                Made a couple of minor "look and feel" changes.
+
+Version 0.97    The menuing system has been completely re-written.  Some
+Pre 1           screens are still "rough" and screens pertaining to
+7/7/1999        adding or deleting logical drives have yet to be written.
+
+                Partition table information is now stored in a large
+                structural array that is loaded upon running the
+                program.  Upon exiting the program, only the drives that
+                have changes made to are written to.
+
+                New functions to create and delete primary partition have 
+                been written.
+
+                A new function has been added that determines the
+                locations and sizes of the largest available free space.
+
+                Built-in debugging functions have been added, see the
+                fdisk.ini file for details.  These functions are 
+                enabled and disabled in the fdisk.ini file.
+
+                The program can now be run in a "read only" mode.  This
+                mode is enabled by setting WRITE=OFF in the fdisk.ini 
+                file.  If WRITE=OFF is set, then debugging information
+                is displayed that indicates what would have been written
+                to the disk if WRITE was set to ON.  
+
+                Volume labels, file system types, and drive letters are
+                now displayed for the primary partitions.
+
+                The BeOS file system type has been added to the part.dat 
+                file.
+
+                The fdisk.ini file now has a VERSION= setting that
+                controls what version of MS-FDISK this program emulates.
+                The default is version 6.
+
+                The program now checks what filename was used to
+                execute it.  When the help screen is displayed, it will
+                now use its filename on the syntax screen.  (i.e.  If
+                Free FDISK has a filename of "FFDISK.EXE" then the 
+                syntax screen will display FFDISK.
+
+                There is now a LABEL= option in the fdisk.ini file.  
+                When LABEL=ON, the words "Free FDISK" are displayed   
+                vertically on the right-hand side of the screen.  This
+                feature has been added to help avoid confusion between
+                Free FDISK and other versions of FDISK.
+
+                Currently, only the "/PRI", "/EXT", "/STATUS", "/C", "/L", 
+                and "/?" command line functions are available.
+
+                A new input routine has been created to make it easier
+                to program the menuing system with a uniform method
+                of obtaining input from the keyboard.
+
+                Please see the bugs.txt file for information on what
+                functions do not yet work.
+
+Version 0.97    MAJOR RE-WRITE
+
+                Approximately 95% of the code has been re-written or
+                modified do to a serious bug discovered in versions
+                0.96 and prior.  This bug would cause partitions to
+                be created that overlap other partitions under 
+                certain, very specific, circumstances.  Because
+                this bug was due to a design flaw in the partitioning
+                strategy used by older versions, it was determined that
+                it would be easier to re-write the program.  
+
+                Version 0.97 will consist of several "Pre" versions 
+                that do not have all the features in version 0.96.  All
+                the "Pre" versions will gradually have features added 
+                until all the features of version 0.96 exist in the 
+                final version of Free FDISK 0.97.
+
+Version 0.96    Now de-allocates the buffers any time the program exits back
+5/4/1999        to DOS. 
+
+                Compressed the executable with APACK, by Joergen Ibsen.  As
+                a consequence, the executable is now about 70% smaller.
+
+                Added a command-line parsing routine to handle certain     
+                command-line options that can be in any order.
+
+                Added the following command-line switches for MS FDISK
+                compatibility:  /ACTOK, /PRI, /EXT
+
+                Added the /XO function that allows "eXtended Options" while
+                using the menu system.
+                  Extended Options that have been added thus far:
+                    1.  Allows more than one Primary DOS partition.
+                    2.  Partitions can be "hidden" from DOS.
+                    3.  The partition ID byte can be modified.
+
+                Added code to automatically write the MBR if the drive has
+                never been partitioned.
+
+                Added a routine in the menuing system to warn the user if a
+                primary partition is not active on the first drive.
+
+                For the purpose of hiding partitions from DOS I have added the
+                following partition types to the part.dat file:
+                Type:        Description:
+                141          FreeDOS hidden DOS-12 partition
+                144          FreeDOS hidden DOS-16 < 32MB partition
+                145          FreeDOS hidden Extended partition
+                146          FreeDOS hidden DOS-16 > 32MB partition
+                151          FreeDOS hidden FAT32 partition
+                152          FreeDOS hidden FAT32 PRI LBA partition
+                154          FreeDOS hidden FAT16 PRI LBA partition
+                155          FreeDOS hidden FAT16 Extended LBA partition
+
+                Primary DOS partitions are now deleted on a "last first"
+                basis if more than one Primary DOS partition exists.
+
+                Modified the descriptions for FAT partitions listed in the 
+                part.dat file to help avoid confusion between partition
+                types.
+
+                Adjusted size computation equations to increase the accuracy
+                of the reported sizes of the partitions.
+
+                Fixed a bug that caused the wrong partitions to be displayed
+                as active under certain circumstances when a "fdisk /dump" or
+                a "fdisk /status" is issued.
+
+                Now only asks if you want to use large disk support in the
+                interactive setup if you enter fdisk /lds
+
+                Free FDISK now has a better description of large disk support
+                on the screen where the "large disk support" question is 
+                asked.
+
+                Added support for an optional fdisk.ini file to allow some 
+                frequently used command line options to be saved.  View and
+                modify the fdisk.ini file with your favorite text editor
+                for details.  If the fdisk.ini file is not found then fdisk
+                will use it's default settings.  Any options on the command
+                line will override the fdisk.ini settings, if applicable.
+
+                Added the capability to search the path as defined in the 
+                environment to find the part.dat, fdisk.ini, and boot.mbr
+                files.
+
+Version 0.95    Fixed the bug that prevented FAT12 partitions from having
+4/16/1999       the proper upper limit of 15MB.
+
+Version 0.94A   Fixed a bug that prevented FAT32 partitions larger than 2GB
+4/6/1999        from being created while using the command line.
+
+Version 0.94    Made a few minor "look and feel" changes to the interactive
+3/30/1999       setup.  The physical drive being modified should now be 
+                displayed on almost all of the screens.
+
+                Added a routine that automatically creates a Primary DOS
+                Partition and sets the partition active in the interactive
+                setup.
+
+                Added a routine that asks you if want to create Logical DOS 
+                Drives after you create an Extended DOS Partition.
+
+                Added a routine that asks you if you want to create an Extended
+                DOS partition if there is space on the hard disk after you have
+                created a Primary DOS Partition.
+
+                Added a routine that asks you if you want to create another 
+                Logical DOS Drive in the Extended partition if more than 10MB
+                10MB is available.
+
+Version 0.93    Added code to limit FAT-32 non-LBA partitions to over 512MB.
+3/3/1999
+                Added the following commands for MS FDISK command line
+                compatibility:  /STATUS, /CMBR
+
+                Added code to show the space available on the drive or
+                in the extended partition when adding partitions or logical
+                drives.
+
+                Now only allows partions that exist to be set active in the
+                "interactive setup."
+
+                Partition listings now have the partition numbers highlighted,
+                where applicable.
+
+                Fixed a bug preventing FAT32 partitions larger than 2048MB
+                from being created while using the "interactive setup."
+
+                The partition creation screens in the interactive setup now 
+                have brief instructions on what type of number to enter for 
+                the size of the partition you want to create.
+
+Version 0.92    Added FAT-32 support without support for the int 0x13
+2/22/1999       extensions.  If large disk support is selected from the
+                "interactive setup" then FDISK will create non-int 0x13
+                extension FAT-32 partitions.  FDISK will delete all
+                primary partitions and logical drives supported by W95 OSR2's
+                FDISK.  Support for the creation of int 0x13 extension type
+                partitions will come later.
+
+                Updated the "part.dat" file to provide better descriptions
+                of FAT-32 and LBA FAT-16 partitions.
+
+                Updated the program's internal partition type lookup table
+                to include FAT-32 and LBA FAT-16 partitions.
+
+Version 0.91    Added the "fdisk /mono" switch to accomodate users with 
+2/17/1999       monochrome monitors.
+
+                Added code to detect if the BIOS video setting is set to
+                monochrome.  If the BIOS video setting is set to monochrome
+                then the menus will not have any boldfaced text.
+
+                Added an "fdisk /mono" entry to the help routine and changed
+                the reference to the "boot.bin" file to "boot.mbr" to reflect
+                the name change as of version 0.9.
+
+Version 0.9     Added support to allow automatic partitioning of an empty 
+2/7/1999        drive if it has a Compaq Diagnostic Partition.
+
+                Changed the name of the alternate bootloader file from
+                boot.bin to boot.mbr to prevent incompatibilities with
+                other software.
+ 
+                If there is only one hard drive, option 5 is no longer 
+                displayed in the menu.
+
+                Changed the look and feel of almost all of the menus.
+
+                Set the compiler to compile for a small memory model and
+                changed the method of allocating the 
+                partition_lookup_table_buffer for a total size reduction in 
+                the executable of 20,116 bytes.
+ 
+                Combined the Menu routines for creating primary and extended
+                DOS partitions.
+
+Version 0.8     Added the "fdisk /dump" to dump all partition information 
+12/19/1998      from all hard disks to the screen.  This dump can be
+                re-directed to a file by using standard re-direction
+                commands.  (i.e. "fdisk /dump > filename.ext")  This 
+                function can be used to aid in future debugging. 
+
+                Added error trapping to prevent the user from trying to 
+                change to a non-existant hard disk via option 5 in the
+                main menu.
+
+                Added code to make the error trapping system while working
+                through the menus "friendlier."  The user is no longer 
+                kicked out to the DOS prompt.
+ 
+                The problem with partitions being incompatible with 
+                other partitioning utilities has been fixed.  
+
+                Code has been added to allow the deletion of a partition
+                by the partitions type of primary or extended.  This
+                additional functionality works from both the menu system
+                as well as the command line.
+
+                Changed the look and feel of some of the menus.
+
+                Trapped bad entries when selecting the hard drive to FDISK
+                from the menuing system.
+
+                The "set active partition" function inside the menu system
+                no longer displays the extended partition table.
+
+                The [ESC] key now backs out of most menu based functions.
+
+                The program no longer limits the user to a maximum of 4
+                hard drives.  This could be useful if SCSI drives are 
+                connected to the PC.
+
+                Found and fixed a mapping problem when creating the 2nd
+                logical drive in the extended partition.
+         
+                Fixed a bug when creating logical drives by percentage.
+                
+                Created an automated partitioning routine (/a drive#) that
+                will automatically partition an empty drive and set the
+                primary partition active.  Support for a Compaq Diagnostic
+                Partition is planned.  This routine will also create an
+                extended partition on logical drives if space permits.
+
+Version 0.71    Thanks go to John Price for instructing me on how to modify
+12/6/1998       the 2 non-8086 compliant sections of assembly language to
+                make them compliant.  Finally allows the program to run
+                on a 8086 or a 8088.  (Unfortunately, I do not have such
+                a PC to test this on.)
+
+Version 0.7     Found and removed a section of dead code.  
+12/4/1998
+                Removed some of the less common partition types from the 
+                built-in lookup table and added error trapping for unknown
+                partition types.  
+
+                Added code to load the part.dat file into a buffer instead
+                of constantly loading it from the disk when needed.  (This
+                will speed up access from a floppy disk.)
+
+                Removed the header file mem.h because it was unused.
+ 
+                Added code to display the reboot message only if changes 
+                were made to the partition tables or MBR.
+
+                Modified the help routine and added code to only display
+                one screenful of information at a time.
+
+                Found and fixed one more bug that created the "null pointer
+                error" message.  I hope this is the last null pointer error.
+
+                Added code to allow the user to change the partition type
+                of primary partitions.
+
+                Fixed a problem with the ending head location of logical 
+                partitions.
+
+                Made modifications to percentage calculations when creating
+                partitions to create the partitions based upon the percentage
+                of free space available. 
+
+                Added code to allow the user to create partitions of types
+                other than DOS.
+
+                Removed size limit when creating extended partitions by using
+                the menu system.
+
+                Fixed the bug that caused the "extended partition exists" 
+                error after deleting an extended partition and trying
+                to create another extended partition while using the menu
+                system.
+
+Version 0.6     Added functionality to allow the program to get the listing
+11/29/1998      of partition types from an easily maintainable text file
+                called "part.dat"  If the program does not detect the
+                partiton data file, it will revert to using its internal
+                partition lookup table.  I would recommend only using the
+                lookup file when running Free FDISK from the hard drive.
+                If Free FDISK is ran from a floppy disk with the partition
+                data file, it runs much slower due to accessing the
+                partition data file.
+
+                Added code to allow the user to load a different boot loader
+                into the MBR.  This boot loader is stored in a file named 
+                "BOOT.BIN"
+
+                Added code to allow the user to save the boot code from the
+                MBR into a "BOOT.BIN" file.
+
+                Fixed a bug that prevented logical drives from being created
+                by percentage when using the menus.
+
+Version 0.5     Finally allows the user to create logical drives in
+11/25/1998      the extended partition.
+
+                Changed the location of the "type of size calculations"
+                in the code.  
+
+                Allows you to delete logical partitions; but, only in the
+                reverse order in which they were created.
+                
+                Fixed the bug that prevented MS-DOS's FDISK from creating
+                logical drives in the extended partition.
+
+                Thanks go to Phil Brutsche for fixing the bugs that were
+                creating the "null pointer error" messages.
+              
+                Modified the code to start and end partitions on cylinder
+                boundries.
+
+                Added the command "fdisk [/rmbr drive#]" to remove the boot
+                loader from the first sector of the hard disk and still
+                preserve the primary partition table. 
+
+                Fixed a bug that allowed a partition to extend beyond its
+                boundries.
+
+                Added code to display the available drives and their sizes.
+
+                When displaying the partition information of a drive, the
+                program now displays the total hard disk size.
+
+Version 0.4n    Not a public release.
+11/20/1998
+                Released by Phil Brutsche.  Fixed a few bugs in version 0.4.
+
+Version 0.4     Added code to trap the "null pointer error" messages.
+11/13/1998      There still are a few possible combinations that will
+                result in this message, though.
+
+                Partitions are now correctly created when creating
+                their size by the percentage of the total hard disk
+                space.
+                
+                Fdisk /mbr no longer writes the MS-DOS version of the
+                boot loader.  I used the boot loader from BOOTEASY
+                that I found on a FreeBSD distribution.  For more 
+                information, please see the file bloader.txt
+
+Version 0.3     First public release.
+11/8/1998
+                Added menus.
+              
+                Removed the requirement of entering the drive number
+                when typing "FDISK /I" or FDISK /MBR".  Without the
+                drive number, both functions will default to the first
+                hard disk.  Of course, you can still enter the drive
+                number for drives other than the first.
+
+                Added code to prevent the entry of partition sizes over
+                2 Gig.
+
+Version 0.2     Not a public release
+11/4/1998
+                Added functions to toggle the active partition,
+                delete a partition, and create the boot loader
+                code.
+
+                Found and corrected a bug preventing the exended
+                partition from being displayed. 
+
+Version 0.1     Not a public release
+~10/1998
+                Basic functionality--the program clears partition
+                tables, displays contents of the partition tables,
+                and creates primary partitions.  It lacks a menu,
+                does not create the boot code, and does not create
+                extended partitions or logical drives.  It also 
+                does not yet have any error trapping to prevent a
+                user from trying to create a drive over 2 Gig.
+
+
