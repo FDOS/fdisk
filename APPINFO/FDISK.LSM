@@ -7,9 +7,9 @@ Keywords:       fdisk, format, hard drive, partition, fat16, fat32, partition, m
 Author:         Brian E. Reifsnyder <breifsnyde -at- state.pa.us>
 Maintained-by:  Brian E. Reifsnyder <breifsnyde -at- state.pa.us>
 Primary-site:   http://gitlab.com/FDOS/base/fdisk
-defunct-Primary-site:   http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/dos/fdisk/
 Alternate-site: www.freedos.org
 Platforms:      DOS, FreeDOS
 Copying-policy: GNU General Public License, version 2
-Defunct-Original-Site: http://www.23cc.com/free-fdisk
-End
+Defunct-Site: http://www.23cc.com/free-fdisk
+Modified-date:  2020-12-15.0
+end
