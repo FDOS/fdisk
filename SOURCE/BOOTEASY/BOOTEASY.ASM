@@ -74,7 +74,7 @@ Boot:
 Load:
 		mov	DX,BP		; restore drive number
 		pop	AX		; key '1'..'5'
-		mov     [Base+default],AL	; save function key number
+		mov     [Base+defaultLocal],AL	; save function key number
 		cmp	AL,'5'
 		je	SwitchDrive
 		mov	AH,16
@@ -200,7 +200,7 @@ waitkey:
 		cmp     DX,BX           ; check for timeout
 		jb      waitkey		; wait for scancode
 loaddefault:
-		mov     AL,[Base+default]	; prior system id
+		mov     AL,[Base+defaultLocal]	; prior system id
 		jmp     short testkey		; boot default system
 reply:
 		int     16h             ; AH=0, keybd bios service
@@ -247,7 +247,7 @@ SaveBoot:
 		xor     DH,DH		; drive #, head 0
 		int     13h		; replace boot record
 		pop	SI
-		mov     byte [Base+default],'?' ; reset default
+		mov     byte [Base+defaultLocal],'?' ; reset defaultLocal
 		ret
 
 ; -------------------------------
@@ -257,7 +257,7 @@ FkeyMsg         db      13,10,'F'
 key             db      '0 . . .',' '+80h,'disk '
 diskNum		db	'1'
 defaultMsg	db	13,10,10,'Default: F'
-default         db      '?',' '+80h
+defaultLocal    db      '?',' '+80h
 
 nameTable       db      fat     -namtab,   1
                 db      fat     -namtab,   4
@@ -308,4 +308,4 @@ noname		db	'?','?'+80h
 		dw	0aa55h		; magic
 
 ;code		ends
-		end
+;		end
