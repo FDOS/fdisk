@@ -6,18 +6,22 @@ Written By:  Brian E. Reifsnyder
 
 Syntax:
 -------
+```
  * FDISK                   Runs FreeDOS FDISK in interactive mode.
  * FDISK /? [/NOPAUSE]     Displays this help information.
+```
 
 
 FreeDOS FDISK interactive user interface switches:
 --------------------------------------------------
+```
   FDISK /MONO
   FDISK /XO
-
+```
 
 Description of FreeDOS FDISK compatibility switches:
 ----------------------------------------------------
+```
   /ACTOK   Normally skips integrity checking...kept for compatibility.
   /CMBR    Writes the MBR to <drive#>.
   /EXT     Creates an Extended DOS Partition of <size>MB on <drive#>.  /LOG
@@ -32,12 +36,13 @@ Description of FreeDOS FDISK compatibility switches:
              rebooting is enabled in the "fdisk.ini" file.)
   /STATUS  Displays the current partition layout.
   /X       Do not use LBA partitions.
-
+```
 
 
 Description of FreeDOS FDISK extended switches:
 
 For partition table modification:
+```
   /AUTO    Automatically partitions the hard disk with FAT16 partitions.
   /ACTIVATE
            Sets <partition#> active.
@@ -66,44 +71,53 @@ For partition table modification:
              functionallity.  See /EXT, above, for more information.
   /SWAP    Swaps the 2 partition entries, <first_partition#> and
              <second_partition#).
-
+```
 
 For MBR modification:
 ---------------------
+```
   /AMBR    Writes the MBR stored in the "boot.mbr" file.
   /MBR     Writes the MBR to <drive#>.
   /RMBR    Removes the MBR from <drive#>.
   /SMBR    Saves the MBR, on <drive#>, into a "boot.mbr" file.
+```
 
 
 For handling flags on a hard disk:
 ----------------------------------
+```
   /CLEARFLAG
            Resets the <flag#> or all the flags on <drive#> to 0.
   /SETFLAG
            Sets <flag#> to 1 or <flag_value>, if specified.
   /TESTFLAG:
            Tests <flag#> for 1 or <flag_value>, if specified.
+```
 
 
 For obtaining information about the hard disk(s):
 -------------------------------------------------
+```
   /DUMP    Dumps all partition information from all hard disks.  This
              function is mainly used for debugging by redirecting the
              output to a file.
   /INFO    Displays partition information from <drive#>
+```
 
 
 For rebooting the computer:
 ---------------------------
+```
   /REBOOT  Forces a reboot.
+```
 
 
 Interactive user interface switches:
 ------------------------------------
+```
   /MONO    Forces the user interface to run in monochrome mode.
   /XO      Enables extended options.
-
+```
 
 
 
