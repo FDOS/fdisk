@@ -192,7 +192,8 @@ typedef unsigned char  _u8;
 */
 
 
-#include "catgets.h"
+/* #include "catgets.h"  */
+#include "kitten.h"
 
 MEXTERN nl_catd cat;
 MEXTERN char *s;
