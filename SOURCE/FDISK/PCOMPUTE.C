@@ -3,8 +3,8 @@
 // Written By:  Brian E. Reifsnyder
 // Module:  PCOMPUTE.C
 // Module Description:  Partition Computation and Modification Functions
-// Version:  1.2.1
-// Copyright:  1998-2002 under the terms of the GNU GPL, Version 2
+// Version:  1.3.1
+// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
 */
 
 /*
@@ -1358,7 +1358,7 @@ unsigned long Number_Of_Cylinders(unsigned long size)
   unsigned long num_head;
   unsigned long size_in_mb = size/2048;
 
-  if (((size_in_mb * 1048576) % 512) != 0) size++;
+  if (((size_in_mb * 1048576UL) % 512UL) != 0) size++;
 
   num_head = size / pDrive->total_sect;
   if((size % pDrive->total_sect) != 0) num_head++;

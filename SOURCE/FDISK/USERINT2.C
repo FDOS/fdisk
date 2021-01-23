@@ -3,8 +3,8 @@
 // Written By:  Brian E. Reifsnyder
 // Module:  USERINT2.C
 // Module Description:  Second User Interface Code Module
-// Version:  1.2.1
-// Copyright:  1998-2003 under the terms of the GNU GPL, Version 2
+// Version:  1.3.1
+// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
 */
 
 /*
@@ -315,7 +315,7 @@ int Create_Logical_Drive_Interface()
       printf(" Mbytes ");
 
       maximum_possible_percentage
-       = Convert_To_Percentage(maximum_partition_size_in_MB
+       = (int)Convert_To_Percentage(maximum_partition_size_in_MB
        ,pDrive->ext_part_size_in_MB);
 
       cprintf("(%3d%%)",maximum_possible_percentage);

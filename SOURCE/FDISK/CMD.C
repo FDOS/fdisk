@@ -5,8 +5,8 @@
 //                      All functions that process command line entry are
 //                      here.
 // Written By:  Brian E. Reifsnyder
-// Version:  1.2.1
-// Copyright:  1998-2002 under the terms of the GNU GPL, Version 2
+// Version:  1.3.0
+// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
 */
 
 /*
@@ -162,7 +162,7 @@ void Command_Line_Create_Extended_Partition()
   maximum_partition_size_in_MB = Max_Pri_Part_Size_In_MB(EXTENDED);
 
   maximum_possible_percentage
-   = Convert_To_Percentage(maximum_partition_size_in_MB
+   = (int)Convert_To_Percentage(maximum_partition_size_in_MB
    ,pDrive->total_hard_disk_size_in_MB);
 
 //   ,pDrive->ext_part_size_in_MB);
@@ -216,7 +216,7 @@ void Command_Line_Create_Logical_DOS_Drive()
   maximum_partition_size_in_MB = Max_Log_Part_Size_In_MB();
 
   maximum_possible_percentage
-   = Convert_To_Percentage(maximum_partition_size_in_MB
+   = (int)Convert_To_Percentage(maximum_partition_size_in_MB
    ,pDrive->ext_part_size_in_MB);
 
   if(arg[0].extra_value==100)
@@ -281,7 +281,7 @@ void Command_Line_Create_Primary_Partition()
   maximum_partition_size_in_MB = Max_Pri_Part_Size_In_MB(PRIMARY);
 
   maximum_possible_percentage
-   = Convert_To_Percentage(maximum_partition_size_in_MB
+   = (int)Convert_To_Percentage(maximum_partition_size_in_MB
    ,pDrive->total_hard_disk_size_in_MB);
 
 

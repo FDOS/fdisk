@@ -4,7 +4,7 @@
 // Module Description:  Header File for MAIN.C
 // Written By:  Brian E. Reifsnyder
 // Version:  1.2.1
-// Copyright:  1998-2002 under the terms of the GNU GPL, Version 2
+// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
 */
 
 
@@ -23,15 +23,15 @@
 
 #define PRINAME "Free FDISK"
 #define ALTNAME "FreeDOS"
-#define VERSION "1.2.1"
-#define COPYLEFT "1998 - 2003"
+#define VERSION "1.3.1"
+#define COPYLEFT "1998 - 2008"
 
-//#define DEBUG
+#define DEBUG
 			 /* ***** Uncomment the above line to compile */
 			 /* ***** debugging code and functions into   */
 			 /* ***** Free FDISK.                         */
 
-//#define BETA_RELEASE
+#define BETA_RELEASE
 			 /* ***** Uncomment the above line to         */
 			 /* ***** have this program inform the user   */
 			 /* ***** that it is a beta release.          */

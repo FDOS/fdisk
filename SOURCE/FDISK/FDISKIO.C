@@ -6,8 +6,8 @@
 //                      Functions that access the hard disk and are specific
 //                      to Free FDISK are in this module.
 // Written By:  Brian E. Reifsnyder
-// Version:  1.2.1
-// Copyright:  1998-2002 under the terms of the GNU GPL, Version 2
+// Version:  1.3.1
+// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
 */
 
 /*
@@ -94,7 +94,7 @@ void Automatically_Partition_Hard_Drive()
   Determine_Free_Space();
   if( pDrive->pri_part_largest_free_space > 0)
     {
-    Create_Primary_Partition(5,999999);
+    Create_Primary_Partition(5,999999L);
 
     /* Fill the extended partition with logical drives. */
     Determine_Free_Space();

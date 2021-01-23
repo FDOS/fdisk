@@ -4,8 +4,8 @@
 //                      All functions that access the hard disk via
 //                      interrupt 0x13 are here, including LBA support.
 // Written By:  Brian E. Reifsnyder
-// Module Version:  3.0
-// Copyright:  2001 under the terms of the GNU GPL, Version 2
+// Module Version:  3.1
+// Copyright:  2008 under the terms of the GNU GPL, Version 2
 */
 
 /*
@@ -55,6 +55,7 @@ void Clear_Partition_Table_Area_Of_Sector_Buffer(void);
 void Check_For_INT13_Extensions();
 void Convert_Logical_To_Physical(unsigned long sector
  ,unsigned long total_heads,unsigned long total_sectors);
+void Error_Handler(int error);
 void Get_Partition_Information(void);
 
 int Determine_Drive_Letters();
@@ -96,7 +97,8 @@ void Check_For_INT13_Extensions()
   int carry;
   int drive_number=0x80;
 
-  unsigned int ah_register;
+//-  unsigned int ah_register;
+  unsigned char ah_register;
   unsigned int bx_register;
   unsigned int cx_register;
 
@@ -111,7 +113,8 @@ void Check_For_INT13_Extensions()
 
   do
     {
-    carry=99;
+//    carry=99;
+    carry=0;
 
     asm{
       mov ah,0x41
@@ -123,14 +126,20 @@ void Check_For_INT13_Extensions()
       mov WORD PTR bx_register,bx
       mov WORD PTR cx_register,cx
 
-      jnc carry_flag_not_set    /* Jump if the carry flag is clear  */
-      }                         /* If the carry flag is clear, then */
-                                /* the extensions exist.            */
-    carry=1;
+//      jnc carry_flag_not_set    /* Jump if the carry flag is clear  */
+//      }                         /* If the carry flag is clear, then */
+//				/* the extensions exist.            */
+//    carry=1;
+//    part_table[(drive_number-128)].ext_int_13=FALSE;
+      adc WORD PTR carry,0          /* Set carry if CF=1 */
+      }
+
+
+//    carry_flag_not_set:
+//    if( (carry==99) && (bx_register==0xaa55) )
     part_table[(drive_number-128)].ext_int_13=FALSE;
 
-    carry_flag_not_set:
-    if( (carry==99) && (bx_register==0xaa55) )
+    if( (!carry)  && (bx_register==0xaa55))
       {
       flags.use_extended_int_13=TRUE;
       part_table[(drive_number-128)].ext_int_13=TRUE;
@@ -403,6 +412,78 @@ int Determine_Drive_Letters()
   return(current_letter-1);
 }
 
+/* Error Handler */
+void Error_Handler(int error)
+{
+  if(error == 0x11) return;  //  Read error corrected by ECC
+
+  printf("\n\nError Reading Hard Disk:\n");
+  printf("  ");
+
+  switch(error)
+    {
+    case 0x01:
+      printf("Function number or drive not permitted.\n");
+      break;
+
+    case 0x02:
+      printf("Address not found.\n");
+      break;
+
+    case 0x04:
+      printf("Addressed sector not found.\n");
+      break;
+
+    case 0x05:
+      printf("Error on sector reset.\n");
+      break;
+
+    case 0x07:
+      printf("Error during controler initialization.\n");
+      break;
+
+    case 0x09:
+      printf("DMA transmission error.  Segment border exceeded.\n");
+      break;
+
+    case 0x0a:
+      printf("Defective sector.\n");
+      break;
+
+    case 0x10:
+      printf("Read error.\n");
+      break;
+
+    case 0x11:
+      printf("Read error corrected by ECC.\n");
+      break;
+
+    case 0x20:
+      printf("Controller defect.\n");
+      break;
+
+    case 0x40:
+      printf("Search operation failed.\n");
+      break;
+
+    case 0x80:
+      printf("Time out, unit not responding.\n");
+      break;
+
+    case 0xaa:
+      printf("Unit not ready.\n");
+      break;
+
+    case 0xcc:
+      printf("Write error.\n");
+      break;
+    }
+
+
+  printf("\nProgram Terminated.\n\n");
+
+  exit(error);
+}
 
 /* Extract Cylinder */
 unsigned long Extract_Cylinder(unsigned long hex1, unsigned long hex2)
@@ -491,7 +572,8 @@ int Get_Hard_Drive_Parameters(int physical_drive)
   if(total_number_hard_disks==0) return(255);
 
 
-  if(error_code>0) return(error_code);
+//  if(error_code>0) return(error_code);
+  if(error_code > 0) Error_Handler(error_code);
 
   pDrive->total_head=total_heads;
   pDrive->total_sect=total_sectors;
@@ -520,7 +602,8 @@ int Get_Hard_Drive_Parameters(int physical_drive)
       mov BYTE PTR error_code,ah
       }
 
-    if(error_code>0) return(error_code);
+//    if(error_code>0) return(error_code);
+    if(error_code > 0) Error_Handler(error_code);
 
     /* Compute the total number of logical cylinders based upon the number */
     /* of physical sectors returned from service 0x48.                     */
@@ -815,7 +898,8 @@ int Read_Partition_Tables()
       {
       error_code=Read_Physical_Sectors(physical_drive,0,0,1,1);
 
-      if(error_code!=0) return(error_code);
+//      if(error_code!=0) return(error_code);
+      if(error_code != 0) Error_Handler(error_code);
 
       flags.maximum_drive_number=drive+128;
 
@@ -910,7 +994,8 @@ int Read_Partition_Tables()
          ,pDrive->ptr_ext_part->start_head,
           pDrive->ptr_ext_part->start_sect,1);
 
-        if(error_code!=0) return(error_code);
+//	if(error_code!=0) return(error_code);
+	if(error_code != 0) Error_Handler(error_code);
 
 	/* Ensure that the sector has a valid partition table before        */
         /* any information is loaded into pDrive->           */
@@ -1096,7 +1181,8 @@ int Read_Physical_Sectors(int drive, long cylinder, long head
 
   number_of_sectors=1;
 
-  if(flags.use_extended_int_13==FALSE)
+//  if(flags.use_extended_int_13==FALSE)
+  if(part_table[(drive-128)].ext_int_13==FALSE)
     {
     error_code=Read_Physical_Sectors_CHS(drive,cylinder,head,sector,number_of_sectors);
     }
@@ -1149,6 +1235,8 @@ int Read_Physical_Sectors(int drive, long cylinder, long head
     }
 #endif
 
+  if(error_code != 0) Error_Handler(error_code);
+
   return(error_code);
 }
 
@@ -1167,6 +1255,8 @@ int Read_Physical_Sectors_CHS(int drive, long cylinder, long head
     printf("sector != 1\n"); exit(1);
 //    error_code=biosdisk(2, drive, (int)head, (int)cylinder, (int)sector, number_of_sectors, huge_sector_buffer);
     }
+
+  if(error_code != 0) Error_Handler(error_code);
 
   return(error_code);
 }
@@ -1212,6 +1302,8 @@ int Read_Physical_Sectors_LBA(int drive, long cylinder, long head
     mov BYTE PTR error_code,ah
     }
 
+  if(error_code != 0) Error_Handler(error_code);
+
   return(error_code);
 }
 
@@ -1255,7 +1347,8 @@ int Write_Partition_Tables()
 #ifdef DEBUG
       else error_code=0;
 #endif
-      if(error_code!=0) return(error_code);
+//      if(error_code!=0) return(error_code);
+      if(error_code != 0) Error_Handler(error_code);
 
       Clear_Partition_Table_Area_Of_Sector_Buffer();
 
@@ -1289,7 +1382,8 @@ int Write_Partition_Tables()
       sector_buffer[0x1ff]=0xaa;
 
       error_code=Write_Physical_Sectors((drive_index+0x80),0,0,1,1);
-      if(error_code>0) return(error_code);
+//      if(error_code>0) return(error_code);
+      if(error_code > 0) Error_Handler(error_code);
 
       /* Write the Extended Partition Table, if applicable. */
 
@@ -1335,7 +1429,8 @@ int Write_Partition_Tables()
           error_code
              =Write_Physical_Sectors((drive_index+0x80)
 			     ,extended_cylinder,extended_head,extended_sector,1);
-          if(error_code!=0) return(error_code);
+//	  if(error_code!=0) return(error_code);
+	  if(error_code != 0) Error_Handler(error_code);
 
           if(pDrive->next_ext_exists[index]!=TRUE)
             {
@@ -1372,6 +1467,9 @@ int Write_Physical_Sectors(int drive, long cylinder, long head, long sector, int
     {
     error_code=Write_Physical_Sectors_LBA(drive,cylinder,head,sector,number_of_sectors);
     }
+
+  if(error_code > 0) Error_Handler(error_code);
+
   return(error_code);
 }
 
@@ -1446,6 +1544,8 @@ int Write_Physical_Sectors_CHS(int drive, long cylinder, long head, long sector,
     error_code=0;
     }
 #endif
+
+  if(error_code > 0) Error_Handler(error_code);
 
   return(error_code);
 }
@@ -1549,6 +1649,8 @@ int Write_Physical_Sectors_LBA(int drive, long cylinder, long head, long sector,
     error_code=0;
     }
 #endif
+
+  if(error_code > 0) Error_Handler(error_code);
 
   return(error_code);
 }

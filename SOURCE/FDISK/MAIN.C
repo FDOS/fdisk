@@ -3,8 +3,8 @@
 // Written By:  Brian E. Reifsnyder
 // Module:  MAIN.C
 // Module Description:  Main Free FDISK Code Module and Misc. Functions
-// Version:  1.2.1
-// Copyright:  1998-2002 under the terms of the GNU GPL, Version 2
+// Version:  1.3.1
+// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
 */
 
 
@@ -72,14 +72,14 @@ unsigned long computed_partition_size;
 
 unsigned long Convert_Cyl_To_MB(unsigned long num_cyl,unsigned long total_heads, unsigned long total_sect)
 {
-  unsigned long sect_per_meg = 1048576/512;
+  unsigned long sect_per_meg = 1048576UL/512UL;
   return( ( ( (num_cyl * total_heads) * total_sect)
 	    + (sect_per_meg/2)) / sect_per_meg );
 }
 
 unsigned long Convert_Sect_To_MB(unsigned long num_sect)
 {
-  unsigned long sect_per_meg = 1048576/512;
+  unsigned long sect_per_meg = 1048576UL/512UL;
 
   return((num_sect + (sect_per_meg/2)) / sect_per_meg);
 }
