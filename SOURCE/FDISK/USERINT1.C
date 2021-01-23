@@ -3,8 +3,8 @@
 // Written By:  Brian E. Reifsnyder
 // Module:  USERINT1.C
 // Module Description:  First User Interface Code Module
-// Version:  1.2.1
-// Copyright:  1998-2002 under the terms of the GNU GPL, Version 2
+// Version:  1.3.1
+// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
 */
 
 /*
@@ -201,7 +201,9 @@ void Interactive_User_Interface()
   if( (flags.version==W95B) || (flags.version==W98) )
    Ask_User_About_FAT32_Support();
 
-  Create_MBR_If_Not_Present();
+//  Create_MBR_If_Not_Present();     DO NOT AUTOMATICALLY CREATE THE MBR.
+//                                   THIS FEATURE WAS REQUESTED TO BE
+//                                   DISABLED.
 
   do
     {

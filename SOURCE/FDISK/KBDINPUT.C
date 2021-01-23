@@ -3,8 +3,8 @@
 // Written By:  Brian E. Reifsnyder
 // Module:  KBDINPUT.C
 // Module Description:  Keyboard Interface Routine
-// Version:  1.2.1
-// Copyright:  1998-2002 under the terms of the GNU GPL, Version 2
+// Version:  1.3.1
+// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
 */
 
 /*
