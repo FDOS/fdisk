@@ -1,0 +1,5 @@
+c:\tcpp\lib\c0s.obj+ 
+main cmd fdiskio + 
+helpscr kbdinput pdiskio pcompute + 
+ui1 ui2 bootnorm booteasy smartmbr kitten + 
+,fdisk,, c:\tcpp\lib\cs.lib 

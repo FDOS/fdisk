@@ -1,0 +1,403 @@
+     1                                  ;
+     2                                  ; extremely clever DOS MBR by tom ehlert
+     3                                  ;
+     4                                  ; Copyright 2006 tom ehlert
+     5                                  ; all rights reserved
+     6                                  ;
+     7                                  
+     8                                  
+     9                                  segment _DATA           class=DATA  align=2
+    10                                  
+    11                                                   
+    12                                    global  _smart_mbr            
+    13                                  _smart_mbr:
+    14                                  
+    15                                    global  _BootSmart_code
+    16                                  _BootSmart_code:
+    17                                  
+    18                                  ;-----------------------------------------------------------------------
+    19                                  ;   ENTRY (copied from freedos bootsector)
+    20                                  ;
+    21                                  ; IN: DL = boot drive
+    22                                  ;OUT: DL = boot drive
+    23                                  ;
+    24                                  ;-----------------------------------------------------------------------
+    25                                  align 16
+    26                                  
+    27                                  real_start:     
+    28                                  									; 1) whereever we are, we copy ourself
+    29                                  									; 2) to 0:7c00
+    30                                  
+    31 00000000 E80000                  				call $+3
+    32 00000003 5E                      				pop  si				; get current location
+    33                                  				
+    34                                  				
+    35 00000004 FC                                      cld
+    36 00000005 31C0                                    xor     ax, ax
+    37 00000007 8ED8                                    mov     ds, ax
+    38 00000009 8EC0                                    mov     es, ax
+    39 0000000B BF0278                                  mov     di, 0x7802
+    40                                  
+    41 0000000E 8ED0                                    mov     ss, ax          ; initialize stack
+    42                                  
+    43 00000010 89FC                                    mov     sp, di
+    44 00000012 47                                      inc     di
+    45                                                  
+    46                                  
+    47 00000013 B9FD01                                  mov     cx, 0x0200-3  
+    48                                                  
+    49                                                                  
+    50 00000016 2E                                      db 0x2e  				; CS: copy from current code segment
+    51 00000017 F3A4                                    rep     movsb 
+    52                                  
+    53 00000019 EA1E780000                              jmp     word 0x0000:0x7800+ cont-_smart_mbr
+    54                                  
+    55                                  cont:           
+    56                                  
+    57                                  
+    58 0000001E 8ED8                    				mov     ds, ax
+    59 00000020 8ED0                                    mov     ss, ax
+    60 00000022 31C0                                    xor     ax,ax
+    61 00000024 8EC0                                    mov     es,ax
+    62                                                  
+    63 00000026 E84001                                 call    print
+    64 00000029 4472697665536D6172-                    db      "DriveSmart...",0
+    64 00000032 742E2E2E00         
+    65                                  
+    66                                  
+    67                                  										 ; search for active partition
+    68 00000037 BDBE79                                  mov bp,0x79be				 ; start of partition table
+    69                                  test_next_for_active:				
+    70 0000003A F6460080                                test byte [bp],0x80
+    71 0000003E 7555                                    jne  active_partition_found
+    72 00000040 83C510                                  add  bp,0x10                    ; next table
+    73 00000043 81FDFE79                                cmp  bp, 07800h+0x1fe; scanned beyond end of table ??
+    74 00000047 72F1                                    jb  test_next_for_active
+    75                                  
+    76                                  ;*****************************************************************				
+    77 00000049 E81D01                                  call print
+    78 0000004C 6E6F20616374697665-                     db 'no active partition found',0
+    78 00000055 20706172746974696F-
+    78 0000005E 6E20666F756E6400   
+    79                                  				
+    80                                  WAIT_FOR_REBOOT: 
+    81 00000066 B8004C                  				mov ax,0x4c00
+    82 00000069 CD21                    				int 0x21
+    83 0000006B F4                      				hlt
+    84 0000006C EBF8                                    jmp WAIT_FOR_REBOOT
+    85                                  
+    86                                  
+    87                                  ;*****************************************************************
+    88                                  trouble_reading_drive:
+    89 0000006E E8F800                                  call print
+    90 00000071 72656164206572726F-                     db 'read error',0
+    90 0000007A 7200               
+    91 0000007C EBE8                                    jmp WAIT_FOR_REBOOT
+    92                                  
+    93                                  ;*****************************************************************
+    94                                  
+    95                                  invalid_partition_code:
+    96 0000007E E8E800                                  call print
+    97 00000081 7369676E6174757265-                     db 'signature != 55AA',0
+    97 0000008A 20213D203535414100 
+    98                                  			
+    99 00000093 EBD1                                    jmp WAIT_FOR_REBOOT
+   100                                  
+   101                                  								
+   102                                  ;*****************************************************************
+   103                                  
+   104                                  active_partition_found:
+   105                                  
+   106 00000095 E8D100                  				call print
+   107 00000098 6C6F6164696E672061-     				db 'loading active partition',0
+   107 000000A1 637469766520706172-
+   107 000000AA 746974696F6E00     
+   108                                  
+   109 000000B1 E82B00                                  call read_boot_sector                    
+   110                                  				
+   111 000000B4 72B8                                    jc  trouble_reading_drive
+   112                                  			
+   113 000000B6 813EFE7D55AA                            cmp word [0x7c00+0x1fe],0xaa55
+   114 000000BC 75C0                                    jne invalid_partition_code
+   115                                  			
+   116                                  ;               call print
+   117                                  ;               db '.jump DOS..',0
+   118                                  
+   119                                  ;
+   120                                  
+   121 000000BE E8B400                  	call get_drive_params
+   122 000000C1 7211                    	jc  gogogo
+   123                                  
+   124                                  ;  now we patch the new disk geometry into loaded boot sector
+   125                                  	
+   126 000000C3 BE007C                  	mov si,0x7c00
+   127                                  	
+   128 000000C6 668B4608                	mov eax,[bp+8]
+   129 000000CA 6689441C                	mov [si+0x1c],eax		; hidden sectors
+   130                                  	
+   131 000000CE 89541A                  	mov [si+0x1a],dx		; heads
+   132 000000D1 895C18                  	mov [si+0x18],bx		; sectors per track
+   133                                  
+   134                                  
+   135                                  
+   136                                  
+   137                                  gogogo:			
+   138 000000D4 E89200                      call print
+   139 000000D7 676F00                      db 'go',0
+   140                                  
+   141                                      ; jmp WAIT_FOR_REBOOT
+   142                                  
+   143                                  
+   144 000000DA EA007C0000                  jmp word 0x0:0x7c00             ; and jump to boot sector code
+   145                                  
+   146                                  
+   147                                  ;*****************************
+   148                                  ; read_boot_sector				
+   149                                  ;
+   150                                  ; IN: DI--> partition info
+   151                                  ;OUT:CARRY
+   152                                  ;*****************************
+   153                                  
+   154                                  read_boot_sector:
+   155                                  
+   156 000000DF CD03                       				int 3 
+   157                                     				
+   158 000000E1 C706FE7D0000            		mov word [0x7c00+0x1fe],0
+   159                                  
+   160                                                  ;  /* check for LBA support */
+   161 000000E7 BBAA55                  		mov bx,0x55aa		
+   162 000000EA B441                    		mov ah,0x41
+   163 000000EC 8A5600                  		mov dl,[bp]
+   164 000000EF CD13                    		int 0x13
+   165                                  
+   166 000000F1 7232                    		jc  StandardBios    ;  if (regs.b.x != 0xaa55 || (regs.flags & 0x01))
+   167 000000F3 81FB55AA                		cmp bx,0xaa55       ;    goto StandardBios;
+   168 000000F7 752C                    		jne StandardBios
+   169                                  
+   170                                                                ;  /* if DAP cannot be used, don't use LBA */
+   171                                                                ;  if ((regs.c.x & 1) == 0)
+   172                                                                ;    goto StandardBios;
+   173 000000F9 F6C101                   		test cl,1
+   174 000000FC 7427                     		jz StandardBios
+   175                                   
+   176 000000FE EB10                            jmp short LBABios
+   177                                  
+   178                                  
+   179                                  
+   180                                  ;struct _bios_LBA_address_packet            /* Used to access a hard disk via LBA */
+   181                                  ;{
+   182                                  ;  unsigned char packet_size;    /* size of this packet...set to 16  */
+   183                                  ;  unsigned char reserved_1;     /* set to 0...unused                */
+   184                                  ;  unsigned char number_of_blocks;       /* 0 < number_of_blocks < 128       */
+   185                                  ;  unsigned char reserved_2;     /* set to 0...unused                */
+   186                                  ;  UBYTE far *buffer_address;    /* addr of transfer buffer          */
+   187                                  ;  unsigned long block_address;  /* LBA address                      */
+   188                                  ;  unsigned long block_address_high;     /* high bytes of LBA addr...unused  */
+   189                                  ;};
+   190                                  
+   191                                  _bios_LBA_address_packet:
+   192 00000100 10                      	db 0x10
+   193 00000101 00                      	db 0
+   194 00000102 04                      	db 4				; read four sectors - why not
+   195 00000103 00                      	db 0
+   196 00000104 007C                    	dw 0x7c00			; fixed boot address for DOS sector
+   197 00000106 0000                    	dw 0x0000	
+   198 00000108 0000                    _bios_LBA_low  dw 0
+   199 0000010A 0000                    _bios_LBA_high dw 0
+   200 0000010C 00000000                	dw 0,0
+   201                                  
+   202                                  
+   203                                  LBABios:
+   204                                  						; copy start adpdress of partition to DAP
+   205 00000110 8B4608                  	mov ax,[bp+8]
+   206 00000113 A30879                  	mov [0x7800+ (_bios_LBA_low-real_start)],ax
+   207 00000116 8B460A                  	mov ax,[bp+8+2]
+   208 00000119 A30A79                  	mov [0x7800+ (_bios_LBA_high-real_start)],ax
+   209                                  
+   210 0000011C B80042                      mov ax,0x4200		;  regs.a.x = LBA_READ;
+   211 0000011F BE0079                      mov si,0x7800+ (_bios_LBA_address_packet-real_start); regs.si = FP_OFF(&dap);
+   212                                  
+   213 00000122 CD13                    	int 0x13
+   214 00000124 C3                      	ret
+   215                                  
+   216                                  ;*****************************************************************
+   217                                  ; read disk, using standard BIOS
+   218                                  ;
+   219                                  StandardBios:
+   220                                  ;	call print
+   221                                  ;	db 'standard BIOS',0  
+   222                                  
+   223                                  
+   224                                  
+   225 00000125 E84D00                  	call get_drive_params
+   226 00000128 7312                    	jnc  lba_chs
+   227                                  
+   228                                  							; take dx/cx 
+   229                                  
+   230 0000012A 8B4E02                  	mov cx,[bp+2]			;      regs.c.x =
+   231                                            					; ((chs.Cylinder & 0xff) << 8) + ((chs.Cylinder & 0x300) >> 2) +
+   232                                            					; chs.Sector;
+   233                                            					; that was easy ;-)
+   234 0000012D 8A7601                      mov dh,[bp+1]			;  regs.d.b.h = chs.Head;
+   235                                      						;  regs.es = FP_SEG(buffer);
+   236                                  
+   237                                  
+   238                                  read_normal_bios2:
+   239                                  
+   240 00000130 B80402                      mov ax,0x0204			;  regs.a.x = 0x0201;
+   241 00000133 BB007C                      mov bx,0x7c00			;  regs.b.x = FP_OFF(buffer);
+   242 00000136 8A5600                      mov dl,[bp]						
+   243 00000139 CD13                    	int 0x13
+   244 0000013B C3                      	ret	
+   245                                  	
+   246                                  
+   247                                  lba_chs:
+   248                                  	;	DX heads 
+   249                                  	;	CX CYL
+   250                                  	;   BX sectors
+   251                                  
+   252                                  							; transform LBA into CHS 
+   253 0000013C 668B4608                	mov eax, [bp+8]  
+   254                                  	
+   255 00000140 660FB7F3                	movzx esi,bx		; ESI=sectors
+   256 00000144 660FB7FA                	movzx edi,dx		; EDI=heads
+   257                                  	
+   258 00000148 6631D2                  	xor edx,edx
+   259 0000014B 66F7F6                  	div esi				; eax = eax/sectors = cylinder
+   260                                  	                        ; edx = sectors 
+   261                                  
+   262 0000014E FEC2                    	inc dl					; sectors are 1..63	                        
+   263 00000150 52                      	push dx					; mod --> dh -> sector number to read
+   264                                  	
+   265 00000151 6631D2                  	xor edx,edx
+   266 00000154 66F7F7                  	div edi					; eax = eax/heads
+   267                                  							; edx = heads
+   268                                  	
+   269 00000157 C0EC06                  	shr ah,6
+   270                                  	
+   271 0000015A 59                      	pop cx					; sectors
+   272 0000015B 08E1                    	or cl,ah				; 2 high bits of cyl count
+   273                                  	
+   274 0000015D 88C5                    	mov ch,al				; CH = low byte of cyl
+   275 0000015F 88D6                    	mov dh,dl               ; DH = head
+   276                                  
+   277 00000161 EBCD                    	jmp read_normal_bios2 	
+   278                                   	
+   279                                  
+   280                                  
+   281                                  
+   282                                  
+   283                                  ;****** PRINT
+   284                                  ; prints text after call to this function.
+   285                                  
+   286                                  print_1char:        
+   287 00000163 31DB                                    xor   bx, bx                   ; video page 0
+   288 00000165 B40E                                    mov   ah, 0x0E                 ; else print it
+   289 00000167 CD10                                    int   0x10                     ; via TTY mode
+   290 00000169 5E                      print:          pop   si                       ; this is the first character
+   291 0000016A AC                      print1:         lodsb                          ; get token
+   292 0000016B 56                                      push  si                       ; stack up potential return address
+   293 0000016C 3C00                                    cmp   al, 0                    ; end of string?
+   294 0000016E 75F3                                    jne   print_1char              ; until done
+   295 00000170 C3                                      ret                            ; and jump to it
+   296                                                  
+   297                                                  
+   298                                  ;INT 13 - DISK - GET DRIVE PARAMETERS (PC,XT286,CONV,PS,ESDI,SCSI)
+   299                                  ;	AH = 08h
+   300                                  ;	DL = drive (bit 7 set for hard disk)
+   301                                  ;	ES:DI = 0000h:0000h to guard against BIOS bugs
+   302                                  ;Return: CF set on error
+   303                                  ;	    AH = status (07h) (see #00234)
+   304                                  ;	CF clear if successful
+   305                                  ;	    AH = 00h
+   306                                  ;	    AL = 00h on at least some BIOSes
+   307                                  ;	    BL = drive type (AT/PS2 floppies only) (see #00242)
+   308                                  ;	    CH = low eight bits of maximum cylinder number
+   309                                  ;	    CL = maximum sector number (bits 5-0)
+   310                                  ;		 high two bits of maximum cylinder number (bits 7-6)
+   311                                  ;	    DH = maximum head number
+   312                                  ;
+   313                                  
+   314                                  ;	    CH = low eight bits of maximum cylinder number
+   315                                  ;	    CL = maximum sector number (bits 5-0)
+   316                                  ;		 high two bits of maximum cylinder number (bits 7-6)
+   317                                  ;	    DH = maximum head number
+   318                                  
+   319 00000171 0000                    drive_heads       dw 0
+   320 00000173 0000                    drive_secpertrack dw 0
+   321                                  
+   322                                  
+   323                                  	; in  BP->partition entry
+   324                                  	; out 
+   325                                  	;	DX heads 
+   326                                  	;	CX CYL
+   327                                  	;   BX sectors
+   328                                  
+   329                                  get_drive_params:
+   330                                  
+   331 00000175 B408                    	mov ah,0x08
+   332 00000177 8A5600                  	mov dl,[bp]
+   333 0000017A CD13                    	int 0x13
+   334 0000017C 721A                    	jc  no_info
+   335                                  	
+   336 0000017E 88CB                    	mov bl,cl
+   337 00000180 83E33F                  	and bx,0x3f		; max sector 	
+   338 00000183 98                      	cbw
+   339                                  	
+   340 00000184 C0E906                  	shr cl,6
+   341 00000187 86E9                    	xchg ch,cl		; max cyl
+   342                                  	
+   343 00000189 41                      	inc cx			; cyl count
+   344                                  	
+   345 0000018A 88F2                    	mov dl,dh
+   346 0000018C B600                    	mov dh,0
+   347 0000018E 42                      	inc dx          ; total head count
+   348                                  	
+   349                                  	
+   350 0000018F 8916[7101]              	mov [drive_heads],dx
+   351 00000193 891E[7301]              	mov [drive_secpertrack],bx
+   352                                  	   
+   353 00000197 F8                      	clc   
+   354                                  no_info:	
+   355 00000198 C3                          ret
+   356                                  
+   357                                  
+   358 00000199 00<rept>                		times	0x1fe-$+$$-0x40 db 0			; fill up to partition table
+   359                                  		
+   360                                  
+   361                                  ; TEST disk                                                
+   362 000001BE 0001010006FE3F813F-     db 0x00,0x01,0x01,0x00,0x06,0xfe,0x3f,0x81,0x3f,0x00,0x00,0x00,0xc3,0xdd,0x1f,0x00
+   362 000001C7 000000C3DD1F00     
+   363 000001CE 8000018206FE7F0302-     db 0x80,0x00,0x01,0x82,0x06,0xfe,0x7f,0x03,0x02,0xde,0x1f,0x00,0x02,0xde,0x1f,0x00                                                
+   363 000001D7 DE1F0002DE1F00     
+   364                                                                                  
+   365                                                                                  ; Toms disk1 
+   366                                  ;db 0x80,0x01,0x01,0x00,0x06,0xfe,0x3f,0x81,0x3f,0x00,0x00,0x00,0xc3,0xdd,0x00,0x00 ;T1
+   367                                  ;db 0x80,0x00,0xc1,0xff,0x07,0xfe,0xff,0xff,0x43,0xc0,0xfb,0x00,0xb6,0x50,0xf4,0x04 
+   368                                                                                  
+   369                                  ; db 0x80,0x01,0x01,0x00,0x07,0xFE,0x3F,0x81,0x3F,0x00,0x00,0x00,0xC3,0xDD,0x1F,0x00
+   370                                  ; db 0x00,0x00,0x01,0x82,0x0F,0xFE,0xFF,0xFF,0x02,0xDE,0x1F,0x00,0x25,0x09,0xD0,0x01
+   371 000001DE 0000C1FF07FEFFFF27-     db 0x00,0x00,0xC1,0xFF,0x07,0xFE,0xFF,0xFF,0x27,0xE7,0xEF,0x01,0x7C,0xE7,0x9B,0x00
+   371 000001E7 E7EF017CE79B00     
+   372 000001EE 0000C1FF07FEFFFFB3-     db 0x00,0x00,0xC1,0xFF,0x07,0xFE,0xFF,0xFF,0xB3,0x7B,0xCE,0x02,0x12,0x64,0x83,0x06
+   372 000001F7 7BCE0212648306     
+   373                                  
+   374                                  		times	0x1fe-$+$$ db 0                 ; fill up to magic 55 AA
+   375                                   		
+   376 000001FE 55AA                    		db 0x55,0xaa
+   377                                  		                               
+   378                                  
+   379                                  	
+   380                                  	
+   381                                  	
+   382                                  	
+   383                                  	
+   384                                  
+   385                                  
+   386                                  
+   387                                  
+   388                                  
+   389                                  
+   390                                  
+   391                                  
+   392                                  

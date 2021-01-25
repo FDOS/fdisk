@@ -1,0 +1,2 @@
+c:\tcpp\bin\tcc -ml -lm -P -efdisk main.obj bootnorm.obj booteasy.obj cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pdiskio.obj pcompute.obj ui1.obj ui2.obj
+                                   main.obj                           cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pcompute.obj pdiskio.obj userint1.obj userint2.obj

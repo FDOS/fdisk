@@ -1,0 +1,47 @@
+Microsoft (R) Macro Assemblar Version 5.10                  8/4/5
+                                                             Symbols-1
+
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ACTIVE_PARTITION_FOUND . . . . .  	L NEAR	00A4	
+
+CONT . . . . . . . . . . . . . .  	L NEAR	0023	
+
+INVALID_PARTITION_CODE . . . . .  	L NEAR	0083	
+
+LBABIOS  . . . . . . . . . . . .  	L NEAR	00DF	
+
+PRINT  . . . . . . . . . . . . .  	L NEAR	010D	
+PRINT1 . . . . . . . . . . . . .  	L NEAR	010E	
+PRINT_1CHAR  . . . . . . . . . .  	L NEAR	0105	
+
+READ_BOOT_SECTOR . . . . . . . .  	L NEAR	00B6	
+REAL_START . . . . . . . . . . .  	L NEAR	0000	
+
+STANDARDBIOS . . . . . . . . . .  	L NEAR	00F5	
+
+TEST_NEXT_FOR_ACTIVE . . . . . .  	L NEAR	002F	
+TROUBLE_READING_DRIVE  . . . . .  	L NEAR	005F	
+
+WAIT_FOR_REBOOT  . . . . . . . .  	L NEAR	005D	
+
+@CPU . . . . . . . . . . . . . .  	TEXT  0101h		
+@FILENAME  . . . . . . . . . . .  	TEXT  bootnorm		
+@VERSION . . . . . . . . . . . .  	TEXT  510		
+_BIOS_LBA_ADDRESS_PACKET . . . .  	L NEAR	00CF	
+_BIOS_LBA_HIGH . . . . . . . . .  	L WORD	00D9	
+_BIOS_LBA_LOW  . . . . . . . . .  	L WORD	00D7	
+_BOOTNORMAL_CODE . . . . . . . .  	L NEAR	0000	
+
+
+      0 Source  Lines
+      0 Total   Lines
+     21 Symbols
+
+  45874 + 435210 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors
