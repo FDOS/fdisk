@@ -45,7 +45,6 @@ extern void Pause(void);
 int Get_Hard_Drive_Parameters(int physical_drive);
 int Read_Physical_Sectors_CHS(int drive,long cylinder, long head, long sector, int number_of_sectors);
 int Read_Physical_Sectors_LBA(int drive,long cylinder, long head, long sector, int number_of_sectors);
-int Read_Physical_Sectors_LBA_only(int drive,ulong LBA, int number_of_sectors);
 int Write_Physical_Sectors_CHS(int drive, long cylinder, long head, long sector, int number_of_sectors);
 int Write_Physical_Sectors_LBA(int drive, long cylinder, long head, long sector, int number_of_sectors);
 
@@ -415,21 +414,28 @@ unsigned long Extract_Cylinder(unsigned long hex1, unsigned long hex2)
 }
 
 /* Extract the Cylinder from an LBA Value */
-unsigned long Extract_Cylinder_From_LBA_Value(long lba_value
- ,long head,long sector,long total_heads
- ,long total_sectors)
-{
-  long z1 = ( ( (lba_value-(sector-1))/total_sectors)-head)/(total_heads+1) ;
-  long z2 = lba_value/(total_sectors * (total_heads+1));
-  
-  if (z1 != z2)
-	{
-	asm int 3;
-  	z1 = ( ( (lba_value-(sector-1))/total_sectors)-head)/(total_heads+1) ;
-    z2 = lba_value/(total_sectors * (total_heads+1));
-    }
+void Extract_CHS_From_LBA_Value(long lba_value, long total_heads,long total_sectors,
+										long *pcylinders, long *pheads, long *psectors)
+{  
+	ulong lba = lba_value;	  
+	static init = 0;
+	
+	if (init == 0)
+		{
+		init = 1;
+		printf("total_heads %lu total_sect %lu\n", total_heads,total_sectors);
+		}
+	
 
-	return z2;	  
+  *pcylinders = lba_value/(total_sectors * (total_heads+1));
+
+  lba_value = lba_value % (total_sectors * (total_heads+1));
+  
+  *pheads   = lba_value / total_sectors;
+  
+  *psectors = lba_value % total_sectors;   
+  
+  printf("%8lu --> %4lu %3lu %3lu\n", lba, *pcylinders, *pheads, *psectors);
 }
 
 /* Extract Sector */
@@ -509,7 +515,7 @@ int Get_Hard_Drive_Parameters(int physical_drive)
   if (total_heads == 0 || total_sectors == 0)
   	return 255;							
   
-  
+  printf("Get_Hard_Drive_Parameters:total_heads %lu total_sect %lu\n", total_heads, total_sectors); 
 
   pDrive->total_head=total_heads;
   pDrive->total_sect=total_sectors;
@@ -547,6 +553,8 @@ int Get_Hard_Drive_Parameters(int physical_drive)
 
     total_cylinders=((number_of_physical_sectors/total_sectors)/(total_heads+1));
 
+	printf("ext_int13: total_cylinders %lu \n", total_cylinders); 
+
     /* If the number of cylinders calculated using service 0x48 is in error,*/
     /* use the total cylinders reported by service 0x08.                    */
     if(legacy_total_cylinders>total_cylinders)
@@ -566,27 +574,13 @@ int Get_Hard_Drive_Parameters(int physical_drive)
   return(0);
 }
 
-
-// return physical start of a logical partition
-ulong get_log_drive_start(Partition_Table *pDrive, int partnum)
-{
-    if(partnum==0)
-    	return pDrive->log_drive[partnum].rel_sect+pDrive->ptr_ext_part->rel_sect;
-	else           
-   		return pDrive->log_drive[partnum].rel_sect
-         				+pDrive->ptr_ext_part->rel_sect
-         				+pDrive->next_ext[partnum-1].rel_sect;
-}
-
-
-
 /* Get the volume labels and file system types from the boot sectors */
 void Get_Partition_Information()
 {
   int drivenum;
   int partnum;
   int label_offset;
-	long lba_sect;
+
 
   /* First get the information from the primary partitions. */
 
@@ -611,15 +605,11 @@ void Get_Partition_Information()
                 label_offset = 43;
                 }
 
-		if (pDrive->ext_int_13)	
-			Read_Physical_Sectors_LBA_only((drivenum+128),pDrive->pri_part[partnum].rel_sect,1);
-		else                 
-			Read_Physical_Sectors((drivenum+128)
+		Read_Physical_Sectors((drivenum+128)
                  ,pDrive->pri_part[partnum].start_cyl
                  ,pDrive->pri_part[partnum].start_head
                  ,pDrive->pri_part[partnum].start_sect,1);
-                 
-		if (flags.verbose) printf("primary %d sect %lu label %11.11s\n", partnum, pDrive->pri_part[partnum].rel_sect, sector_buffer+label_offset);
+
 
                 if( sector_buffer[label_offset+10]>=32 &&
                         sector_buffer[label_offset+10]<=122 )
@@ -651,22 +641,11 @@ void Get_Partition_Information()
         else
                 {
 		label_offset = 43;
-                } 
-                
-		if (pDrive->ext_int_13)	
-			{
-			lba_sect = get_log_drive_start(pDrive, partnum);
-			
-			Read_Physical_Sectors_LBA_only((drivenum+128),lba_sect,1);
-			}
-		else                 
-	        Read_Physical_Sectors((drivenum+128)
-	         ,pDrive->log_drive[partnum].start_cyl
-	         ,pDrive->log_drive[partnum].start_head
-	         ,pDrive->log_drive[partnum].start_sect,1);
-
-		if (flags.verbose) printf("logical %u sect %lu label %11.11s\n", partnum, lba_sect, sector_buffer+label_offset);
-
+                }
+        Read_Physical_Sectors((drivenum+128)
+         ,pDrive->log_drive[partnum].start_cyl
+         ,pDrive->log_drive[partnum].start_head
+         ,pDrive->log_drive[partnum].start_sect,1);
 
 	if( sector_buffer[label_offset+10]>=32 &&
                 sector_buffer[label_offset+10]<=122 )
@@ -890,8 +869,10 @@ int Read_Partition_Tables()
           pDrive->pri_part[index].end_sect=Extract_Sector(sector_buffer[(entry_offset+0x06)],sector_buffer[(entry_offset+0x07)]);
 	  }
 
-	pDrive->pri_part[index].rel_sect= *(_u32*)(sector_buffer+entry_offset+0x08);
-	pDrive->pri_part[index].num_sect= *(_u32*)(sector_buffer+entry_offset+0x0c);
+	pDrive->pri_part[index].rel_sect=
+			*(_u32*)(sector_buffer+entry_offset+0x08);
+	pDrive->pri_part[index].num_sect=
+			*(_u32*)(sector_buffer+entry_offset+0x0c);
 
 	if( (pDrive->ext_int_13==TRUE)
 	 && (pDrive->pri_part[index].num_type!=0) )
@@ -899,7 +880,7 @@ int Read_Partition_Tables()
 	  /* If int 0x13 extensions are used compute the virtual CHS values. */
 
 	  /* The head number is 0 unless the cyl is 0...then the head is 1. */
-	  if(pDrive->pri_part[index].rel_sect==pDrive->total_sect)
+/*	  if(pDrive->pri_part[index].rel_sect==pDrive->total_sect)
 	    {
 	    pDrive->pri_part[index].start_head=1;
 	    }
@@ -917,7 +898,6 @@ int Read_Partition_Tables()
 	  pDrive->pri_part[index].end_sect=pDrive->total_sect;
 	  pDrive->pri_part[index].end_cyl
 	   =Extract_Cylinder_From_LBA_Value(
-	   /* */
 	   (pDrive->pri_part[index].rel_sect
 	   +pDrive->pri_part[index].num_sect)
 	   ,0					//!!,pDrive->pri_part[index].end_head
@@ -925,8 +905,21 @@ int Read_Partition_Tables()
 	   ,pDrive->total_head
 	   ,pDrive->total_sect);
 	   
+*/
+  		
+       Extract_CHS_From_LBA_Value(pDrive->pri_part[index].rel_sect, 
+                                  pDrive->total_head,pDrive->total_sect,
+                                  &pDrive->pri_part[index].start_cyl, 
+                                  &pDrive->pri_part[index].start_head,
+                                  &pDrive->pri_part[index].start_sect);
 
-
+       Extract_CHS_From_LBA_Value(pDrive->pri_part[index].rel_sect+pDrive->pri_part[index].num_sect-1, 
+                                  pDrive->total_head,pDrive->total_sect,
+                                  &pDrive->pri_part[index].end_cyl, 
+                                  &pDrive->pri_part[index].end_head,
+                                  &pDrive->pri_part[index].end_sect);
+                                  
+  
 							/*
 							a protective GPT partition starts at sector
 							1 and has a size of 0xffffffff
@@ -1011,16 +1004,15 @@ int Read_Partition_Tables()
               /* If int 0x13 extensions are used compute the virtual CHS values. */
 
               /* The head number is 0 unless the cyl is 0...then the head is 1. */
-              if(pDrive->log_drive[index].rel_sect==pDrive->total_sect)
+/*              if(pDrive->log_drive[index].rel_sect==pDrive->total_sect)
                 {
                 pDrive->log_drive[index].start_head=1;
                 }
               else pDrive->log_drive[index].start_head=0;
               pDrive->log_drive[index].start_sect=1;
-              
-              
+*/
 
-              if(index==0)
+/*              if(index==0)
                 pDrive->log_drive[index].start_cyl
                  =Extract_Cylinder_From_LBA_Value(
                  (pDrive->log_drive[index].rel_sect
@@ -1039,11 +1031,23 @@ int Read_Partition_Tables()
 		 ,pDrive->log_drive[index].start_sect
                  ,pDrive->total_head
 		 ,pDrive->total_sect);
+*/
+		long lba_sect;
+		
+        if(index==0)
+           lba_sect = pDrive->log_drive[index].rel_sect+pDrive->ptr_ext_part->rel_sect;
+		else           
+           lba_sect = pDrive->log_drive[index].rel_sect
+                 				+pDrive->ptr_ext_part->rel_sect
+                 				+pDrive->next_ext[index-1].rel_sect;
 
+        Extract_CHS_From_LBA_Value(lba_sect,
+                                  pDrive->total_head,pDrive->total_sect,
+                                  &pDrive->log_drive[index].start_cyl, 
+                                  &pDrive->log_drive[index].start_head,
+                                  &pDrive->log_drive[index].start_sect);
 
-	      pDrive->log_drive[index].end_head=pDrive->total_head;
-	      pDrive->log_drive[index].end_sect=pDrive->total_sect;
-
+/*		
 	      if(index==0)
 		pDrive->log_drive[index].end_cyl
 		 =Extract_Cylinder_From_LBA_Value(
@@ -1066,6 +1070,16 @@ int Read_Partition_Tables()
 		 ,pDrive->total_head
 		 ,pDrive->total_sect);
 	      }
+*/	      
+	      
+       Extract_CHS_From_LBA_Value(lba_sect+pDrive->log_drive[index].num_sect,
+                                  pDrive->total_head,pDrive->total_sect-1,
+                                  &pDrive->log_drive[index].end_cyl, 
+                                  &pDrive->log_drive[index].end_head,
+                                  &pDrive->log_drive[index].end_sect);  
+                                  
+		}                                  
+   
 
 	      pDrive->log_drive[index].size_in_MB
 	       = Convert_Cyl_To_MB(
@@ -1103,9 +1117,9 @@ int Read_Partition_Tables()
               {
               /* If int 0x13 extensions are used compute the virtual CHS values. */
 
-              pDrive->next_ext[index].start_head=0;
+/*            pDrive->next_ext[index].start_head=0;
               pDrive->next_ext[index].start_sect=1;
-              /* */
+
               pDrive->next_ext[index].start_cyl
                =Extract_Cylinder_From_LBA_Value(
                (pDrive->next_ext[index].rel_sect
@@ -1114,7 +1128,14 @@ int Read_Partition_Tables()
                ,pDrive->next_ext[index].start_sect
                ,pDrive->total_head
 	       ,pDrive->total_sect);
+*/
+	       Extract_CHS_From_LBA_Value(pDrive->next_ext[index].rel_sect+pDrive->ptr_ext_part->rel_sect,
+                                  pDrive->total_head,pDrive->total_sect,
+                                  &pDrive->next_ext[index].start_head, 
+                                  &pDrive->next_ext[index].start_head,
+                                  &pDrive->next_ext[index].start_sect);
 
+/*
               pDrive->next_ext[index].end_head=pDrive->total_head;
               pDrive->next_ext[index].end_sect=pDrive->total_sect;
               pDrive->next_ext[index].end_cyl
@@ -1126,6 +1147,14 @@ int Read_Partition_Tables()
                ,pDrive->next_ext[index].end_sect
                ,pDrive->total_head
                ,pDrive->total_sect);
+*/               
+		       Extract_CHS_From_LBA_Value(pDrive->next_ext[index].rel_sect
+               							+pDrive->ptr_ext_part->rel_sect+pDrive->next_ext[index].num_sect-1,
+                                  pDrive->total_head,pDrive->total_sect,
+                                  &pDrive->next_ext[index].end_cyl, 
+                                  &pDrive->next_ext[index].end_head,
+                                  &pDrive->next_ext[index].end_sect);
+               
               }
 
               error_code=Read_Physical_Sectors(physical_drive
@@ -1234,13 +1263,19 @@ int Read_Physical_Sectors_CHS(int drive, long cylinder, long head
 }
 
 /* Read a physical sector using LBA values */
-int Read_Physical_Sectors_LBA_only(int drive, ulong LBA_address, int number_of_sectors)
+int Read_Physical_Sectors_LBA(int drive, long cylinder, long head
+ , long sector, int number_of_sectors)
 {
   unsigned int error_code=0;
 
   /* Get the segment and offset of disk_address_packet. */
   unsigned int disk_address_packet_address_offset=FP_OFF(disk_address_packet);
 
+
+  /* Translate CHS values to LBA values. */
+  unsigned long LBA_address=Translate_CHS_To_LBA(cylinder,head,sector
+  ,part_table[(drive-128)].total_head
+  ,part_table[(drive-128)].total_sect);
 
   /* Add number_of_sectors to disk_address_packet */
   disk_address_packet[2]=number_of_sectors;
@@ -1269,18 +1304,6 @@ int Read_Physical_Sectors_LBA_only(int drive, ulong LBA_address, int number_of_s
     }
 
   return(error_code);
-}
-
-/* Read a physical sector using LBA values */
-int Read_Physical_Sectors_LBA(int drive, long cylinder, long head
- , long sector, int number_of_sectors)
-{
-  /* Translate CHS values to LBA values. */
-  unsigned long LBA_address=Translate_CHS_To_LBA(cylinder,head,sector
-  ,part_table[(drive-128)].total_head
-  ,part_table[(drive-128)].total_sect);
-  
-  return Read_Physical_Sectors_LBA_only(drive, LBA_address, number_of_sectors);
 }
 
 /* Translate a CHS value to an LBA value. */

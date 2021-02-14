@@ -10,7 +10,7 @@
 # macros:
 
 CC=c:\tcpp\bin\tcc
-CFLAGS=-ms -g1 -w -O -Z -1
+CFLAGS=-ms -g5 -w -O -Z -1
 
 # -mx     Set Memory Model
 # -gN     Stop after N warnings
@@ -36,7 +36,10 @@ ui1.obj ui2.obj bootnorm.obj booteasy.obj kitten.obj smartmbr.obj
 
 # build targets:
 
-all: fdisk.exe
+all: fdisk.exe test.exe
+
+test.exe: test.c
+  $(CC) test.c
 
 fdisk.exe: main.obj $(OBJ)  
 	cmd /c echo c:\tcpp\lib\c0s.obj+>resp.tmp 
@@ -45,7 +48,7 @@ fdisk.exe: main.obj $(OBJ)
 	cmd /c echo ui1 ui2 bootnorm booteasy smartmbr kitten  +>>resp.tmp 
 	cmd /c echo  ,fdisk,, c:\tcpp\lib\cs.lib  >>resp.tmp
 	c:\tcpp\bin\tlink /c /M @resp.tmp
-
+    upx -q fdisk.exe
 
  #c:\tcpp\bin\tlink /m $(LNK),fdisk,,c:\tcpp\lib\c0s.obj
 

@@ -68,8 +68,14 @@ void dump_MBR(char *buffer)
 	for ( i = 0; i < 4; i++)		
 		{
 		P = (struct part_entry*)(buffer+0x1be + 16*i);
-		
-		printf("start_sect %8lu size %8lu\n", P->start_sect, P->num_sect);
+
+		if (P->partitiontype) 		
+		   printf("%d: 0x%02x %s sect %8lu-%-8lu size %8lu\n", i,
+								P->bootable? "A" : " ",
+								P->partitiontype,
+								P->start_sect, 
+								P->start_sect + P->num_sect-1,
+								P->num_sect);
 		}	
 	printf("\n");
 }
@@ -89,8 +95,7 @@ void set_partition_size(int partno, ulong sectorcount, int HD)
 		exit(1);
 		}                
 
-	if (0) 
-		dump_MBR(buffer);	
+	// dump_MBR(buffer);	
 	
 
 	if (partno >= 0 && partno <= 3)
@@ -224,7 +229,8 @@ int main(int argc, char *argv[])
 
 	printf("?? %u:%u:%lu %u\n", partno, sectorcount, HD, cnt);
 		
-	printf("usage: /SETSIZE:partion(0..3):sectorcount:harddisk(0..7)\n");
+	printf("usage: /SETSIZE partion(0..3) sectorcount harddisk(0..7)\n");
+	printf("       /CHECK   harddisk(0..7)\n");
 
 	return 0;
 }

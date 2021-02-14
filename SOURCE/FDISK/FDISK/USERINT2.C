@@ -12,7 +12,7 @@
 //  DEFINES
 /////////////////////////////////////////////////////////////////////////////
 */
-
+                  
 #define USERINT
 
 /*
@@ -121,7 +121,7 @@ int Create_DOS_Partition_Interface(int type)
   int partition_slot_just_used;
 
   long maximum_partition_size_in_MB;
-  long maximum_possible_percentage;
+  long maximum_possible_percentage; 
 
   unsigned long input=0;
   Partition_Table *pDrive = &part_table[flags.drive_number-0x80];
@@ -172,7 +172,7 @@ int Create_DOS_Partition_Interface(int type)
       numeric_type=Partition_Type_To_Create(input,numeric_type);
 
       partition_slot_just_used=Create_Primary_Partition(numeric_type,input);
-      if((flags.drive_number-128)==0) Set_Active_Partition(partition_slot_just_used);
+      if((flags.drive_number-128)==0)  Set_Active_Partition_If_None_Is_Active(partition_slot_just_used);
       partition_created=TRUE;
       }
     }

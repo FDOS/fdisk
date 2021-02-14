@@ -522,7 +522,9 @@ void main(int argc, char *argv[], char *env[])
   
   if (memicmp(argv[1],"SMART",5) == 0)
   	smart_mbr();
-  
+                     
+                     
+	asm int 3;                     
   
 //  int i;
 
