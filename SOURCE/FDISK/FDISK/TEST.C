@@ -71,8 +71,8 @@ void dump_MBR(char *buffer)
 
 		if (P->partitiontype) 		
 		   printf("%d: 0x%02x %s sect %8lu-%-8lu size %8lu\n", i,
-								P->bootable? "A" : " ",
 								P->partitiontype,
+								P->bootable == 0x80 ? "A" : " ",
 								P->start_sect, 
 								P->start_sect + P->num_sect-1,
 								P->num_sect);
@@ -126,6 +126,9 @@ check_partition_table(int HD)
 	char buffer[4096];
 	struct part_entry *Pi, *Pj;
 	int i, j, error;
+	
+				asm int 3;
+
 	
 	if ((error = ReadWrite_Physical_Sectors_CHS(HD, 0,0,1,1,buffer, READ)) != 0)
 		{

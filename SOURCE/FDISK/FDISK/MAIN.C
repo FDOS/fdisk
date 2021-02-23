@@ -36,6 +36,7 @@ $set 1
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dos.h>
 
 #include "cmd.h"
 #include "main.h"
@@ -506,6 +507,43 @@ void Re_Initialization()
 
   Read_Partition_Tables();
 }
+    
+    
+
+/*
+	if the C: drive has not been formatted, and fdisk
+	is (re)started, it will generate a couple of 
+	   retry/abort/fail
+	messages because it searches FDISK.INI.
+	this is annoying and must be stopped	   
+*/
+
+void int24_handler(void)
+{
+	asm {
+	pop bp
+	mov al,0;
+	iret
+	}   
+}
+
+void interrupt (far *old_int24)();
+                        
+void restore_int24(void)
+{
+	setvect(0x24, old_int24);
+}                        
+                        
+void int24_init(void)
+{    
+
+	old_int24 = getvect(0x24);
+
+	setvect(0x24, (void interrupt (far *)())int24_handler);
+	
+	atexit(restore_int24);
+}
+
 
 /*
 /////////////////////////////////////////////////////////////////////////////
@@ -523,9 +561,8 @@ void main(int argc, char *argv[], char *env[])
   if (memicmp(argv[1],"SMART",5) == 0)
   	smart_mbr();
                      
-                     
-	asm int 3;                     
-  
+  int24_init();                   
+
 //  int i;
 
   /* First check to see if the "/?" command-line switch was entered.  If it

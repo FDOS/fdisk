@@ -346,8 +346,10 @@ int Create_Logical_Drive_Interface()
       numeric_type=Partition_Type_To_Create(input,numeric_type);
 
       Create_Logical_Drive(numeric_type,input);
-      drive_created=TRUE;
-
+      drive_created=TRUE; 
+      
+      Determine_Free_Space(); // update pDrive->ext_part_largest_free_space  !! 
+      
       }while(pDrive->ext_part_largest_free_space>=2);
     }
 
