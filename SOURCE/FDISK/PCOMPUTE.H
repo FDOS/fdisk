@@ -32,7 +32,7 @@ PCEXTERN int More_Than_One_Hard_Disk(void);
 PCEXTERN int Partition_Type_To_Create(unsigned long size_in_mb
  ,int requested_partition_type);
 
-PCEXTERN long Max_Log_Part_Size_In_MB();
+PCEXTERN long Max_Log_Part_Size_In_MB(void);
 PCEXTERN long Max_Pri_Part_Size_In_MB(int type);
 
 PCEXTERN unsigned long Combine_Cylinder_and_Sector(unsigned long cylinder, unsigned long sector);

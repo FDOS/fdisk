@@ -95,8 +95,9 @@ void Display_Help_Screen()
     printAt(0,0,"\n");
     }
   printf("MBR (Master Boot Record) modification:\n");
-  printf("  /MBR  [drive#]  Writes the standard MBR to <drive#>.\n");
-  printf("  /BMBR [drive#]     \"    \"  BOOTEASY MBR to <drive#>.\n");
+  printf("  /MBR  [drive#]  Writes the standard MBR to <drive#>\n");
+  printf("  /BMBR [drive#]     \"    \"  BOOTEASY MBR to <drive#>\n");
+  printf("  /SMARTMBR [drive#] \"    \"  DriveSmart MBR to <drive#>\n");
   printf("  /AMBR [drive#]     \"    \"  MBR stored in the \"boot.mbr\" file\n");
   printf("  /SMBR [drive#]  Saves the current MBR on <drive#>, into a \"boot.mbr\" file.\n");
   printf("  /RMBR [drive#]  Removes the MBR from <drive#>.\n");

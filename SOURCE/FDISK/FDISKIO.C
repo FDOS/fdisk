@@ -55,6 +55,7 @@ $set 3
 
 extern char booteasy_code[];
 extern char bootnormal_code[];
+extern char BootSmart_code[];
 
 /*
 /////////////////////////////////////////////////////////////////////////////
@@ -94,7 +95,7 @@ void Automatically_Partition_Hard_Drive()
   Determine_Free_Space();
   if( pDrive->pri_part_largest_free_space > 0)
     {
-    Create_Primary_Partition(5,999999L);
+    Create_Primary_Partition(5,999999ul);
 
     /* Fill the extended partition with logical drives. */
     Determine_Free_Space();
@@ -221,6 +222,28 @@ void Create_BootNormal_MBR(void)
   Read_Physical_Sectors(flags.drive_number,0,0,1,1);
 
   memcpy(sector_buffer,bootnormal_code,SIZE_OF_MBR);
+
+  sector_buffer[0x1fe]=0x55;
+  sector_buffer[0x1ff]=0xaa;
+
+  Write_Physical_Sectors(flags.drive_number,0,0,1,1);
+}      
+
+void fmemcpy(void far *dest, void far *src,unsigned cnt)
+{            
+	unsigned i;
+	for (i=0; i <  cnt; i++)
+	 ((unsigned char*)dest)[i] = ((unsigned char*)src)[i];
+}
+
+/* Create Normal MBR */
+void Create_BootSmart_MBR(void)
+{
+  Qprintf("Creating Drive Smart MBR for disk %x\n",flags.drive_number);
+
+  Read_Physical_Sectors(flags.drive_number,0,0,1,1);
+  
+  fmemcpy(sector_buffer,BootSmart_code,SIZE_OF_MBR);
 
   sector_buffer[0x1fe]=0x55;
   sector_buffer[0x1ff]=0xaa;

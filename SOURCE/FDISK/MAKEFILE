@@ -9,23 +9,50 @@
 
 # macros:
 
-CC=tcc
-CFLAGS=-ml -g1 -w -O -Z -P
-LDFLAGS=-ml -lm -P
+CC=c:\tcpp\bin\tcc
+CFLAGS=-ms -g5 -w -O -Z -1
+
+# -mx     Set Memory Model
+# -gN     Stop after N warnings
+# -wxxx   Warning control                                  
+# -O      Optimize jumps 
+# -Z      Optimize register usage
+# -1      80186/286 Instructions
+
+
+
+
+
+LDFLAGS= -lm -P
 LDLIBS=
 RM=del
-SRC = main.c cmd.c fdiskio.c helpscr.c kbdinput.c pdiskio.c pcompute.c userint1.c userint2.c
-OBJ = main.obj bootnormal.obj booteasy.obj cmd.obj fdiskio.obj \
-      helpscr.obj kbdinput.obj pdiskio.obj pcompute.obj \
-      userint1.obj userint2.obj
+SRC = main.c cmd.c fdiskio.c helpscr.c kbdinput.c pdiskio.c \
+      pcompute.c userint1.c userint2.c 
+OBJ = main.obj cmd.obj fdiskio.obj \
+helpscr.obj kbdinput.obj pdiskio.obj pcompute.obj \
+ui1.obj ui2.obj bootnorm.obj booteasy.obj kitten.obj smartmbr.obj
+
+
 
 # build targets:
 
-all: fdisk.exe
+all: fdisk.exe test.exe
+
+test.exe: test.c
+  $(CC) test.c
 
 fdisk.exe: main.obj $(OBJ)  
- $(CC) $(LDFLAGS) -efdisk $(OBJ) $(LDLIBS)
+	cmd /c echo c:\tcpp\lib\c0s.obj+>resp.tmp 
+	cmd /c echo main cmd fdiskio +>>resp.tmp 
+    cmd /c echo helpscr kbdinput pdiskio pcompute +>>resp.tmp 
+	cmd /c echo ui1 ui2 bootnorm booteasy smartmbr kitten  +>>resp.tmp 
+	cmd /c echo  ,fdisk,, c:\tcpp\lib\cs.lib  >>resp.tmp
+	c:\tcpp\bin\tlink /c /M @resp.tmp
+    upx -q fdisk.exe
 
+ #c:\tcpp\bin\tlink /m $(LNK),fdisk,,c:\tcpp\lib\c0s.obj
+
+# c:\tcpp\lib\cs.lib 
 # compile targets:
 
 main.obj: main.c
@@ -50,10 +77,24 @@ pcompute.obj: pcompute.c
  $(CC) $(CFLAGS) -c pcompute.c
 
 ui1.obj: userint1.c
- $(CC) $(CFLAGS) -c userint1.c
+ $(CC) $(CFLAGS) -c -oui1 userint1.c
 
 ui2.obj: userint2.c
- $(CC) $(CFLAGS) -c userint2.c
+ $(CC) $(CFLAGS) -c -oui2 userint2.c
+
+kitten.obj: kitten.c
+ $(CC) $(CFLAGS) -c kitten.c
+ 
+bootnorm.obj: bootnorm.asm
+     nasm -f obj bootnorm.asm
+
+booteasy.obj: booteasy.asm
+     nasm -f obj booteasy.asm
+
+smartmbr.obj: smartmbr.asm
+     nasm -f obj smartmbr.asm -l smartmbr.lst
+ 
+ 
 
 # clean up:
 

@@ -23,15 +23,15 @@
 
 #define PRINAME "Free FDISK"
 #define ALTNAME "FreeDOS"
-#define VERSION "1.3.1"
-#define COPYLEFT "1998 - 2008"
+#define VERSION "1.3.3"
+#define COPYLEFT "1998 - 2003"
 
-#define DEBUG
+//#define DEBUG
 			 /* ***** Uncomment the above line to compile */
 			 /* ***** debugging code and functions into   */
 			 /* ***** Free FDISK.                         */
 
-#define BETA_RELEASE
+//#define BETA_RELEASE
 			 /* ***** Uncomment the above line to         */
 			 /* ***** have this program inform the user   */
 			 /* ***** that it is a beta release.          */
@@ -58,12 +58,17 @@
 			 /* *****   Win 98          8                 */
 			 /* *****   FreeDOS:        100               */
 
-#define SIZE_OF_MBR 445
+//#define SIZE_OF_MBR 445
 			 /* ***** This is the number of bytes for the */
 			 /* ***** boot code in the partition table.   */
 			 /* ***** If the boot code in the partition   */
 			 /* ***** table changes, this WILL need       */
 			 /* ***** changed.  (Start the count at 0.)   */
+            // sectorsize - 4 tables - '55aa' - signature
+#define SIZE_OF_MBR (512 - 4*16 - 2 - 6)
+			 
+			 
+			 
 
 #define EMULATED_CYLINDERS 15000
 //#define EMULATED_CYLINDERS   784
@@ -192,7 +197,6 @@ typedef unsigned char  _u8;
 */
 
 
-/* #include "catgets.h"  */
 #include "kitten.h"
 
 MEXTERN nl_catd cat;

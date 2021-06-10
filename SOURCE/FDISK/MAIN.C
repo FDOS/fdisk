@@ -72,14 +72,14 @@ unsigned long computed_partition_size;
 
 unsigned long Convert_Cyl_To_MB(unsigned long num_cyl,unsigned long total_heads, unsigned long total_sect)
 {
-  unsigned long sect_per_meg = 1048576UL/512UL;
+  unsigned long sect_per_meg = 1048576ul/512;
   return( ( ( (num_cyl * total_heads) * total_sect)
 	    + (sect_per_meg/2)) / sect_per_meg );
 }
 
 unsigned long Convert_Sect_To_MB(unsigned long num_sect)
 {
-  unsigned long sect_per_meg = 1048576UL/512UL;
+  unsigned long sect_per_meg = 1048576ul/512;
 
   return((num_sect + (sect_per_meg/2)) / sect_per_meg);
 }
@@ -380,7 +380,7 @@ void Initialization(char *environment[])
 
 
   /* Set some flags */
-  flags.check_for_extra_cylinder=TRUE;
+  flags.check_for_extra_cylinder=FALSE;
   flags.display_name_description_copyright=TRUE;
   flags.do_not_pause_help_information=FALSE;
   flags.fprmt=FALSE;
@@ -517,6 +517,15 @@ void main(int argc, char *argv[], char *env[])
   int command_ok;
   int index;
   int location;
+  
+  extern void far smart_mbr(void);
+  
+  if (memicmp(argv[1],"SMART",5) == 0)
+  	smart_mbr();
+                     
+                     
+	asm int 3;                     
+  
 //  int i;
 
   /* First check to see if the "/?" command-line switch was entered.  If it
@@ -641,7 +650,7 @@ void main(int argc, char *argv[], char *env[])
 	      exit(9);
 	      }
 
-	    Set_Active_Partition(int(arg[0].value-1));
+	    Set_Active_Partition((int)(arg[0].value-1));
 	    command_ok=TRUE;
 
 	    Shift_Command_Line_Options(1);
@@ -912,6 +921,23 @@ void main(int argc, char *argv[], char *env[])
 	    {
 	    Command_Line_Set_Flag();
 	    command_ok=TRUE;
+	    }
+
+	  if(0==strcmp(arg[0].choice,"SMBR"))
+	    {
+	    Save_MBR();
+	    command_ok=TRUE;
+
+	    Shift_Command_Line_Options(1);
+	    }
+
+	  if(0==strcmp(arg[0].choice,"SMARTMBR"))
+	    {
+	    extern void Create_BootSmart_MBR(void);
+	    Create_BootSmart_MBR();
+	    command_ok=TRUE;
+
+	    Shift_Command_Line_Options(1);
 	    }
 
 	  if(0==strcmp(arg[0].choice,"SMBR"))

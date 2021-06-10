@@ -2,7 +2,7 @@
 cd ..\source\fdisk
 if exist fdisk.exe copy fdisk.exe ..\..\program\*.* /Y
 if exist news.txt copy news.txt ..\..\docs\*.* /Y
-del *.asm
+
 del *.bak
 del *.dsk
 del *.exe

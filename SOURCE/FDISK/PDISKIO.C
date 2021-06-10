@@ -45,6 +45,7 @@ extern void Pause(void);
 int Get_Hard_Drive_Parameters(int physical_drive);
 int Read_Physical_Sectors_CHS(int drive,long cylinder, long head, long sector, int number_of_sectors);
 int Read_Physical_Sectors_LBA(int drive,long cylinder, long head, long sector, int number_of_sectors);
+int Read_Physical_Sectors_LBA_only(int drive,ulong LBA, int number_of_sectors);
 int Write_Physical_Sectors_CHS(int drive, long cylinder, long head, long sector, int number_of_sectors);
 int Write_Physical_Sectors_LBA(int drive, long cylinder, long head, long sector, int number_of_sectors);
 
@@ -499,7 +500,17 @@ unsigned long Extract_Cylinder_From_LBA_Value(long lba_value
  ,long head,long sector,long total_heads
  ,long total_sectors)
 {
-  return( ( ( ( (lba_value-(sector-1))/total_sectors)-head)/(total_heads+1) ) );
+  long z1 = ( ( (lba_value-(sector-1))/total_sectors)-head)/(total_heads+1) ;
+  long z2 = lba_value/(total_sectors * (total_heads+1));
+  
+  if (z1 != z2)
+	{
+	asm int 3;
+  	z1 = ( ( (lba_value-(sector-1))/total_sectors)-head)/(total_heads+1) ;
+    z2 = lba_value/(total_sectors * (total_heads+1));
+    }
+
+	return z2;	  
 }
 
 /* Extract Sector */
@@ -569,11 +580,17 @@ int Get_Hard_Drive_Parameters(int physical_drive)
 
   if(flags.total_number_hard_disks==255)
    flags.total_number_hard_disks = total_number_hard_disks;
-  if(total_number_hard_disks==0) return(255);
+  if(total_number_hard_disks==0) return(255);  
 
-
-//  if(error_code>0) return(error_code);
-  if(error_code > 0) Error_Handler(error_code);
+  if(error_code>0) return(error_code);
+  
+  							// USB CF card adapters simulate existing hard drives,
+  							// but return for not present cards head/sectors/cy = 0/0/0
+  							// reported by Japheth
+  if (total_heads == 0 || total_sectors == 0)
+  	return 255;							
+  
+  
 
   pDrive->total_head=total_heads;
   pDrive->total_sect=total_sectors;
@@ -602,8 +619,7 @@ int Get_Hard_Drive_Parameters(int physical_drive)
       mov BYTE PTR error_code,ah
       }
 
-//    if(error_code>0) return(error_code);
-    if(error_code > 0) Error_Handler(error_code);
+    if(error_code>0) return(error_code);
 
     /* Compute the total number of logical cylinders based upon the number */
     /* of physical sectors returned from service 0x48.                     */
@@ -631,13 +647,27 @@ int Get_Hard_Drive_Parameters(int physical_drive)
   return(0);
 }
 
+
+// return physical start of a logical partition
+ulong get_log_drive_start(Partition_Table *pDrive, int partnum)
+{
+    if(partnum==0)
+    	return pDrive->log_drive[partnum].rel_sect+pDrive->ptr_ext_part->rel_sect;
+	else           
+   		return pDrive->log_drive[partnum].rel_sect
+         				+pDrive->ptr_ext_part->rel_sect
+         				+pDrive->next_ext[partnum-1].rel_sect;
+}
+
+
+
 /* Get the volume labels and file system types from the boot sectors */
 void Get_Partition_Information()
 {
   int drivenum;
   int partnum;
   int label_offset;
-
+	long lba_sect;
 
   /* First get the information from the primary partitions. */
 
@@ -662,10 +692,15 @@ void Get_Partition_Information()
                 label_offset = 43;
                 }
 
-		Read_Physical_Sectors((drivenum+128)
+		if (pDrive->ext_int_13)	
+			Read_Physical_Sectors_LBA_only((drivenum+128),pDrive->pri_part[partnum].rel_sect,1);
+		else                 
+			Read_Physical_Sectors((drivenum+128)
                  ,pDrive->pri_part[partnum].start_cyl
                  ,pDrive->pri_part[partnum].start_head
                  ,pDrive->pri_part[partnum].start_sect,1);
+                 
+		if (flags.verbose) printf("primary %d sect %lu label %11.11s\n", partnum, pDrive->pri_part[partnum].rel_sect, sector_buffer+label_offset);
 
                 if( sector_buffer[label_offset+10]>=32 &&
                         sector_buffer[label_offset+10]<=122 )
@@ -697,11 +732,22 @@ void Get_Partition_Information()
         else
                 {
 		label_offset = 43;
-                }
-        Read_Physical_Sectors((drivenum+128)
-         ,pDrive->log_drive[partnum].start_cyl
-         ,pDrive->log_drive[partnum].start_head
-         ,pDrive->log_drive[partnum].start_sect,1);
+                } 
+                
+		if (pDrive->ext_int_13)	
+			{
+			lba_sect = get_log_drive_start(pDrive, partnum);
+			
+			Read_Physical_Sectors_LBA_only((drivenum+128),lba_sect,1);
+			}
+		else                 
+	        Read_Physical_Sectors((drivenum+128)
+	         ,pDrive->log_drive[partnum].start_cyl
+	         ,pDrive->log_drive[partnum].start_head
+	         ,pDrive->log_drive[partnum].start_sect,1);
+
+		if (flags.verbose) printf("logical %u sect %lu label %11.11s\n", partnum, lba_sect, sector_buffer+label_offset);
+
 
 	if( sector_buffer[label_offset+10]>=32 &&
                 sector_buffer[label_offset+10]<=122 )
@@ -898,8 +944,7 @@ int Read_Partition_Tables()
       {
       error_code=Read_Physical_Sectors(physical_drive,0,0,1,1);
 
-//      if(error_code!=0) return(error_code);
-      if(error_code != 0) Error_Handler(error_code);
+      if(error_code!=0) return(error_code);
 
       flags.maximum_drive_number=drive+128;
 
@@ -926,10 +971,8 @@ int Read_Partition_Tables()
           pDrive->pri_part[index].end_sect=Extract_Sector(sector_buffer[(entry_offset+0x06)],sector_buffer[(entry_offset+0x07)]);
 	  }
 
-	pDrive->pri_part[index].rel_sect=
-			*(_u32*)(sector_buffer+entry_offset+0x08);
-	pDrive->pri_part[index].num_sect=
-			*(_u32*)(sector_buffer+entry_offset+0x0c);
+	pDrive->pri_part[index].rel_sect= *(_u32*)(sector_buffer+entry_offset+0x08);
+	pDrive->pri_part[index].num_sect= *(_u32*)(sector_buffer+entry_offset+0x0c);
 
 	if( (pDrive->ext_int_13==TRUE)
 	 && (pDrive->pri_part[index].num_type!=0) )
@@ -958,10 +1001,27 @@ int Read_Partition_Tables()
 	   /* */
 	   (pDrive->pri_part[index].rel_sect
 	   +pDrive->pri_part[index].num_sect)
-	   ,pDrive->pri_part[index].end_head
-	   ,pDrive->pri_part[index].end_sect
+	   ,0					//!!,pDrive->pri_part[index].end_head
+	   ,1					//!!,pDrive->pri_part[index].end_sect
 	   ,pDrive->total_head
 	   ,pDrive->total_sect);
+	   
+
+
+							/*
+							a protective GPT partition starts at sector
+							1 and has a size of 0xffffffff
+							
+							unfortunately rel_sect+num_sect is 0 then.
+							
+							so we FORCE this down to the last cylinder
+							*/
+	   
+	  if (pDrive->pri_part[index].num_sect == 0xfffffffful)
+	  		{
+	  		// printf("correcting cyl %lu -> %lu\n", pDrive->pri_part[index].end_cyl, pDrive->total_cyl);
+		  	pDrive->pri_part[index].end_cyl = pDrive->total_cyl;
+		  	}    
 	  }
 
 	pDrive->pri_part[index].size_in_MB
@@ -994,8 +1054,7 @@ int Read_Partition_Tables()
          ,pDrive->ptr_ext_part->start_head,
           pDrive->ptr_ext_part->start_sect,1);
 
-//	if(error_code!=0) return(error_code);
-	if(error_code != 0) Error_Handler(error_code);
+        if(error_code!=0) return(error_code);
 
 	/* Ensure that the sector has a valid partition table before        */
         /* any information is loaded into pDrive->           */
@@ -1025,13 +1084,10 @@ int Read_Partition_Tables()
               pDrive->log_drive[index].end_sect=Extract_Sector(sector_buffer[(entry_offset+0x06)],sector_buffer[(entry_offset+0x07)]);
               }
 
-            pDrive->log_drive[index].rel_sect=
-			*(_u32*)(sector_buffer+entry_offset+0x08);
-            pDrive->log_drive[index].num_sect=
-                        *(_u32*)(sector_buffer+entry_offset+0x0c);
+            pDrive->log_drive[index].rel_sect= *(_u32*)(sector_buffer+entry_offset+0x08);
+            pDrive->log_drive[index].num_sect= *(_u32*)(sector_buffer+entry_offset+0x0c);
 
-            if( (pDrive->ext_int_13==TRUE)
-	     && (pDrive->log_drive[index].num_type!=0) )
+            if( (pDrive->ext_int_13==TRUE) && (pDrive->log_drive[index].num_type!=0) )
               {
               /* If int 0x13 extensions are used compute the virtual CHS values. */
 
@@ -1073,8 +1129,8 @@ int Read_Partition_Tables()
 		 (pDrive->log_drive[index].rel_sect
 		 +pDrive->ptr_ext_part->rel_sect
 		 +pDrive->log_drive[index].num_sect)
-		 ,pDrive->log_drive[index].end_head
-		 ,pDrive->log_drive[index].end_sect
+		 ,0					//!!,pDrive->log_drive[index].end_head
+		 ,1					//!!,pDrive->log_drive[index].end_sect
 		 ,pDrive->total_head
 		 ,pDrive->total_sect);
 	      else
@@ -1084,8 +1140,8 @@ int Read_Partition_Tables()
 		 +pDrive->ptr_ext_part->rel_sect
 		 +pDrive->log_drive[index].num_sect
 		 +pDrive->next_ext[index-1].rel_sect)
-		 ,pDrive->log_drive[index].end_head
-		 ,pDrive->log_drive[index].end_sect
+		 ,0					//!!,pDrive->log_drive[index].end_head
+		 ,1					//!!,pDrive->log_drive[index].end_sect
 		 ,pDrive->total_head
 		 ,pDrive->total_sect);
 	      }
@@ -1235,8 +1291,6 @@ int Read_Physical_Sectors(int drive, long cylinder, long head
     }
 #endif
 
-  if(error_code != 0) Error_Handler(error_code);
-
   return(error_code);
 }
 
@@ -1256,25 +1310,17 @@ int Read_Physical_Sectors_CHS(int drive, long cylinder, long head
 //    error_code=biosdisk(2, drive, (int)head, (int)cylinder, (int)sector, number_of_sectors, huge_sector_buffer);
     }
 
-  if(error_code != 0) Error_Handler(error_code);
-
   return(error_code);
 }
 
 /* Read a physical sector using LBA values */
-int Read_Physical_Sectors_LBA(int drive, long cylinder, long head
- , long sector, int number_of_sectors)
+int Read_Physical_Sectors_LBA_only(int drive, ulong LBA_address, int number_of_sectors)
 {
   unsigned int error_code=0;
 
   /* Get the segment and offset of disk_address_packet. */
   unsigned int disk_address_packet_address_offset=FP_OFF(disk_address_packet);
 
-
-  /* Translate CHS values to LBA values. */
-  unsigned long LBA_address=Translate_CHS_To_LBA(cylinder,head,sector
-  ,part_table[(drive-128)].total_head
-  ,part_table[(drive-128)].total_sect);
 
   /* Add number_of_sectors to disk_address_packet */
   disk_address_packet[2]=number_of_sectors;
@@ -1302,9 +1348,19 @@ int Read_Physical_Sectors_LBA(int drive, long cylinder, long head
     mov BYTE PTR error_code,ah
     }
 
-  if(error_code != 0) Error_Handler(error_code);
-
   return(error_code);
+}
+
+/* Read a physical sector using LBA values */
+int Read_Physical_Sectors_LBA(int drive, long cylinder, long head
+ , long sector, int number_of_sectors)
+{
+  /* Translate CHS values to LBA values. */
+  unsigned long LBA_address=Translate_CHS_To_LBA(cylinder,head,sector
+  ,part_table[(drive-128)].total_head
+  ,part_table[(drive-128)].total_sect);
+  
+  return Read_Physical_Sectors_LBA_only(drive, LBA_address, number_of_sectors);
 }
 
 /* Translate a CHS value to an LBA value. */
@@ -1347,8 +1403,7 @@ int Write_Partition_Tables()
 #ifdef DEBUG
       else error_code=0;
 #endif
-//      if(error_code!=0) return(error_code);
-      if(error_code != 0) Error_Handler(error_code);
+      if(error_code!=0) return(error_code);
 
       Clear_Partition_Table_Area_Of_Sector_Buffer();
 
@@ -1382,8 +1437,7 @@ int Write_Partition_Tables()
       sector_buffer[0x1ff]=0xaa;
 
       error_code=Write_Physical_Sectors((drive_index+0x80),0,0,1,1);
-//      if(error_code>0) return(error_code);
-      if(error_code > 0) Error_Handler(error_code);
+      if(error_code>0) return(error_code);
 
       /* Write the Extended Partition Table, if applicable. */
 
@@ -1429,8 +1483,7 @@ int Write_Partition_Tables()
           error_code
              =Write_Physical_Sectors((drive_index+0x80)
 			     ,extended_cylinder,extended_head,extended_sector,1);
-//	  if(error_code!=0) return(error_code);
-	  if(error_code != 0) Error_Handler(error_code);
+          if(error_code!=0) return(error_code);
 
           if(pDrive->next_ext_exists[index]!=TRUE)
             {
@@ -1467,9 +1520,6 @@ int Write_Physical_Sectors(int drive, long cylinder, long head, long sector, int
     {
     error_code=Write_Physical_Sectors_LBA(drive,cylinder,head,sector,number_of_sectors);
     }
-
-  if(error_code > 0) Error_Handler(error_code);
-
   return(error_code);
 }
 
@@ -1544,8 +1594,6 @@ int Write_Physical_Sectors_CHS(int drive, long cylinder, long head, long sector,
     error_code=0;
     }
 #endif
-
-  if(error_code > 0) Error_Handler(error_code);
 
   return(error_code);
 }
@@ -1649,8 +1697,6 @@ int Write_Physical_Sectors_LBA(int drive, long cylinder, long head, long sector,
     error_code=0;
     }
 #endif
-
-  if(error_code > 0) Error_Handler(error_code);
 
   return(error_code);
 }

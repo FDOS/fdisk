@@ -1,7 +1,8 @@
-/* Functions that emulate UNIX catgets, some small DOS file functions */
+/* $Id: kitten.h,v 1.2 2000/06/09 03:12:01 jhall Exp $ */
+
+/* Functions that emulate UNIX catgets */
 
 /* Copyright (C) 1999,2000 Jim Hall <jhall@freedos.org> */
-/* Kitten version by Tom Ehlert, heavily modified by Eric Auer 2003 */
 
 /*
   This library is free software; you can redistribute it and/or
@@ -23,6 +24,9 @@
 #ifndef _CATGETS_H
 #define _CATGETS_H
 
+#define NOCATS
+
+
 #ifdef NOCATS
 
 /* #define NOCATS to disable that stuff completely */
@@ -33,38 +37,35 @@
 
 #else
 
+
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Data types */
+  /* Data types */
 
-typedef int nl_catd;
+  typedef int nl_catd;
 
-/* Functions */
+  /* Symbolic constants */
+
+#define MCLoadBySet 0			/* not implemented */
+#define MCLoadAll   0			/* not implemented */
+
+
+  /* Functions */
 
 #define catgets(catalog, set,message_number,message) kittengets(set,message_number,message)
 #define catopen(name,flag) kittenopen(name)
 #define catclose(catalog)  kittenclose()
 
 
-char *  kittengets( int set_number, int message_number,char *message);
-nl_catd kittenopen(char *name);
-void    kittenclose (void);
+  char *  pascal kittengets( int set_number, int message_number,char *message);
+  nl_catd kittenopen(char *name);
+  void    kittenclose (void);
 
-int get_line (int file, char *buffer, int size);
 
-int dos_open(char *filename, int mode);
-#define open(filename,mode) dos_open(filename,mode)
-
-int dos_read(int file, void *ptr, unsigned count);
-#define read(file, ptr, count) dos_read(file,ptr,count)
-
-int dos_write(int file, void *ptr, unsigned count);
-#define write(file, ptr, count) dos_write(file,ptr,count)
-
-void dos_close(int file);
-#define close(file) dos_close(file)
 
 #ifdef __cplusplus
 }

@@ -172,7 +172,7 @@ int Create_DOS_Partition_Interface(int type)
       numeric_type=Partition_Type_To_Create(input,numeric_type);
 
       partition_slot_just_used=Create_Primary_Partition(numeric_type,input);
-      if((flags.drive_number-128)==0) Set_Active_Partition(partition_slot_just_used);
+      if((flags.drive_number-128)==0)  Set_Active_Partition_If_None_Is_Active(partition_slot_just_used);
       partition_created=TRUE;
       }
     }
@@ -385,7 +385,7 @@ void Delete_Extended_DOS_Partition_Interface()
 
   if( (flags.esc==FALSE) && (input==TRUE) )
     {
-    Delete_Primary_Partition(int(pDrive->ptr_ext_part-pDrive->pri_part));
+    Delete_Primary_Partition((int)(pDrive->ptr_ext_part-pDrive->pri_part));
     Clear_Extended_Partition_Table(flags.drive_number-128);
 
     Clear_Screen(0);
