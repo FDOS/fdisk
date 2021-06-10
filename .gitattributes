@@ -8,3 +8,6 @@
 *.zip -text
 *.ZIP -text
 *.sh text eol=lf
+*.HTM text
+*.htm text
+

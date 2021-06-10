@@ -71,8 +71,8 @@ void dump_MBR(char *buffer)
 
 		if (P->partitiontype) 		
 		   printf("%d: 0x%02x %s sect %8lu-%-8lu size %8lu\n", i,
-								P->bootable? "A" : " ",
 								P->partitiontype,
+								P->bootable == 0x80 ? "A" : " ",
 								P->start_sect, 
 								P->start_sect + P->num_sect-1,
 								P->num_sect);

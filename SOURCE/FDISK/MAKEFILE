@@ -39,7 +39,7 @@ ui1.obj ui2.obj bootnorm.obj booteasy.obj kitten.obj smartmbr.obj
 all: fdisk.exe test.exe
 
 test.exe: test.c
-  $(CC) test.c
+  $(CC) -lM test.c
 
 fdisk.exe: main.obj $(OBJ)  
 	cmd /c echo c:\tcpp\lib\c0s.obj+>resp.tmp 
