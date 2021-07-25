@@ -9,7 +9,8 @@
 
 # macros:
 
-CC=c:\tcpp\bin\tcc
+CCBASE=c:\tc30
+CC=$(CCBASE)\bin\tcc
 CFLAGS=-ms -g5 -w -O -Z -1
 
 # -mx     Set Memory Model
@@ -20,11 +21,13 @@ CFLAGS=-ms -g5 -w -O -Z -1
 # -1      80186/286 Instructions
 
 
-
+ECHO=ECHO
+#ECHO=cmd /c echo
 
 
 LDFLAGS= -lm -P
 LDLIBS=
+LD=$(CCBASE)\bin\tlink /c /m
 RM=del
 SRC = main.c cmd.c fdiskio.c helpscr.c kbdinput.c pdiskio.c \
       pcompute.c userint1.c userint2.c 
@@ -32,6 +35,8 @@ OBJ = main.obj cmd.obj fdiskio.obj \
 helpscr.obj kbdinput.obj pdiskio.obj pcompute.obj \
 ui1.obj ui2.obj bootnorm.obj booteasy.obj kitten.obj smartmbr.obj
 
+NASM=nasm
+UPX=upx
 
 
 # build targets:
@@ -39,20 +44,17 @@ ui1.obj ui2.obj bootnorm.obj booteasy.obj kitten.obj smartmbr.obj
 all: fdisk.exe test.exe
 
 test.exe: test.c
-  $(CC) -lM test.c
+  $(CC) -M test.c
 
-fdisk.exe: main.obj $(OBJ)  
-	cmd /c echo c:\tcpp\lib\c0s.obj+>resp.tmp 
-	cmd /c echo main cmd fdiskio +>>resp.tmp 
-    cmd /c echo helpscr kbdinput pdiskio pcompute +>>resp.tmp 
-	cmd /c echo ui1 ui2 bootnorm booteasy smartmbr kitten  +>>resp.tmp 
-	cmd /c echo  ,fdisk,, c:\tcpp\lib\cs.lib  >>resp.tmp
-	c:\tcpp\bin\tlink /c /M @resp.tmp
-    upx -q fdisk.exe
+fdisk.exe: $(OBJ)  
+	$(ECHO) $(CCBASE)\lib\c0s.obj+>resp.tmp 
+	$(ECHO) main cmd fdiskio +>>resp.tmp 
+    $(ECHO) helpscr kbdinput pdiskio pcompute +>>resp.tmp 
+	$(ECHO) ui1 ui2 bootnorm booteasy smartmbr kitten  +>>resp.tmp 
+	$(ECHO)  ,fdisk,, $(CCBASE)\lib\cs.lib  >>resp.tmp
+	$(LD) @resp.tmp
+    $(UPX) -q fdisk.exe
 
- #c:\tcpp\bin\tlink /m $(LNK),fdisk,,c:\tcpp\lib\c0s.obj
-
-# c:\tcpp\lib\cs.lib 
 # compile targets:
 
 main.obj: main.c
@@ -86,13 +88,13 @@ kitten.obj: kitten.c
  $(CC) $(CFLAGS) -c kitten.c
  
 bootnorm.obj: bootnorm.asm
-     nasm -f obj bootnorm.asm
+     $(NASM) -f obj bootnorm.asm
 
 booteasy.obj: booteasy.asm
-     nasm -f obj booteasy.asm
+     $(NASM) -f obj booteasy.asm
 
 smartmbr.obj: smartmbr.asm
-     nasm -f obj smartmbr.asm -l smartmbr.lst
+     $(NASM) -f obj smartmbr.asm -l smartmbr.lst
  
  
 
@@ -107,4 +109,4 @@ clobber:
  $(RM) *.exe
  $(RM) *.obj
  $(RM) *.swp
-
+ $(RM) *.tmp
