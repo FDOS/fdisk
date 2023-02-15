@@ -20,52 +20,44 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-
 #ifndef _CATGETS_H
 #define _CATGETS_H
 
 #define NOCATS
 
-
 #ifdef NOCATS
 
 /* #define NOCATS to disable that stuff completely */
-#define nl_catd int
-#define catopen(x,y) 1
-#define catclose(x) 
-#define catgets(c,x,y,s) s
+#define nl_catd         int
+#define catopen( x, y ) 1
+#define catclose( x )
+#define catgets( c, x, y, s ) s
 
 #else
-
-
-
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-  /* Data types */
+/* Data types */
 
-  typedef int nl_catd;
+typedef int nl_catd;
 
-  /* Symbolic constants */
+/* Symbolic constants */
 
-#define MCLoadBySet 0			/* not implemented */
-#define MCLoadAll   0			/* not implemented */
+#define MCLoadBySet 0 /* not implemented */
+#define MCLoadAll   0 /* not implemented */
 
+/* Functions */
 
-  /* Functions */
+#define catgets( catalog, set, message_number, message )                     \
+   kittengets( set, message_number, message )
+#define catopen( name, flag ) kittenopen( name )
+#define catclose( catalog )   kittenclose()
 
-#define catgets(catalog, set,message_number,message) kittengets(set,message_number,message)
-#define catopen(name,flag) kittenopen(name)
-#define catclose(catalog)  kittenclose()
-
-
-  char *  pascal kittengets( int set_number, int message_number,char *message);
-  nl_catd kittenopen(char *name);
-  void    kittenclose (void);
-
-
+char *pascal kittengets( int set_number, int message_number, char *message );
+nl_catd kittenopen( char *name );
+void kittenclose( void );
 
 #ifdef __cplusplus
 }

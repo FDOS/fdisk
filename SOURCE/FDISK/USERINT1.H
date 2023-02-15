@@ -25,19 +25,21 @@
 /////////////////////////////////////////////////////////////////////////////
 */
 
-UMEXTERN int Standard_Menu(int menu);
+UMEXTERN int Standard_Menu( int menu );
 
-UMEXTERN unsigned long Input(int size_of_field,int x_position,int y_position,int type
- ,int min_range,long max_range,int return_message,long default_value
- ,long maximum_possible_percentage,char optional_char_1[1],char optional_char_2[1]);
+UMEXTERN unsigned long
+Input( int size_of_field, int x_position, int y_position, int type,
+       int min_range, long max_range, int return_message, long default_value,
+       long maximum_possible_percentage, char optional_char_1[1],
+       char optional_char_2[1] );
 
-UMEXTERN void Clear_Screen(int type);
-UMEXTERN void Display_Information(void);
-UMEXTERN void Display_Label(void);
-UMEXTERN void Interactive_User_Interface(void);
-UMEXTERN void Menu_Routine(void);
-UMEXTERN void Pause(void);
-UMEXTERN void Position_Cursor(int row,int column);
-UMEXTERN void Print_Centered(int y,char *text,int style);
-UMEXTERN void Print_UL(unsigned long number);
-UMEXTERN void Print_UL_B(unsigned long number);
+UMEXTERN void Clear_Screen( int type );
+UMEXTERN void Display_Information( void );
+UMEXTERN void Display_Label( void );
+UMEXTERN void Interactive_User_Interface( void );
+UMEXTERN void Menu_Routine( void );
+UMEXTERN void Pause( void );
+UMEXTERN void Position_Cursor( int row, int column );
+UMEXTERN void Print_Centered( int y, char *text, int style );
+UMEXTERN void Print_UL( unsigned long number );
+UMEXTERN void Print_UL_B( unsigned long number );
