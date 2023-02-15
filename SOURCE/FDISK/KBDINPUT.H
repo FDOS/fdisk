@@ -25,7 +25,8 @@
 /////////////////////////////////////////////////////////////////////////////
 */
 
-KBDEXTERN unsigned long Input(int size_of_field,int x_position,int y_position,int type
- ,int min_range,long max_range,int return_message,long default_value
- ,long maximum_possible_percentage,char optional_char_1[1],char optional_char_2[1]);
-
+KBDEXTERN unsigned long
+Input( int size_of_field, int x_position, int y_position, int type,
+       int min_range, long max_range, int return_message, long default_value,
+       long maximum_possible_percentage, char optional_char_1[1],
+       char optional_char_2[1] );
