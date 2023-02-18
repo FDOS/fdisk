@@ -6,7 +6,7 @@
 # Note:  Free FDISK is written in C.
 
 compiler        = wcc
-compiler_flags  = -q -0 -mm -bc -w4
+compiler_flags  = -q -0 -mm -bc -zp=1 -w4
 assembler       = nasm
 assembler_flags_obj = -t -f obj
 linker          = wlink
