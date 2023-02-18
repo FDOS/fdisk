@@ -125,9 +125,9 @@ void Check_For_INT13_Extensions( void )
    int drive_number = 0x80;
 
    //-  unsigned int ah_register;
-   unsigned char ah_register;
-   unsigned int bx_register;
-   unsigned int cx_register;
+   unsigned char ah_register = 0;
+   unsigned int bx_register = 0;
+   unsigned int cx_register = 0;
 
 #ifdef DEBUG
    if ( debug.lba == TRUE ) {
