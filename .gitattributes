@@ -1,8 +1,10 @@
 * text eol=auto
 *.bat text eol=crlf
 *.BAT text eol=crlf
+*.c text eol=crlf
 *.com -text
 *.COM -text
+*.h text eol=crlf
 *.prj -text
 *.PRJ -text
 *.zip -text
