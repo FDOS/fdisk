@@ -42,8 +42,6 @@
 /////////////////////////////////////////////////////////////////////////////
 */
 
-extern char **environ;
-
 /*
 /////////////////////////////////////////////////////////////////////////////
 //  PROTOTYPES
@@ -59,7 +57,7 @@ unsigned long Number_Of_Cylinders( unsigned long size );
 */
 
 /* Clear the Active Partition */
-void Clear_Active_Partition()
+void Clear_Active_Partition( void )
 {
    int index = 0;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
@@ -750,7 +748,7 @@ void Delete_Primary_Partition( int partition_number )
 }
 
 /* Determine the locations of free space in the partition table */
-void Determine_Free_Space()
+void Determine_Free_Space( void )
 {
    int first_used_partition = UNUSED;
    int last_used_partition = UNUSED;
@@ -1033,7 +1031,7 @@ void Determine_Free_Space()
    }
 
    /* Make final adjustments to the computed free space size. */
-   if ( pDrive->pri_part_largest_free_space <= 0 ) {
+   if ( pDrive->pri_part_largest_free_space == 0 ) {
       pDrive->pri_part_largest_free_space = 0;
    }
 
@@ -1288,7 +1286,7 @@ int LBA_Partition_Type_To_Create( int standard_partition_type )
 }
 
 /* Get the maximum size of the logical drive, in MB. */
-long Max_Log_Part_Size_In_MB()
+long Max_Log_Part_Size_In_MB( void )
 {
    long maximum_partition_size_in_MB;
    long stored_maximum_partition_size_in_MB;

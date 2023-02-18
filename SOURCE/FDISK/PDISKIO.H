@@ -92,8 +92,8 @@ typedef struct part_table_structure {
    int device_access_using_packet_structure;
 
    /* Pre-computed hard disk sizes */
-   long total_hard_disk_size_in_log_sectors;
-   unsigned long total_hard_disk_size_in_MB;
+   long total_disk_size_in_log_sectors;
+   unsigned long total_disk_size_in_MB;
 
    int part_values_changed;
    int pri_part_exists;

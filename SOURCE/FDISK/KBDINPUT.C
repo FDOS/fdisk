@@ -43,7 +43,9 @@ $set 4
 
 #include <conio.h>
 #include <ctype.h>
+#ifndef __WATCOMC__
 #include <dir.h>
+#endif
 #include <dos.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,14 +54,13 @@ $set 4
 #include "main.h"
 #include "pdiskio.h"
 #include "userint1.h"
+#include "compat.h"
 
 /*
 /////////////////////////////////////////////////////////////////////////////
 //  GLOBAL VARIABLES
 /////////////////////////////////////////////////////////////////////////////
 */
-
-extern char **environ;
 
 /*
 /////////////////////////////////////////////////////////////////////////////

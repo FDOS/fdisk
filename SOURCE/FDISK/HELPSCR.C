@@ -28,7 +28,7 @@
 */
 
 /* Display Help Screens */
-void Display_Help_Screen()
+void Display_Help_Screen( void )
 {
    char version[40];
    char name[20];

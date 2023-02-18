@@ -23,7 +23,9 @@
 
 #include <conio.h>
 #include <ctype.h>
+#ifndef __WATCOMC__
 #include <dir.h>
+#endif
 #include <dos.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,14 +38,13 @@
 #include "pdiskio.h"
 #include "userint1.h"
 #include "userint2.h"
+#include "compat.h"
 
 /*
 /////////////////////////////////////////////////////////////////////////////
 //  GLOBAL VARIABLES
 /////////////////////////////////////////////////////////////////////////////
 */
-
-extern char **environ;
 
 /*
 /////////////////////////////////////////////////////////////////////////////
@@ -54,6 +55,7 @@ extern char **environ;
 /* Clear Screen */
 void Clear_Screen( int type ) /* Clear screen code as suggested by     */
 {                             /* Ralf Quint                            */
+   unsigned char color = flags.screen_color;
    asm {
     mov ah,0x0f /* get max column to clear */
     int 0x10
@@ -62,7 +64,7 @@ void Clear_Screen( int type ) /* Clear screen code as suggested by     */
 
     mov ah,0x06 /* scroll up */
     mov al,0x00 /* 0 rows, clear whole window */
-    mov bh,BYTE PTR flags.screen_color /* set color */
+    mov bh,BYTE PTR color /* set color */
     mov cx,0x0000                  /* coordinates of upper left corner of screen */
       /*    mov dh,25    */ /* maximum row */
     mov dl,79                      /* maximum column */
@@ -77,7 +79,7 @@ void Clear_Screen( int type ) /* Clear screen code as suggested by     */
 }
 
 /* Display Information */
-void Display_Information()
+void Display_Information( void )
 {
    if ( flags.extended_options_flag == TRUE ) {
       Position_Cursor( 0, 0 );
@@ -149,7 +151,7 @@ void Display_Information()
 }
 
 /* Display Label */
-void Display_Label()
+void Display_Label( void )
 {
    if ( flags.label == TRUE ) {
       int index = 0;
@@ -206,7 +208,7 @@ void Exit_Screen( void )
 }
 
 /* Interactive User Interface Control Routine */
-void Interactive_User_Interface()
+void Interactive_User_Interface( void )
 {
    int counter = 0;
    int index = 0;
@@ -489,7 +491,7 @@ void Interactive_User_Interface()
 }
 
 /* Pause Routine */
-void Pause()
+void Pause( void )
 {
    printf( "\nPress any key to continue" );
 
@@ -562,8 +564,8 @@ int Standard_Menu( int menu )
    char option_4[60] = "";
    char option_5[60] = "Change current fixed disk drive";
 
-   char optional_char_1[1] = { NULL };
-   char optional_char_2[1] = { NULL };
+   char optional_char_1[1] = { '\0' };
+   char optional_char_2[1] = { '\0' };
 
    for ( ;; ) {
       Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
@@ -717,7 +719,7 @@ int Standard_Menu( int menu )
          optional_char_1[0] = 'M';
       }
       else {
-         optional_char_1[0] = NULL;
+         optional_char_1[0] = '\0';
       }
 
       if ( ( menu == MM ) && ( flags.allow_abort == TRUE ) ) {
@@ -727,7 +729,7 @@ int Standard_Menu( int menu )
          optional_char_2[0] = 'A';
       }
       else {
-         optional_char_2[0] = NULL;
+         optional_char_2[0] = '\0';
       }
 
       /* Display Special Messages */

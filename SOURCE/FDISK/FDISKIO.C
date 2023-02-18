@@ -35,7 +35,9 @@ $set 3
 */
 
 #include <conio.h>
+#ifndef __WATCOMC__
 #include <dir.h>
+#endif
 #include <dos.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,6 +48,7 @@ $set 3
 #include "main.h"
 #include "pcompute.h"
 #include "pdiskio.h"
+#include "compat.h"
 
 /*
 /////////////////////////////////////////////////////////////////////////////
@@ -64,7 +67,7 @@ extern char BootSmart_code[];
 */
 
 /* Automatically partition the selected hard drive */
-void Automatically_Partition_Hard_Drive()
+void Automatically_Partition_Hard_Drive( void )
 {
    int index = 0;
    /*  unsigned long maximum_partition_size_in_MB; */
@@ -114,7 +117,7 @@ void Automatically_Partition_Hard_Drive()
 }
 
 /* Clear the first sector on the hard disk...removes the partitions and MBR. */
-void Clear_Entire_Sector_Zero()
+void Clear_Entire_Sector_Zero( void )
 {
    //Qprintf("Clearing boot sector of drive %x\n", flags.drive_number);
    Clear_Sector_Buffer();
@@ -139,7 +142,7 @@ void Clear_Flag( int flag_number )
 }
 
 /* Clear Partition Table */
-void Clear_Partition_Table()
+void Clear_Partition_Table( void )
 {
    //Qprintf("Clearing partitiontable for drive %02x..",flags.drive_number);
 
@@ -263,7 +266,7 @@ void Create_MBR( void )
 }
 
 /* Create Master Boot Code if it is not present */
-void Create_MBR_If_Not_Present()
+void Create_MBR_If_Not_Present( void )
 {
    Read_Physical_Sectors( 0x80, 0, 0, 1, 1 );
 
@@ -274,7 +277,7 @@ void Create_MBR_If_Not_Present()
 }
 
 /* Load External Partition Type Lookup Table */
-void Load_External_Lookup_Table()
+void Load_External_Lookup_Table( void )
 {
    int index = 0;
    int offset = 0;
@@ -382,7 +385,7 @@ void Load_External_Lookup_Table()
 }
 
 /* Read and process the fdisk.ini file */
-void Process_Fdiskini_File()
+void Process_Fdiskini_File( void )
 {
    //  char char_number[2];
    char command_buffer[20];
@@ -1148,7 +1151,7 @@ void Process_Fdiskini_File()
 }
 
 /* Remove MBR */
-void Remove_MBR()
+void Remove_MBR( void )
 {
    int index = 0;
 
@@ -1163,7 +1166,7 @@ void Remove_MBR()
 }
 
 /* Save MBR */
-void Save_MBR()
+void Save_MBR( void )
 {
    int index = 0;
 
