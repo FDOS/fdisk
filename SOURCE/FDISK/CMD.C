@@ -56,6 +56,7 @@ $set 2
 #include <string.h>
 
 #include "cmd.h"
+#include "compat.h"
 #include "fdiskio.h"
 #include "main.h"
 #include "pcompute.h"

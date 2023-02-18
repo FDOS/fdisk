@@ -18,7 +18,7 @@ struct driveParameter {
    ulong max_sector;
 };
 
-getDriveParameters( int hd, struct driveParameter *dp )
+int getDriveParameters( int hd, struct driveParameter *dp )
 {
    union REGS ir;
 
@@ -86,7 +86,7 @@ void set_partition_size( int partno, ulong sectorcount, int HD )
 {
    char buffer[4096];
    struct part_entry *P;
-   int i, error;
+   int error;
 
    if ( ( error = ReadWrite_Physical_Sectors_CHS( HD, 0, 0, 1, 1, buffer,
                                                   READ ) ) != 0 ) {
@@ -117,7 +117,7 @@ void set_partition_size( int partno, ulong sectorcount, int HD )
    exit( 0 );
 }
 
-check_partition_table( int HD )
+int check_partition_table( int HD )
 {
 
    char buffer[4096];
@@ -169,7 +169,7 @@ check_partition_table( int HD )
 
 int main( int argc, char *argv[] )
 {
-   int i, cnt;
+   int i;
    int HD = 0;
    uint partno;
    ulong sectorcount;
@@ -217,7 +217,7 @@ int main( int argc, char *argv[] )
       exit( 0 );
    }
 
-   printf( "?? %u:%u:%lu %u\n", partno, sectorcount, HD, cnt );
+   printf( "?? %u:%u:%lu\n", partno, sectorcount, HD );
 
    printf( "usage: /SETSIZE partion(0..3) sectorcount harddisk(0..7)\n" );
    printf( "       /CHECK   harddisk(0..7)\n" );
