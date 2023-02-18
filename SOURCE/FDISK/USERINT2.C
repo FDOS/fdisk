@@ -23,7 +23,9 @@
 
 #include <conio.h>
 #include <ctype.h>
+#ifndef __WATCOMC__
 #include <dir.h>
+#endif
 #include <dos.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,6 +38,7 @@
 #include "pdiskio.h"
 #include "userint1.h"
 #include "userint2.h"
+#include "compat.h"
 
 /*
 /////////////////////////////////////////////////////////////////////////////
@@ -71,7 +74,7 @@ int IsRecognizedFatPartition( unsigned partitiontype )
 }
 
 /* Ask user if they want to use large disk support (FAT 32) */
-void Ask_User_About_FAT32_Support()
+void Ask_User_About_FAT32_Support( void )
 {
    Clear_Screen( 0 );
 
@@ -111,7 +114,7 @@ void Ask_User_About_FAT32_Support()
 }
 
 /* Change Current Fixed Disk Drive */
-void Change_Current_Fixed_Disk_Drive()
+void Change_Current_Fixed_Disk_Drive( void )
 {
    int new_drive_number;
    int old_drive_number = flags.drive_number;
@@ -241,7 +244,7 @@ int Create_DOS_Partition_Interface( int type )
       printf( " Mbytes " );
 
       maximum_possible_percentage = Convert_To_Percentage(
-         maximum_partition_size_in_MB, pDrive->total_hard_disk_size_in_MB );
+         maximum_partition_size_in_MB, pDrive->total_disk_size_in_MB );
 
       cprintf( "(%3d%%)", maximum_possible_percentage );
 
@@ -333,7 +336,7 @@ int Create_DOS_Partition_Interface( int type )
 
 /* Create Logical Drive Interface */
 /* Returns a 0 if successful and a 1 if unsuccessful */
-int Create_Logical_Drive_Interface()
+int Create_Logical_Drive_Interface( void )
 {
    long input = 0;
 
@@ -472,7 +475,7 @@ int Create_Logical_Drive_Interface()
 }
 
 /* Delete Extended DOS Partition Interface */
-void Delete_Extended_DOS_Partition_Interface()
+void Delete_Extended_DOS_Partition_Interface( void )
 {
    int input = 0;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
@@ -509,7 +512,7 @@ void Delete_Extended_DOS_Partition_Interface()
 }
 
 /* Delete Logical Drive Interface */
-int Delete_Logical_Drive_Interface()
+int Delete_Logical_Drive_Interface( void )
 {
    char char_number[2];
 
@@ -605,7 +608,7 @@ int Delete_Logical_Drive_Interface()
 }
 
 /* Delete Non-DOS Partition User Interface */
-void Delete_N_DOS_Partition_Interface()
+void Delete_N_DOS_Partition_Interface( void )
 {
    int input = 0;
 
@@ -638,7 +641,7 @@ void Delete_N_DOS_Partition_Interface()
 }
 
 /* Delete Primary DOS Partition Interface */
-void Delete_Primary_DOS_Partition_Interface()
+void Delete_Primary_DOS_Partition_Interface( void )
 {
    int input = 0;
    int partition_to_delete;
@@ -681,7 +684,7 @@ void Delete_Primary_DOS_Partition_Interface()
 }
 
 /* Display information for all hard drives */
-void Display_All_Drives()
+void Display_All_Drives( void )
 {
    int current_column_offset_of_general_drive_information;
    int current_column_offset = 4;
@@ -722,7 +725,7 @@ void Display_All_Drives()
       Position_Cursor(
          ( current_column_offset_of_general_drive_information + 10 ),
          current_line );
-      Print_UL( part_table[drive - 1].total_hard_disk_size_in_MB );
+      Print_UL( part_table[drive - 1].total_disk_size_in_MB );
 
       /* Get space_used_on_drive_in_MB */
       index = 0;
@@ -796,12 +799,12 @@ void Display_All_Drives()
       } while ( drive_letter_index < 27 );
 
       /* Print amount of free space on drive */
-      if ( part_table[drive - 1].total_hard_disk_size_in_MB >
+      if ( part_table[drive - 1].total_disk_size_in_MB >
            space_used_on_drive_in_MB ) {
          Position_Cursor(
             ( current_column_offset_of_general_drive_information + 18 ),
             current_line_of_general_drive_information );
-         Print_UL( part_table[drive - 1].total_hard_disk_size_in_MB -
+         Print_UL( part_table[drive - 1].total_disk_size_in_MB -
                    space_used_on_drive_in_MB );
       }
 
@@ -812,7 +815,7 @@ void Display_All_Drives()
       else {
          usage = Convert_To_Percentage(
             space_used_on_drive_in_MB,
-            part_table[drive - 1].total_hard_disk_size_in_MB );
+            part_table[drive - 1].total_disk_size_in_MB );
       }
 
       Position_Cursor(
@@ -827,7 +830,7 @@ void Display_All_Drives()
    printAt( 4, 20, "(1 Mbyte = 1048576 bytes)" );
 }
 
-void Display_CL_Partition_Table()
+void Display_CL_Partition_Table( void )
 {
    int index = 0;
 
@@ -893,7 +896,7 @@ void Display_CL_Partition_Table()
 
          /* Usage */
          usage = Convert_To_Percentage( pDrive->pri_part[index].size_in_MB,
-                                        pDrive->total_hard_disk_size_in_MB );
+                                        pDrive->total_disk_size_in_MB );
 
          printf( "   %3d%%", usage );
 
@@ -959,7 +962,7 @@ void Display_CL_Partition_Table()
 }
 
 /* Display Extended Partition Information Sub Screen */
-void Display_Extended_Partition_Information_SS()
+void Display_Extended_Partition_Information_SS( void )
 {
    int column_index = 0;
    int index;
@@ -1047,7 +1050,7 @@ void Display_Extended_Partition_Information_SS()
 }
 
 /* Display Or Modify Logical Drive Information in the extended partition */
-void Display_Or_Modify_Logical_Drive_Information()
+void Display_Or_Modify_Logical_Drive_Information( void )
 {
    char char_number[1];
 
@@ -1133,7 +1136,7 @@ Beginning:
 }
 
 /* Display/Modify Partition Information */
-void Display_Partition_Information()
+void Display_Partition_Information( void )
 {
    int input;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
@@ -1201,7 +1204,7 @@ Beginning:
 }
 
 /* Display Primary Partition information Sub-screen */
-void Display_Primary_Partition_Information_SS()
+void Display_Primary_Partition_Information_SS( void )
 {
    int cursor_offset = 0;
    int index = 0;
@@ -1276,7 +1279,7 @@ void Display_Primary_Partition_Information_SS()
                /* Usage */
                usage =
                   Convert_To_Percentage( pDrive->pri_part[index].size_in_MB,
-                                         pDrive->total_hard_disk_size_in_MB );
+                                         pDrive->total_disk_size_in_MB );
 
                printAt( 65, ( cursor_offset + 9 ), "%3d%%", usage );
 
@@ -1324,7 +1327,7 @@ void Display_Primary_Partition_Information_SS()
                /* Usage */
                usage =
                   Convert_To_Percentage( pDrive->pri_part[index].size_in_MB,
-                                         pDrive->total_hard_disk_size_in_MB );
+                                         pDrive->total_disk_size_in_MB );
 
                printAt( 51, ( cursor_offset + 9 ), "%3d%%", usage );
 
@@ -1350,17 +1353,17 @@ void Display_Primary_Partition_Information_SS()
 
    if ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
         ( flags.version == W98 ) ) {
-      Print_UL_B( pDrive->total_hard_disk_size_in_MB );
+      Print_UL_B( pDrive->total_disk_size_in_MB );
    }
    else {
-      cprintf( "%4d", pDrive->total_hard_disk_size_in_MB );
+      cprintf( "%4d", pDrive->total_disk_size_in_MB );
    }
 
    printf( " Mbytes (1 Mbyte = 1048576 bytes)" );
 }
 
 /* Dump the partition tables from all drives to screen */
-void Dump_Partition_Information()
+void Dump_Partition_Information( void )
 {
    int index = 0;
    //flags.extended_options_flag=TRUE;
@@ -1373,7 +1376,7 @@ void Dump_Partition_Information()
 }
 
 /* List the Partition Types */
-void List_Partition_Types()
+void List_Partition_Types( void )
 {
    int index = 0;
    int row = 4;
@@ -1596,7 +1599,7 @@ void Modify_Primary_Partition_Information( int partition_number )
       /* Usage */
       usage =
          Convert_To_Percentage( pDrive->pri_part[partition_number].size_in_MB,
-                                pDrive->total_hard_disk_size_in_MB );
+                                pDrive->total_disk_size_in_MB );
 
       printAt( 51, 9, "%3d%%", usage );
 
@@ -1669,7 +1672,7 @@ void Modify_Primary_Partition_Information( int partition_number )
 }
 
 /* Set Active Partition Interface */
-int Set_Active_Partition_Interface()
+int Set_Active_Partition_Interface( void )
 {
    int index = 0;
    int input;

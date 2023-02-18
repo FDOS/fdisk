@@ -38,6 +38,7 @@ $set 1
 #include <string.h>
 
 #include "cmd.h"
+#include "compat.h"
 #include "fdiskio.h"
 #include "helpscr.h"
 #include "main.h"
@@ -52,7 +53,7 @@ $set 1
 /////////////////////////////////////////////////////////////////////////////
 */
 
-extern char **environ;
+//extern char **environ;
 
 /*
 /////////////////////////////////////////////////////////////////////////////
@@ -130,7 +131,7 @@ ulong GetPercentOfLargeNumber( int percent, ulong number )
 }
 
 /* Determine if the video display will support boldfacing text */
-void Determine_Color_Video_Support()
+void Determine_Color_Video_Support( void )
 {
    /* Changed to code suggested by Ralf Quint. */
 
@@ -183,9 +184,11 @@ int BlinkPrintAt( int column, int row, char *format, ... )
       textcolor( WHITE | BLINK );
    }
    len = cprintf( "%s", buffer );
+
    if ( flags.monochrome != TRUE ) {
       textcolor( WHITE );
    }
+
    return len;
 }
 
@@ -554,7 +557,7 @@ void Initialization( char *environment[] )
 }
 
 /* Reboot the PC */
-void Reboot_PC()
+void Reboot_PC( void )
 {
    /* Note:  Reboot is a cold start. */
    void( ( far * fp )(void)) =
@@ -564,7 +567,7 @@ void Reboot_PC()
 }
 
 /* Re-Initialize LBA related functions. */
-void Re_Initialization()
+void Re_Initialization( void )
 {
    /* Check for interrupt 0x13 extensions (If the proper version is set.) */
    if ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
@@ -602,7 +605,7 @@ void int24_handler( void )
    }
 }
 
-void interrupt( far *old_int24 )();
+void interrupt( far *old_int24 )( void );
 
 void restore_int24( void ) { setvect( 0x24, old_int24 ); }
 
@@ -627,7 +630,7 @@ void main( int argc, char *argv[], char *env[] )
    int index;
    int location;
 
-   extern void far smart_mbr( void );
+   extern void __cdecl far smart_mbr( void );
 
    if ( memicmp( argv[1], "SMART", 5 ) == 0 ) {
       smart_mbr();

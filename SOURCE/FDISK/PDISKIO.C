@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "compat.h"
 #include "pdiskio.h"
 
 extern void Pause( void );
@@ -59,21 +60,21 @@ long Translate_CHS_To_LBA( unsigned long cylinder, unsigned long head,
                            unsigned long total_sectors );
 
 void Clear_Partition_Table_Area_Of_Sector_Buffer( void );
-void Check_For_INT13_Extensions();
+void Check_For_INT13_Extensions( void );
 void Convert_Logical_To_Physical( unsigned long sector,
                                   unsigned long total_heads,
                                   unsigned long total_sectors );
 void Error_Handler( int error );
 void Get_Partition_Information( void );
 
-int Determine_Drive_Letters();
-int Read_Partition_Tables();
+int Determine_Drive_Letters( void );
+int Read_Partition_Tables( void );
 int Read_Physical_Sectors( int drive, long cylinder, long head, long sector,
                            int number_of_sectors );
 int Write_Logical_Sectors( unsigned char drive_letter[2],
                            unsigned long logical_sector_number,
                            int number_of_sectors );
-int Write_Partition_Tables();
+int Write_Partition_Tables( void );
 int Write_Physical_Sectors( int drive, long cylinder, long head, long sector,
                             int number_of_sectors );
 
@@ -83,17 +84,17 @@ unsigned long Decimal_Number( unsigned long hex1, unsigned long hex2,
 void StorePartitionInSectorBuffer( char *sector_buffer,
                                    struct Partition *pPart );
 
-void Check_For_INT13_Extensions();
-void Clear_Sector_Buffer();
-void Initialize_LBA_Structures();
-void Load_Brief_Partition_Table();
+void Check_For_INT13_Extensions( void );
+void Clear_Sector_Buffer( void );
+void Initialize_LBA_Structures( void );
+void Load_Brief_Partition_Table( void );
 
 /* External Prototype Declarations */
 /* ******************************* */
 extern void Clear_Extended_Partition_Table( int drive );
 extern void Clear_Screen( int type );
 /*  extern void Convert_Long_To_Integer(long number);*/
-extern void Pause();
+extern void Pause( void );
 extern void Print_Centered( int y, char *text, int style );
 extern void Position_Cursor( int row, int column );
 
@@ -103,8 +104,22 @@ extern void Position_Cursor( int row, int column );
 /////////////////////////////////////////////////////////////////////////////
 */
 
+#ifdef __WATCOMC__
+unsigned biosdisk( unsigned function, unsigned drive, unsigned head, unsigned cylinder, unsigned sector,
+                             unsigned number_of_sectors, void __far *sector_buffer )
+{
+   struct diskinfo_t dinfo;
+   dinfo.drive = drive;
+   dinfo.head = head;
+   dinfo.track = cylinder;
+   dinfo.sector = sector;
+   dinfo.nsectors = number_of_sectors;
+   return _bios_disk( function, &dinfo );
+}
+#endif
+
 /* Check for interrupt 0x13 extensions */
-void Check_For_INT13_Extensions()
+void Check_For_INT13_Extensions( void )
 {
    int carry;
    int drive_number = 0x80;
@@ -217,13 +232,13 @@ void Clear_Boot_Sector( int drive, long cylinder, long head, long sector )
 }
 
 /* Clear The Partition Table Area Of sector_buffer only. */
-void Clear_Partition_Table_Area_Of_Sector_Buffer()
+void Clear_Partition_Table_Area_Of_Sector_Buffer( void )
 {
    memset( sector_buffer + 0x1be, 0, 4 * 16 );
 }
 
 /* Clear Sector Buffer */
-void Clear_Sector_Buffer() { memset( sector_buffer, 0, 512 ); }
+void Clear_Sector_Buffer( void ) { memset( sector_buffer, 0, 512 ); }
 
 /* Combine Cylinder and Sector Values */
 unsigned long Combine_Cylinder_and_Sector( unsigned long cylinder,
@@ -254,7 +269,7 @@ unsigned long Combine_Cylinder_and_Sector( unsigned long cylinder,
 }
 
 /* Determine drive letters */
-int Determine_Drive_Letters()
+int Determine_Drive_Letters( void )
 /* Returns last used drive letter as ASCII number. */
 {
    //  int active_found=FALSE;
@@ -667,7 +682,7 @@ ulong get_log_drive_start( Partition_Table *pDrive, int partnum )
 }
 
 /* Get the volume labels and file system types from the boot sectors */
-void Get_Partition_Information()
+void Get_Partition_Information( void )
 {
    int drivenum;
    int partnum;
@@ -765,7 +780,7 @@ void Get_Partition_Information()
 }
 
 /* Initialize the LBA Structures */
-void Initialize_LBA_Structures()
+void Initialize_LBA_Structures( void )
 {
 
    /* Initialize the Disk Address Packet */
@@ -793,7 +808,7 @@ void Initialize_LBA_Structures()
 }
 
 /* Load the brief_partition_table[8] [27] */
-void Load_Brief_Partition_Table()
+void Load_Brief_Partition_Table( void )
 {
    int drivenum;
    int partnum;
@@ -817,7 +832,7 @@ void Load_Brief_Partition_Table()
 }
 
 /* Load the Partition Tables and get information on all drives */
-int Read_Partition_Tables()
+int Read_Partition_Tables( void )
 {
    int drive;
    int error_code = 0;
@@ -845,11 +860,11 @@ int Read_Partition_Tables()
       ) {
          /* Pre-compute the total size of the hard drive */
          /* */
-         pDrive->total_hard_disk_size_in_log_sect =
+         pDrive->total_disk_size_in_log_sectors =
             ( pDrive->total_cyl + 1 ) * ( pDrive->total_head + 1 ) *
             pDrive->total_sect;
 
-         pDrive->total_hard_disk_size_in_MB =
+         pDrive->total_disk_size_in_MB =
             Convert_Cyl_To_MB( ( pDrive->total_cyl + 1 ),
                                pDrive->total_head + 1, pDrive->total_sect );
       }
@@ -874,11 +889,11 @@ int Read_Partition_Tables()
             pDrive->total_head = EMULATED_HEADS;
             pDrive->total_sect = EMULATED_SECTORS;
 
-            pDrive->total_hard_disk_size_in_log_sectors =
+            pDrive->total_disk_size_in_log_sectors =
                ( pDrive->total_cyl + 1 ) * ( pDrive->total_head + 1 ) *
                pDrive->total_sect;
 
-            pDrive->total_hard_disk_size_in_MB = Convert_Cyl_To_MB(
+            pDrive->total_disk_size_in_MB = Convert_Cyl_To_MB(
                ( pDrive->total_cyl + 1 ), pDrive->total_head + 1,
                pDrive->total_sect );
 
@@ -1393,7 +1408,7 @@ long Translate_CHS_To_LBA( unsigned long cylinder, unsigned long head,
 }
 
 /* Write partition tables */
-int Write_Partition_Tables()
+int Write_Partition_Tables( void )
 {
    int error_code;
    int index;

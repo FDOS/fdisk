@@ -71,19 +71,19 @@ $set 2
 
 int Get_Options( char *arguments[], int number_of_arguments );
 
-void Command_Line_Clear_Flag();
-void Command_Line_Create_Extended_Partition();
-void Command_Line_Create_Logical_DOS_Drive();
-void Command_Line_Create_Primary_Partition();
-void Command_Line_Delete();
-void Command_Line_Info();
-void Command_Line_Modify();
-void Command_Line_Move();
-void Command_Line_Set_Flag();
-void Command_Line_Status();
-void Command_Line_Swap();
-void Command_Line_Test_Flag();
-void Command_Line_X();
+void Command_Line_Clear_Flag( void );
+void Command_Line_Create_Extended_Partition( void );
+void Command_Line_Create_Logical_DOS_Drive( void );
+void Command_Line_Create_Primary_Partition( void );
+void Command_Line_Delete( void );
+void Command_Line_Info( void );
+void Command_Line_Modify( void );
+void Command_Line_Move( void );
+void Command_Line_Set_Flag( void );
+void Command_Line_Status( void );
+void Command_Line_Swap( void );
+void Command_Line_Test_Flag( void );
+void Command_Line_X( void );
 void Shift_Command_Line_Options( int number_of_places );
 
 /*
@@ -93,7 +93,7 @@ void Shift_Command_Line_Options( int number_of_places );
 */
 
 /* /CLEARFLAG command line option */
-void Command_Line_Clear_Flag()
+void Command_Line_Clear_Flag( void )
 {
    int option_count = 1;
 
@@ -135,7 +135,7 @@ void Command_Line_Clear_Flag()
 }
 
 /* /EXT command line options */
-void Command_Line_Create_Extended_Partition()
+void Command_Line_Create_Extended_Partition( void )
 {
    int maximum_possible_percentage;
 
@@ -157,7 +157,7 @@ void Command_Line_Create_Extended_Partition()
    maximum_partition_size_in_MB = Max_Pri_Part_Size_In_MB( EXTENDED );
 
    maximum_possible_percentage = (int)Convert_To_Percentage(
-      maximum_partition_size_in_MB, pDrive->total_hard_disk_size_in_MB );
+      maximum_partition_size_in_MB, pDrive->total_disk_size_in_MB );
 
    //   ,pDrive->ext_part_size_in_MB);
 
@@ -186,7 +186,7 @@ void Command_Line_Create_Extended_Partition()
 }
 
 /* /LOG and /LOGO command line options */
-void Command_Line_Create_Logical_DOS_Drive()
+void Command_Line_Create_Logical_DOS_Drive( void )
 {
    int maximum_possible_percentage;
    int option_count = 1;
@@ -247,7 +247,7 @@ void Command_Line_Create_Logical_DOS_Drive()
 }
 
 /* /PRI and /PRIO command line options */
-void Command_Line_Create_Primary_Partition()
+void Command_Line_Create_Primary_Partition( void )
 {
    int maximum_possible_percentage;
    int option_count = 1;
@@ -270,7 +270,7 @@ void Command_Line_Create_Primary_Partition()
    maximum_partition_size_in_MB = Max_Pri_Part_Size_In_MB( PRIMARY );
 
    maximum_possible_percentage = (int)Convert_To_Percentage(
-      maximum_partition_size_in_MB, pDrive->total_hard_disk_size_in_MB );
+      maximum_partition_size_in_MB, pDrive->total_disk_size_in_MB );
 
    if ( arg[0].extra_value == 100 ) {
       /* Set limit on percentage. */
@@ -303,7 +303,7 @@ void Command_Line_Create_Primary_Partition()
 }
 
 /* /DELETE command line option */
-void Command_Line_Delete()
+void Command_Line_Delete( void )
 {
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
@@ -405,7 +405,7 @@ void Command_Line_Delete()
 }
 
 /* /INFO command line option */
-void Command_Line_Info()
+void Command_Line_Info( void )
 {
    int option_count = 1;
 
@@ -421,7 +421,7 @@ void Command_Line_Info()
 }
 
 /* /MODIFY command line option */
-void Command_Line_Modify()
+void Command_Line_Modify( void )
 {
    /*
   if((arg[0].value<1) || (arg[0].value>4))
@@ -442,7 +442,7 @@ void Command_Line_Modify()
 }
 
 /* /MOVE command line option */
-void Command_Line_Move()
+void Command_Line_Move( void )
 {
    if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
       printf(
@@ -463,7 +463,7 @@ void Command_Line_Move()
 }
 
 /* /SETFLAG command line option */
-void Command_Line_Set_Flag()
+void Command_Line_Set_Flag( void )
 {
    if ( ( arg[0].value < 1 ) || ( arg[0].value > 64 ) ) {
       printf( "\nInvalid flag number...Operation Terminated.\n" );
@@ -490,7 +490,7 @@ void Command_Line_Set_Flag()
 }
 
 /* /STATUS command line option */
-void Command_Line_Status()
+void Command_Line_Status( void )
 {
    flags.monochrome = TRUE;
    textcolor( 7 );
@@ -502,7 +502,7 @@ void Command_Line_Status()
 }
 
 /* /SWAP command line option */
-void Command_Line_Swap()
+void Command_Line_Swap( void )
 {
    if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
       printf(
@@ -523,7 +523,7 @@ void Command_Line_Swap()
 }
 
 /* /TESTFLAG command line option */
-void Command_Line_Test_Flag()
+void Command_Line_Test_Flag( void )
 {
    int flag;
 
@@ -559,7 +559,7 @@ void Command_Line_Test_Flag()
 }
 
 /* /X command line option */
-void Command_Line_X()
+void Command_Line_X( void )
 {
    int index;
 
