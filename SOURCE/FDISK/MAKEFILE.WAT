@@ -1,4 +1,4 @@
-# This makefile is for Free FDISK and Open Watcom 1.9.
+# This makefile is for Free FDISK and Open Watcom.
 #
 # Created by Bernd Boeckmann
 #   for verison 1.3.4 and Open Watcom 1.9.
@@ -11,6 +11,8 @@ assembler       = nasm
 assembler_flags_obj = -t -f obj
 linker          = wlink
 linker_flags    =
+compile_linker  = wcl
+compile_linker_flags = $(compiler_flags)
 
 objs = main.obj cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pdiskio.obj
 objs += pcompute.obj userint1.obj userint2.obj bootnorm.obj booteasy.obj
@@ -26,12 +28,12 @@ all : fdisk.exe test.exe
 .ASM.OBJ :
    $(assembler) $(assembler_flags_obj) $*.ASM -o $@
 
-#test.exe : test.c
-#  $(compiler) -M test.c
-#
+test.exe : test.c
+  $(compile_linker) $(compile_linker_flags) test.c watcom.c
+
 
 fdisk.exe : $(objs) fdisk.lnk
-   $(linker) @fdisk
+   $(linker) $(linker_flags) @fdisk
 
 
 fdisk.lnk : $(part_objects)

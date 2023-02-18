@@ -135,8 +135,8 @@ void Determine_Color_Video_Support( void )
 {
    /* Changed to code suggested by Ralf Quint. */
 
-   unsigned char videomode;
-   unsigned char maxcolumn;
+   unsigned char videomode = 0;
+   unsigned char maxcolumn = 0;
 
    asm {
 

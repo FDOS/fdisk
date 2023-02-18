@@ -5,11 +5,13 @@
 #define asm __asm
 
 #define WHITE 15
-#define BLINK 0
+#define BLINK 128
 
 #define setvect _dos_setvect
 #define getvect _dos_getvect
 
+int biosdisk( unsigned function, unsigned drive, unsigned head, unsigned cylinder, unsigned sector,
+                             unsigned number_of_sectors, void __far *sector_buffer );
 char *searchpath( char * fn );
 
 void textcolor( unsigned char color );

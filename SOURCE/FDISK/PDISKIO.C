@@ -104,20 +104,6 @@ extern void Position_Cursor( int row, int column );
 /////////////////////////////////////////////////////////////////////////////
 */
 
-#ifdef __WATCOMC__
-unsigned biosdisk( unsigned function, unsigned drive, unsigned head, unsigned cylinder, unsigned sector,
-                             unsigned number_of_sectors, void __far *sector_buffer )
-{
-   struct diskinfo_t dinfo;
-   dinfo.drive = drive;
-   dinfo.head = head;
-   dinfo.track = cylinder;
-   dinfo.sector = sector;
-   dinfo.nsectors = number_of_sectors;
-   return _bios_disk( function, &dinfo );
-}
-#endif
-
 /* Check for interrupt 0x13 extensions */
 void Check_For_INT13_Extensions( void )
 {
