@@ -2,6 +2,8 @@
 #include <bios.h>
 #include "compat.h"
 
+#ifdef __WATCOMC__
+
 char *searchpath(char * fn)
 {
    return fn;
@@ -23,3 +25,9 @@ int biosdisk( unsigned function, unsigned drive, unsigned head, unsigned cylinde
    dinfo.nsectors = number_of_sectors;
    return _bios_disk( function, &dinfo );
 }
+
+int color_printf( const char *format, ... )
+{
+   return 0;
+}
+#endif

@@ -16,6 +16,12 @@ char *searchpath( char * fn );
 
 void textcolor( unsigned char color );
 
+int color_printf( const char *format, ... );
+
+#else   /* Borland / Turbo C */
+
+#define color_printf cprintf
+
 #endif
 
 #endif
