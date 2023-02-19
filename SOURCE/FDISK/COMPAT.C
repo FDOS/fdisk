@@ -51,7 +51,7 @@ int Color_Print( const char *format, ... )
    result = vsnprintf( buffer, sizeof( buffer ), format, arglist );
    va_end( arglist );
 
-   if (result < 0 || result >= sizeof( buffer )) return result;
+   if (result < 0 || result >= sizeof( buffer )) return 0;
 
    for (p = buffer; *p; ++p) {
       asm {
@@ -93,7 +93,7 @@ int Color_Print( const char *format, ... )
       }
    }
 
-   return 0;
+   return (int)( p - buffer );
 }
 
 #endif
