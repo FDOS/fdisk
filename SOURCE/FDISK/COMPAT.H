@@ -14,13 +14,13 @@ int biosdisk( unsigned function, unsigned drive, unsigned head, unsigned cylinde
                              unsigned number_of_sectors, void __far *sector_buffer );
 char *searchpath( char * fn );
 
-void textcolor( unsigned char color );
+void textcolor( int color );
 
-int color_printf( const char *format, ... );
+int Color_Print( const char *format, ... );
 
 #else   /* Borland / Turbo C */
 
-#define color_printf cprintf
+#define Color_Print cprintf
 
 #endif
 

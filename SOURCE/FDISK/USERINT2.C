@@ -162,7 +162,7 @@ int Create_DOS_Partition_Interface( int type )
       Print_Centered( 4, "Create Primary DOS Partition", BOLD );
 
       printAt( 4, 6, "Current fixed disk drive: " );
-      cprintf( "%d", ( flags.drive_number - 127 ) );
+      Color_Print( "%d", ( flags.drive_number - 127 ) );
 
       printAt(
          4, 8,
@@ -227,7 +227,7 @@ int Create_DOS_Partition_Interface( int type )
       }
 
       printAt( 4, 6, "Current fixed disk drive: " );
-      cprintf( "%d", ( flags.drive_number - 127 ) );
+      Color_Print( "%d", ( flags.drive_number - 127 ) );
 
       Display_Primary_Partition_Information_SS();
 
@@ -238,7 +238,7 @@ int Create_DOS_Partition_Interface( int type )
          Print_UL_B( maximum_partition_size_in_MB );
       }
       else {
-         cprintf( "%4d", maximum_partition_size_in_MB );
+         Color_Print( "%4d", maximum_partition_size_in_MB );
       }
 
       printf( " Mbytes " );
@@ -246,7 +246,7 @@ int Create_DOS_Partition_Interface( int type )
       maximum_possible_percentage = Convert_To_Percentage(
          maximum_partition_size_in_MB, pDrive->total_disk_size_in_MB );
 
-      cprintf( "(%3d%%)", maximum_possible_percentage );
+      Color_Print( "(%3d%%)", maximum_possible_percentage );
 
       printAt(
          4, 18,
@@ -313,16 +313,16 @@ int Create_DOS_Partition_Interface( int type )
    }
 
    printAt( 4, 6, "Current fixed disk drive: " );
-   cprintf( "%d", ( flags.drive_number - 127 ) );
+   Color_Print( "%d", ( flags.drive_number - 127 ) );
 
    Display_Primary_Partition_Information_SS();
 
    Position_Cursor( 4, 21 );
    if ( type == PRIMARY ) {
-      cprintf( "Primary DOS Partition created" );
+      Color_Print( "Primary DOS Partition created" );
    }
    else {
-      cprintf( "Extended DOS Partition created" );
+      Color_Print( "Extended DOS Partition created" );
    }
 
    Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
@@ -389,7 +389,7 @@ int Create_Logical_Drive_Interface( void )
 
          if ( ( flags.version == 4 ) || ( flags.version == 5 ) ||
               ( flags.version == 6 ) ) {
-            cprintf( "%4d", pDrive->ext_part_size_in_MB );
+            Color_Print( "%4d", pDrive->ext_part_size_in_MB );
          }
          else {
             Print_UL_B( pDrive->ext_part_size_in_MB );
@@ -401,7 +401,7 @@ int Create_Logical_Drive_Interface( void )
 
          if ( ( flags.version == 4 ) || ( flags.version == 5 ) ||
               ( flags.version == 6 ) ) {
-            cprintf( "%4d", maximum_partition_size_in_MB );
+            Color_Print( "%4d", maximum_partition_size_in_MB );
          }
          else {
             Print_UL_B( maximum_partition_size_in_MB );
@@ -412,7 +412,7 @@ int Create_Logical_Drive_Interface( void )
          maximum_possible_percentage = (int)Convert_To_Percentage(
             maximum_partition_size_in_MB, pDrive->ext_part_size_in_MB );
 
-         cprintf( "(%3d%%)", maximum_possible_percentage );
+         Color_Print( "(%3d%%)", maximum_possible_percentage );
 
          printAt(
             4, 20,
@@ -719,7 +719,7 @@ void Display_All_Drives( void )
       /* Print drive number */
       Position_Cursor( current_column_offset_of_general_drive_information,
                        current_line );
-      cprintf( "%d", drive );
+      Color_Print( "%d", drive );
 
       /* Print size of drive */
       Position_Cursor(
@@ -1043,7 +1043,7 @@ void Display_Extended_Partition_Information_SS( void )
       Print_UL_B( part_table[flags.drive_number - 128].ext_part_size_in_MB );
    }
    else {
-      cprintf( "%4d",
+      Color_Print( "%4d",
                ( part_table[flags.drive_number - 128].ext_part_size_in_MB ) );
    }
    printf( " Mbytes (1 Mbyte = 1048576 bytes)" );
@@ -1216,7 +1216,7 @@ void Display_Primary_Partition_Information_SS( void )
    Determine_Drive_Letters();
 
    printAt( 4, 6, "Current fixed disk drive: " );
-   cprintf( "%d", ( flags.drive_number - 127 ) );
+   Color_Print( "%d", ( flags.drive_number - 127 ) );
 
    if ( ( pDrive->pri_part[0].num_type > 0 ) ||
         ( pDrive->pri_part[1].num_type > 0 ) ||
@@ -1356,7 +1356,7 @@ void Display_Primary_Partition_Information_SS( void )
       Print_UL_B( pDrive->total_disk_size_in_MB );
    }
    else {
-      cprintf( "%4d", pDrive->total_disk_size_in_MB );
+      Color_Print( "%4d", pDrive->total_disk_size_in_MB );
    }
 
    printf( " Mbytes (1 Mbyte = 1048576 bytes)" );
@@ -1402,7 +1402,7 @@ void List_Partition_Types( void )
            ( index == 255 ) ) {
 
          printAt( 0, 23, "Press " );
-         cprintf( "Any Key" );
+         Color_Print( "Any Key" );
          printf( " to continue" );
 
          asm {
@@ -1432,7 +1432,7 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
       Determine_Drive_Letters();
 
       printAt( 6, 6, "Current fixed disk drive: " );
-      cprintf( "%d", ( flags.drive_number - 127 ) );
+      Color_Print( "%d", ( flags.drive_number - 127 ) );
 
       printAt(
          4, 8,
@@ -1560,7 +1560,7 @@ void Modify_Primary_Partition_Information( int partition_number )
       Determine_Drive_Letters();
 
       printAt( 4, 6, "Current fixed disk drive: " );
-      cprintf( "%d", ( flags.drive_number - 127 ) );
+      Color_Print( "%d", ( flags.drive_number - 127 ) );
 
       printAt(
          4, 8,
