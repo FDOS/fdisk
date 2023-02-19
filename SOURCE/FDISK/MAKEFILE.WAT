@@ -17,7 +17,7 @@ UPX      = upx
 UPXFLAGS = -qq -9 --8086
 objs  = main.obj cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pdiskio.obj
 objs += pcompute.obj userint1.obj userint2.obj bootnorm.obj booteasy.obj
-objs += kitten.obj smartmbr.obj watcom.obj
+objs += kitten.obj smartmbr.obj compat.obj
 
 
 all : fdisk.exe test.exe
@@ -44,7 +44,7 @@ fdisk.lnk : $(objs)
    @for %i in ($(objs)) do @echo FILE %i >>$^@
 
 test.exe : test.c watcom.c
-  $(CL) $(CLFLAGS) test.c watcom.c
+  $(CL) $(CLFLAGS) test.c compat.c
 
 
 # clean up:
