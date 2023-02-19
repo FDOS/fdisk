@@ -33,6 +33,7 @@ $set 1
 #include <conio.h>
 #include <ctype.h>
 #include <dos.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -160,30 +161,47 @@ void Determine_Color_Video_Support( void )
 
 int printAt( int column, int row, char *format, ... )
 {
+   va_list arglist;
+   int result;
    Position_Cursor( column, row );
 
-   return vprintf( format, &format + 1 );
+   va_start( arglist, format );
+   result = vprintf( format, arglist );
+   va_end( arglist );
+
+   return result;
 }
+
 int cprintAt( int column, int row, char *format, ... )
 {
    char buffer[256];
+   va_list arglist;
+
    Position_Cursor( column, row );
 
-   vsprintf( buffer, format, &format + 1 );
-   return cprintf( "%s", buffer );
+   va_start( arglist, format );
+   vsprintf( buffer, format, arglist );
+   va_end( arglist );
+
+   return Color_Print( "%s", buffer );
 }
+
 int BlinkPrintAt( int column, int row, char *format, ... )
 {
    char buffer[256];
+   va_list arglist;
    int len;
+
    Position_Cursor( column, row );
 
-   vsprintf( buffer, format, &format + 1 );
+   va_start( arglist, format );
+   vsprintf( buffer, format, arglist );
+   va_end( arglist );
 
    if ( flags.monochrome != TRUE ) {
       textcolor( WHITE | BLINK );
    }
-   len = cprintf( "%s", buffer );
+   len = Color_Print( "%s", buffer );
 
    if ( flags.monochrome != TRUE ) {
       textcolor( WHITE );
@@ -631,6 +649,12 @@ void main( int argc, char *argv[], char *env[] )
    int location;
 
    extern void __cdecl far smart_mbr( void );
+
+   /* Watcom C output buffering conflicts with cursor positioning functions
+      so disable it */
+#ifdef __WATCOMC__
+      setbuf( stdout, NULL );
+#endif
 
    if ( memicmp( argv[1], "SMART", 5 ) == 0 ) {
       smart_mbr();

@@ -84,22 +84,22 @@ void Display_Information( void )
    if ( flags.extended_options_flag == TRUE ) {
       Position_Cursor( 0, 0 );
       if ( flags.version == FOUR ) {
-         cprintf( "4" );
+         Color_Print( "4" );
       }
       if ( flags.version == FIVE ) {
-         cprintf( "5" );
+         Color_Print( "5" );
       }
       if ( flags.version == SIX ) {
-         cprintf( "6" );
+         Color_Print( "6" );
       }
       if ( flags.version == W95 ) {
-         cprintf( "W95" );
+         Color_Print( "W95" );
       }
       if ( flags.version == W95B ) {
-         cprintf( "W95B" );
+         Color_Print( "W95B" );
       }
       if ( flags.version == W98 ) {
-         cprintf( "W98" );
+         Color_Print( "W98" );
       }
 
       if ( flags.partition_type_lookup_table == INTERNAL ) {
@@ -132,9 +132,9 @@ void Display_Information( void )
 
 #ifdef BETA_RELEASE
    Position_Cursor( 2, 1 );
-   cprintf( "BETA RELEASE" );
+   Color_Print( "BETA RELEASE" );
    Position_Cursor( 66, 1 );
-   cprintf( "BETA RELEASE" );
+   Color_Print( "BETA RELEASE" );
 #endif
 
 #ifdef DEBUG
@@ -178,7 +178,7 @@ void Exit_Screen( void )
 
       if ( flags.reboot == FALSE ) {
          printAt( 4, 11, "You " );
-         cprintf( "MUST" );
+         Color_Print( "MUST" );
          printf( " restart your system for your changes to take effect." );
          printAt(
             4, 12,
@@ -294,7 +294,7 @@ void Interactive_User_Interface( void )
             }
 
             printAt( 4, 6, "Current fixed disk drive: " );
-            cprintf( "%d", ( flags.drive_number - 127 ) );
+            Color_Print( "%d", ( flags.drive_number - 127 ) );
 
             Display_Primary_Partition_Information_SS();
 
@@ -314,7 +314,7 @@ void Interactive_User_Interface( void )
 
             Print_Centered( 4, "Create Extended DOS Partition", BOLD );
             printAt( 4, 6, "Current fixed disk drive: " );
-            cprintf( "%d", ( flags.drive_number - 127 ) );
+            Color_Print( "%d", ( flags.drive_number - 127 ) );
 
             Display_Primary_Partition_Information_SS();
 
@@ -512,8 +512,8 @@ void Position_Cursor( int column, int row )
 
       /* Position Cursor */
     mov ah,0x02
-    mov dh,BYTE PTR row
-    mov dl,BYTE PTR column
+    mov dh,byte ptr row
+    mov dl,byte ptr column
     int 0x10
    }
 }
@@ -526,7 +526,7 @@ void Print_Centered( int y, char *text, int style )
    Position_Cursor( x, y );
 
    if ( style == BOLD ) {
-      cprintf( text );
+      Color_Print( text );
    }
    else {
       printf( text );
@@ -537,7 +537,7 @@ void Print_Centered( int y, char *text, int style )
 void Print_UL( unsigned long number ) { printf( "%6lu", number ); }
 
 /* Print 6 Digit Unsigned Long Values in bold print */
-void Print_UL_B( unsigned long number ) { cprintf( "%6lu", number ); }
+void Print_UL_B( unsigned long number ) { Color_Print( "%6lu", number ); }
 
 /* Standard Menu Routine */
 /* Displays the menus laid out in a standard format and returns the */
@@ -662,7 +662,7 @@ int Standard_Menu( int menu )
 
       /* Display Current Drive Number */
       printAt( 4, 6, "Current fixed disk drive: " );
-      cprintf( "%d", ( flags.drive_number - 127 ) );
+      Color_Print( "%d", ( flags.drive_number - 127 ) );
 
       if ( menu == DP ) {
          /* Ensure that primary partitions are available to delete. */

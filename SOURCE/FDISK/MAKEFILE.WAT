@@ -6,7 +6,7 @@
 # Note:  Free FDISK is written in C.
 
 CC       = wcc
-CFLAGS   = -q -0 -mm -bc -zp=1 -w4
+CFLAGS   = -q -0 -mm -bc -w4
 AS       = nasm
 ASFLAGS  = -t -f obj
 LD       = wlink
@@ -43,7 +43,7 @@ fdisk.lnk : $(objs)
 !endif
    @for %i in ($(objs)) do @echo FILE %i >>$^@
 
-test.exe : test.c watcom.c
+test.exe : test.c compat.c
   $(CL) $(CLFLAGS) test.c compat.c
 
 

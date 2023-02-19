@@ -892,7 +892,7 @@ int Read_Partition_Tables( void )
          else {
 #endif
             if ( drive == 0 ) {
-               cprintf( "\n    No fixed disks present.\n" );
+               Color_Print( "\n    No fixed disks present.\n" );
                exit( 6 );
             }
             pDrive->total_cyl = 0;

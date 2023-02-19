@@ -156,15 +156,15 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
    if ( type != ESC ) {
       Position_Cursor( x_position, y_position );
 
-      cprintf( "[" );
+      Color_Print( "[" );
 
       index = 0;
       do {
-         cprintf( " " );
+         Color_Print( " " );
          index++;
       } while ( index < size_of_field );
 
-      cprintf( "]" );
+      Color_Print( "]" );
    }
 
    /* Display the return message */
@@ -172,7 +172,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
         ( return_message == ESCC ) ) {
       printAt( 4, 24, "                                                 " );
       printAt( 4, 24, catgets( cat, 4, 1, "Press" ) );
-      cprintf( " Esc " );
+      Color_Print( " Esc " );
       printf( catgets( cat, 4, 2, "to" ) );
       printf( " " );
    }
@@ -211,7 +211,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
             ( x_position + size_of_field - line_buffer_index + index ),
             y_position );
          index--;
-         cprintf( "%c", line_buffer[index] );
+         Color_Print( "%c", line_buffer[index] );
       } while ( index > 0 );
 
       default_value_preentered = TRUE;
@@ -414,7 +414,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
          line_buffer_index = 1;
 
          Position_Cursor( ( x_position + 1 ), y_position );
-         cprintf( "%c", line_buffer[0] );
+         Color_Print( "%c", line_buffer[0] );
       }
 
       /* Process a legitimate entry if type==CHARNUM. */
@@ -441,7 +441,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
          type = CHARNUM;
 
          Position_Cursor( ( x_position + 1 ), y_position );
-         cprintf( "%c", line_buffer[0] );
+         Color_Print( "%c", line_buffer[0] );
       }
 
       /* Process a legitimate entry if type==NUMYN. */
@@ -464,7 +464,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
             type = NUMCHAR;
 
             Position_Cursor( ( x_position + 1 ), y_position );
-            cprintf( "%c", line_buffer[0] );
+            Color_Print( "%c", line_buffer[0] );
          }
 
          if ( ( input < '1' ) || ( input > ( char_max_range + 48 ) ) ) {
@@ -489,7 +489,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
             type = CHARNUM;
 
             Position_Cursor( ( x_position + 1 ), y_position );
-            cprintf( "%c", line_buffer[0] );
+            Color_Print( "%c", line_buffer[0] );
          }
 
          if ( ( input == optional_char_2[0] ) ||
@@ -504,7 +504,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
             type = CHARNUM;
 
             Position_Cursor( ( x_position + 1 ), y_position );
-            cprintf( "%c", line_buffer[0] );
+            Color_Print( "%c", line_buffer[0] );
          }
       }
 
@@ -518,7 +518,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
             type = NUMCHAR;
 
             Position_Cursor( ( x_position + 1 ), y_position );
-            cprintf( "%c", line_buffer[0] );
+            Color_Print( "%c", line_buffer[0] );
          }
       }
 
@@ -533,7 +533,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
             type = NUMYN;
 
             Position_Cursor( ( x_position + 1 ), y_position );
-            cprintf( "%c", line_buffer[0] );
+            Color_Print( "%c", line_buffer[0] );
          }
       }
 
@@ -553,12 +553,12 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
             data = 99;
 
             Position_Cursor( 4, 23 );
-            cprintf( "Invalid entry, please enter %c-", min_range );
-            cprintf( "%c.", max_range );
+            Color_Print( "Invalid entry, please enter %c-", min_range );
+            Color_Print( "%c.", max_range );
          }
 
          Position_Cursor( ( x_position + 1 ), y_position );
-         cprintf( "%c", line_buffer[0] );
+         Color_Print( "%c", line_buffer[0] );
       }
 
       /* Process the backspace key if type==NUMCHAR. */
@@ -569,7 +569,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
          line_buffer_index = 1;
 
          Position_Cursor( ( x_position + 1 ), y_position );
-         cprintf( "%c", line_buffer[0] );
+         Color_Print( "%c", line_buffer[0] );
       }
 
       if ( type == YN ) {
@@ -601,7 +601,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
          }
 
          Position_Cursor( ( x_position + 1 ), y_position );
-         cprintf( "%c", line_buffer[0] );
+         Color_Print( "%c", line_buffer[0] );
       }
 
       /* Process the backspace key if type==NUMYN. */
@@ -611,7 +611,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
          line_buffer_index = 1;
 
          Position_Cursor( ( x_position + 1 ), y_position );
-         cprintf( "%c", line_buffer[0] );
+         Color_Print( "%c", line_buffer[0] );
       }
 
       if ( ( type == NUM ) && ( input != '\xff' ) ) {
@@ -648,7 +648,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                proper_input_given = FALSE;
 
                cprintAt( 4, 23, "%d is not a choice, please enter ", input );
-               cprintf( "%d-%d.", min_range, max_range );
+               Color_Print( "%d-%d.", min_range, max_range );
                invalid_input = TRUE;
             }
 
@@ -708,7 +708,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                ( x_position + size_of_field - line_buffer_index + index ),
                y_position );
             index--;
-            cprintf( "%c", line_buffer[index] );
+            Color_Print( "%c", line_buffer[index] );
          } while ( index > 0 );
       }
 
@@ -753,7 +753,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                proper_input_given = FALSE;
 
                cprintAt( 4, 23, "%d is not a choice, please enter ", input );
-               cprintf( "%d-%d.", min_range, max_range );
+               Color_Print( "%d-%d.", min_range, max_range );
                invalid_input = TRUE;
             }
 
@@ -826,7 +826,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                ( x_position + size_of_field - line_buffer_index + index ),
                y_position );
             index--;
-            cprintf( "%c", line_buffer[index] );
+            Color_Print( "%c", line_buffer[index] );
          } while ( index > 0 );
       }
 
@@ -852,10 +852,10 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       /* Place brackets back on screen as a precautionary measure. */
       if ( type != ESC ) {
          Position_Cursor( x_position, y_position );
-         cprintf( "[" );
+         Color_Print( "[" );
 
          Position_Cursor( ( x_position + size_of_field + 1 ), y_position );
-         cprintf( "]" );
+         Color_Print( "]" );
       }
 
    } while ( proper_input_given == FALSE );
