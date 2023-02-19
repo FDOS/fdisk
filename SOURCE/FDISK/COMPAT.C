@@ -5,21 +5,32 @@
 #ifdef __WATCOMC__
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-char *searchpath(char * fn)
+char *searchpath( char * fn )
 {
-   return fn;
+   static char full_path[ _MAX_PATH ];
+   
+   _searchenv( fn, "PATH", full_path );
+   if ( full_path[0] ) {
+      return full_path;
+   }
+
+   return NULL;
 }
 
 static unsigned short _textcolor = 0x07;
 
+/* Watcom C does not have this */
 void textcolor( int color )
 {
    _textcolor = color;
 }
 
-int biosdisk( unsigned function, unsigned drive, unsigned head, unsigned cylinder, unsigned sector,
-                             unsigned number_of_sectors, void __far *sector_buffer )
+/* Watcom C does not have this */
+int biosdisk( unsigned function, unsigned drive, unsigned head,
+              unsigned cylinder, unsigned sector, unsigned number_of_sectors,
+              void __far *sector_buffer )
 {
    struct diskinfo_t dinfo;
    dinfo.drive = drive;
@@ -34,10 +45,13 @@ int Color_Print( const char *format, ... )
 {
    char buffer[256], *p;
    va_list arglist;
+   int result;
 
    va_start( arglist, format ); 
-   vsprintf( buffer, format, arglist );
+   result = vsnprintf( buffer, sizeof( buffer ), format, arglist );
    va_end( arglist );
+
+   if (result < 0 || result >= sizeof( buffer )) return result;
 
    for (p = buffer; *p; ++p) {
       asm {
