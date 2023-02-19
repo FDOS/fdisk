@@ -5,38 +5,35 @@
 #
 # Note:  Free FDISK is written in C.
 
-compiler        = wcc
-compiler_flags  = -q -0 -mm -bc -zp=1 -w4
-assembler       = nasm
-assembler_flags_obj = -t -f obj
-linker          = wlink
-linker_flags    =
-compile_linker  = wcl
-compile_linker_flags = $(compiler_flags)
-
-objs = main.obj cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pdiskio.obj
+CC       = wcc
+CFLAGS   = -q -0 -mm -bc -zp=1 -w4
+AS       = nasm
+ASFLAGS  = -t -f obj
+LD       = wlink
+LDFLAGS  =
+CL       = wcl
+CLFLAGS  = $(CFLAGS)
+UPX      = upx
+UPXFLAGS = -qq -9 --8086
+objs  = main.obj cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pdiskio.obj
 objs += pcompute.obj userint1.obj userint2.obj bootnorm.obj booteasy.obj
 objs += kitten.obj smartmbr.obj watcom.obj
 
-UPX=upx
 
 all : fdisk.exe test.exe
 
 .C.OBJ : .AUTODEPEND
-   $(compiler) $(compiler_flags) $*.C
+   $(CC) $(CFLAGS) $*.C
 
 .ASM.OBJ :
-   $(assembler) $(assembler_flags_obj) $*.ASM -o $@
-
-test.exe : test.c
-  $(compile_linker) $(compile_linker_flags) test.c watcom.c
+   $(AS) $(ASFLAGS) $*.ASM -o $@
 
 
 fdisk.exe : $(objs) fdisk.lnk
-   $(linker) $(linker_flags) @fdisk
+   $(LD) $(LDFLAGS) @fdisk
+   -$(UPX) $(UPXFLAGS) $^@    # ignore UPX return code
 
-
-fdisk.lnk : $(part_objects)
+fdisk.lnk : $(objs)
    @echo NAME $^& >$^@
    @echo SYSTEM DOS >>$^@
    @echo OPTION QUIET >>$^@
@@ -45,6 +42,9 @@ fdisk.lnk : $(part_objects)
    @echo DEBUG ALL>>$^@
 !endif
    @for %i in ($(objs)) do @echo FILE %i >>$^@
+
+test.exe : test.c watcom.c
+  $(CL) $(CLFLAGS) test.c watcom.c
 
 
 # clean up:
