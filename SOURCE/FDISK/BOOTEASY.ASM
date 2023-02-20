@@ -2,8 +2,9 @@
 ; normal DOS boot sector
 ;
 
-segment _BOOTEASY_DATA           class=DATA align=2
-                 
+segment _BOOTEASY_DATA class=DATA align=2
+group DGROUP _BOOTEASY_DATA
+
   global  _booteasy_code
 _booteasy_code:
 
