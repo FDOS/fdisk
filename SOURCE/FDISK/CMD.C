@@ -447,13 +447,13 @@ void Command_Line_Move( void )
 {
    if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
       printf(
-         "\Source partition number is out of range...Operation Terminated.\n" );
+         "\nSource partition number is out of range...Operation Terminated.\n" );
       exit( 9 );
    }
 
    if ( ( arg[0].extra_value < 1 ) || ( arg[0].extra_value > 4 ) ) {
       printf(
-         "\Destination partition number is out of range...Operation Terminated.\n" );
+         "\nDestination partition number is out of range...Operation Terminated.\n" );
       exit( 9 );
    }
 
