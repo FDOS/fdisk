@@ -144,7 +144,7 @@ void Command_Line_Create_Extended_Partition( void )
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
-   if ( arg[0].value <= 0 ) {
+   if ( arg[0].value == 0 ) {
       printf( "\n" );
       printf( catgets( cat, 2, 6, "Invalid partition size specifed" ) );
       printf( "\n" );
@@ -197,7 +197,7 @@ void Command_Line_Create_Logical_DOS_Drive( void )
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
-   if ( arg[0].value <= 0 ) {
+   if ( arg[0].value == 0 ) {
       printf( "\n" );
       printf( catgets( cat, 2, 6, "Invalid partition size specifed" ) );
       printf( "\n" );
@@ -257,7 +257,7 @@ void Command_Line_Create_Primary_Partition( void )
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
-   if ( arg[0].value <= 0 ) {
+   if ( arg[0].value == 0 ) {
       printf( "\n" );
       printf( catgets( cat, 2, 6, "Invalid partition size specifed" ) );
       printf( "\n" );
@@ -431,7 +431,7 @@ void Command_Line_Modify( void )
     exit(9);
     }
 */
-   if ( ( arg[0].extra_value <= 0 ) || ( arg[0].extra_value > 255 ) ) {
+   if ( ( arg[0].extra_value == 0 ) || ( arg[0].extra_value > 255 ) ) {
       printf(
          "\nNew partition type is out of range...Operation Terminated.\n" );
       exit( 9 );
