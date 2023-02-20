@@ -7,4 +7,8 @@
 // Copyright:  1998-2001 under the terms of the GNU GPL, Version 2
 */
 
-extern void Display_Help_Screen( void );
+#ifndef HELPSCR_H
+
+void Display_Help_Screen( void );
+
+#endif /* HELPSCR_H */

@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "compat.h"
 #include "fdiskio.h"
 #include "kbdinput.h"
 #include "main.h"
@@ -38,7 +39,6 @@
 #include "pdiskio.h"
 #include "userint1.h"
 #include "userint2.h"
-#include "compat.h"
 
 /*
 /////////////////////////////////////////////////////////////////////////////
@@ -65,9 +65,9 @@ void Clear_Screen( int type ) /* Clear screen code as suggested by     */
     mov ah,0x06 /* scroll up */
     mov al,0x00 /* 0 rows, clear whole window */
     mov bh,BYTE PTR color /* set color */
-    mov cx,0x0000                  /* coordinates of upper left corner of screen */
+    mov cx,0x0000 /* coordinates of upper left corner of screen */
       /*    mov dh,25    */ /* maximum row */
-    mov dl,79                      /* maximum column */
+    mov dl,79     /* maximum column */
     int 0x10
    }
 
@@ -103,30 +103,30 @@ void Display_Information( void )
       }
 
       if ( flags.partition_type_lookup_table == INTERNAL ) {
-         cprintAt( 5, 0, "INT" );
+         Color_Print_At( 5, 0, "INT" );
       }
       else {
-         cprintAt( 5, 0, "EXT" );
+         Color_Print_At( 5, 0, "EXT" );
       }
 
       if ( flags.use_extended_int_13 == TRUE ) {
-         cprintAt( 9, 0, "LBA" );
+         Color_Print_At( 9, 0, "LBA" );
       }
 
       if ( flags.fat32 == TRUE ) {
-         cprintAt( 13, 0, "FAT32" );
+         Color_Print_At( 13, 0, "FAT32" );
       }
 
       if ( flags.use_ambr == TRUE ) {
-         cprintAt( 72, 0, "AMBR" );
+         Color_Print_At( 72, 0, "AMBR" );
       }
 
       if ( flags.partitions_have_changed == TRUE ) {
-         cprintAt( 77, 0, "C" );
+         Color_Print_At( 77, 0, "C" );
       }
 
       if ( flags.extended_options_flag == TRUE ) {
-         cprintAt( 79, 0, "X" );
+         Color_Print_At( 79, 0, "X" );
       }
    }
 
@@ -138,14 +138,14 @@ void Display_Information( void )
 #endif
 
 #ifdef DEBUG
-   cprintAt( 60, 0, "DEBUG" );
+   Color_Print_At( 60, 0, "DEBUG" );
 
    if ( debug.emulate_disk > 0 ) {
-      cprintAt( 66, 0, "E%1d", debug.emulate_disk );
+      Color_Print_At( 66, 0, "E%1d", debug.emulate_disk );
    }
 
    if ( debug.write == FALSE ) {
-      cprintAt( 69, 0, "RO" );
+      Color_Print_At( 69, 0, "RO" );
    }
 #endif
 }
@@ -161,7 +161,7 @@ void Display_Label( void )
       strcpy( label, PRINAME );
 
       do {
-         printAt( 79, ( ( index * 2 ) + 3 ), "%c", label[index] );
+         Print_At( 79, ( ( index * 2 ) + 3 ), "%c", label[index] );
          index++;
       } while ( index < 10 );
    }
@@ -177,21 +177,21 @@ void Exit_Screen( void )
       Clear_Screen( NOEXTRAS );
 
       if ( flags.reboot == FALSE ) {
-         printAt( 4, 11, "You " );
+         Print_At( 4, 11, "You " );
          Color_Print( "MUST" );
          printf( " restart your system for your changes to take effect." );
-         printAt(
+         Print_At(
             4, 12,
             "Any drives you have created or changed must be formatted" );
-         cprintAt( 4, 13, "AFTER" );
+         Color_Print_At( 4, 13, "AFTER" );
          printf( " you restart." );
 
          Input( 0, 0, 0, ESC, 0, 0, ESCE, 0, 0, NULL, NULL );
          Clear_Screen( NOEXTRAS );
       }
       else {
-         cprintAt( 4, 13, "System will now restart" );
-         printAt( 4, 15, "Press any key when ready . . ." );
+         Color_Print_At( 4, 13, "System will now restart" );
+         Print_At( 4, 15, "Press any key when ready . . ." );
 
          /* Wait for a keypress. */
          asm {
@@ -293,12 +293,12 @@ void Interactive_User_Interface( void )
                Print_Centered( 4, "Create Extended DOS Partition", BOLD );
             }
 
-            printAt( 4, 6, "Current fixed disk drive: " );
-            Color_Print( "%d", ( flags.drive_number - 127 ) );
+            Print_At( 4, 6, "Current fixed disk drive: " );
+            Color_Printf( "%d", ( flags.drive_number - 127 ) );
 
             Display_Primary_Partition_Information_SS();
 
-            cprintAt( 4, 22, "No space to create a DOS partition." );
+            Color_Print_At( 4, 22, "No space to create a DOS partition." );
 
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
             menu = MM;
@@ -313,12 +313,12 @@ void Interactive_User_Interface( void )
             Clear_Screen( 0 );
 
             Print_Centered( 4, "Create Extended DOS Partition", BOLD );
-            printAt( 4, 6, "Current fixed disk drive: " );
-            Color_Print( "%d", ( flags.drive_number - 127 ) );
+            Print_At( 4, 6, "Current fixed disk drive: " );
+            Color_Printf( "%d", ( flags.drive_number - 127 ) );
 
             Display_Primary_Partition_Information_SS();
 
-            cprintAt( 4, 22, "Extended DOS Partition already exists." );
+            Color_Print_At( 4, 22, "Extended DOS Partition already exists." );
 
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
          }
@@ -329,10 +329,11 @@ void Interactive_User_Interface( void )
 
       if ( menu == CLDD ) {
          if ( pDrive->ptr_ext_part == NULL ) {
-            cprintAt( 4, 22, "Cannot create Logical DOS Drive without" );
-            cprintAt( 4, 23,
-                      "an Extended DOS Partition on the current drive." );
-            printAt( 4, 24, "                                        " );
+            Color_Print_At( 4, 22,
+                            "Cannot create Logical DOS Drive without" );
+            Color_Print_At(
+               4, 23, "an Extended DOS Partition on the current drive." );
+            Print_At( 4, 24, "                                        " );
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
             menu = MM;
          }
@@ -360,8 +361,8 @@ void Interactive_User_Interface( void )
          } while ( index < 4 );
 
          if ( counter == 0 ) {
-            cprintAt( 4, 22, "No Primary DOS Partition to delete." );
-            printAt( 4, 24, "                                        " );
+            Color_Print_At( 4, 22, "No Primary DOS Partition to delete." );
+            Print_At( 4, 24, "                                        " );
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
             menu = MM;
          }
@@ -373,8 +374,8 @@ void Interactive_User_Interface( void )
 
       if ( menu == DEDP ) {
          if ( pDrive->ptr_ext_part == NULL ) {
-            cprintAt( 4, 22, "No Extended DOS Partition to delete." );
-            printAt( 4, 24, "                                        " );
+            Color_Print_At( 4, 22, "No Extended DOS Partition to delete." );
+            Print_At( 4, 24, "                                        " );
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
             menu = MM;
          }
@@ -386,8 +387,8 @@ void Interactive_User_Interface( void )
       if ( menu == DLDD ) {
          if ( ( pDrive->num_of_log_drives == 0 ) ||
               ( pDrive->ptr_ext_part == NULL ) ) {
-            cprintAt( 4, 22, "No Logical DOS Drive(s) to delete." );
-            printAt( 4, 24, "                                        " );
+            Color_Print_At( 4, 22, "No Logical DOS Drive(s) to delete." );
+            Print_At( 4, 24, "                                        " );
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
             menu = MM;
          }
@@ -411,8 +412,8 @@ void Interactive_User_Interface( void )
          } while ( index < 4 );
 
          if ( counter == 0 ) {
-            cprintAt( 4, 22, "No Non-DOS Partition to delete." );
-            printAt( 4, 24, "                                        " );
+            Color_Print_At( 4, 22, "No Non-DOS Partition to delete." );
+            Print_At( 4, 24, "                                        " );
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
             menu = MM;
          }
@@ -430,7 +431,7 @@ void Interactive_User_Interface( void )
 
       if ( menu == BMBR ) {
          Create_BootEasy_MBR();
-         cprintAt( 4, 22, "BootEasy MBR has been created." );
+         Color_Print_At( 4, 22, "BootEasy MBR has been created." );
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
       }
 
@@ -449,26 +450,27 @@ void Interactive_User_Interface( void )
          }
 
          if ( !file_pointer ) {
-            cprintAt(
+            Color_Print_At(
                4, 22,
                "\Unable to find the \"boot.mbr\" file...MBR has not been created.\n" );
          }
          else {
             Create_Alternate_MBR();
-            cprintAt( 4, 22, "MBR has been written using \"boot.mbr\"" );
+            Color_Print_At( 4, 22,
+                            "MBR has been written using \"boot.mbr\"" );
          }
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
       }
 
       if ( menu == SMBR ) {
          Save_MBR();
-         cprintAt( 4, 22, "MBR has been saved to \"boot.mbr\"" );
+         Color_Print_At( 4, 22, "MBR has been saved to \"boot.mbr\"" );
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
       }
 
       if ( menu == RMBR ) {
          Remove_MBR();
-         cprintAt( 4, 22, "MBR has been removed from the hard disk." );
+         Color_Print_At( 4, 22, "MBR has been removed from the hard disk." );
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
       }
 
@@ -537,7 +539,7 @@ void Print_Centered( int y, char *text, int style )
 void Print_UL( unsigned long number ) { printf( "%6lu", number ); }
 
 /* Print 6 Digit Unsigned Long Values in bold print */
-void Print_UL_B( unsigned long number ) { Color_Print( "%6lu", number ); }
+void Print_UL_B( unsigned long number ) { Color_Printf( "%6lu", number ); }
 
 /* Standard Menu Routine */
 /* Displays the menus laid out in a standard format and returns the */
@@ -661,8 +663,8 @@ int Standard_Menu( int menu )
       Print_Centered( 4, title, BOLD );
 
       /* Display Current Drive Number */
-      printAt( 4, 6, "Current fixed disk drive: " );
-      Color_Print( "%d", ( flags.drive_number - 127 ) );
+      Print_At( 4, 6, "Current fixed disk drive: " );
+      Color_Printf( "%d", ( flags.drive_number - 127 ) );
 
       if ( menu == DP ) {
          /* Ensure that primary partitions are available to delete. */
@@ -677,8 +679,8 @@ int Standard_Menu( int menu )
          } while ( index < 4 );
 
          if ( counter == 0 ) {
-            cprintAt( 4, 22, "No partitions to delete." );
-            printAt( 4, 24, "                                        " );
+            Color_Print_At( 4, 22, "No partitions to delete." );
+            Print_At( 4, 24, "                                        " );
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
             menu = MM;
             return ( menu );
@@ -686,34 +688,34 @@ int Standard_Menu( int menu )
       }
 
       /* Display Menu */
-      printAt( 4, 8, "Choose one of the following:" );
+      Print_At( 4, 8, "Choose one of the following:" );
 
-      cprintAt( 4, 10, "1.  " );
+      Color_Print_At( 4, 10, "1.  " );
       printf( "%s", option_1 );
 
       if ( maximum_number_of_options > 1 ) {
-         cprintAt( 4, 11, "2.  " );
+         Color_Print_At( 4, 11, "2.  " );
          printf( "%s", option_2 );
       }
 
       if ( maximum_number_of_options > 2 ) {
-         cprintAt( 4, 12, "3.  " );
+         Color_Print_At( 4, 12, "3.  " );
          printf( "%s", option_3 );
       }
 
       if ( maximum_number_of_options > 3 ) {
-         cprintAt( 4, 13, "4.  " );
+         Color_Print_At( 4, 13, "4.  " );
          printf( "%s", option_4 );
       }
 
       if ( ( menu == MM ) && ( flags.more_than_one_drive == TRUE ) ) {
          maximum_number_of_options = 5;
-         cprintAt( 4, 14, "5.  " );
+         Color_Print_At( 4, 14, "5.  " );
          printf( "%s", option_5 );
       }
 
       if ( ( menu == MM ) && ( flags.extended_options_flag == TRUE ) ) {
-         cprintAt( 50, 15, "M.  " );
+         Color_Print_At( 50, 15, "M.  " );
          printf( "MBR maintenance" );
 
          optional_char_1[0] = 'M';
@@ -723,7 +725,7 @@ int Standard_Menu( int menu )
       }
 
       if ( ( menu == MM ) && ( flags.allow_abort == TRUE ) ) {
-         cprintAt( 50, 16, "A.  " );
+         Color_Print_At( 50, 16, "A.  " );
          printf( "Abort changes and exit" );
 
          optional_char_2[0] = 'A';
@@ -744,14 +746,14 @@ int Standard_Menu( int menu )
            ( pDrive->pri_part[1].active_status == 0 ) &&
            ( pDrive->pri_part[2].active_status == 0 ) &&
            ( pDrive->pri_part[3].active_status == 0 ) ) {
-         cprintAt( 4, 21, "WARNING! " );
+         Color_Print_At( 4, 21, "WARNING! " );
          printf(
             "No partitions are set active - disk 1 is not startable unless" );
-         printAt( 4, 22, "a partition is set active" );
+         Print_At( 4, 22, "a partition is set active" );
       }
 
       /* Get input from user */
-      printAt( 4, 17, "Enter choice: " );
+      Print_At( 4, 17, "Enter choice: " );
 
       if ( menu == MM ) {
          input = (int)Input( 1, 19, 17, NUM, 1, maximum_number_of_options,

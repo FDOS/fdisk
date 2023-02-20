@@ -1,3 +1,4 @@
+#include "compat.h"
 #include <bios.h>
 #include <conio.h>
 #include <ctype.h>
@@ -5,7 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "compat.h"
 
 typedef unsigned long ulong;
 typedef unsigned int uint;

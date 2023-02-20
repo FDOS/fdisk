@@ -300,36 +300,35 @@ MEXTERN Debugging_Table debug;
 MEXTERN Flags flags;
 MEXTERN User_Defined_CHS_Settings user_defined_chs_settings[8];
 
-MEXTERN int Get_Environment_Settings( char *environment[] );
-MEXTERN int Get_Options( char *arguments[], int number_of_arguments );
+int Get_Environment_Settings( char *environment[] );
+int Get_Options( char *arguments[], int number_of_arguments );
 //MEXTERN int Partition_Type_To_Create(unsigned long size_in_mb);
-MEXTERN unsigned long Decimal_Number( unsigned long hex1, unsigned long hex2,
-                                      unsigned long hex3,
-                                      unsigned long hex4 );
+unsigned long Decimal_Number( unsigned long hex1, unsigned long hex2,
+                              unsigned long hex3, unsigned long hex4 );
 //MEXTERN void Convert_Long_To_Integer(long number);
-MEXTERN void Determine_Color_Video_Support( void );
-MEXTERN void Initialization( char *environment[] );
-MEXTERN void Re_Initialization( void );
-MEXTERN void Reboot_PC( void );
+void Determine_Color_Video_Support( void );
+void Initialization( char *environment[] );
+void Re_Initialization( void );
+void Reboot_PC( void );
 
-MEXTERN int printAt( int column, int row, char *, ... );
-MEXTERN int cprintAt( int column, int row, char *, ... );
-MEXTERN int BlinkPrintAt( int column, int row, char *format, ... );
+int Print_At( int column, int row, char *, ... );
+int Color_Print_At( int column, int row, char *, ... );
+int BlinkPrintAt( int column, int row, char *format, ... );
 
-MEXTERN ulong GetPercentOfLargeNumber( int percent, ulong number );
+ulong GetPercentOfLargeNumber( int percent, ulong number );
 
 typedef struct {
    char *string;
    int *flag;
 } OnOffTable;
 
-MEXTERN OnOffTable *FindOnOffTable( char *flagname );
+OnOffTable *FindOnOffTable( char *flagname );
 
-MEXTERN unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
-                                         unsigned long total_heads,
-                                         unsigned long total_sect );
-MEXTERN unsigned long Convert_Sect_To_MB( unsigned long num_sect );
-MEXTERN unsigned long Convert_To_Percentage( unsigned long small_num,
-                                             unsigned long large_num );
-MEXTERN unsigned long Convert_Percent_To_MB( unsigned long percent,
-                                             unsigned long total_cyl );
+unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
+                                 unsigned long total_heads,
+                                 unsigned long total_sect );
+unsigned long Convert_Sect_To_MB( unsigned long num_sect );
+unsigned long Convert_To_Percentage( unsigned long small_num,
+                                     unsigned long large_num );
+unsigned long Convert_Percent_To_MB( unsigned long percent,
+                                     unsigned long total_cyl );

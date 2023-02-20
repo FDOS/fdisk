@@ -13,6 +13,9 @@
 /////////////////////////////////////////////////////////////////////////////
 */
 
+#ifndef PDISKIO_H
+#define PDISKIO_H
+
 #ifdef PDISKIO
 #define PEXTERN
 #else
@@ -145,26 +148,27 @@ PEXTERN Partition_Table part_table[8];
 /////////////////////////////////////////////////////////////////////////////
 */
 
-PEXTERN int Determine_Drive_Letters( void );
+int Determine_Drive_Letters( void );
 /*PEXTERN int Read_Logical_Sectors(unsigned char drive_letter[2]
  , unsigned long logical_sector_number, int number_of_sectors); */
-PEXTERN int Read_Partition_Tables( void );
-PEXTERN int Read_Physical_Sectors( int drive, long cylinder, long head,
-                                   long sector, int number_of_sectors );
-PEXTERN int Write_Logical_Sectors( unsigned char drive_letter[2],
-                                   unsigned long logical_sector_number,
-                                   int number_of_sectors );
-PEXTERN int Write_Partition_Tables( void );
-PEXTERN int Write_Physical_Sectors( int drive, long cylinder, long head,
-                                    long sector, int number_of_sectors );
+int Read_Partition_Tables( void );
+int Read_Physical_Sectors( int drive, long cylinder, long head, long sector,
+                           int number_of_sectors );
+int Write_Logical_Sectors( unsigned char drive_letter[2],
+                           unsigned long logical_sector_number,
+                           int number_of_sectors );
+int Write_Partition_Tables( void );
+int Write_Physical_Sectors( int drive, long cylinder, long head, long sector,
+                            int number_of_sectors );
 
-PEXTERN unsigned long Decimal_Number( unsigned long hex1, unsigned long hex2,
-                                      unsigned long hex3,
-                                      unsigned long hex4 );
+unsigned long Decimal_Number( unsigned long hex1, unsigned long hex2,
+                              unsigned long hex3, unsigned long hex4 );
 
-PEXTERN void Check_For_INT13_Extensions( void );
-PEXTERN void Clear_Sector_Buffer( void );
-PEXTERN void Initialize_LBA_Structures( void );
-PEXTERN void Load_Brief_Partition_Table( void );
+void Check_For_INT13_Extensions( void );
+void Clear_Sector_Buffer( void );
+void Initialize_LBA_Structures( void );
+void Load_Brief_Partition_Table( void );
 
-PEXTERN int IsRecognizedFatPartition( unsigned );
+int IsRecognizedFatPartition( unsigned );
+
+#endif /* PDISKIO_H */

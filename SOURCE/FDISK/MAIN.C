@@ -159,7 +159,7 @@ void Determine_Color_Video_Support( void )
    }
 }
 
-int printAt( int column, int row, char *format, ... )
+int Print_At( int column, int row, char *format, ... )
 {
    va_list arglist;
    int result;
@@ -172,7 +172,7 @@ int printAt( int column, int row, char *format, ... )
    return result;
 }
 
-int cprintAt( int column, int row, char *format, ... )
+int Color_Print_At( int column, int row, char *format, ... )
 {
    char buffer[256];
    va_list arglist;
@@ -183,7 +183,7 @@ int cprintAt( int column, int row, char *format, ... )
    vsprintf( buffer, format, arglist );
    va_end( arglist );
 
-   return Color_Print( "%s", buffer );
+   return Color_Print( buffer );
 }
 
 int BlinkPrintAt( int column, int row, char *format, ... )
@@ -201,7 +201,7 @@ int BlinkPrintAt( int column, int row, char *format, ... )
    if ( flags.monochrome != TRUE ) {
       textcolor( WHITE | BLINK );
    }
-   len = Color_Print( "%s", buffer );
+   len = Color_Print( buffer );
 
    if ( flags.monochrome != TRUE ) {
       textcolor( WHITE );
@@ -653,7 +653,7 @@ void main( int argc, char *argv[], char *env[] )
    /* Watcom C output buffering conflicts with cursor positioning functions
       so disable it */
 #ifdef __WATCOMC__
-      setbuf( stdout, NULL );
+   setbuf( stdout, NULL );
 #endif
 
    if ( memicmp( argv[1], "SMART", 5 ) == 0 ) {
