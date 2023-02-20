@@ -57,17 +57,17 @@ void Clear_Screen( int type ) /* Clear screen code as suggested by     */
 {                             /* Ralf Quint                            */
    unsigned char color = flags.screen_color;
    asm {
-    mov ah,0x0f /* get max column to clear */
+    mov ah, 0x0f /* get max column to clear */
     int 0x10
-    mov dh,ah
+    mov dh, ah
 
 
-    mov ah,0x06 /* scroll up */
-    mov al,0x00 /* 0 rows, clear whole window */
-    mov bh,BYTE PTR color /* set color */
-    mov cx,0x0000 /* coordinates of upper left corner of screen */
-      /*    mov dh,25    */ /* maximum row */
-    mov dl,79     /* maximum column */
+    mov ah, 0x06 /* scroll up */
+    mov al, 0x00 /* 0 rows, clear whole window */
+    mov bh, BYTE PTR color /* set color */
+    xor cx, cx   /* coordinates of upper left corner of screen */
+   /*    mov dh,25    */ /* maximum row */
+    mov dl, 79   /* maximum column */
     int 0x10
    }
 

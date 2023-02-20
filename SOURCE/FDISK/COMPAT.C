@@ -74,7 +74,7 @@ get_pos:
      ; reached end of screen, we have to scroll
    mov ax, 0601h
    mov bh, byte ptr _textcolor
-   mov cx, 0x0100
+   xor cx, cx
    mov dx, 184Fh
    int 10h
    mov dx, 1800h
