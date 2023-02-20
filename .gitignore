@@ -1,0 +1,9 @@
+*.dsk
+*.err
+*.lnk
+*.lst
+*.obj
+*.map
+*.tmp
+
+.DS_Store
