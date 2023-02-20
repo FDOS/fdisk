@@ -3,8 +3,8 @@
 ;
 
 
-segment _DATA           class=DATA align=2
-
+segment _BOOTNORM_DATA class=DATA align=2
+group DGROUP _BOOTNORM_DATA
                  
   global  _bootnormal_code
 _bootnormal_code:
