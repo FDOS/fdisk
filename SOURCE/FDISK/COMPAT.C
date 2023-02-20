@@ -26,7 +26,7 @@ static unsigned short _textcolor = 0x07;
 /* Watcom C does not have this */
 void textcolor( int color ) { _textcolor = color; }
 
-/* Watcom C does not have biosdisk equivalent _bios_disk */
+/* Watcom C does have biosdisk equivalent _bios_disk */
 int biosdisk( unsigned function, unsigned drive, unsigned head,
               unsigned cylinder, unsigned sector, unsigned number_of_sectors,
               void __far *sector_buffer )
@@ -65,7 +65,7 @@ get_pos:
    cmp dl, byte ptr screen_columns
    jb  move_cursor
 
-     ; reached end of line, locate cursor in next line
+     ; reached end of line, move cursor to next line
    mov dl, 0
    add dh, 1
    cmp dh, 25
@@ -86,7 +86,7 @@ move_cursor:
    }
 }
 
-/* Helper function for Color_Printf. Uses INT 10H to put colored characters
+/* Helper function for Color_Print. Uses INT 10H to put colored characters
    onto screen. Does not handle control characters. */
 static void Color_Putc( char c )
 {
@@ -104,9 +104,7 @@ static void Color_Putc( char c )
 /* Watcom C cprintf does not support colored text output. There exists
    _outtext in its graphics library but that pulls in 25k of code.
    Therefore we use Color_Printf as a wrapper function which preprecessor
-   aliases to cprintf under Borland C and is reimplemented for Watcom C.
-   It uses c library functions to handle control characters and the helper
-   function Color_Putc to put visible characters onto screen.
+   aliases to cprintf under Borland C and is reimplemented for Watcom C. 
    Writes at most 255 characters. */
 int Color_Printf( const char *format, ... )
 {
@@ -125,6 +123,9 @@ int Color_Printf( const char *format, ... )
    return Color_Print( buffer );
 }
 
+/* Color_Print outputs a string to screen with color.
+   It uses c library functions to handle control characters and Color_Putc
+   to put visible characters onto screen. */
 int Color_Print( char *text )
 {
    char *p = text;
