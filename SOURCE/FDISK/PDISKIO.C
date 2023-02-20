@@ -846,9 +846,9 @@ int Read_Partition_Tables( void )
       ) {
          /* Pre-compute the total size of the hard drive */
          /* */
-         pDrive->total_disk_size_in_log_sectors =
-            ( pDrive->total_cyl + 1 ) * ( pDrive->total_head + 1 ) *
-            pDrive->total_sect;
+         pDrive->total_disk_size_in_log_sectors = ( pDrive->total_cyl + 1 ) *
+                                                  ( pDrive->total_head + 1 ) *
+                                                  pDrive->total_sect;
 
          pDrive->total_disk_size_in_MB =
             Convert_Cyl_To_MB( ( pDrive->total_cyl + 1 ),
@@ -1275,14 +1275,14 @@ int Read_Physical_Sectors( int drive, long cylinder, long head, long sector,
       Print_Centered( 4, "Read_Physical_Sector() function debugging screen",
                       BOLD );
 
-      printAt( 4, 10, "Information passed to this function:" );
+      Print_At( 4, 10, "Information passed to this function:" );
 
-      printAt( 50, 11, "Drive:     0x%X", drive );
-      printAt( 50, 12, "Cylinder:  %d", cylinder );
-      printAt( 50, 13, "Head:      %d", head );
-      printAt( 50, 14, "Sector:    %d", sector );
-      printAt( 4, 16,
-               "Contents of partition table area in sector_buffer[]:" );
+      Print_At( 50, 11, "Drive:     0x%X", drive );
+      Print_At( 50, 12, "Cylinder:  %d", cylinder );
+      Print_At( 50, 13, "Head:      %d", head );
+      Print_At( 50, 14, "Sector:    %d", sector );
+      Print_At( 4, 16,
+                "Contents of partition table area in sector_buffer[]:" );
 
       {
          int index, offset, current_line = 0;
@@ -1291,7 +1291,7 @@ int Read_Physical_Sectors( int drive, long cylinder, long head, long sector,
          do {
             index = 0;
 
-            printAt( 4, current_line + 18, "%d:  ", ( current_line + 1 ) );
+            Print_At( 4, current_line + 18, "%d:  ", ( current_line + 1 ) );
             do {
                printf( "%02X ", sector_buffer[( index + offset )] );
                index++;
@@ -1302,7 +1302,7 @@ int Read_Physical_Sectors( int drive, long cylinder, long head, long sector,
          } while ( offset < ( 0x1be + 64 ) );
       }
 
-      printAt( 4, 23, "Press any key to continue." );
+      Print_At( 4, 23, "Press any key to continue." );
 
       asm {
       mov ah,7
@@ -1578,27 +1578,27 @@ int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
       Clear_Screen( NULL );
       Print_Centered(
          4, "Write_Physical_Sector_CHS() function debugging screen", BOLD );
-      printAt(
+      Print_At(
          6, 6,
          "Note:  WRITE=OFF is set or an emulated disk is in existence...no" );
-      printAt(
+      Print_At(
          4, 7,
          "       changes will be made.  Please check the \"fdisk.ini\" file" );
-      printAt( 4, 8, "       for details." );
+      Print_At( 4, 8, "       for details." );
 
-      printAt( 4, 10, "Information passed to this function:" );
+      Print_At( 4, 10, "Information passed to this function:" );
 
-      printAt( 50, 11, "Drive:     0x%X", drive );
-      printAt( 50, 12, "Cylinder:  %d", cylinder );
-      printAt( 50, 13, "Head:      %d", head );
-      printAt( 50, 14, "Sector:    %d", sector );
-      printAt( 4, 16,
-               "Contents of partition table area in sector_buffer[]:" );
+      Print_At( 50, 11, "Drive:     0x%X", drive );
+      Print_At( 50, 12, "Cylinder:  %d", cylinder );
+      Print_At( 50, 13, "Head:      %d", head );
+      Print_At( 50, 14, "Sector:    %d", sector );
+      Print_At( 4, 16,
+                "Contents of partition table area in sector_buffer[]:" );
 
       do {
          index = 0;
 
-         printAt( 4, current_line + 18, "%d:  ", ( current_line + 1 ) );
+         Print_At( 4, current_line + 18, "%d:  ", ( current_line + 1 ) );
          do {
             printf( "%02X ", sector_buffer[( index + offset )] );
             index++;
@@ -1608,7 +1608,7 @@ int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
          offset = offset + 16;
       } while ( offset < ( 0x1be + 64 ) );
 
-      printAt( 4, 23, "Press any key to continue." );
+      Print_At( 4, 23, "Press any key to continue." );
 
       asm {
       mov ah,7
@@ -1683,27 +1683,27 @@ int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
       Clear_Screen( NULL );
       Print_Centered(
          4, "Write_Physical_Sector_LBA() function debugging screen", BOLD );
-      printAt(
+      Print_At(
          4, 6,
          "Note:  WRITE=OFF is set or an emulated disk is in existence...no" );
-      printAt(
+      Print_At(
          4, 7,
          "       changes will be made.  Please check the \"fdisk.ini\" file" );
-      printAt( 4, 8, "       for details." );
+      Print_At( 4, 8, "       for details." );
 
-      printAt( 4, 10, "Information passed to this function:" );
+      Print_At( 4, 10, "Information passed to this function:" );
 
-      printAt( 50, 11, "Drive:     0x%X", drive );
-      printAt( 50, 12, "Cylinder:  %d", cylinder );
-      printAt( 50, 13, "Head:      %d", head );
-      printAt( 50, 14, "Sector:    %d", sector );
-      printAt( 4, 16,
-               "Contents of partition table area in sector_buffer[]:" );
+      Print_At( 50, 11, "Drive:     0x%X", drive );
+      Print_At( 50, 12, "Cylinder:  %d", cylinder );
+      Print_At( 50, 13, "Head:      %d", head );
+      Print_At( 50, 14, "Sector:    %d", sector );
+      Print_At( 4, 16,
+                "Contents of partition table area in sector_buffer[]:" );
 
       do {
          index = 0;
 
-         printAt( 4, current_line + 18, "%d:  ", ( current_line + 1 ) );
+         Print_At( 4, current_line + 18, "%d:  ", ( current_line + 1 ) );
          do {
             printf( "%02X ", sector_buffer[( index + offset )] );
             index++;
@@ -1713,7 +1713,7 @@ int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
          offset = offset + 16;
       } while ( offset < ( 0x1be + 64 ) );
 
-      printAt( 4, 23, "Press any key to continue." );
+      Print_At( 4, 23, "Press any key to continue." );
 
       asm {
       mov ah,7

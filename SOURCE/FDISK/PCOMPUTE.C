@@ -293,37 +293,40 @@ int Create_Logical_Drive( int numeric_type, long size_in_MB )
       Print_Centered(
          1, "int Create_Logical_Drive(int numeric_type,long size_in_MB)",
          BOLD );
-      printAt( 4, 3, "int numeric_type=%d", numeric_type );
-      printAt( 4, 4, "long size_in_MB=%d", size_in_MB );
-      printAt( 4, 5, "Number of partition that was created:  %d",
-               pDrive->log_drive_largest_free_space_location );
-      printAt( 4, 7, "Brief logical drive table:" );
+      Print_At( 4, 3, "int numeric_type=%d", numeric_type );
+      Print_At( 4, 4, "long size_in_MB=%d", size_in_MB );
+      Print_At( 4, 5, "Number of partition that was created:  %d",
+                pDrive->log_drive_largest_free_space_location );
+      Print_At( 4, 7, "Brief logical drive table:" );
 
       index = pDrive->log_drive_largest_free_space_location - 1;
       offset = 9;
 
-      printAt(
+      Print_At(
          4, 8,
          " #  NT     SC    SH    SS      EC   EH   ES      Rel. Sect.    Size in MB " );
 
       do {
          if ( ( index >= 0 ) && ( index < 24 ) ) {
-            printAt( 4, offset, "%2d", index );
-            printAt( 7, offset, "%3d", pDrive->log_drive[index].num_type );
-            printAt( 13, offset, "%4d", pDrive->log_drive[index].start_cyl );
-            printAt( 19, offset, "%4d", pDrive->log_drive[index].start_head );
-            printAt( 25, offset, "%4d", pDrive->log_drive[index].start_sect );
+            Print_At( 4, offset, "%2d", index );
+            Print_At( 7, offset, "%3d", pDrive->log_drive[index].num_type );
+            Print_At( 13, offset, "%4d", pDrive->log_drive[index].start_cyl );
+            Print_At( 19, offset, "%4d",
+                      pDrive->log_drive[index].start_head );
+            Print_At( 25, offset, "%4d",
+                      pDrive->log_drive[index].start_sect );
 
-            printAt( 33, offset, "%4d", pDrive->log_drive[index].end_cyl );
-            printAt( 38, offset, "%4d", pDrive->log_drive[index].end_head );
-            printAt( 43, offset, "%4d", pDrive->log_drive[index].end_sect );
+            Print_At( 33, offset, "%4d", pDrive->log_drive[index].end_cyl );
+            Print_At( 38, offset, "%4d", pDrive->log_drive[index].end_head );
+            Print_At( 43, offset, "%4d", pDrive->log_drive[index].end_sect );
 
-            printAt( 58, offset, "%d", pDrive->log_drive[index].rel_sect );
+            Print_At( 58, offset, "%d", pDrive->log_drive[index].rel_sect );
 
-            printAt( 72, offset, "%5d", pDrive->log_drive[index].size_in_MB );
+            Print_At( 72, offset, "%5d",
+                      pDrive->log_drive[index].size_in_MB );
          }
          else {
-            printAt( 4, offset, "N/A" );
+            Print_At( 4, offset, "N/A" );
          }
 
          offset++;
@@ -331,9 +334,9 @@ int Create_Logical_Drive( int numeric_type, long size_in_MB )
 
       } while ( offset <= 11 );
 
-      printAt( 4, 15, "Next extended location table:" );
+      Print_At( 4, 15, "Next extended location table:" );
 
-      printAt(
+      Print_At(
          4, 16,
          " #         SC    SH    SS      EC   EH   ES      Rel. Sect.    Size in MB " );
 
@@ -343,15 +346,15 @@ int Create_Logical_Drive( int numeric_type, long size_in_MB )
       do {
          if ( ( index >= 0 ) && ( index < 24 ) &&
               ( pDrive->next_ext_exists[index] == TRUE ) ) {
-            printAt( 4, offset, "%2d", index );
+            Print_At( 4, offset, "%2d", index );
 
-            printAt( 13, offset, "%4d", pDrive->next_ext[index].start_cyl );
-            printAt( 19, offset, "%4d", pDrive->next_ext[index].start_head );
-            printAt( 25, offset, "%4d", pDrive->next_ext[index].start_sect );
+            Print_At( 13, offset, "%4d", pDrive->next_ext[index].start_cyl );
+            Print_At( 19, offset, "%4d", pDrive->next_ext[index].start_head );
+            Print_At( 25, offset, "%4d", pDrive->next_ext[index].start_sect );
 
-            printAt( 33, offset, "%4d", pDrive->next_ext[index].end_cyl );
-            printAt( 38, offset, "%4d", pDrive->next_ext[index].end_head );
-            printAt( 43, offset, "%4d", pDrive->next_ext[index].end_sect );
+            Print_At( 33, offset, "%4d", pDrive->next_ext[index].end_cyl );
+            Print_At( 38, offset, "%4d", pDrive->next_ext[index].end_head );
+            Print_At( 43, offset, "%4d", pDrive->next_ext[index].end_sect );
 
             /*
 	Temporarily removed because the size of the relative sector field
@@ -362,11 +365,11 @@ int Create_Logical_Drive( int numeric_type, long size_in_MB )
 	printf("%4d",pDrive->next_ext_rel_sect[index]);
 	*/
 
-            printAt( 72, offset, "%4d",
-                     ( ( pDrive->next_ext[index].num_sect ) / 2048 ) );
+            Print_At( 72, offset, "%4d",
+                      ( ( pDrive->next_ext[index].num_sect ) / 2048 ) );
          }
          else {
-            printAt( 4, offset, "N/A" );
+            Print_At( 4, offset, "N/A" );
          }
 
          offset++;
@@ -517,23 +520,23 @@ int Create_Primary_Partition( int numeric_type, long size_in_MB )
       Print_Centered(
          1, "int Create_Primary_Partition(int numeric_type,long size_in_MB)",
          BOLD );
-      printAt( 4, 3, "int numeric_type=%d", numeric_type );
-      printAt( 4, 4, "long size_in_MB=%d", size_in_MB );
-      printAt( 4, 5, "empty_partition_number=%d", empty_partition_number );
+      Print_At( 4, 3, "int numeric_type=%d", numeric_type );
+      Print_At( 4, 4, "long size_in_MB=%d", size_in_MB );
+      Print_At( 4, 5, "empty_partition_number=%d", empty_partition_number );
 
-      printAt( 4, 8, "New Partition Information:" );
-      printAt( 4, 10, "Starting Cylinder:  %d", newPartition->start_cyl );
-      printAt( 4, 11, "Starting Head:      %d", newPartition->start_head );
-      printAt( 4, 12, "Starting Sector:    %lu", newPartition->start_sect );
+      Print_At( 4, 8, "New Partition Information:" );
+      Print_At( 4, 10, "Starting Cylinder:  %d", newPartition->start_cyl );
+      Print_At( 4, 11, "Starting Head:      %d", newPartition->start_head );
+      Print_At( 4, 12, "Starting Sector:    %lu", newPartition->start_sect );
 
-      printAt( 40, 10, "Ending Cylinder:    %d", newPartition->end_cyl );
-      printAt( 40, 11, "Ending Head:        %d", newPartition->end_head );
-      printAt( 40, 11, "Ending Sector:      %d", newPartition->end_sect );
+      Print_At( 40, 10, "Ending Cylinder:    %d", newPartition->end_cyl );
+      Print_At( 40, 11, "Ending Head:        %d", newPartition->end_head );
+      Print_At( 40, 11, "Ending Sector:      %d", newPartition->end_sect );
 
-      printAt( 4, 14, "Relative Sectors:   %lu", newPartition->rel_sect );
+      Print_At( 4, 14, "Relative Sectors:   %lu", newPartition->rel_sect );
 
-      printAt( 40, 14, "Size of partition in MB:    %lu",
-               newPartition->size_in_MB );
+      Print_At( 40, 14, "Size of partition in MB:    %lu",
+                newPartition->size_in_MB );
 
       Pause();
    }

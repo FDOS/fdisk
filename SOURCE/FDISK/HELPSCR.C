@@ -50,7 +50,7 @@ void Display_Help_Screen( void )
 
    if ( flags.do_not_pause_help_information == FALSE ) {
       Clear_Screen( NOEXTRAS );
-      printAt( 0, 0, "\n" );
+      Print_At( 0, 0, "\n" );
    }
 
    printf( "\n%-20s                   %40s\n", name, version );
@@ -72,7 +72,7 @@ void Display_Help_Screen( void )
       printf( "\n\n" );
       Pause();
       Clear_Screen( NOEXTRAS );
-      printAt( 0, 0, "\n" );
+      Print_At( 0, 0, "\n" );
    }
    printf(
       "Creating primary partitions and logical drives: sizes in MB or [,100] in percent\n" );
@@ -103,7 +103,7 @@ void Display_Help_Screen( void )
    if ( flags.do_not_pause_help_information == FALSE ) {
       Pause();
       Clear_Screen( NOEXTRAS );
-      printAt( 0, 0, "\n" );
+      Print_At( 0, 0, "\n" );
    }
    printf( "MBR (Master Boot Record) modification:\n" );
    printf( "  /MBR  [drive#]  Writes the standard MBR to <drive#>\n" );
@@ -129,7 +129,7 @@ void Display_Help_Screen( void )
    if ( flags.do_not_pause_help_information == FALSE ) {
       Pause();
       Clear_Screen( NOEXTRAS );
-      printAt( 0, 0, "\n" );
+      Print_At( 0, 0, "\n" );
    }
    printf( "For handling flags on a hard disk:\n" );
    printf(

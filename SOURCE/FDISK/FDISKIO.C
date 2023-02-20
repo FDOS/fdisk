@@ -44,11 +44,11 @@ $set 3
 #include <string.h>
 
 //#include "bootcode.h"
+#include "compat.h"
 #include "fdiskio.h"
 #include "main.h"
 #include "pcompute.h"
 #include "pdiskio.h"
-#include "compat.h"
 
 /*
 /////////////////////////////////////////////////////////////////////////////
