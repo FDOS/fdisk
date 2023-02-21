@@ -58,7 +58,7 @@ $set 3
 
 extern char booteasy_code[];
 extern char bootnormal_code[];
-extern char BootSmart_code[];
+extern void cdecl far BootSmart_code();
 
 /*
 /////////////////////////////////////////////////////////////////////////////

@@ -639,7 +639,7 @@ void main( int argc, char *argv[], char *env[] )
    int index;
    int location;
 
-   extern void __cdecl far smart_mbr( void );
+   extern void cdecl far smart_mbr( void );
 
    /* Watcom C output buffering conflicts with cursor positioning functions
       so disable it */
@@ -652,8 +652,6 @@ void main( int argc, char *argv[], char *env[] )
    }
 
    int24_init();
-
-   //  int i;
 
    /* First check to see if the "/?" command-line switch was entered.  If it
      was, then don't bother doing anything else.  Just display the help and
