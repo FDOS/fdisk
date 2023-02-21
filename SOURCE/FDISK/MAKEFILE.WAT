@@ -16,8 +16,8 @@ CLFLAGS  = $(CFLAGS)
 UPX      = upx
 UPXFLAGS = -qq -9 --8086
 objs  = main.obj cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pdiskio.obj
-objs += pcompute.obj userint1.obj userint2.obj bootnorm.obj booteasy.obj
-objs += kitten.obj smartmbr.obj compat.obj
+objs += pcompute.obj userint1.obj userint2.obj kitten.obj compat.obj
+objs += int24.obj bootnorm.obj booteasy.obj smartmbr.obj
 
 
 all : fdisk.exe test.exe
