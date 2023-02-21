@@ -6,9 +6,8 @@
 ;
 
 
-segment _DATA           class=DATA  align=2
+segment SMARTMBR_TEXT class=CODE align=2
 
-                 
   global  _smart_mbr            
 _smart_mbr:
 
@@ -375,18 +374,3 @@ db 0x00,0x00,0xC1,0xFF,0x07,0xFE,0xFF,0xFF,0xB3,0x7B,0xCE,0x02,0x12,0x64,0x83,0x
  		
 		db 0x55,0xaa
 		                               
-
-	
-	
-	
-	
-	
-
-
-
-
-
-
-
-
-
