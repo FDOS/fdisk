@@ -633,7 +633,7 @@ void int24_init( void )
 //  MAIN ROUTINE
 /////////////////////////////////////////////////////////////////////////////
 */
-void main( int argc, char *argv[], char *env[] )
+void main( int argc, char *argv[] )
 {
    int command_ok;
    int index;
@@ -709,7 +709,7 @@ void main( int argc, char *argv[], char *env[] )
       path[0] = 0;
    }
 
-   Initialization( &*env );
+   Initialization( environ );
 
 #ifdef DEBUG
    if ( debug.path == TRUE ) {
