@@ -2,11 +2,9 @@
 #
 # Created by Bernd Boeckmann
 #   for verison 1.3.4 and Open Watcom 1.9.
-#
-# Note:  Free FDISK is written in C.
 
 CC       = wcc
-CFLAGS   = -q -0 -mm -bc -w4
+CFLAGS   = -q -0 -mm -bt=dos -w4
 AS       = nasm
 ASFLAGS  = -t -f obj
 LD       = wlink
@@ -31,7 +29,7 @@ all : fdisk.exe test.exe
 
 fdisk.exe : $(objs) fdisk.lnk
    $(LD) $(LDFLAGS) @fdisk
-   -$(UPX) $(UPXFLAGS) $^@    # ignore UPX return code
+   -$(UPX) $(UPXFLAGS) $^@    # ignore UPX return code (it may not be there)
 
 fdisk.lnk : $(objs)
    @echo NAME $^& >$^@
