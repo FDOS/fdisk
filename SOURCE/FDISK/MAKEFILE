@@ -33,7 +33,7 @@ SRC = main.c cmd.c fdiskio.c helpscr.c kbdinput.c pdiskio.c \
       pcompute.c userint1.c userint2.c 
 OBJ = main.obj cmd.obj fdiskio.obj \
 helpscr.obj kbdinput.obj pdiskio.obj pcompute.obj \
-ui1.obj ui2.obj bootnorm.obj booteasy.obj kitten.obj smartmbr.obj
+ui1.obj ui2.obj bootnorm.obj booteasy.obj kitten.obj smartmbr.obj int24.obj
 
 NASM=nasm
 UPX=upx
@@ -47,13 +47,13 @@ test.exe: test.c
   $(CC) -M test.c
 
 fdisk.exe: $(OBJ)  
-	$(ECHO) $(CCBASE)\lib\c0s.obj+>resp.tmp 
-	$(ECHO) main cmd fdiskio +>>resp.tmp 
-    $(ECHO) helpscr kbdinput pdiskio pcompute +>>resp.tmp 
-	$(ECHO) ui1 ui2 bootnorm booteasy smartmbr kitten  +>>resp.tmp 
-	$(ECHO)  ,fdisk,, $(CCBASE)\lib\cs.lib  >>resp.tmp
-	$(LD) @resp.tmp
-    $(UPX) -q fdisk.exe
+     $(ECHO) $(CCBASE)\lib\c0s.obj+>resp.tmp 
+     $(ECHO) main cmd fdiskio +>>resp.tmp
+   $(ECHO) helpscr kbdinput pdiskio pcompute +>>resp.tmp 
+     $(ECHO) ui1 ui2 bootnorm booteasy smartmbr kitten int24 +>>resp.tmp 
+     $(ECHO)  ,fdisk,, $(CCBASE)\lib\cs.lib  >>resp.tmp
+     $(LD) @resp.tmp
+   $(UPX) -q fdisk.exe
 
 # compile targets:
 
@@ -87,6 +87,9 @@ ui2.obj: userint2.c
 kitten.obj: kitten.c
  $(CC) $(CFLAGS) -c kitten.c
  
+int24.obj: int24.asm
+     $(NASM) -f obj int24.asm
+
 bootnorm.obj: bootnorm.asm
      $(NASM) -f obj bootnorm.asm
 
@@ -110,3 +113,4 @@ clobber:
  $(RM) *.obj
  $(RM) *.swp
  $(RM) *.tmp
+ 
