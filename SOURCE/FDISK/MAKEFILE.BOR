@@ -4,12 +4,12 @@
 #   for version 0.99 and Borland C 3.1.
 # Modified by Brian E. Reifsnyder 
 #   for version 0.99A and Borland Turbo C++ 3.0.
-# Modified by Bernd Boeckmann back to Borland C 3.1.
+# Modified by Bernd Boeckmann to support both Turbo and Borland C.
 #
 # Note:  Free FDISK is written in C.
 
 # Build via:
-# > make -f makefile.bcc
+# > make -f makefile.bor
 
 # you may override the default BCC location via
 #  make -f makefile.bcc -DCCBASE=D:\BC31
@@ -18,13 +18,13 @@
 #  make -f makefile.bcc -DCC=TCC -DCCBASE=C:\TC
 
 !if !$d(CC)
-CC=BCC
+CC=bcc
 !endif
 !if !$d(CCBASE)
-CCBASE=C:\BORLANDC
+CCBASE=c:\borlandc
 !endif
 !if !$d(CFLAGS)
-CFLAGS=-ms -g5 -w -O -Z -1
+CFLAGS=-ms -g5 -w -O -Z
 !endif
 
 CC=$(CCBASE)\bin\$(CC)
@@ -42,11 +42,9 @@ LDFLAGS= -lm -P
 LDLIBS=
 LD=$(CCBASE)\bin\tlink /c /m
 RM=del
-SRC = main.c cmd.c fdiskio.c helpscr.c kbdinput.c pdiskio.c \
-      pcompute.c userint1.c userint2.c 
-OBJ = main.obj cmd.obj fdiskio.obj \
-helpscr.obj kbdinput.obj pdiskio.obj pcompute.obj \
-ui1.obj ui2.obj bootnorm.obj booteasy.obj kitten.obj smartmbr.obj int24.obj
+OBJ = main.obj cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pdiskio.obj \
+      pcompute.obj ui1.obj ui2.obj kitten.obj  int24.obj \
+      bootnorm.obj booteasy.obj smartmbr.obj
 
 NASM=nasm
 UPX=upx
@@ -66,7 +64,7 @@ fdisk.exe: $(OBJ)
    $(ECHO) ui1 ui2 bootnorm booteasy smartmbr kitten int24 +>>resp.tmp 
    $(ECHO)  ,fdisk,, $(CCBASE)\lib\cs.lib  >>resp.tmp
    $(LD) @resp.tmp
-   $(UPX) -q --8086  cfdisk.exe
+   $(UPX) -q --8086 fdisk.exe
 
 # compile targets:
 
