@@ -86,6 +86,9 @@ struct Partition {
 typedef struct part_table_structure {
 
    /* Hard disk Geometry */
+   /* total_cyl and total_head are actually not the total but the highest
+      values as returned by BIOS (zero based!). One has to +1 to get the
+      total count!!! */
    unsigned long total_cyl;
    unsigned long total_head;
    unsigned long total_sect;
