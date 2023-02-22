@@ -630,7 +630,7 @@ int Get_Hard_Drive_Parameters( int physical_drive )
 
    /* Check for an extra cylinder */
    if ( flags.check_for_extra_cylinder == TRUE ) {
-      if ( 0 == Read_Physical_Sectors( physical_drive, ( total_cylinders ),
+      if ( 0 == Read_Physical_Sectors( physical_drive, total_cylinders + 1,
                                        total_heads, total_sectors, 1 ) ) {
          total_cylinders++;
       }
