@@ -671,7 +671,7 @@ void Get_Partition_Information( void )
       for ( partnum = 0; partnum < 4; partnum++ ) {
          strcpy( pDrive->pri_part[partnum].vol_label, "           " );
 
-         /* Check for and get the volume label on a FAT12/FAT16 partition. */
+         /* Check for and get the volume label on a FAT partition. */
          if ( IsRecognizedFatPartition(
                  pDrive->pri_part[partnum].num_type ) ) {
             if ( pDrive->pri_part[partnum].num_type == 11 ||
@@ -986,7 +986,7 @@ int Read_Partition_Tables( void )
                   Extract_Cylinder_From_LBA_Value(
                      /* */
                      ( pDrive->pri_part[index].rel_sect +
-                       pDrive->pri_part[index].num_sect ),
+                       pDrive->pri_part[index].num_sect - 1 ),
                      0 //!!,pDrive->pri_part[index].end_head
                      ,
                      1 //!!,pDrive->pri_part[index].end_sect
@@ -1123,7 +1123,7 @@ int Read_Partition_Tables( void )
                            Extract_Cylinder_From_LBA_Value(
                               ( pDrive->log_drive[index].rel_sect +
                                 pDrive->ptr_ext_part->rel_sect +
-                                pDrive->log_drive[index].num_sect ),
+                                pDrive->log_drive[index].num_sect - 1 ),
                               0 //!!,pDrive->log_drive[index].end_head
                               ,
                               1 //!!,pDrive->log_drive[index].end_sect
@@ -1136,7 +1136,7 @@ int Read_Partition_Tables( void )
                               ( pDrive->log_drive[index].rel_sect +
                                 pDrive->ptr_ext_part->rel_sect +
                                 pDrive->log_drive[index].num_sect +
-                                pDrive->next_ext[index - 1].rel_sect ),
+                                pDrive->next_ext[index - 1].rel_sect - 1 ),
                               0 //!!,pDrive->log_drive[index].end_head
                               ,
                               1 //!!,pDrive->log_drive[index].end_sect
@@ -1206,7 +1206,7 @@ int Read_Partition_Tables( void )
                            Extract_Cylinder_From_LBA_Value(
                               ( pDrive->next_ext[index].rel_sect +
                                 pDrive->ptr_ext_part->rel_sect +
-                                pDrive->next_ext[index].num_sect ),
+                                pDrive->next_ext[index].num_sect - 1 ),
                               pDrive->next_ext[index].end_head,
                               pDrive->next_ext[index].end_sect,
                               pDrive->total_head, pDrive->total_sect );
