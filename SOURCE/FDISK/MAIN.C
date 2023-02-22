@@ -538,7 +538,8 @@ void Initialization( char *environment[] )
       flags.set_any_pri_part_active = TRUE;
    }
 
-   /* Set monochrome mode, if it is desired. */
+   /* Set the colors. monochrome mode, if it is desired. */
+   textattr( flags.screen_color );
    if ( flags.monochrome == TRUE ) {
       textcolor( 7 );
    }
