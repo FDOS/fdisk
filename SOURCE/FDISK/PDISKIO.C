@@ -110,7 +110,6 @@ void Check_For_INT13_Extensions( void )
    int carry;
    int drive_number = 0x80;
 
-   //-  unsigned int ah_register;
    unsigned char ah_register = 0;
    unsigned int bx_register = 0;
    unsigned int cx_register = 0;
@@ -125,7 +124,6 @@ void Check_For_INT13_Extensions( void )
 #endif
 
    do {
-      //    carry=99;
       carry = 0;
 
       asm {
@@ -137,17 +135,9 @@ void Check_For_INT13_Extensions( void )
       mov BYTE PTR ah_register,ah
       mov WORD PTR bx_register,bx
       mov WORD PTR cx_register,cx
-
-            //      jnc carry_flag_not_set    /* Jump if the carry flag is clear  */
-            //      }                         /* If the carry flag is clear, then */
-            //				/* the extensions exist.            */
-            //    carry=1;
-            //    part_table[(drive_number-128)].ext_int_13=FALSE;
       adc WORD PTR carry,0 /* Set carry if CF=1 */
       }
 
-      //    carry_flag_not_set:
-      //    if( (carry==99) && (bx_register==0xaa55) )
       part_table[( drive_number - 128 )].ext_int_13 = FALSE;
 
       if ( ( !carry ) && ( bx_register == 0xaa55 ) ) {
@@ -328,8 +318,7 @@ int Determine_Drive_Letters( void )
                     brief_partition_table[index][sub_index] ) ) {
                drive_lettering_buffer[index][sub_index] = current_letter;
                current_letter++;
-               sub_index =
-                  5; /* Set sub_index = 5 to break out of loop early. */
+               break;
             }
 
             sub_index++;
@@ -376,12 +365,12 @@ int Determine_Drive_Letters( void )
    } while ( index < 8 );
 
    /* Find the Non-DOS Logical Drives in the Extended Partition Table */
-   non_dos_partition_counter = '1';
    index = 0;
    do {
       Partition_Table *pDrive = &part_table[index];
 
       pDrive->num_of_non_dos_log_drives = 0;
+      non_dos_partition_counter = '1';
       sub_index = 4;
 
       do {
@@ -404,7 +393,6 @@ int Determine_Drive_Letters( void )
          sub_index++;
       } while ( sub_index < 27 );
 
-      non_dos_partition_counter = '1';
       index++;
    } while ( index < 8 );
 
