@@ -21,10 +21,21 @@ char *searchpath( char *fn )
    return NULL;
 }
 
-static unsigned short _textcolor = 0x07;
+static unsigned short _textattr = 0x07;
 
 /* Watcom C does not have this */
-void textcolor( int color ) { _textcolor = color; }
+void textattr( int color )
+{
+   _textattr = color & 0xff;
+}
+
+void textcolor( int color ) {
+   _textattr = _textattr & 0x70 | color & 0x8f;
+}
+
+void textbackground( int background ) {
+   _textattr = _textattr & 0x8f | (background << 4) & 0x70;
+}
 
 /* Watcom C does have biosdisk equivalent _bios_disk */
 int biosdisk( unsigned function, unsigned drive, unsigned head,
@@ -73,7 +84,7 @@ get_pos:
 
      ; reached end of screen, we have to scroll
    mov ax, 0601h
-   mov bh, byte ptr _textcolor
+   mov bh, byte ptr _textattr
    xor cx, cx
    mov dx, 184Fh
    int 10h
@@ -93,7 +104,7 @@ static void Color_Putc( char c )
    asm {
       mov ah, 09h
       mov al, byte ptr c
-      mov bx, _textcolor
+      mov bx, _textattr
       mov cx, 1
       int 10h
    }
