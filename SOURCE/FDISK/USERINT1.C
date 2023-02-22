@@ -452,7 +452,7 @@ void Interactive_User_Interface( void )
          if ( !file_pointer ) {
             Color_Print_At(
                4, 22,
-               "\Unable to find the \"boot.mbr\" file...MBR has not been created.\n" );
+               "\nUnable to find the \"boot.mbr\" file...MBR has not been created.\n" );
          }
          else {
             Create_Alternate_MBR();
@@ -490,6 +490,7 @@ void Interactive_User_Interface( void )
    }
 
    Clear_Screen( NOEXTRAS );
+   Position_Cursor( 0, 0 );
 }
 
 /* Pause Routine */
