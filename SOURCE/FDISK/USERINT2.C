@@ -251,7 +251,7 @@ int Create_DOS_Partition_Interface( int type )
 
       Print_At(
          4, 18,
-         "Enter partition size in Mbytes or percent of disk space (%) to" );
+         "Enter partition size in Mbytes or percent of disk space (%%) to" );
 
       if ( type == PRIMARY ) {
          Print_At(
