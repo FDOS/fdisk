@@ -417,7 +417,7 @@ int Create_Logical_Drive_Interface( void )
 
          Print_At(
             4, 20,
-            "Enter logical drive size in Mbytes or percent of disk space (%)..." );
+            "Enter logical drive size in Mbytes or percent of disk space (%%)..." );
 
          flags.esc = FALSE;
 
