@@ -273,7 +273,7 @@ int Create_DOS_Partition_Interface( int type )
                         maximum_possible_percentage, NULL, NULL );
       }
       else {
-         input = Input( 6, 69, 19, NUMP, 1, maximum_partition_size_in_MB,
+         input = Input( 7, 69, 19, NUMP, 1, maximum_partition_size_in_MB,
                         ESCR, maximum_partition_size_in_MB,
                         maximum_possible_percentage, NULL, NULL );
       }
@@ -428,7 +428,7 @@ int Create_Logical_Drive_Interface( void )
                            maximum_possible_percentage, NULL, NULL );
          }
          else {
-            input = Input( 6, 70, 20, NUMP, 1, maximum_partition_size_in_MB,
+            input = Input( 7, 70, 20, NUMP, 1, maximum_partition_size_in_MB,
                            ESCR, maximum_partition_size_in_MB,
                            maximum_possible_percentage, NULL, NULL );
          }
