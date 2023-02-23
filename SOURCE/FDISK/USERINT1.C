@@ -55,7 +55,11 @@
 /* Clear Screen */
 void Clear_Screen( int type ) /* Clear screen code as suggested by     */
 {                             /* Ralf Quint                            */
-   unsigned char color = flags.screen_color;
+   Clear_Screen_With_Attr( type, flags.screen_color );
+}
+
+void Clear_Screen_With_Attr( int type, unsigned char attr )
+{
    asm {
     mov ah, 0x0f /* get max column to clear */
     int 0x10
@@ -64,7 +68,7 @@ void Clear_Screen( int type ) /* Clear screen code as suggested by     */
 
     mov ah, 0x06 /* scroll up */
     mov al, 0x00 /* 0 rows, clear whole window */
-    mov bh, BYTE PTR color /* set color */
+    mov bh, BYTE PTR attr /* set color */
     xor cx, cx   /* coordinates of upper left corner of screen */
    /*    mov dh,25    */ /* maximum row */
     mov dl, 79   /* maximum column */
@@ -489,7 +493,9 @@ void Interactive_User_Interface( void )
       Exit_Screen();
    }
 
-   Clear_Screen( NOEXTRAS );
+   /* clear screen with "normal" black background and position cursor at the
+      top left */
+   Clear_Screen_With_Attr( NOEXTRAS, TEXT_ATTR_NORMAL );
    Position_Cursor( 0, 0 );
 }
 

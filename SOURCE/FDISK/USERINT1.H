@@ -16,8 +16,11 @@
 /////////////////////////////////////////////////////////////////////////////
 */
 
+#define TEXT_ATTR_NORMAL 0x07
+
 int Standard_Menu( int menu );
 void Clear_Screen( int type );
+void Clear_Screen_With_Attr( int type, unsigned char attr );
 void Display_Information( void );
 void Display_Label( void );
 void Interactive_User_Interface( void );
