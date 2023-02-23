@@ -542,11 +542,11 @@ void Print_Centered( int y, char *text, int style )
    }
 }
 
-/* Print 6 Digit Unsigned Long Values */
-void Print_UL( unsigned long number ) { printf( "%6lu", number ); }
+/* Print 7 Digit Unsigned Long Values */
+void Print_UL( unsigned long number ) { printf( "%7lu", number ); }
 
-/* Print 6 Digit Unsigned Long Values in bold print */
-void Print_UL_B( unsigned long number ) { Color_Printf( "%6lu", number ); }
+/* Print 7 Digit Unsigned Long Values in bold print */
+void Print_UL_B( unsigned long number ) { Color_Printf( "%7lu", number ); }
 
 /* Standard Menu Routine */
 /* Displays the menus laid out in a standard format and returns the */
