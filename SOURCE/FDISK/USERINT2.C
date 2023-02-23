@@ -386,7 +386,7 @@ int Create_Logical_Drive_Interface( void )
             return ( 1 );
          }
 
-         Print_At( 4, 17, "Total Extended DOS Partition size is " );
+         Print_At( 4, 17, "Total Extended Partition size is " );
 
          if ( ( flags.version == 4 ) || ( flags.version == 5 ) ||
               ( flags.version == 6 ) ) {
@@ -1038,7 +1038,7 @@ void Display_Extended_Partition_Information_SS( void )
       Color_Print_At( 4, 10, "No logical drives defined" );
    }
 
-   Print_At( 4, 17, "Total Extended DOS Partition size is " );
+   Print_At( 4, 17, "Total Extended Partition size is " );
 
    if ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
         ( flags.version == W98 ) ) {
@@ -1228,7 +1228,7 @@ void Display_Primary_Partition_Information_SS( void )
       if ( flags.extended_options_flag == FALSE ) {
          Print_At(
             4, 8,
-            "Partition  Status   Type    Volume Label  Mbytes   System   Usage" );
+            "Partition  Status   Type    Volume Label   Mbytes  System    Usage" );
 
          for ( index = 0; index < 4; index++ ) {
             if ( pDrive->pri_part[index].num_type > 0 ) {
@@ -1271,12 +1271,12 @@ void Display_Primary_Partition_Information_SS( void )
                          pDrive->pri_part[index].vol_label );
 
                /* Mbytes */
-               Position_Cursor( 45, ( cursor_offset + 9 ) );
+               Position_Cursor( 46, ( cursor_offset + 9 ) );
                Print_UL( pDrive->pri_part[index].size_in_MB );
 
                /* System */
                Print_At(
-                  54, ( cursor_offset + 9 ), "%s",
+                  55, ( cursor_offset + 9 ), "%s",
                   partition_lookup_table_buffer_short[pDrive->pri_part[index]
                                                          .num_type] );
 
@@ -1285,7 +1285,7 @@ void Display_Primary_Partition_Information_SS( void )
                   Convert_To_Percentage( pDrive->pri_part[index].size_in_MB,
                                          pDrive->total_disk_size_in_MB );
 
-               Print_At( 65, ( cursor_offset + 9 ), "%3d%%", usage );
+               Print_At( 66, ( cursor_offset + 9 ), "%3d%%", usage );
 
                cursor_offset++;
             }
