@@ -93,9 +93,9 @@ unsigned long Convert_Sect_To_MB( unsigned long num_sect )
 unsigned long Convert_To_Percentage( unsigned long small_num,
                                      unsigned long large_num )
 {
-   unsigned long percentage = ( 100 * small_num ) / large_num;
+   unsigned long percentage = ( 100ull * small_num ) / large_num;
 
-   if ( ( ( 100 * small_num ) % large_num ) >= ( large_num / 2 ) ) {
+   if ( ( ( 100ull * small_num ) % large_num ) >= ( large_num / 2 ) ) {
       percentage++;
    }
    if ( percentage > 100 ) {
