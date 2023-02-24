@@ -77,41 +77,42 @@ int IsRecognizedFatPartition( unsigned partitiontype )
 /* Ask user if they want to use large disk support (FAT 32) */
 void Ask_User_About_FAT32_Support( void )
 {
+   static int already_asked = 0;
+
+   if ( already_asked ) return;
+   already_asked = 1;
+
    Clear_Screen( 0 );
 
-   Print_Centered(
-      5,
-      "Free FDISK is capable of using large disk support to allow you to    ",
-      0 );
-   Print_Centered(
-      6,
-      "create partitions that are greater than 2,048 MB by using FAT32      ",
-      0 );
-   Print_Centered(
-      7,
-      "partitions.  If you enable large disk support, any partitions or     ",
-      0 );
-   Print_Centered(
-      8,
-      "logical drives greater than 512 MB will be created using FAT32.      ",
-      0 );
-   Print_Centered(
-      10,
-      "IMPORTANT:  If you enable large disk support, some operating systems ",
-      0 );
-   Print_Centered(
-      11,
-      "will be unable to access the partitions and logical drives that are  ",
-      0 );
-   Print_Centered(
-      12,
-      "over 512 MB in size.                                                 ",
-      0 );
+   Print_At(
+      4, 5, 
+      "Free FDISK is capable of using large disk support to allow you to");
+   Print_At(
+      4, 6,
+      "create partitions that are greater than 2,048 MB by using FAT32");
+   Print_At(
+      4, 7,
+      "partitions.  If you enable large disk support, any partitions or");
+   Print_At(
+      4, 8,
+      "logical drives greater than 512 MB will be created using FAT32.");
+   Print_At(
+      4, 10,
+      "IMPORTANT:  If you enable large disk support, some operating systems"
+      );
+   Print_At(
+      4, 11,
+      "will be unable to access the partitions and logical drives that are");
+   Print_At(
+      4, 12,
+      "over 512 MB in size."
+      );
 
-   Print_Centered(
-      17, "Do you want to use large disk (FAT32) support (Y/N)....?    ", 0 );
+   Print_At(
+      4, 17, "Do you want to use large disk (FAT32) support (Y/N)....?");
 
    flags.fat32 = (int)Input( 1, 62, 17, YN, 0, 0, NONE, 1, 0, NULL, NULL );
+
 }
 
 /* Change Current Fixed Disk Drive */
@@ -251,7 +252,7 @@ int Create_DOS_Partition_Interface( int type )
 
       Print_At(
          4, 18,
-         "Enter partition size in Mbytes or percent of disk space (%%) to" );
+         "Enter partition size in Mbytes or percent (%%) of disk space to" );
 
       if ( type == PRIMARY ) {
          Print_At(
@@ -417,18 +418,18 @@ int Create_Logical_Drive_Interface( void )
 
          Print_At(
             4, 20,
-            "Enter logical drive size in Mbytes or percent of disk space (%%)..." );
+            "Enter logical drive size in Mbytes or percent (%%) of disk space:" );
 
          flags.esc = FALSE;
 
          if ( ( flags.version == 4 ) || ( flags.version == 5 ) ||
               ( flags.version == 6 ) ) {
-            input = Input( 4, 70, 20, NUMP, 1, maximum_partition_size_in_MB,
+            input = Input( 4, 69, 20, NUMP, 1, maximum_partition_size_in_MB,
                            ESCR, maximum_partition_size_in_MB,
                            maximum_possible_percentage, NULL, NULL );
          }
          else {
-            input = Input( 7, 70, 20, NUMP, 1, maximum_partition_size_in_MB,
+            input = Input( 7, 69, 20, NUMP, 1, maximum_partition_size_in_MB,
                            ESCR, maximum_partition_size_in_MB,
                            maximum_possible_percentage, NULL, NULL );
          }
