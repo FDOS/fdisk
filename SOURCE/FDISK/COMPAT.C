@@ -43,12 +43,26 @@ int biosdisk( unsigned function, unsigned drive, unsigned head,
               void __far *sector_buffer )
 {
    struct diskinfo_t dinfo;
+   unsigned error, carry = 0;
+
    dinfo.drive = drive;
    dinfo.head = head;
    dinfo.track = cylinder;
    dinfo.sector = sector;
    dinfo.nsectors = number_of_sectors;
-   return _bios_disk( function, &dinfo );
+   dinfo.buffer = sector_buffer;
+
+   error = _bios_disk( function, &dinfo );
+
+   /* fix for watcom _bios_disk not checking carry flag after INT13H call */
+   /* see __ibm_bios_disk in: */
+   /* https://github.com/open-watcom/open-watcom-v2/blob/master/bld/clib/bios/a/bdisk086.asm */
+   asm adc carry, 0;
+   if ( !carry ) {
+      error = 0;
+   }
+
+   return error;
 }
 
 /* Advances the text cursor one by position. Handles cases where cursor would
