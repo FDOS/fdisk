@@ -564,7 +564,10 @@ void Initialization( char *environment[] )
       Initialize_LBA_Structures();
    }
 
-   Read_Partition_Tables();
+   if ( Read_Partition_Tables() != 0 ) {
+      Color_Print( "\n    Error reading partition tables.\n" );
+      exit( 1 );
+   }
 
    if ( ( flags.flag_sector >
           part_table[( flags.drive_number - 128 )].total_sect ) &&

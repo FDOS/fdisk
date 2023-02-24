@@ -576,7 +576,11 @@ void Command_Line_X( void )
       index++;
    } while ( index < 8 );
 
-   Read_Partition_Tables();
+   if ( Read_Partition_Tables() != 0 ) {
+      Color_Print( "\n    Error reading partition tables.\n" );
+      exit( 1 );
+   }
+
    Interactive_User_Interface();
 }
 
