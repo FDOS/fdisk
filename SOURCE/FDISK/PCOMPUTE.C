@@ -761,6 +761,7 @@ void Determine_Free_Space( void )
 
    int drive = flags.drive_number - 0x80;
 
+
    Partition_Table *pDrive = &part_table[drive];
 
    long free_space_after_last_used_partition = 0;

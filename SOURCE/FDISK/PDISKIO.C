@@ -914,7 +914,7 @@ int Read_Partition_Tables( void )
       /* Read the Primary Partition Table. */
       if ( error_code == 0 ) {
          error_code = Read_Physical_Sectors( physical_drive, 0, 0, 1, 1 );
-
+      
          if ( error_code != 0 ) {
             return ( error_code );
          }
@@ -960,6 +960,7 @@ int Read_Partition_Tables( void )
                *(_u32 *)( sector_buffer + entry_offset + 0x08 );
             pDrive->pri_part[index].num_sect =
                *(_u32 *)( sector_buffer + entry_offset + 0x0c );
+
 
             if ( ( pDrive->ext_int_13 == TRUE ) &&
                  ( pDrive->pri_part[index].num_type != 0 ) ) {
