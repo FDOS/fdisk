@@ -141,6 +141,8 @@ typedef struct part_table_structure {
    int next_ext_exists[23];
 
    struct Partition next_ext[23];
+
+   int size_truncated;  /* true if disk size > 32-bit unsigned long */
 } Partition_Table;
 
 PEXTERN Partition_Table part_table[8];

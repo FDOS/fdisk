@@ -589,7 +589,7 @@ int Get_Hard_Drive_Parameters( int physical_drive )
       unsigned long legacy_total_cylinders = total_cylinders;
       unsigned long sectors_per_cylinder = total_sectors * ( total_heads + 1 );
       unsigned long number_of_physical_sectors;
-
+      unsigned long number_of_physical_sectors_hi;
       asm {
       mov ah,0x48
       mov dl,BYTE PTR physical_drive
@@ -606,6 +606,13 @@ int Get_Hard_Drive_Parameters( int physical_drive )
       /* of physical sectors returned from service 0x48.                     */
 
       number_of_physical_sectors = *(_u32 *)( result_buffer + 16 );
+      number_of_physical_sectors_hi = *(_u32 *)( result_buffer + 20 );
+
+      /* sector count too large to store in 32-bit (disk larger 2 TB)? */
+      pDrive->size_truncated = number_of_physical_sectors_hi != 0;
+      if ( pDrive->size_truncated ) {
+         number_of_physical_sectors = 0xffffffff;
+      };
 
       /* -1 to store last accessible cylinder number not total_cylinders !! */
       total_cylinders = ( number_of_physical_sectors + sectors_per_cylinder - 
