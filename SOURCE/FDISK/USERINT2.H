@@ -23,6 +23,7 @@ int Set_Active_Partition_Interface( void );
 int Standard_Menu( int menu );
 
 void Ask_User_About_FAT32_Support( void );
+int Inform_About_Trimmed_Disk( void );
 void Change_Current_Fixed_Disk_Drive( void );
 void Delete_Extended_DOS_Partition_Interface( void );
 void Delete_N_DOS_Partition_Interface( void );

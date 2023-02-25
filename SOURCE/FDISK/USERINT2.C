@@ -115,6 +115,46 @@ void Ask_User_About_FAT32_Support( void )
 
 }
 
+int Inform_About_Trimmed_Disk( void )
+{
+   static int already_asked = 0;
+
+   if ( already_asked ) return 1;
+   already_asked = 1;
+
+   Clear_Screen( 0 );
+
+   Color_Print_At( 27, 3, "!!! DATA LOSS WARNING !!!");
+
+   Print_At(
+      4, 5, 
+      "You have at least one disk larger than 2,097,152 MB. Free FDISK can");
+   Print_At(
+      4, 6,
+      "NOT handle partitions exceeding this barrier!");
+   Print_At(
+      4, 8,
+      "You may proceed but are in risk of data loss, especially if there");
+   Print_At(
+      4, 9,
+      "are already partitions created with other tools exceeding the barrier.");
+   Print_At(
+      4, 10,
+      "It should be ok if Free FDISK is the only partitioning tool you are");
+   Print_At(
+      4, 11,
+      "using, but we recommend using another disk utility to handle this type");
+   Print_At(
+      4, 12,
+      "of disk.");
+
+   Print_At(
+      4, 17,
+      "Are you sure you want to continue (Y/N).................?");
+
+   return Input( 1, 62, 17, YN, 0, 0, NONE, 1, 0, NULL, NULL );
+}
+
 /* Change Current Fixed Disk Drive */
 void Change_Current_Fixed_Disk_Drive( void )
 {

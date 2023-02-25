@@ -226,6 +226,16 @@ void Interactive_User_Interface( void )
 
    flags.verbose = flags.quiet = 0;
 
+   /* abort if user decides so after beeing informed of FDISK not able
+      to correctly handle disks too large */
+   for (index = 0; index <= flags.maximum_drive_number - 0x80; ++index) {
+      if (part_table[index].size_truncated) {
+         if (!Inform_About_Trimmed_Disk()) {
+            goto ret;
+         }
+      }
+   }
+
    /* Ask the user if FAT32 is desired. */
    if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
       Ask_User_About_FAT32_Support();
@@ -499,6 +509,7 @@ void Interactive_User_Interface( void )
       Exit_Screen();
    }
 
+ret:
    /* clear screen with "normal" black background and position cursor at the
       top left */
    Clear_Screen_With_Attr( NOEXTRAS, TEXT_ATTR_NORMAL );
