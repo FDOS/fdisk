@@ -76,18 +76,12 @@ unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
                                  unsigned long total_heads,
                                  unsigned long total_sect )
 {
-   /* seems to round at 0.5 MB ( sect_per_meg / 2 ) */
-   unsigned long sect_per_meg = 1048576ul / 512;
-   return (
-      ( ( ( num_cyl * total_heads ) * total_sect ) + ( sect_per_meg / 2 ) ) /
-      sect_per_meg );
+   return ( num_cyl * total_heads  * total_sect ) / 2048ul;
 }
 
 unsigned long Convert_Sect_To_MB( unsigned long num_sect )
 {
-   unsigned long sect_per_meg = 1048576ul / 512;
-
-   return ( ( num_sect + ( sect_per_meg / 2 ) ) / sect_per_meg );
+   return num_sect / 2048ul;
 }
 
 unsigned long Convert_To_Percentage( unsigned long small_num,
