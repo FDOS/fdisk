@@ -615,8 +615,7 @@ int Get_Hard_Drive_Parameters( int physical_drive )
       };
 
       /* -1 to store last accessible cylinder number not total_cylinders !! */
-      total_cylinders = ( number_of_physical_sectors + sectors_per_cylinder - 
-         1) / sectors_per_cylinder - 1;
+      total_cylinders = ( number_of_physical_sectors ) / sectors_per_cylinder - 1;
 
       /* If the number of cylinders calculated using service 0x48 is in error,*/
       /* use the total cylinders reported by service 0x08.                    */
