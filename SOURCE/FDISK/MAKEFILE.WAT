@@ -13,6 +13,11 @@ CL       = wcl
 CLFLAGS  = $(CFLAGS)
 UPX      = upx
 UPXFLAGS = -qq -9 --8086
+
+!ifdef DEBUG
+CFLAGS += -d2
+!endif
+
 objs  = main.obj cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pdiskio.obj
 objs += pcompute.obj userint1.obj userint2.obj kitten.obj compat.obj
 objs += int24.obj bootnorm.obj booteasy.obj smartmbr.obj
