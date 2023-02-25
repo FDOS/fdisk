@@ -494,7 +494,7 @@ void Command_Line_Set_Flag( void )
 void Command_Line_Status( void )
 {
    flags.monochrome = TRUE;
-   textcolor( 7 );
+   textattr( 7 );
    Clear_Screen( 0 );
    Print_Centered( 1, "Fixed Disk Drive Status", 0 );
    Display_All_Drives();

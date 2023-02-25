@@ -145,12 +145,12 @@ void Determine_Color_Video_Support( void )
    if ( videomode == 7 ) /* monochrome mode */
    {
       flags.monochrome = TRUE;
-      textcolor( 7 );
+      textattr( 7 );
    }
    else /* assume color mode */
    {
       flags.monochrome = FALSE;
-      textcolor( 15 );
+      textattr( 15 );
    }
 }
 
@@ -536,7 +536,7 @@ void Initialization( char *environment[] )
    /* Set the colors. monochrome mode, if it is desired. */
    textattr( flags.screen_color );
    if ( flags.monochrome == TRUE ) {
-      textcolor( 7 );
+      textattr( 7 );
    }
    else {
       textcolor( 15 );
@@ -920,7 +920,7 @@ void main( int argc, char *argv[] )
 
             if ( 0 == strcmp( arg[0].choice, "MONO" ) ) {
                flags.monochrome = TRUE;
-               textcolor( 7 );
+               textattr( 7 );
                flags.use_iui = TRUE;
                command_ok = TRUE;
 
