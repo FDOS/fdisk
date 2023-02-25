@@ -231,6 +231,7 @@ void Interactive_User_Interface( void )
    //                                   DISABLED.
 
    do {
+
       menu = Standard_Menu( menu );
 
       pDrive = &part_table[flags.drive_number - 0x80];

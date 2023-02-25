@@ -72,9 +72,9 @@ struct Partition {
    long start_cyl;
    long start_head;
    long start_sect;
-   long end_cyl;
-   long end_head;
-   long end_sect;
+   long end_cyl;     /* inclusive ! */
+   long end_head;    /* inclusive ! */
+   long end_sect;    /* inclusive ! */
 
    unsigned long rel_sect;
    unsigned long num_sect;

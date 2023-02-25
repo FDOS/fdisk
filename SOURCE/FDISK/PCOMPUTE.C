@@ -764,11 +764,11 @@ void Determine_Free_Space( void )
 
    Partition_Table *pDrive = &part_table[drive];
 
-   long free_space_after_last_used_partition = 0;
-   long free_space_before_first_used_partition = 0;
-   long free_space_between_partitions_0_and_1 = 0;
-   long free_space_between_partitions_1_and_2 = 0;
-   long free_space_between_partitions_2_and_3 = 0;
+   unsigned long free_space_after_last_used_partition = 0;
+   unsigned long free_space_before_first_used_partition = 0;
+   unsigned long free_space_between_partitions_0_and_1 = 0;
+   unsigned long free_space_between_partitions_1_and_2 = 0;
+   unsigned long free_space_between_partitions_2_and_3 = 0;
 
    int pri_part_physical_order[4];
 #ifdef DEBUG
@@ -914,8 +914,7 @@ void Determine_Free_Space( void )
               .start_cyl > 0 ) {
          free_space_before_first_used_partition =
             ( pDrive->pri_part[pri_part_physical_order[first_used_partition]]
-                 .start_cyl ) -
-            1;
+                 .start_cyl );
       }
       else {
          free_space_before_first_used_partition = 0;
@@ -929,12 +928,7 @@ void Determine_Free_Space( void )
          free_space_after_last_used_partition =
             ( pDrive->total_cyl -
               pDrive->pri_part[pri_part_physical_order[last_used_partition]]
-                 .end_cyl ) -
-            1;
-
-         if ( free_space_after_last_used_partition < 0 ) {
-            free_space_after_last_used_partition = 0;
-         }
+                 .end_cyl );
       }
    }
 
@@ -946,7 +940,7 @@ void Determine_Free_Space( void )
          free_space_between_partitions_0_and_1 =
             ( pDrive->pri_part[pri_part_physical_order[1]].start_cyl -
               pDrive->pri_part[pri_part_physical_order[0]].end_cyl ) -
-            2;
+            1;
       }
    }
 
@@ -956,7 +950,7 @@ void Determine_Free_Space( void )
          free_space_between_partitions_1_and_2 =
             ( pDrive->pri_part[pri_part_physical_order[2]].start_cyl -
               pDrive->pri_part[pri_part_physical_order[1]].end_cyl ) -
-            2;
+            1;
       }
    }
 
@@ -966,7 +960,7 @@ void Determine_Free_Space( void )
          free_space_between_partitions_2_and_3 =
             ( pDrive->pri_part[pri_part_physical_order[3]].start_cyl -
               pDrive->pri_part[pri_part_physical_order[2]].end_cyl ) -
-            2;
+            1;
       }
    }
 
@@ -1029,7 +1023,7 @@ void Determine_Free_Space( void )
       }
    }
    else {
-      pDrive->pri_part_largest_free_space = pDrive->total_cyl;
+      pDrive->pri_part_largest_free_space = pDrive->total_cyl + 1;
       pDrive->pp_largest_free_space_start_cyl = 0;
       pDrive->pp_largest_free_space_end_cyl = pDrive->total_cyl;
    }
@@ -1100,8 +1094,8 @@ void Determine_Free_Space( void )
             if ( ( pDrive->log_drive[( index + 1 )].start_cyl -
                    pDrive->log_drive[index].end_cyl ) > 1 ) {
                pDrive->ext_part_largest_free_space =
-                  ( pDrive->log_drive[( index + 1 )].start_cyl - 1 ) -
-                  ( pDrive->log_drive[index].end_cyl + 1 );
+                  ( pDrive->log_drive[( index + 1 )].start_cyl -
+                  pDrive->log_drive[index].end_cyl - 1 );
                pDrive->log_drive_free_space_start_cyl =
                   pDrive->log_drive[index].end_cyl + 1;
                pDrive->log_drive_free_space_end_cyl =
@@ -1159,8 +1153,7 @@ void Determine_Free_Space( void )
                  pDrive->ext_part_largest_free_space ) {
                pDrive->ext_part_largest_free_space =
                   ( pDrive->log_drive[0].start_cyl -
-                    pDrive->ptr_ext_part->start_cyl ) -
-                  1;
+                    pDrive->ptr_ext_part->start_cyl );
                pDrive->log_drive_free_space_start_cyl =
                   pDrive->ptr_ext_part->start_cyl;
                pDrive->log_drive_free_space_end_cyl =
@@ -1168,14 +1161,14 @@ void Determine_Free_Space( void )
                pDrive->log_drive_largest_free_space_location = 0;
             }
          }
+         
          else {
             if ( ( pDrive->log_drive[1].start_cyl -
                    pDrive->ptr_ext_part->start_cyl ) >
                  pDrive->ext_part_largest_free_space ) {
                pDrive->ext_part_largest_free_space =
                   ( pDrive->log_drive[1].start_cyl -
-                    pDrive->ptr_ext_part->start_cyl ) -
-                  1;
+                    pDrive->ptr_ext_part->start_cyl );
                pDrive->log_drive_free_space_start_cyl =
                   pDrive->ptr_ext_part->start_cyl;
                pDrive->log_drive_free_space_end_cyl =
@@ -1200,6 +1193,7 @@ void Determine_Free_Space( void )
                     pDrive->log_drive_free_space_start_cyl );
             printf( "Ending cylinder of largest free space:  %d\n",
                     pDrive->log_drive_free_space_end_cyl );
+            Pause();
          }
 #endif
 
@@ -1208,13 +1202,13 @@ void Determine_Free_Space( void )
          if ( ( last_used_partition < 23 ) &&
               ( pDrive->log_drive[last_used_partition].end_cyl <
                 pDrive->ptr_ext_part->end_cyl ) ) {
-            if ( ( ( pDrive->ptr_ext_part->end_cyl + 1 ) -
+            if ( ( pDrive->ptr_ext_part->end_cyl -
                    pDrive->log_drive[last_used_partition].end_cyl ) >
                  ( pDrive->ext_part_largest_free_space ) ) {
                pDrive->ext_part_largest_free_space =
                   ( pDrive->ptr_ext_part->end_cyl -
                     pDrive->log_drive[last_used_partition]
-                       .end_cyl ); // removed -1
+                       .end_cyl );
                pDrive->log_drive_free_space_start_cyl =
                   pDrive->log_drive[last_used_partition].end_cyl + 1;
                pDrive->log_drive_free_space_end_cyl =
@@ -1243,12 +1237,12 @@ void Determine_Free_Space( void )
       else {
          /* If the extended partition is empty. */
          pDrive->ext_part_largest_free_space =
-            ( pDrive->ptr_ext_part->end_cyl + 1 ) -
-            pDrive->ptr_ext_part->start_cyl;
+            ( pDrive->ptr_ext_part->end_cyl) -
+            pDrive->ptr_ext_part->start_cyl + 1;
          pDrive->log_drive_free_space_start_cyl =
             pDrive->ptr_ext_part->start_cyl;
          pDrive->log_drive_free_space_end_cyl =
-            pDrive->ptr_ext_part->end_cyl + 1;
+            pDrive->ptr_ext_part->end_cyl;
 
 #ifdef DEBUG
          if ( debug.determine_free_space == TRUE ) {
@@ -1290,17 +1284,17 @@ int LBA_Partition_Type_To_Create( int standard_partition_type )
 }
 
 /* Get the maximum size of the logical drive, in MB. */
-long Max_Log_Part_Size_In_MB( void )
+unsigned long Max_Log_Part_Size_In_MB( void )
 {
-   long maximum_partition_size_in_MB;
-   long stored_maximum_partition_size_in_MB;
+   unsigned long maximum_partition_size_in_MB;
+   unsigned long stored_maximum_partition_size_in_MB;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    Determine_Free_Space();
 
    maximum_partition_size_in_MB =
-      Convert_Cyl_To_MB( ( pDrive->ext_part_largest_free_space + 1 ),
+      Convert_Cyl_To_MB( ( pDrive->ext_part_largest_free_space ),
                          pDrive->total_head + 1, pDrive->total_sect );
 
    stored_maximum_partition_size_in_MB = maximum_partition_size_in_MB;
@@ -1340,17 +1334,17 @@ long Max_Log_Part_Size_In_MB( void )
 }
 
 /* Get the maximum size of the primary partion, in MB.  */
-long Max_Pri_Part_Size_In_MB( int type )
+unsigned long Max_Pri_Part_Size_In_MB( int type )
 {
-   long maximum_partition_size_in_MB;
-   long stored_maximum_partition_size_in_MB;
+   unsigned long maximum_partition_size_in_MB;
+   unsigned long stored_maximum_partition_size_in_MB;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    Determine_Free_Space();
 
    maximum_partition_size_in_MB =
-      Convert_Cyl_To_MB( ( pDrive->pri_part_largest_free_space + 1 ),
+      Convert_Cyl_To_MB( ( pDrive->pri_part_largest_free_space ),
                          pDrive->total_head + 1, pDrive->total_sect );
 
    stored_maximum_partition_size_in_MB = maximum_partition_size_in_MB;
