@@ -599,6 +599,7 @@ int Get_Hard_Drive_Parameters( int physical_drive )
       unsigned int result_buffer_offset = FP_OFF( result_buffer );
 
       unsigned long legacy_total_cylinders = total_cylinders;
+      unsigned long sectors_per_cylinder = total_sectors * ( total_heads + 1 );
       unsigned long number_of_physical_sectors;
 
       asm {
@@ -618,8 +619,9 @@ int Get_Hard_Drive_Parameters( int physical_drive )
 
       number_of_physical_sectors = *(_u32 *)( result_buffer + 16 );
 
-      total_cylinders = ( ( number_of_physical_sectors / total_sectors ) /
-                          ( total_heads + 1 ) );
+      /* -1 to store last accessible cylinder number not total_cylinders !! */
+      total_cylinders = ( number_of_physical_sectors + sectors_per_cylinder - 
+         1) / sectors_per_cylinder - 1;
 
       /* If the number of cylinders calculated using service 0x48 is in error,*/
       /* use the total cylinders reported by service 0x08.                    */
