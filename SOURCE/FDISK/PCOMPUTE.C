@@ -110,9 +110,9 @@ int Create_Logical_Drive( int numeric_type, long size_in_MB )
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
-   long computed_ending_cylinder;
-   long maximum_size_in_cylinders = pDrive->ext_part_largest_free_space;
-   long requested_size_in_cylinders =
+   unsigned long computed_ending_cylinder;
+   unsigned long maximum_size_in_cylinders = pDrive->ext_part_largest_free_space;
+   unsigned long requested_size_in_cylinders =
       Number_Of_Cylinders( size_in_MB * 2048 );
 
    unsigned long computed_partition_size;
@@ -394,9 +394,9 @@ int Create_Primary_Partition( int numeric_type, long size_in_MB )
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
-   long computed_ending_cylinder;
-   long maximum_size_in_cylinders = pDrive->pri_part_largest_free_space;
-   long requested_size_in_cylinders =
+   unsigned long computed_ending_cylinder;
+   unsigned long maximum_size_in_cylinders = pDrive->pri_part_largest_free_space;
+   unsigned long requested_size_in_cylinders =
       Number_Of_Cylinders( size_in_MB * 2048 );
 
    unsigned long computed_partition_size;
@@ -434,6 +434,7 @@ int Create_Primary_Partition( int numeric_type, long size_in_MB )
    if ( ( maximum_size_in_cylinders - 3 ) <= requested_size_in_cylinders ) {
       requested_size_in_cylinders = maximum_size_in_cylinders;
    }
+
 
    /* Make sure the starting cylinder of an extended partition is at least  */
    /* 1.  If the cylinder number is 0, increment it to 1.                   */
@@ -516,7 +517,7 @@ int Create_Primary_Partition( int numeric_type, long size_in_MB )
 
 #ifdef DEBUG
    if ( debug.create_partition == TRUE ) {
-      Clear_Screen( NULL );
+      Clear_Screen( NOEXTRAS );
       Print_Centered(
          1, "int Create_Primary_Partition(int numeric_type,long size_in_MB)",
          BOLD );
@@ -1179,7 +1180,7 @@ void Determine_Free_Space( void )
 
 #ifdef DEBUG
          if ( debug.determine_free_space == TRUE ) {
-            Clear_Screen( NULL );
+            Clear_Screen( NOEXTRAS );
             Print_Centered(
                0, "Determine_Free_Space(int drive) debugging screen 5",
                BOLD );
