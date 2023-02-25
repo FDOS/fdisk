@@ -55,7 +55,12 @@
 /* Clear Screen */
 void Clear_Screen( int type ) /* Clear screen code as suggested by     */
 {                             /* Ralf Quint                            */
-   Clear_Screen_With_Attr( type, flags.screen_color );
+   if (flags.monochrome == TRUE) {
+      Clear_Screen_With_Attr( type, 0x07 );      
+   }
+   else {
+      Clear_Screen_With_Attr( type, flags.screen_color );      
+   }
 }
 
 void Clear_Screen_With_Attr( int type, unsigned char attr )

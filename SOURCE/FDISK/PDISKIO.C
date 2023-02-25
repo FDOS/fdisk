@@ -615,7 +615,7 @@ int Get_Hard_Drive_Parameters( int physical_drive )
       };
 
       /* -1 to store last accessible cylinder number not total_cylinders !! */
-      total_cylinders = ( number_of_physical_sectors ) / sectors_per_cylinder - 1;
+      total_cylinders = number_of_physical_sectors / sectors_per_cylinder - 1;
 
       /* If the number of cylinders calculated using service 0x48 is in error,*/
       /* use the total cylinders reported by service 0x08.                    */
@@ -624,8 +624,9 @@ int Get_Hard_Drive_Parameters( int physical_drive )
       }
    }
 
-   /* Check for an extra cylinder */
-   if ( flags.check_for_extra_cylinder == TRUE ) {
+   /* Check for an extra cylinder, but only if not using extended INT 13 */
+   if ( flags.check_for_extra_cylinder == TRUE &&
+        pDrive->ext_int_13 == FALSE ) {
       if ( 0 == Read_Physical_Sectors( physical_drive, total_cylinders + 1,
                                        total_heads, total_sectors, 1 ) ) {
          total_cylinders++;
