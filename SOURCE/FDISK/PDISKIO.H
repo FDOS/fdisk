@@ -69,17 +69,17 @@ struct Partition {
    int num_type;
    char vol_label[13];
 
-   long start_cyl;
-   long start_head;
-   long start_sect;
-   long end_cyl;     /* inclusive ! */
-   long end_head;    /* inclusive ! */
-   long end_sect;    /* inclusive ! */
+   unsigned long start_cyl;
+   unsigned long start_head;
+   unsigned long start_sect;
+   unsigned long end_cyl;     /* inclusive ! */
+   unsigned long end_head;    /* inclusive ! */
+   unsigned long end_sect;    /* inclusive ! */
 
    unsigned long rel_sect;
    unsigned long num_sect;
 
-   long size_in_MB;
+   unsigned long size_in_MB;
 };
 
 /* Partition Table Structure...Created 5/6/1999 */
@@ -98,7 +98,7 @@ typedef struct part_table_structure {
    int device_access_using_packet_structure;
 
    /* Pre-computed hard disk sizes */
-   long total_disk_size_in_log_sectors;
+   unsigned long total_disk_size_in_log_sectors;
    unsigned long total_disk_size_in_MB;
 
    int part_values_changed;
@@ -114,22 +114,22 @@ typedef struct part_table_structure {
    /* General pre-computed information. */
    unsigned long pri_part_largest_free_space;
 
-   long pp_largest_free_space_start_cyl;
-   long pp_largest_free_space_start_head;
-   long pp_largest_free_space_start_sect;
+   unsigned long pp_largest_free_space_start_cyl;
+   unsigned long pp_largest_free_space_start_head;
+   unsigned long pp_largest_free_space_start_sect;
 
-   long pp_largest_free_space_end_cyl;
+   unsigned long pp_largest_free_space_end_cyl;
 
    /* Extended Partition Table */
    struct Partition *ptr_ext_part;
 
-   long ext_part_size_in_MB;
+   unsigned long ext_part_size_in_MB;
    unsigned long ext_part_num_sect;
-   long ext_part_largest_free_space;
+   unsigned long ext_part_largest_free_space;
 
    int log_drive_largest_free_space_location;
-   long log_drive_free_space_start_cyl;
-   long log_drive_free_space_end_cyl;
+   unsigned long log_drive_free_space_start_cyl;
+   unsigned long log_drive_free_space_end_cyl;
 
    int num_of_log_drives;
    int num_of_non_dos_log_drives;

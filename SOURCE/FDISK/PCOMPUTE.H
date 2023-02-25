@@ -16,6 +16,7 @@
 #ifndef PCOMPUTE_H
 #define PCOMPUTE_H
 
+#include "pdiskio.h"
 /*
 /////////////////////////////////////////////////////////////////////////////
 //  PROTOTYPES
@@ -23,8 +24,8 @@
 */
 
 int LBA_Partition_Type_To_Create( int standard_partition_type );
-int Create_Logical_Drive( int numeric_type, long size_in_MB );
-int Create_Primary_Partition( int numeric_type, long size_in_MB );
+int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB );
+int Create_Primary_Partition( int numeric_type, unsigned long size_in_MB );
 int More_Than_One_Hard_Disk( void );
 int Partition_Type_To_Create( unsigned long size_in_mb,
                               int requested_partition_type );
@@ -35,15 +36,12 @@ unsigned long Max_Pri_Part_Size_In_MB( int type );
 unsigned long Combine_Cylinder_and_Sector( unsigned long cylinder,
                                            unsigned long sector );
 unsigned long Extract_Cylinder( unsigned long hex1, unsigned long hex2 );
-unsigned long Extract_Cylinder_From_LBA_Value( long lba_value, long head,
-                                               long sector, long total_heads,
-                                               long total_sectors );
+unsigned long Extract_Cylinder_From_LBA_Value( unsigned long lba_value, 
+                                               Partition_Table *pDrive );
 unsigned long Extract_Sector( unsigned long hex1, unsigned long hex2 );
-
-void Calculate_Partition_Ending_Cylinder( long start_cylinder,
-                                          unsigned long size );
 void Clear_Active_Partition( void );
-void Clear_Boot_Sector( int drive, long cylinder, long head, long sector );
+void Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head, 
+                        unsigned long sector );
 void Clear_Extended_Partition_Table( int drive );
 void Delete_Logical_Drive( int logical_drive_number );
 void Delete_Primary_Partition( int partition_number );

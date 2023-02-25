@@ -484,22 +484,10 @@ unsigned long Extract_Cylinder( unsigned long hex1, unsigned long hex2 )
 }
 
 /* Extract the Cylinder from an LBA Value */
-unsigned long Extract_Cylinder_From_LBA_Value( long lba_value, long head,
-                                               long sector, long total_heads,
-                                               long total_sectors )
+unsigned long Extract_Cylinder_From_LBA_Value( unsigned long lba_value,
+                                               Partition_Table *pDrive )
 {
-   long z1 = ( ( ( lba_value - ( sector - 1 ) ) / total_sectors ) - head ) /
-             ( total_heads + 1 );
-   long z2 = lba_value / ( total_sectors * ( total_heads + 1 ) );
-
-   if ( z1 != z2 ) {
-      asm int 3;
-      z1 = ( ( ( lba_value - ( sector - 1 ) ) / total_sectors ) - head ) /
-           ( total_heads + 1 );
-      z2 = lba_value / ( total_sectors * ( total_heads + 1 ) );
-   }
-
-   return z2;
+   return lba_value / ( pDrive->total_sect * ( pDrive->total_head + 1 ) );
 }
 
 /* Extract Sector */
@@ -979,9 +967,7 @@ int Read_Partition_Tables( void )
                pDrive->pri_part[index].start_cyl =
                   Extract_Cylinder_From_LBA_Value(
                      pDrive->pri_part[index].rel_sect,
-                     pDrive->pri_part[index].start_head,
-                     pDrive->pri_part[index].start_sect, pDrive->total_head,
-                     pDrive->total_sect );
+                     pDrive );
 
                pDrive->pri_part[index].end_head = pDrive->total_head;
                pDrive->pri_part[index].end_sect = pDrive->total_sect;
@@ -990,11 +976,7 @@ int Read_Partition_Tables( void )
                      /* */
                      ( pDrive->pri_part[index].rel_sect +
                        pDrive->pri_part[index].num_sect - 1 ),
-                     0 //!!,pDrive->pri_part[index].end_head
-                     ,
-                     1 //!!,pDrive->pri_part[index].end_sect
-                     ,
-                     pDrive->total_head, pDrive->total_sect );
+                     pDrive );
 
                /*
 							a protective GPT partition starts at sector
@@ -1103,9 +1085,7 @@ int Read_Partition_Tables( void )
                            Extract_Cylinder_From_LBA_Value(
                               ( pDrive->log_drive[index].rel_sect +
                                 pDrive->ptr_ext_part->rel_sect ),
-                              pDrive->log_drive[index].start_head,
-                              pDrive->log_drive[index].start_sect,
-                              pDrive->total_head, pDrive->total_sect );
+                              pDrive );
                      }
                      else {
                         pDrive->log_drive[index].start_cyl =
@@ -1113,9 +1093,7 @@ int Read_Partition_Tables( void )
                               ( pDrive->log_drive[index].rel_sect +
                                 pDrive->ptr_ext_part->rel_sect +
                                 pDrive->next_ext[index - 1].rel_sect ),
-                              pDrive->log_drive[index].start_head,
-                              pDrive->log_drive[index].start_sect,
-                              pDrive->total_head, pDrive->total_sect );
+                              pDrive );
                      }
 
                      pDrive->log_drive[index].end_head = pDrive->total_head;
@@ -1127,11 +1105,7 @@ int Read_Partition_Tables( void )
                               ( pDrive->log_drive[index].rel_sect +
                                 pDrive->ptr_ext_part->rel_sect +
                                 pDrive->log_drive[index].num_sect - 1 ),
-                              0 //!!,pDrive->log_drive[index].end_head
-                              ,
-                              1 //!!,pDrive->log_drive[index].end_sect
-                              ,
-                              pDrive->total_head, pDrive->total_sect );
+                              pDrive );
                      }
                      else {
                         pDrive->log_drive[index].end_cyl =
@@ -1140,11 +1114,7 @@ int Read_Partition_Tables( void )
                                 pDrive->ptr_ext_part->rel_sect +
                                 pDrive->log_drive[index].num_sect +
                                 pDrive->next_ext[index - 1].rel_sect - 1 ),
-                              0 //!!,pDrive->log_drive[index].end_head
-                              ,
-                              1 //!!,pDrive->log_drive[index].end_sect
-                              ,
-                              pDrive->total_head, pDrive->total_sect );
+                              pDrive );
                      }
                   }
 
@@ -1199,9 +1169,7 @@ int Read_Partition_Tables( void )
                            Extract_Cylinder_From_LBA_Value(
                               ( pDrive->next_ext[index].rel_sect +
                                 pDrive->ptr_ext_part->rel_sect ),
-                              pDrive->next_ext[index].start_head,
-                              pDrive->next_ext[index].start_sect,
-                              pDrive->total_head, pDrive->total_sect );
+                              pDrive );
 
                         pDrive->next_ext[index].end_head = pDrive->total_head;
                         pDrive->next_ext[index].end_sect = pDrive->total_sect;
@@ -1210,9 +1178,7 @@ int Read_Partition_Tables( void )
                               ( pDrive->next_ext[index].rel_sect +
                                 pDrive->ptr_ext_part->rel_sect +
                                 pDrive->next_ext[index].num_sect - 1 ),
-                              pDrive->next_ext[index].end_head,
-                              pDrive->next_ext[index].end_sect,
-                              pDrive->total_head, pDrive->total_sect );
+                              pDrive );
                      }
 
                      error_code = Read_Physical_Sectors(

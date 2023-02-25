@@ -104,7 +104,7 @@ void Clear_Extended_Partition_Table( int drive )
 
 /* Create Logical Drive */
 /* Returns a 0 if successful and a 1 if unsuccessful */
-int Create_Logical_Drive( int numeric_type, long size_in_MB )
+int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
 {
    int index;
 
@@ -294,7 +294,7 @@ int Create_Logical_Drive( int numeric_type, long size_in_MB )
          1, "int Create_Logical_Drive(int numeric_type,long size_in_MB)",
          BOLD );
       Print_At( 4, 3, "int numeric_type=%d", numeric_type );
-      Print_At( 4, 4, "long size_in_MB=%d", size_in_MB );
+      Print_At( 4, 4, "long size_in_MB=%lu", size_in_MB );
       Print_At( 4, 5, "Number of partition that was created:  %d",
                 pDrive->log_drive_largest_free_space_location );
       Print_At( 4, 7, "Brief logical drive table:" );
@@ -310,19 +310,19 @@ int Create_Logical_Drive( int numeric_type, long size_in_MB )
          if ( ( index >= 0 ) && ( index < 24 ) ) {
             Print_At( 4, offset, "%2d", index );
             Print_At( 7, offset, "%3d", pDrive->log_drive[index].num_type );
-            Print_At( 13, offset, "%4d", pDrive->log_drive[index].start_cyl );
-            Print_At( 19, offset, "%4d",
+            Print_At( 13, offset, "%4lu", pDrive->log_drive[index].start_cyl );
+            Print_At( 19, offset, "%4lu",
                       pDrive->log_drive[index].start_head );
-            Print_At( 25, offset, "%4d",
+            Print_At( 25, offset, "%4lu",
                       pDrive->log_drive[index].start_sect );
 
-            Print_At( 33, offset, "%4d", pDrive->log_drive[index].end_cyl );
-            Print_At( 38, offset, "%4d", pDrive->log_drive[index].end_head );
-            Print_At( 43, offset, "%4d", pDrive->log_drive[index].end_sect );
+            Print_At( 33, offset, "%4lu", pDrive->log_drive[index].end_cyl );
+            Print_At( 38, offset, "%4lu", pDrive->log_drive[index].end_head );
+            Print_At( 43, offset, "%4lu", pDrive->log_drive[index].end_sect );
 
-            Print_At( 58, offset, "%d", pDrive->log_drive[index].rel_sect );
+            Print_At( 58, offset, "%lu", pDrive->log_drive[index].rel_sect );
 
-            Print_At( 72, offset, "%5d",
+            Print_At( 72, offset, "%5lu",
                       pDrive->log_drive[index].size_in_MB );
          }
          else {
@@ -348,13 +348,13 @@ int Create_Logical_Drive( int numeric_type, long size_in_MB )
               ( pDrive->next_ext_exists[index] == TRUE ) ) {
             Print_At( 4, offset, "%2d", index );
 
-            Print_At( 13, offset, "%4d", pDrive->next_ext[index].start_cyl );
-            Print_At( 19, offset, "%4d", pDrive->next_ext[index].start_head );
-            Print_At( 25, offset, "%4d", pDrive->next_ext[index].start_sect );
+            Print_At( 13, offset, "%4lu", pDrive->next_ext[index].start_cyl );
+            Print_At( 19, offset, "%4lu", pDrive->next_ext[index].start_head );
+            Print_At( 25, offset, "%4lu", pDrive->next_ext[index].start_sect );
 
-            Print_At( 33, offset, "%4d", pDrive->next_ext[index].end_cyl );
-            Print_At( 38, offset, "%4d", pDrive->next_ext[index].end_head );
-            Print_At( 43, offset, "%4d", pDrive->next_ext[index].end_sect );
+            Print_At( 33, offset, "%4lu", pDrive->next_ext[index].end_cyl );
+            Print_At( 38, offset, "%4lu", pDrive->next_ext[index].end_head );
+            Print_At( 43, offset, "%4lu", pDrive->next_ext[index].end_sect );
 
             /*
 	Temporarily removed because the size of the relative sector field
@@ -365,7 +365,7 @@ int Create_Logical_Drive( int numeric_type, long size_in_MB )
 	printf("%4d",pDrive->next_ext_rel_sect[index]);
 	*/
 
-            Print_At( 72, offset, "%4d",
+            Print_At( 72, offset, "%4lu",
                       ( ( pDrive->next_ext[index].num_sect ) / 2048 ) );
          }
          else {
@@ -386,7 +386,7 @@ int Create_Logical_Drive( int numeric_type, long size_in_MB )
 
 /* Create a Primary Partition */
 /* Returns partition number if successful and a 99 if unsuccessful */
-int Create_Primary_Partition( int numeric_type, long size_in_MB )
+int Create_Primary_Partition( int numeric_type, unsigned long size_in_MB )
 {
    int index;
    int empty_partition_number;
@@ -522,17 +522,17 @@ int Create_Primary_Partition( int numeric_type, long size_in_MB )
          1, "int Create_Primary_Partition(int numeric_type,long size_in_MB)",
          BOLD );
       Print_At( 4, 3, "int numeric_type=%d", numeric_type );
-      Print_At( 4, 4, "long size_in_MB=%d", size_in_MB );
+      Print_At( 4, 4, "long size_in_MB=%lu", size_in_MB );
       Print_At( 4, 5, "empty_partition_number=%d", empty_partition_number );
 
       Print_At( 4, 8, "New Partition Information:" );
-      Print_At( 4, 10, "Starting Cylinder:  %d", newPartition->start_cyl );
-      Print_At( 4, 11, "Starting Head:      %d", newPartition->start_head );
+      Print_At( 4, 10, "Starting Cylinder:  %lu", newPartition->start_cyl );
+      Print_At( 4, 11, "Starting Head:      %lu", newPartition->start_head );
       Print_At( 4, 12, "Starting Sector:    %lu", newPartition->start_sect );
 
-      Print_At( 40, 10, "Ending Cylinder:    %d", newPartition->end_cyl );
-      Print_At( 40, 11, "Ending Head:        %d", newPartition->end_head );
-      Print_At( 40, 11, "Ending Sector:      %d", newPartition->end_sect );
+      Print_At( 40, 10, "Ending Cylinder:   %lu", newPartition->end_cyl );
+      Print_At( 40, 11, "Ending Head:       %lu", newPartition->end_head );
+      Print_At( 40, 11, "Ending Sector:     %lu", newPartition->end_sect );
 
       Print_At( 4, 14, "Relative Sectors:   %lu", newPartition->rel_sect );
 
@@ -816,7 +816,7 @@ void Determine_Free_Space( void )
       Print_Centered( 0, "Determine_Free_Space(int drive) debugging screen 1",
                       BOLD );
 
-      printf( "\n\nCylinder Size (total heads * total sectors)=%d\n",
+      printf( "\n\nCylinder Size (total heads * total sectors)=%lu\n",
               cylinder_size );
 
       printf(
@@ -826,12 +826,12 @@ void Determine_Free_Space( void )
       do {
          printf( "Partition %1d:  %1d    ", index,
                  pri_part_physical_order[index] );
-         printf( "SC:  %4d    ",
+         printf( "SC:  %4lu    ",
                  pDrive->pri_part[pri_part_physical_order[index]].start_cyl );
-         printf( "EC:  %4d    ",
+         printf( "EC:  %4lu    ",
                  pDrive->pri_part[pri_part_physical_order[index]].end_cyl );
          printf(
-            "Size in MB:  %4d\n",
+            "Size in MB:  %4lu\n",
             pDrive->pri_part[pri_part_physical_order[index]].size_in_MB );
 
          index++;
@@ -879,12 +879,12 @@ void Determine_Free_Space( void )
       do {
          printf( "Partition %d:  %1d    ", index,
                  pri_part_physical_order[index] );
-         printf( "SC:  %4d    ",
+         printf( "SC:  %4lu    ",
                  pDrive->pri_part[pri_part_physical_order[index]].start_cyl );
-         printf( "EC:  %4d    ",
+         printf( "EC:  %4lu    ",
                  pDrive->pri_part[pri_part_physical_order[index]].end_cyl );
          printf(
-            "Size in MB:  %4d\n",
+            "Size in MB:  %4lu\n",
             pDrive->pri_part[pri_part_physical_order[index]].size_in_MB );
 
          index++;
@@ -1037,21 +1037,21 @@ void Determine_Free_Space( void )
 #ifdef DEBUG
    if ( debug.determine_free_space == TRUE ) {
       printf( "\n\nFree space (in cylinders) in primary partition table:\n" );
-      printf( "\nFree space before first used partition:  %d",
+      printf( "\nFree space before first used partition:  %lu",
               free_space_before_first_used_partition );
-      printf( "\nFree space after last used partition:  %d",
+      printf( "\nFree space after last used partition:  %lu",
               free_space_after_last_used_partition );
-      printf( "\nFree space between partitions 0 and 1:  %d",
+      printf( "\nFree space between partitions 0 and 1:  %lu",
               free_space_between_partitions_0_and_1 );
-      printf( "\nFree space between partitions 1 and 2:  %d",
+      printf( "\nFree space between partitions 1 and 2:  %lu",
               free_space_between_partitions_1_and_2 );
-      printf( "\nFree space between partitions 2 and 3:  %d",
+      printf( "\nFree space between partitions 2 and 3:  %lu",
               free_space_between_partitions_2_and_3 );
-      printf( "\n\nLargest free space in primary partition table:  %d",
+      printf( "\n\nLargest free space in primary partition table:  %lu",
               pDrive->pri_part_largest_free_space );
-      printf( "\nStarting cylinder of largest free space:  %d",
+      printf( "\nStarting cylinder of largest free space:  %lu",
               pDrive->pp_largest_free_space_start_cyl );
-      printf( "\nEnding cylinder of largest free space:  %d",
+      printf( "\nEnding cylinder of largest free space:  %lu",
               pDrive->pp_largest_free_space_end_cyl );
       Pause();
    }
@@ -1067,7 +1067,7 @@ void Determine_Free_Space( void )
 
 #ifdef DEBUG
       if ( debug.determine_free_space == TRUE ) {
-         Clear_Screen( NULL );
+         Clear_Screen( NOEXTRAS );
          Print_Centered(
             0, "Determine_Free_Space(int drive) debugging screen 3", BOLD );
          printf( "\n\n" );
@@ -1112,8 +1112,8 @@ void Determine_Free_Space( void )
                }
 
                printf( "\nLogical Drive #: %2d    ", index );
-               printf( "SC: %4d    ", pDrive->log_drive[index].start_cyl );
-               printf( "EC: %4d    ", pDrive->log_drive[index].end_cyl );
+               printf( "SC: %4lu    ", pDrive->log_drive[index].start_cyl );
+               printf( "EC: %4lu    ", pDrive->log_drive[index].end_cyl );
             }
 #endif
 
@@ -1123,24 +1123,24 @@ void Determine_Free_Space( void )
 #ifdef DEBUG
          if ( debug.determine_free_space == TRUE ) {
             printf( "\nLogical Drive #: %2d    ", index );
-            printf( "SC: %4d    ", pDrive->log_drive[22].start_cyl );
-            printf( "EC: %4d    \n", pDrive->log_drive[22].end_cyl );
+            printf( "SC: %4lu    ", pDrive->log_drive[22].start_cyl );
+            printf( "EC: %4lu    \n", pDrive->log_drive[22].end_cyl );
             Pause();
 
-            Clear_Screen( NULL );
+            Clear_Screen( NOEXTRAS );
             Print_Centered(
                0, "Determine_Free_Space(int drive) debugging screen 4",
                BOLD );
             printf( "\n\nNote:  All values are in cylinders.\n\n" );
             printf(
                "Results of free space calculations after computing spaces between\n  logical drives:\n\n" );
-            printf( "Location of largest free space:  %d\n",
+            printf( "Location of largest free space:  %lu\n",
                     pDrive->log_drive_largest_free_space_location );
-            printf( "Size of largest free space:  %4d\n",
+            printf( "Size of largest free space:  %4lu\n",
                     pDrive->ext_part_largest_free_space );
-            printf( "Starting cylinder of largest free space:  %d\n",
+            printf( "Starting cylinder of largest free space:  %lu\n",
                     pDrive->log_drive_free_space_start_cyl );
-            printf( "Ending cylinder of largest free space:  %d\n",
+            printf( "Ending cylinder of largest free space:  %lu\n",
                     pDrive->log_drive_free_space_end_cyl );
             Pause();
          }
@@ -1186,13 +1186,13 @@ void Determine_Free_Space( void )
                BOLD );
             printf(
                "\n\nResults of free space calculations after computing space before\n  the first logical drive:\n\n" );
-            printf( "Location of largest free space:  %d\n",
+            printf( "Location of largest free space:  %lu\n",
                     pDrive->log_drive_largest_free_space_location );
-            printf( "Size of largest free space:  %4d\n",
+            printf( "Size of largest free space:  %4lu\n",
                     pDrive->ext_part_largest_free_space );
-            printf( "Starting cylinder of largest free space:  %d\n",
+            printf( "Starting cylinder of largest free space:  %lu\n",
                     pDrive->log_drive_free_space_start_cyl );
-            printf( "Ending cylinder of largest free space:  %d\n",
+            printf( "Ending cylinder of largest free space:  %lu\n",
                     pDrive->log_drive_free_space_end_cyl );
             Pause();
          }
@@ -1223,13 +1223,13 @@ void Determine_Free_Space( void )
          if ( debug.determine_free_space == TRUE ) {
             printf(
                "\n\nResults of free space calculations after computing space after\n  the last logical drive:\n\n" );
-            printf( "Location of largest free space:  %d\n",
+            printf( "Location of largest free space:  %lu\n",
                     pDrive->log_drive_largest_free_space_location );
-            printf( "Size of largest free space:  %4d\n",
+            printf( "Size of largest free space:  %4lu\n",
                     pDrive->ext_part_largest_free_space );
-            printf( "Starting cylinder of largest free space:  %d\n",
+            printf( "Starting cylinder of largest free space:  %lu\n",
                     pDrive->log_drive_free_space_start_cyl );
-            printf( "Ending cylinder of largest free space:  %d\n",
+            printf( "Ending cylinder of largest free space:  %lu\n",
                     pDrive->log_drive_free_space_end_cyl );
             Pause();
          }
@@ -1250,11 +1250,11 @@ void Determine_Free_Space( void )
             printf(
                "\n\nThere are not any Logical DOS Drives in the Extended DOS Partition\n\n" );
             printf( "Location of largest free space:     0\n" );
-            printf( "Size of largest free space:  %d\n",
+            printf( "Size of largest free space:  %lu\n",
                     pDrive->ext_part_largest_free_space );
-            printf( "Starting cylinder of largest free space:  %d\n",
+            printf( "Starting cylinder of largest free space:  %lu\n",
                     pDrive->log_drive_free_space_start_cyl );
-            printf( "Ending cylinder of largest free space:  %d\n",
+            printf( "Ending cylinder of largest free space:  %lu\n",
                     pDrive->log_drive_free_space_end_cyl );
             Pause();
          }
