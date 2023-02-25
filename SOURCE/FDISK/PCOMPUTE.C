@@ -1417,11 +1417,6 @@ unsigned long Number_Of_Cylinders( unsigned long size )
 
    unsigned long num_cyl;
    unsigned long num_head;
-   unsigned long size_in_mb = size / 2048;
-
-   if ( ( ( size_in_mb * 1048576ul ) % 512 ) != 0 ) {
-      size++;
-   }
 
    num_head = size / pDrive->total_sect;
    if ( ( size % pDrive->total_sect ) != 0 ) {
