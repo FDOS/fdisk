@@ -386,7 +386,7 @@ int Create_Logical_Drive_Interface( void )
    int maximum_possible_percentage;
    int numeric_type;
 
-   long maximum_partition_size_in_MB;
+   unsigned long maximum_partition_size_in_MB;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
