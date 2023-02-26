@@ -1163,7 +1163,7 @@ void Determine_Free_Space( void )
          if ( ( last_used_partition < 23 ) &&
               ( pDrive->log_drive[last_used_partition].end_cyl <
                 pDrive->ptr_ext_part->end_cyl ) ) {
-            if ( ( pDrive->ptr_ext_part->end_cyl ) >
+            if ( pDrive->ptr_ext_part->end_cyl >
                  ( pDrive->log_drive[last_used_partition].end_cyl +
                    pDrive->ext_part_largest_free_space ) ) {
                pDrive->ext_part_largest_free_space =

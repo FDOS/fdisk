@@ -577,7 +577,7 @@ int Standard_Menu( int menu )
 
    int maximum_number_of_options = 0;
 
-   char copyleft[60] = "";
+   char copyleft[80] = "";
    char program_name[60] = "";
    char program_description[60] = "";
    char version[30] = "";
@@ -608,8 +608,8 @@ int Standard_Menu( int menu )
       }
 
       strcpy( program_description, "Fixed Disk Setup Program" );
-      strcpy( copyleft, "GNU GPL Copyright Brian E. Reifsnyder " );
-      strcat( copyleft, COPYLEFT );
+      strcpy( copyleft, "GNU GPL (c) " COPYLEFT " by Brian E. Reifsnyder"
+         " and The FreeDOS Community" );
 
       if ( menu == MM ) {
          maximum_number_of_options = 4;

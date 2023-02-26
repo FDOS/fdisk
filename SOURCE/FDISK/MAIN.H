@@ -21,8 +21,8 @@
 
 #define PRINAME  "Free FDISK"
 #define ALTNAME  "FreeDOS"
-#define VERSION  "1.3.4"
-#define COPYLEFT "1998 - 2003"
+#define VERSION  "1.3.5"
+#define COPYLEFT "1998 - 2023"
 
 //#define DEBUG
 /* ***** Uncomment the above line to compile */
