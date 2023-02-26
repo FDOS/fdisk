@@ -1,0 +1,7 @@
+Begin3
+Language:    DE, 850, German (Standard)
+Title:       Fdisk
+Description: Festplattenpartitionierungstool.
+Summary:     Festplattenpartitionierungstool zum Erstellen, L”schen und Anschauen von Festplattenpartitionen.
+Keywords:    fdisk, format, hard drive, Festplatte, FAT16, FAT32, Partition, mbr
+End

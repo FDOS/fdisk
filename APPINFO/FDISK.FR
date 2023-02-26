@@ -1,0 +1,7 @@
+Begin3
+Language:    FR, 850, French (Standard)
+Title:       Fdisk
+Description: Outil de partitionnement Fixed disk
+Summary:     Outil pour cr‚er, effacer et afficher les partitions du disque dur.
+Keywords:    fdisk, formater, disque dur, partition, fat16, fat32, partition, mbr
+End
