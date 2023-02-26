@@ -1,7 +1,6 @@
-FreeDOS FDISK
-=============
-Version 1.0
-Written By:  Brian E. Reifsnyder
+# FreeDOS FDISK
+
+Written by Brian E. Reifsnyder and The FreeDOS Community.
 
 
 Syntax:
@@ -119,10 +118,8 @@ Interactive user interface switches:
   /XO      Enables extended options.
 ```
 
-
-
-This program is Copyright 1998 - 2001, by Brian E. Reifsnyder, under
-the terms of the GNU General Public License, version 2.
+This program is Copyright 1998 - 2023, by Brian E. Reifsnyder and The FreeDOS
+Community, under the terms of the GNU General Public License, version 2.
 
 This program comes as-is and without warranty of any kind.  The author of
 this software assumes no responsibility pertaining to the use or mis-use of
