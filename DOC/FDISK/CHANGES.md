@@ -4,15 +4,21 @@ Free FDISK Change Log
 
 Version 1.3.5 (unreleased)
 --------------------------
- - CRITICAL: fix FDISK not calculating head and sector values when loading
-     the partition table in LBA mode but instead hard-coding them.
-     (Bernd Boeckmann)
- - CRITICAL: fix different calculation errors leading to overlapping
-     partitions or partitions exceeding the end of the disk. (Bernd Boeckmann)
- - CRITICAL: fix a bug resulting in always detecting an extra cylinder
-     even if it does not exist. (Bernd Boeckmann)
-
- - Free FDISK now compiles with Open Watcom C.
+ - CRITICAL: Fix FDISK loading wrong head and sector values from MBR if
+     operating in LBA mode. The previous incorrect behaviuor was hardcoding
+     them to cylinder boundaries instead of calculating them from LBA address,
+     resulting in corrupt partition tables especially if used in combination
+     with other disk utilities.
+ - CRITICAL: Fix different calculation errors leading to overlapping
+     partitions, unnessessary free space between them, or partitions exceeding
+     the end of the disk.
+ - CRITICAL: Fix a bug resulting in detecting non-existant extra cylinders
+     if detection of extra cylinders is enabled.
+ - ENHANCEMENT: Warn if user tries to use FDISK with a disk size of >2TB,
+     because it can not handle it properly. If the user decides to continue
+     the disk size is truncated to 2TB, making sure nothing bad happens by
+     some overflowing values.
+ - ENHANCEMENT: Free FDISK now compiles with Open Watcom C.
 
 
 Version 1.3.4 (2021-02-20)

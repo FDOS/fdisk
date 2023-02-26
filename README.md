@@ -5,7 +5,8 @@ harddisks.
 Written by Brian E. Reifsnyder and The FreeDOS Community.
 
 See [INSTALL.MD](DOC/FDISK/INSTALL.md) for installation instructions and 
-[CHANGES.MD](DOS/FDISK/CHANGES.md) for a history of versions.
+[CHANGES.MD](DOC/FDISK/CHANGES.md) in the `DOC\FDISK` directory for a history
+of versions.
 
 ## Command Line Syntax
 
