@@ -29,7 +29,7 @@
 /* ***** debugging code and functions into   */
 /* ***** Free FDISK.                         */
 
-//#define BETA_RELEASE
+#define BETA_RELEASE
 /* ***** Uncomment the above line to         */
 /* ***** have this program inform the user   */
 /* ***** that it is a beta release.          */

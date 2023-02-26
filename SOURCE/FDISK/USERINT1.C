@@ -140,9 +140,9 @@ void Display_Information( void )
    }
 
 #ifdef BETA_RELEASE
-   Position_Cursor( 2, 1 );
+   Position_Cursor( 2, 0 );
    Color_Print( "BETA RELEASE" );
-   Position_Cursor( 66, 1 );
+   Position_Cursor( 66, 0 );
    Color_Print( "BETA RELEASE" );
 #endif
 
