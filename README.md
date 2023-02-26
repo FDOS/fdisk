@@ -3,23 +3,15 @@
 Written by Brian E. Reifsnyder and The FreeDOS Community.
 
 
-Syntax:
--------
+## Command Line Syntax
+
+### General usage
 ```
  * FDISK                   Runs FreeDOS FDISK in interactive mode.
  * FDISK /? [/NOPAUSE]     Displays this help information.
 ```
 
-
-FreeDOS FDISK interactive user interface switches:
---------------------------------------------------
-```
-  FDISK /MONO
-  FDISK /XO
-```
-
-Description of FreeDOS FDISK compatibility switches:
-----------------------------------------------------
+### Compatibility switches
 ```
   /ACTOK   Normally skips integrity checking...kept for compatibility.
   /CMBR    Writes the MBR to <drive#>.
@@ -37,10 +29,9 @@ Description of FreeDOS FDISK compatibility switches:
   /X       Do not use LBA partitions.
 ```
 
+### Extended switches
 
-Description of FreeDOS FDISK extended switches:
-
-For partition table modification:
+#### Partition table modification
 ```
   /AUTO    Automatically partitions the hard disk with FAT16 partitions.
   /ACTIVATE
@@ -72,8 +63,7 @@ For partition table modification:
              <second_partition#).
 ```
 
-For MBR modification:
----------------------
+#### MBR modification
 ```
   /AMBR    Writes the MBR stored in the "boot.mbr" file.
   /MBR     Writes the MBR to <drive#>.
@@ -81,9 +71,7 @@ For MBR modification:
   /SMBR    Saves the MBR, on <drive#>, into a "boot.mbr" file.
 ```
 
-
-For handling flags on a hard disk:
-----------------------------------
+#### Handling flags on a hard disk
 ```
   /CLEARFLAG
            Resets the <flag#> or all the flags on <drive#> to 0.
@@ -93,9 +81,7 @@ For handling flags on a hard disk:
            Tests <flag#> for 1 or <flag_value>, if specified.
 ```
 
-
-For obtaining information about the hard disk(s):
--------------------------------------------------
+#### Obtaining information about the hard disk(s)
 ```
   /DUMP    Dumps all partition information from all hard disks.  This
              function is mainly used for debugging by redirecting the
@@ -103,20 +89,19 @@ For obtaining information about the hard disk(s):
   /INFO    Displays partition information from <drive#>
 ```
 
-
-For rebooting the computer:
----------------------------
+#### Rebooting the computer
 ```
   /REBOOT  Forces a reboot.
 ```
 
-
-Interactive user interface switches:
-------------------------------------
+#### Interactive user interface switches
 ```
   /MONO    Forces the user interface to run in monochrome mode.
   /XO      Enables extended options.
 ```
+
+
+## Copyright
 
 This program is Copyright 1998 - 2023, by Brian E. Reifsnyder and The FreeDOS
 Community, under the terms of the GNU General Public License, version 2.
