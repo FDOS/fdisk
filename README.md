@@ -1,7 +1,11 @@
 # FreeDOS FDISK
+FreeDOS FDISK is a basic tool for removing and creating partitions on
+harddisks.
 
 Written by Brian E. Reifsnyder and The FreeDOS Community.
 
+See [INSTALL.MD](DOC\FDISK\INSTALL.md) for installation instructions and 
+[CHANGES.MD](DOS\FDISK\CHANGES.md) for a history of versions.
 
 ## Command Line Syntax
 
