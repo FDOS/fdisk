@@ -312,8 +312,10 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
             Print_At( 4, offset, "%2d", index );
 
             Print_At( 13, offset, "%4lu", pDrive->next_ext[index].start_cyl );
-            Print_At( 19, offset, "%4lu", pDrive->next_ext[index].start_head );
-            Print_At( 25, offset, "%4lu", pDrive->next_ext[index].start_sect );
+            Print_At( 19, offset, "%4lu",
+                      pDrive->next_ext[index].start_head );
+            Print_At( 25, offset, "%4lu",
+                      pDrive->next_ext[index].start_sect );
 
             Print_At( 33, offset, "%4lu", pDrive->next_ext[index].end_cyl );
             Print_At( 38, offset, "%4lu", pDrive->next_ext[index].end_head );
@@ -939,7 +941,8 @@ void Determine_Free_Space( void )
       pDrive->pp_largest_free_space_start_cyl = 0;
       pDrive->pp_largest_free_space_end_cyl =
          pDrive->pri_part[pri_part_physical_order[first_used_partition]]
-            .start_cyl - 1;
+            .start_cyl -
+         1;
 
       /* If the largest free space is not before the first used partition  */
       /* make the correct adjustments.                                     */
@@ -949,7 +952,8 @@ void Determine_Free_Space( void )
             free_space_after_last_used_partition;
          pDrive->pp_largest_free_space_start_cyl =
             pDrive->pri_part[pri_part_physical_order[last_used_partition]]
-               .end_cyl + 1;
+               .end_cyl +
+            1;
          pDrive->pp_largest_free_space_end_cyl = pDrive->total_cyl;
       }
 
@@ -1048,8 +1052,8 @@ void Determine_Free_Space( void )
             }
 
             if ( ( pDrive->log_drive[index + 1].num_type > 0 ) &&
-               ( pDrive->log_drive[index + 1].start_cyl -
-                   pDrive->log_drive[index].end_cyl ) > 1 ) {
+                 ( pDrive->log_drive[index + 1].start_cyl >
+                   pDrive->log_drive[index].end_cyl + 1 ) ) {
                pDrive->ext_part_largest_free_space =
                   ( pDrive->log_drive[index + 1].start_cyl -
                     pDrive->log_drive[index].end_cyl - 1 );
@@ -1105,9 +1109,9 @@ void Determine_Free_Space( void )
          /* Determine if there is any free space before the first logical      */
          /* drive in the extended partition.                                   */
          if ( pDrive->log_drive[0].num_type != 0 ) {
-            if ( ( pDrive->log_drive[0].start_cyl -
-                   pDrive->ptr_ext_part->start_cyl ) >
-                 pDrive->ext_part_largest_free_space ) {
+            if ( pDrive->log_drive[0].start_cyl >
+                 ( pDrive->ptr_ext_part->start_cyl +
+                   pDrive->ext_part_largest_free_space ) ) {
                pDrive->ext_part_largest_free_space =
                   ( pDrive->log_drive[0].start_cyl -
                     pDrive->ptr_ext_part->start_cyl );
@@ -1120,9 +1124,9 @@ void Determine_Free_Space( void )
          }
 
          else {
-            if ( ( pDrive->log_drive[1].start_cyl -
-                   pDrive->ptr_ext_part->start_cyl ) >
-                 pDrive->ext_part_largest_free_space ) {
+            if ( pDrive->log_drive[1].start_cyl >
+                 ( pDrive->ptr_ext_part->start_cyl +
+                   pDrive->ext_part_largest_free_space ) ) {
                pDrive->ext_part_largest_free_space =
                   ( pDrive->log_drive[1].start_cyl -
                     pDrive->ptr_ext_part->start_cyl );
@@ -1159,9 +1163,9 @@ void Determine_Free_Space( void )
          if ( ( last_used_partition < 23 ) &&
               ( pDrive->log_drive[last_used_partition].end_cyl <
                 pDrive->ptr_ext_part->end_cyl ) ) {
-            if ( ( pDrive->ptr_ext_part->end_cyl -
-                   pDrive->log_drive[last_used_partition].end_cyl ) >
-                 ( pDrive->ext_part_largest_free_space ) ) {
+            if ( ( pDrive->ptr_ext_part->end_cyl ) >
+                 ( pDrive->log_drive[last_used_partition].end_cyl +
+                   pDrive->ext_part_largest_free_space ) ) {
                pDrive->ext_part_largest_free_space =
                   ( pDrive->ptr_ext_part->end_cyl -
                     pDrive->log_drive[last_used_partition].end_cyl );
