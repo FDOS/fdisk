@@ -7,6 +7,8 @@ Free FDISK is confirmed to build with the following toolchains:
  - Borland C++ 3.1
  - Turbo C++ 3.0
 
+Beside a C Compiler the Netwide Assembler (NASM) must be installed.
+
 If the executable packer UPX is installed and accessible via path the
 generated `FDISK.EXE` gets compressed during the build process.
 
