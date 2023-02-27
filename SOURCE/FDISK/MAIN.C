@@ -637,6 +637,7 @@ void main( int argc, char *argv[] )
    int command_ok;
    int index;
    int location;
+   int fat32_temp;
 
    extern void cdecl far smart_mbr( void );
 
@@ -898,9 +899,10 @@ void main( int argc, char *argv[] )
             }
 
             if ( 0 == strcmp( arg[0].choice, "LOGO" ) ) {
+               fat32_temp = flags.fat32;
                flags.fat32 = FALSE;
                Command_Line_Create_Logical_DOS_Drive();
-               flags.fat32 = TRUE;
+               flags.fat32 = fat32_temp;
                command_ok = TRUE;
             }
          } break;
@@ -940,9 +942,10 @@ void main( int argc, char *argv[] )
             }
 
             if ( 0 == strcmp( arg[0].choice, "PRIO" ) ) {
+               fat32_temp = flags.fat32;
                flags.fat32 = FALSE;
                Command_Line_Create_Primary_Partition();
-               flags.fat32 = TRUE;
+               flags.fat32 = fat32_temp;
                command_ok = TRUE;
             }
          } break;
