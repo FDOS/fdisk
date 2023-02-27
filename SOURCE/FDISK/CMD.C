@@ -654,27 +654,36 @@ int Get_Options( char *argv[], int argc )
 
       argptr++;
 
-      arg[number_of_options].value = atol( argptr );
-
-      while ( isdigit( *argptr ) ) { /* skip number */
+      if ( isdigit( *argptr) ) {
+         arg[number_of_options].value = atol( argptr );
+   
+         while ( isdigit( *argptr ) ) { /* skip number */
+            argptr++;
+         }
+   
+         if ( *argptr == 0 ) { /* done */
+            continue;
+         }
+   
+         if ( *argptr != ',' ) {
+            printf( "<%s> ',' expected; terminated\n", argptr );
+            exit( 9 );
+         }
+   
          argptr++;
+   
+         arg[number_of_options].extra_value = (int)atol( argptr );
+   
+         while ( isdigit( *argptr ) ) { /* skip number */
+            argptr++;
+         }         
       }
-
-      if ( *argptr == 0 ) { /* done */
-         continue;
-      }
-
-      if ( *argptr != ',' ) {
-         printf( "<%s> ',' expected; terminated\n", argptr );
-         exit( 9 );
-      }
-
-      argptr++;
-
-      arg[number_of_options].extra_value = (int)atol( argptr );
-
-      while ( isdigit( *argptr ) ) { /* skip number */
-         argptr++;
+      else {
+         if ( !stricmp( argptr, "MAX") ) {
+            arg[number_of_options].value = 100;
+            arg[number_of_options].extra_value = 100;
+            argptr += 3;
+         }
       }
 
       if ( *argptr != 0 ) /* done */
