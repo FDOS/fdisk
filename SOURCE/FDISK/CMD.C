@@ -230,7 +230,7 @@ void Command_Line_Create_Logical_DOS_Drive( void )
                      maximum_possible_percentage;
       }
       else {
-         maximum_possible_percentage = 0;
+         arg[0].value = 0;
       }
 
       /* Compute the partition size as a percentage. */
