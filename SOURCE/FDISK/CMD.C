@@ -176,7 +176,7 @@ void Command_Line_Create_Extended_Partition( void )
                      maximum_possible_percentage;
       }
       else {
-         maximum_possible_percentage = 0;
+         arg[0].value = 0;
       }
 
       /*
@@ -294,7 +294,7 @@ void Command_Line_Create_Primary_Partition( void )
                      maximum_possible_percentage;
       }
       else {
-         maximum_possible_percentage = 0;
+         arg[0].value = 0;
       }
    }
 
