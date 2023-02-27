@@ -14,11 +14,14 @@ Version 1.3.5 (unreleased)
      the end of the disk.
  - CRITICAL: Fix a bug resulting in detecting non-existant extra cylinders
      if detection of extra cylinders is enabled.
- - ENHANCEMENT: Warn if user tries to use FDISK with a disk size of >2TB,
-     because it can not handle it properly. If the user decides to continue
-     the disk size is truncated to 2TB, making sure nothing bad happens by
-     some overflowing values.
- - ENHANCEMENT: Free FDISK now compiles with Open Watcom C.
+ - MEDIUM: Fix a cylinder off by one error in partition type determination.
+ - LOW: Fix color handling for background colors other than black.
+
+ - Warn if user tries to use FDISK with a disk size of >2TB, because it can
+   not handle it properly. If the user decides to continue the disk size is
+   truncated to 2TB, making sure nothing bad happens by some overflowing
+   values.
+ - Free FDISK now compiles with Open Watcom C.
 
 
 Version 1.3.4 (2021-02-20)

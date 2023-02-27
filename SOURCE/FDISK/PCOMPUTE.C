@@ -137,7 +137,7 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
 
    /* Adjust the partition type, if necessary. */
    numeric_type = Partition_Type_To_Create(
-      ( ( ( requested_size_in_cylinders + 1 ) * ( pDrive->total_head + 1 ) *
+      ( ( requested_size_in_cylinders * ( pDrive->total_head + 1 ) *
           ( pDrive->total_sect ) ) /
         2048 ),
       numeric_type );
@@ -413,7 +413,7 @@ int Create_Primary_Partition( int numeric_type, unsigned long size_in_MB )
    /* Re-obtain a partition type, if applicable. */
    if ( ( numeric_type != 5 ) && ( numeric_type != 0x0f ) ) {
       numeric_type = Partition_Type_To_Create(
-         ( ( ( requested_size_in_cylinders + 1 ) *
+         ( ( requested_size_in_cylinders *
              ( pDrive->total_head + 1 ) * ( pDrive->total_sect ) ) /
            2048 ),
          numeric_type );
@@ -427,7 +427,6 @@ int Create_Primary_Partition( int numeric_type, unsigned long size_in_MB )
    computed_partition_size = (requested_size_in_cylinders)*cylinder_size;
 
    newPartition = &pDrive->pri_part[empty_partition_number];
-
    newPartition->active_status = 0;
    newPartition->num_type = numeric_type;
 
@@ -1439,7 +1438,6 @@ int Partition_Type_To_Create( unsigned long size_in_mb,
         ( requested_partition_type > 16 ) ) {
       return ( requested_partition_type );
    }
-
    /* FAT 12 */
    if ( size_in_mb <= 16 ) {
       numeric_type = 1;
