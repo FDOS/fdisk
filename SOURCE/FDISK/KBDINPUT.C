@@ -150,7 +150,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
    do {
       line_buffer[index] = 0;
       index++;
-   } while ( index < 10 );
+   } while ( index < sizeof( line_buffer ) );
 
    /* Place appropriate text on the screen prior to obtaining input */
    if ( type != ESC ) {
