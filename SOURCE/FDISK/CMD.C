@@ -138,9 +138,8 @@ void Command_Line_Clear_Flag( void )
 /* /EXT command line options */
 void Command_Line_Create_Extended_Partition( void )
 {
-   int maximum_possible_percentage;
-
-   long maximum_partition_size_in_MB;
+   unsigned long maximum_possible_percentage;
+   unsigned long maximum_partition_size_in_MB;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
@@ -157,7 +156,7 @@ void Command_Line_Create_Extended_Partition( void )
 
    maximum_partition_size_in_MB = Max_Pri_Part_Size_In_MB( EXTENDED );
 
-   maximum_possible_percentage = (int)Convert_To_Percentage(
+   maximum_possible_percentage = Convert_To_Percentage(
       maximum_partition_size_in_MB, pDrive->total_disk_size_in_MB );
 
    //   ,pDrive->ext_part_size_in_MB);
@@ -189,11 +188,9 @@ void Command_Line_Create_Extended_Partition( void )
 /* /LOG and /LOGO command line options */
 void Command_Line_Create_Logical_DOS_Drive( void )
 {
-   int maximum_possible_percentage;
+   unsigned long maximum_possible_percentage;
+   unsigned long maximum_partition_size_in_MB;
    int option_count = 1;
-
-   //  long ext_part_size;
-   long maximum_partition_size_in_MB;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
@@ -210,7 +207,7 @@ void Command_Line_Create_Logical_DOS_Drive( void )
 
    maximum_partition_size_in_MB = Max_Log_Part_Size_In_MB();
 
-   maximum_possible_percentage = (int)Convert_To_Percentage(
+   maximum_possible_percentage = Convert_To_Percentage(
       maximum_partition_size_in_MB, pDrive->ext_part_size_in_MB );
 
    if ( arg[0].extra_value == 100 ) {
@@ -250,10 +247,9 @@ void Command_Line_Create_Logical_DOS_Drive( void )
 /* /PRI and /PRIO command line options */
 void Command_Line_Create_Primary_Partition( void )
 {
-   int maximum_possible_percentage;
+   unsigned long maximum_possible_percentage;
+   unsigned long maximum_partition_size_in_MB;
    int option_count = 1;
-
-   long maximum_partition_size_in_MB;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
@@ -270,7 +266,7 @@ void Command_Line_Create_Primary_Partition( void )
 
    maximum_partition_size_in_MB = Max_Pri_Part_Size_In_MB( PRIMARY );
 
-   maximum_possible_percentage = (int)Convert_To_Percentage(
+   maximum_possible_percentage = Convert_To_Percentage(
       maximum_partition_size_in_MB, pDrive->total_disk_size_in_MB );
 
    if ( arg[0].extra_value == 100 ) {
