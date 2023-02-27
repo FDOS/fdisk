@@ -613,7 +613,7 @@ int Get_Hard_Drive_Parameters( int physical_drive )
       /* sector count too large to store in 32-bit (disk larger 2 TB)? */
       pDrive->size_truncated = number_of_physical_sectors_hi != 0;
       if ( pDrive->size_truncated ) {
-         number_of_physical_sectors = 0xffffffff;
+         number_of_physical_sectors = 0xffffffffUL;
       };
 
       /* -1 to store last accessible cylinder number not total_cylinders !! */

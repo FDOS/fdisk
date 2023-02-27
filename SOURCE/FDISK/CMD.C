@@ -171,8 +171,13 @@ void Command_Line_Create_Extended_Partition( void )
       }
 
       /* Determine partition size. */
-      arg[0].value = ( arg[0].value * maximum_partition_size_in_MB ) /
+      if ( maximum_possible_percentage > 0 ) {
+         arg[0].value = ( arg[0].value * maximum_partition_size_in_MB ) /
                      maximum_possible_percentage;
+      }
+      else {
+         maximum_possible_percentage = 0;
+      }
 
       /*
     arg[0].value = Convert_Percent_To_MB(arg[0].value
@@ -220,8 +225,13 @@ void Command_Line_Create_Logical_DOS_Drive( void )
       }
 
       /* Determine partition size. */
-      arg[0].value = ( arg[0].value * maximum_partition_size_in_MB ) /
+      if ( maximum_possible_percentage > 0 ) {
+         arg[0].value = ( arg[0].value * maximum_partition_size_in_MB ) /
                      maximum_possible_percentage;
+      }
+      else {
+         maximum_possible_percentage = 0;
+      }
 
       /* Compute the partition size as a percentage. */
 
@@ -279,8 +289,13 @@ void Command_Line_Create_Primary_Partition( void )
       }
 
       /* Determine partition size. */
-      arg[0].value = ( arg[0].value * maximum_partition_size_in_MB ) /
+      if ( maximum_possible_percentage > 0 ) {
+         arg[0].value = ( arg[0].value * maximum_partition_size_in_MB ) /
                      maximum_possible_percentage;
+      }
+      else {
+         maximum_possible_percentage = 0;
+      }
    }
 
    if ( 0 != strcmp( arg[1].choice, "SPEC" ) ) {
