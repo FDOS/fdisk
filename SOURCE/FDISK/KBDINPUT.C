@@ -365,7 +365,12 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
             } while ( index >= 0 );
 
             if ( percent_entered == TRUE ) {
-               data = ( data * data_max_range ) / maximum_possible_percentage;
+               if ( maximum_possible_percentage ) {
+                  data = ( data * data_max_range ) / maximum_possible_percentage;
+               }
+               else {
+                  data = 0;
+               }
             }
 
             /* Make sure that data is <= max_range */
