@@ -1041,7 +1041,7 @@ void Determine_Free_Space( void )
          /* Check to see if the first possible entry in the extended partition */
          /* is unused.  If it is unused and there is a logical drive after it  */
          /* then skip checking for free space between entry 0 and 1.           */
-         if ( pDrive->ptr_ext_part[0].num_type == 0 ) {
+         if ( pDrive->log_drive[0].num_type == 0 ) {
             index = 1;
          }
 
@@ -1105,8 +1105,8 @@ void Determine_Free_Space( void )
          }
 #endif
 
-         /* Determine if there is any free space before the first logical      */
-         /* drive in the extended partition.                                   */
+         /* Determine if there is any free space before the first logical  */
+         /* drive in the extended partition.                               */
          if ( pDrive->log_drive[0].num_type != 0 ) {
             if ( pDrive->log_drive[0].start_cyl >
                  ( pDrive->ptr_ext_part->start_cyl +

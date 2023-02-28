@@ -14,6 +14,9 @@ Version 1.3.5 (unreleased)
      the end of the disk.
  - CRITICAL: Fix a bug resulting in detecting non-existant extra cylinders
      if detection of extra cylinders is enabled.
+ - CRITICAL: Fix a partition location and size calculation error triggered
+     when creating a new logical partition after deleting the first logical
+     partition (since <= 1.2.1).
  - MEDIUM: Fix a cylinder off by one error in partition type determination.
  - LOW: Fix color handling for background colors other than black.
  
