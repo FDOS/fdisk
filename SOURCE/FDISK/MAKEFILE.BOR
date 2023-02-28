@@ -17,6 +17,8 @@
 # to compile with Turbo C++:
 #  make -f makefile.bcc -DCC=TCC -DCCBASE=C:\TC
 
+.AUTODEPEND
+
 !if !$d(CC)
 CC=bcc
 !endif
@@ -24,7 +26,7 @@ CC=bcc
 CCBASE=c:\borlandc
 !endif
 !if !$d(CFLAGS)
-CFLAGS=-ms -g5 -w -O -Z
+CFLAGS=-ms -f- -g5 -w -O -Z
 !endif
 
 CC=$(CCBASE)\bin\$(CC)
@@ -36,89 +38,57 @@ CC=$(CCBASE)\bin\$(CC)
 # -Z      Optimize register usage
 # -1      80186/286 Instructions
 
-
-ECHO=ECHO
-LDFLAGS= -lm -P
+LDFLAGS=/P /m
 LDLIBS=
-LD=$(CCBASE)\bin\tlink /c /m
-RM=del
-OBJ = main.obj cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pdiskio.obj \
-      pcompute.obj ui1.obj ui2.obj kitten.obj  int24.obj \
-      bootnorm.obj booteasy.obj smartmbr.obj
+LD=tlink
 
-NASM=nasm
-UPX=upx
+ECHO=echo
+RM=del
+
+OBJ = main.obj cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pdiskio.obj \
+	pcompute.obj userint1.obj userint2.obj kitten.obj int24.obj \
+	bootnorm.obj booteasy.obj smartmbr.obj
+
+AS=nasm
+
+PACKER=upx
+PACKERFLAGS=--qq --best --8086
 
 
 # build targets:
 
-all: fdisk.exe test.exe
+all : fdisk.exe test.exe
 
-test.exe: test.c
-  $(CC) -M test.c
+test.exe : test.c
+	$(CC) -M test.c
 
 fdisk.exe: $(OBJ)  
-   $(ECHO) $(CCBASE)\lib\c0s.obj+>resp.tmp 
-   $(ECHO) main cmd fdiskio +>>resp.tmp
-   $(ECHO) helpscr kbdinput pdiskio pcompute +>>resp.tmp 
-   $(ECHO) ui1 ui2 bootnorm booteasy smartmbr kitten int24 +>>resp.tmp 
-   $(ECHO)  ,fdisk,, $(CCBASE)\lib\cs.lib  >>resp.tmp
-   $(LD) @resp.tmp
-   $(UPX) -q --8086 fdisk.exe
+	$(ECHO) $(CCBASE)\lib\c0s.obj+>resp.tmp 
+	$(ECHO) main cmd fdiskio +>>resp.tmp
+	$(ECHO) helpscr kbdinput pdiskio pcompute +>>resp.tmp 
+	$(ECHO) userint1 userint2 kitten +>>resp.tmp
+	$(ECHO) int24 bootnorm booteasy smartmbr +>>resp.tmp 
+	$(ECHO) ,fdisk,fdisk, $(CCBASE)\lib\cs.lib  >>resp.tmp
+	$(LD) $(LDFLAGS) @resp.tmp
+	$(PACKER) $(PACKERFLAGS) $<
 
 # compile targets:
 
-main.obj: main.c
-   $(CC) $(CFLAGS) -c main.c
+.c.obj :
+	$(CC) $(CFLAGS) -c {$< }
 
-cmd.obj: cmd.c
-   $(CC) $(CFLAGS) -c cmd.c
-
-fdiskio.obj: fdiskio.c
-   $(CC) $(CFLAGS) -c fdiskio.c
-
-helpscr.obj: helpscr.c
-   $(CC) $(CFLAGS) -c helpscr.c
-
-kbdinput.obj: kbdinput.c
-   $(CC) $(CFLAGS) -c kbdinput.c
-
-pdiskio.obj: pdiskio.c
-   $(CC) $(CFLAGS) -c pdiskio.c
-
-pcompute.obj: pcompute.c
-   $(CC) $(CFLAGS) -c pcompute.c
-
-ui1.obj: userint1.c
-   $(CC) $(CFLAGS) -c -oui1 userint1.c
-
-ui2.obj: userint2.c
-   $(CC) $(CFLAGS) -c -oui2 userint2.c
-
-kitten.obj: kitten.c
-   $(CC) $(CFLAGS) -c kitten.c
- 
-int24.obj: int24.asm
-   $(NASM) -f obj int24.asm
-
-bootnorm.obj: bootnorm.asm
-   $(NASM) -f obj bootnorm.asm
-
-booteasy.obj: booteasy.asm
-   $(NASM) -f obj booteasy.asm
-
-smartmbr.obj: smartmbr.asm
-   $(NASM) -f obj smartmbr.asm -l smartmbr.lst
+.asm.obj :
+	$(AS) -f obj $<
 
 # clean up:
 
 clean:
- $(RM) *.obj
+	$(RM) *.obj
 
 clobber: 
- $(RM) *.bak
- $(RM) *.dsk
- $(RM) *.exe
- $(RM) *.obj
- $(RM) *.swp
- $(RM) *.tmp
+	$(RM) *.bak
+	$(RM) *.dsk
+	$(RM) *.exe
+	$(RM) *.obj
+	$(RM) *.swp
+	$(RM) *.tmp
