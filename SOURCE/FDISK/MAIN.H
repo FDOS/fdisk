@@ -260,6 +260,7 @@ typedef struct flags_structure {
    int fprmt;
    int fat32;
    int label;
+   int lba_marker; // write LBA marker 1023/254/63 if cylinder >1023
    int monochrome;
    int maximum_drive_number;
    int more_than_one_drive;

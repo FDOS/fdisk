@@ -428,6 +428,7 @@ void Process_Fdiskini_File( void )
    flags.flag_sector = UNCHANGED;
    flags.monochrome = UNCHANGED;
    flags.label = UNCHANGED;
+   flags.lba_marker = UNCHANGED;
    flags.reboot = UNCHANGED;
    flags.screen_color = UNCHANGED;
    flags.set_any_pri_part_active = UNCHANGED;
@@ -903,6 +904,23 @@ void Process_Fdiskini_File( void )
                command_ok = TRUE;
             }
 
+            /* Check for the LBA_MARKER statement */
+            if ( 0 == stricmp( command_buffer, "LBA_MARKER" ) ) {
+               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
+                  flags.lba_marker = TRUE;
+               }
+               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
+                  flags.lba_marker = FALSE;
+               }
+               if ( flags.lba_marker == UNCHANGED ) {
+                  printf(
+                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     line_counter );
+                  exit( 3 );
+               }
+               command_ok = TRUE;
+            }
+
             /* Check for the MONO statement */
             if ( 0 == stricmp( command_buffer, "MONO" ) ) {
                if ( 0 == stricmp( setting_buffer, "ON" ) ) {
@@ -1100,6 +1118,9 @@ void Process_Fdiskini_File( void )
    }
    if ( flags.label == UNCHANGED ) {
       flags.label = FALSE;
+   }
+   if ( flags.lba_marker == UNCHANGED ) {
+      flags.lba_marker = TRUE;
    }
    if ( flags.monochrome == UNCHANGED ) {
       flags.monochrome = FALSE;

@@ -377,6 +377,16 @@ int Get_Environment_Settings( char *environment[] )
          }
       }
 
+      /* Check for the LBA_MARKER statement */
+      if ( 0 == strcmp( command_buffer, "FFD_LBA_MARKER" ) ) {
+         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
+            flags.lba_marker = TRUE;
+         }
+         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
+            flags.lba_marker = FALSE;
+         }
+      }
+
       /* Check for the MONO statement */
       if ( 0 == strcmp( command_buffer, "FFD_MONO" ) ) {
          if ( 0 == strcmp( setting_buffer, "ON" ) ) {

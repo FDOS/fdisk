@@ -1770,18 +1770,37 @@ int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
 void StorePartitionInSectorBuffer( char *sector_buffer,
                                    struct Partition *pPart )
 {
+   unsigned long start_cyl = pPart->start_cyl;
+   unsigned long start_head = pPart->start_head;
+   unsigned long start_sect = pPart->start_sect;
+   unsigned long end_cyl = pPart->end_cyl;
+   unsigned long end_head = pPart->end_head;
+   unsigned long end_sect = pPart->end_sect;
+
+   if ( start_cyl > 1023 && flags.lba_marker ) {
+      start_cyl = 1023;
+      start_head = 254;
+      start_sect = 63;
+   }
+
+   if ( end_cyl > 1023 && flags.lba_marker ) {
+      end_cyl = 1023;
+      end_head = 254;
+      end_sect = 63;
+   }
+
    sector_buffer[0x00] = pPart->active_status;
-   sector_buffer[0x01] = pPart->start_head;
+   sector_buffer[0x01] = start_head;
 
    *(_u16 *)( sector_buffer + 0x02 ) =
-      Combine_Cylinder_and_Sector( pPart->start_cyl, pPart->start_sect );
+      Combine_Cylinder_and_Sector( start_cyl, start_sect );
 
    sector_buffer[0x04] = pPart->num_type;
 
-   sector_buffer[0x05] = pPart->end_head;
+   sector_buffer[0x05] = end_head;
 
    *(_u16 *)( sector_buffer + 0x06 ) =
-      Combine_Cylinder_and_Sector( pPart->end_cyl, pPart->end_sect );
+      Combine_Cylinder_and_Sector( end_cyl, end_sect );
 
    *(_u32 *)( sector_buffer + 0x08 ) = pPart->rel_sect;
    *(_u32 *)( sector_buffer + 0x0c ) = pPart->num_sect;

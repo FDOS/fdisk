@@ -178,11 +178,6 @@ void Command_Line_Create_Extended_Partition( void )
       else {
          arg[0].value = 0;
       }
-
-      /*
-    arg[0].value = Convert_Percent_To_MB(arg[0].value
-     ,(pDrive->total_cyl+1) );
-*/
    }
 
    Create_Primary_Partition( 5, arg[0].value );
