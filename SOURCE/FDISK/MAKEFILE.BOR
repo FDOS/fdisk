@@ -19,28 +19,21 @@
 
 .AUTODEPEND
 
+!if !$d(MODEL)
+MODEL=-ms
+!endif
+
 !if !$d(CC)
 CC=bcc
 !endif
-!if !$d(CCBASE)
-CCBASE=c:\borlandc
-!endif
 !if !$d(CFLAGS)
-CFLAGS=-ms -f- -g5 -w -O -Z
+CFLAGS=$(MODEL) -f- -g5 -w -O -Z
 !endif
 
-CC=$(CCBASE)\bin\$(CC)
-
-# -mx     Set Memory Model
-# -gN     Stop after N warnings
-# -wxxx   Warning control                                  
-# -O      Optimize jumps 
-# -Z      Optimize register usage
-# -1      80186/286 Instructions
-
-LDFLAGS=/P /m
-LDLIBS=
-LD=tlink
+LD=$(CC)
+!if !$d(LDFLAGS)
+LDFLAGS=$(MODEL) -M -lP
+!endif
 
 ECHO=echo
 RM=del
@@ -63,13 +56,10 @@ test.exe : test.c
 	$(CC) -M test.c
 
 fdisk.exe: $(OBJ)  
-	$(ECHO) $(CCBASE)\lib\c0s.obj+>resp.tmp 
-	$(ECHO) main cmd fdiskio +>>resp.tmp
-	$(ECHO) helpscr kbdinput pdiskio pcompute +>>resp.tmp 
-	$(ECHO) userint1 userint2 kitten +>>resp.tmp
-	$(ECHO) int24 bootnorm booteasy smartmbr +>>resp.tmp 
-	$(ECHO) ,fdisk,fdisk, $(CCBASE)\lib\cs.lib  >>resp.tmp
-	$(LD) $(LDFLAGS) @resp.tmp
+	$(LD) @&&^
+	-e$@ $(LDFLAGS)
+	$(OBJ)
+^	
 	$(PACKER) $(PACKERFLAGS) $<
 
 # compile targets:
@@ -86,9 +76,9 @@ clean:
 	$(RM) *.obj
 
 clobber: 
-	$(RM) *.bak
-	$(RM) *.dsk
-	$(RM) *.exe
-	$(RM) *.obj
-	$(RM) *.swp
-	$(RM) *.tmp
+	$(RM) *.bak >NUL
+	$(RM) *.dsk >NUL
+	$(RM) *.exe >NUL
+	$(RM) *.obj >NUL
+	$(RM) *.swp >NUL
+	$(RM) *.tmp >NUL
