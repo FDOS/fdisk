@@ -87,16 +87,25 @@ unsigned long Convert_Sect_To_MB( unsigned long num_sect )
 unsigned long Convert_To_Percentage( unsigned long small_num,
                                      unsigned long large_num )
 {
-   unsigned long percentage = 100 * (unsigned long long)small_num / large_num;
+   unsigned long percentage;
 
-   if ( ( ( 100 * (unsigned long long)small_num ) % large_num ) >= ( large_num / 2 ) ) {
+   /* fix for Borland C not supporting unsigned long long:
+      divide values until 100 * small_value fits in unsigned long */
+   while ( small_num > 42949672ul ) {
+      small_num >>= 1;
+      large_num >>= 1;
+   }
+
+   percentage = 100 * small_num / large_num;
+   
+   if ( (100 * small_num % large_num ) >= large_num / 2 ) {
       percentage++;
    }
    if ( percentage > 100 ) {
       percentage = 100;
    }
 
-   return ( percentage );
+   return percentage;
 }
 
 unsigned long Convert_Percent_To_MB( unsigned long percent,

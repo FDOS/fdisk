@@ -1069,7 +1069,7 @@ void Display_Extended_Partition_Information_SS( void )
                Convert_To_Percentage( pDrive->log_drive[index - 4].num_sect,
                                       pDrive->ext_part_num_sect );
 
-            Print_At( column_index + 35, print_index, "%3d%%", usage );
+            Print_At( column_index + 35, print_index, "%3lu%%", usage );
             print_index++;
          }
          index++;
