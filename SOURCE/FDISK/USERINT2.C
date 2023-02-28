@@ -152,7 +152,7 @@ int Inform_About_Trimmed_Disk( void )
       4, 17,
       "Are you sure you want to continue (Y/N).................?");
 
-   return Input( 1, 62, 17, YN, 0, 0, NONE, 1, 0, NULL, NULL );
+   return (int)Input( 1, 62, 17, YN, 0, 0, NONE, 1, 0, NULL, NULL );
 }
 
 /* Change Current Fixed Disk Drive */
