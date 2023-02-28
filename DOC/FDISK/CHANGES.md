@@ -16,7 +16,9 @@ Version 1.3.5 (unreleased)
      if detection of extra cylinders is enabled.
  - MEDIUM: Fix a cylinder off by one error in partition type determination.
  - LOW: Fix color handling for background colors other than black.
-
+ 
+ - Write LBA marker entry 1023/254/63 into CHS partition table entries if
+     CHS value otherwise would overflow.
  - Warn if user tries to use FDISK with a disk size of >2TB, because it can
    not handle it properly. If the user decides to continue the disk size is
    truncated to 2TB, making sure nothing bad happens by some overflowing
