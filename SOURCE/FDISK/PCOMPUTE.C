@@ -188,7 +188,7 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
 
    pDrive->log_drive[free_space_loc].rel_sect = pDrive->total_sect;
    pDrive->log_drive[free_space_loc].num_sect =
-      computed_partition_size - pDrive->total_sect;
+      computed_partition_size - pDrive->log_drive[free_space_loc].rel_sect;
 
    pDrive->log_drive[free_space_loc].size_in_MB =
       Convert_Sect_To_MB( computed_partition_size );
@@ -1200,7 +1200,17 @@ void Determine_Free_Space( void )
             pDrive->ptr_ext_part->start_cyl + 1;
          pDrive->log_drive_free_space_start_cyl =
             pDrive->ptr_ext_part->start_cyl;
-         pDrive->log_drive_free_space_end_cyl = pDrive->ptr_ext_part->end_cyl;
+         
+         if (pDrive->ptr_ext_part->end_head == pDrive->total_head &&
+            pDrive->ptr_ext_part->end_sect == pDrive->total_sect) {
+            pDrive->log_drive_free_space_end_cyl = pDrive->ptr_ext_part->end_cyl;
+         }
+         else {
+         /* reduce free space by one cylinder if exdended does not end on a
+            cylinder boundary */
+            pDrive->log_drive_free_space_end_cyl = pDrive->ptr_ext_part->end_cyl - 1;
+            pDrive->ext_part_largest_free_space -= 1;
+         }
 
 #ifdef DEBUG
          if ( debug.determine_free_space == TRUE ) {
