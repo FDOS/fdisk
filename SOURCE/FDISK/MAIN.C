@@ -72,11 +72,15 @@ unsigned long computed_partition_size;
 /////////////////////////////////////////////////////////////////////////////
 */
 
+/* convert cylinder count to MB and do overflow checking */
 unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
                                  unsigned long total_heads,
                                  unsigned long total_sect )
 {
-   return ( num_cyl * total_heads  * total_sect ) / 2048ul;
+   unsigned long mb1 = ( num_cyl * total_heads  * total_sect ) / 2048ul;
+   unsigned long mb2 = ( (num_cyl - 1)  * total_heads  * total_sect ) / 2048ul;
+   
+   return (mb1 > mb2) ? mb1 : mb2;
 }
 
 unsigned long Convert_Sect_To_MB( unsigned long num_sect )
