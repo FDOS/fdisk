@@ -83,7 +83,7 @@ void Clear_Screen_With_Attr( int type, unsigned char attr )
    if ( type != NOEXTRAS )
    {
       Display_Information();
-      Display_Label();
+      /*Display_Label();*/
    }
 }
 
@@ -139,11 +139,11 @@ void Display_Information( void )
       }
    }
 
-#ifdef BETA_RELEASE
+#ifndef RELEASE
    Position_Cursor( 2, 0 );
-   Color_Print( "BETA RELEASE" );
-   Position_Cursor( 66, 0 );
-   Color_Print( "BETA RELEASE" );
+   Color_Print( "DEVELOPMENT BUILD" );
+   Position_Cursor( 61, 0 );
+   Color_Print( "DEVELOPMENT BUILD" );
 #endif
 
 #ifdef DEBUG
@@ -167,7 +167,7 @@ void Display_Label( void )
 
       char label[20];
 
-      strcpy( label, PRINAME );
+      strcpy( label, FD_NAME );
 
       do {
          Print_At( 79, ( ( index * 2 ) + 3 ), "%c", label[index] );
@@ -596,16 +596,9 @@ int Standard_Menu( int menu )
    for ( ;; ) {
       Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
-      /* Load Menu Text */
-
-      if ( flags.use_freedos_label == FALSE ) {
-         strcpy( program_name, PRINAME );
-         strcat( program_name, "     Version " );
-         strcat( program_name, VERSION );
-      }
-      else {
-         strcpy( program_name, ALTNAME );
-      }
+      strcpy( program_name, FD_NAME );
+      strcat( program_name, "     Version " );
+      strcat( program_name, VERSION );
 
       strcpy( program_description, "Fixed Disk Setup Program" );
       strcpy( copyleft, "GNU GPL (c) " COPYLEFT " by Brian E. Reifsnyder"

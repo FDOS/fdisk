@@ -37,13 +37,7 @@ void Display_Help_Screen( void )
       flags.do_not_pause_help_information = TRUE;
    }
 
-   if ( flags.use_freedos_label == TRUE ) {
-      strcpy( name, ALTNAME );
-      strcat( name, " FDISK" );
-   }
-   else {
-      strcpy( name, PRINAME );
-   }
+   strcpy( name, FD_NAME );
 
    strcpy( version, "Version " );
    strcat( version, VERSION );

@@ -35,6 +35,14 @@ LD=$(CC)
 LDFLAGS=$(MODEL) -M -lP
 !endif
 
+!if $d(RELEASE)
+CFLAGS=$(CFLAGS) -DRELEASE=$(RELEASE)
+!endif
+
+!if $d(FREEDOS)
+CFLAGS=$(CFLAGS) -DFD_FREEDOS=$(FREEDOS)
+!endif
+
 ECHO=echo
 RM=del
 

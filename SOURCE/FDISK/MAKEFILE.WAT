@@ -17,6 +17,16 @@ PACKERFLAGS = -qq --best --8086
 
 !ifdef DEBUG
 CFLAGS += -d2
+!else
+CFLAGS += -os -s
+!endif
+
+!ifdef RELEASE
+CFLAGS += -DRELEASE=$(RELEASE)
+!endif
+
+!ifdef FREEDOS
+CFLAGS += -DFD_FREEDOS=$(FREEDOS)
 !endif
 
 objs  = main.obj cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pdiskio.obj

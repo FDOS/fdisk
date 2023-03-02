@@ -30,3 +30,15 @@ I you want to compile with Turbo C++ (tcc) you must specify it:
 ```
 make -f makefile.bor -DCC=tcc
 ```
+
+### Building a release version
+To build a release version to get rid of the "development build" nag invoke:
+```
+wmake -f makefile.wat RELEASE=1
+```
+or the Borland Tools equivalent.
+
+To build a FreeDOS FDISK branded release:
+```
+wmake -f makefile.wat RELEASE=1 FREEDOS=1
+```

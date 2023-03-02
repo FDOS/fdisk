@@ -86,7 +86,7 @@ void Ask_User_About_FAT32_Support( void )
 
    Print_At(
       4, 5, 
-      "Free FDISK is capable of using large disk support to allow you to");
+      FD_NAME " is capable of using large disk support to allow you to");
    Print_At(
       4, 6,
       "create partitions that are greater than 2,048 MB by using FAT32");
@@ -124,11 +124,11 @@ int Inform_About_Trimmed_Disk( void )
 
    Clear_Screen( 0 );
 
-   Color_Print_At( 27, 3, "!!! DATA LOSS WARNING !!!");
+   Color_Print_At( 35, 3, "WARNING");
 
    Print_At(
       4, 5, 
-      "You have at least one disk larger than 2,097,152 MB. Free FDISK can");
+      "You have at least one disk larger than 2,097,152 MB.  " FD_NAME " can");
    Print_At(
       4, 6,
       "NOT handle partitions exceeding this barrier!");
@@ -401,10 +401,10 @@ int Create_Logical_Drive_Interface( void )
          Clear_Screen( 0 );
 
          Print_At( 4, 4, "The extended partition does not start on a cylinder boundary!");
-         Print_At( 4, 6, "At the moment " FD_NAME " is not able to handle this. The creation");
+         Print_At( 4, 6, "At the moment " FD_NAME " is not able to handle this.  The creation");
          Print_At( 4, 7, "of logical drives is therefore disabled to prevent data loss.");
          Print_At( 4, 9, "The extended partition was propably created with another disk");
-         Print_At( 4, 10, "utility. You may delete and recreate the extended partition and");
+         Print_At( 4, 10, "utility.  You may delete and recreate the extended partition and");
          Print_At( 4, 11, "the logical drives using Free FDISK or otherwise stick with using");
          Print_At( 4, 12, "another disk utility for creating logical drives.");
 

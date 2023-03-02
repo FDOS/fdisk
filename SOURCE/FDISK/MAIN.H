@@ -19,21 +19,21 @@
 /////////////////////////////////////////////////////////////////////////////
 */
 
-#define PRINAME  "Free FDISK"
-#define ALTNAME  "FreeDOS"
-#define FD_NAME  PRINAME
+#ifdef FD_FREEDOS
+   #define FD_NAME "FreeDOS FDISK"
+#endif
+
 #define VERSION  "1.3.5"
 #define COPYLEFT "1998 - 2023"
+
+#ifndef FD_NAME
+#define FD_NAME  "Free FDISK"
+#endif
 
 //#define DEBUG
 /* ***** Uncomment the above line to compile */
 /* ***** debugging code and functions into   */
 /* ***** Free FDISK.                         */
-
-#define BETA_RELEASE
-/* ***** Uncomment the above line to         */
-/* ***** have this program inform the user   */
-/* ***** that it is a beta release.          */
 
 #define DEFAULT_VERSION 8
 /* ***** Set the above definition to the     */

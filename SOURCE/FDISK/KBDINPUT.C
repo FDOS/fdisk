@@ -309,7 +309,6 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
          }
 
          if ( ( type == NUM ) && ( line_buffer[0] != 0 ) ) {
-            __asm int 3;
             proper_input_given = TRUE;
 
             /* Convert line_buffer to an unsigned integer in data */
@@ -477,7 +476,6 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       /* Process optional character fields. */
       if ( ( type == NUM ) && ( ( optional_char_1 != '\0' ) ||
                                 ( optional_char_2 != '\0' ) ) ) {
-         __asm int 3;
          if ( ( input == optional_char_1 ) ||
               ( ( input - 32 ) == optional_char_1 ) ) {
             if ( input >= 97 ) {

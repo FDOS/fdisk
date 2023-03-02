@@ -13,8 +13,8 @@ Bugfixes:
  - CRITICAL: Position and size calculation for new logical drives is broken if
      the extended partition is not aligned to cylinder boundaries.
      The current "fix" is to only let the user create logical drives if the
-     extended partition is apropriately aligned, which is always the case if
-     the exdended partition is created by FDISK itself.
+     extended partition is appropriately aligned, which is always the case if
+     the extended partition is created by FDISK itself.
  - CRITICAL: Fix a bug resulting in detecting non-existant extra cylinders
      when using ext INT 13 function (since v1.1).
  - CRITICAL: Fix a partition location and size calculation error triggered
