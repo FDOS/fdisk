@@ -102,24 +102,6 @@ void Clear_Extended_Partition_Table( int drive )
    } while ( index < 23 );
 }
 
-/*
-unsigned long CHS_To_LBA( Partition_Table *pDrive, unsigned long cyl,
-                         unsigned long head, unsigned long sect )
-{
-   return ( cyl * (pDrive->total_head + 1) + head ) * pDrive->total_sect + sect - 1;
-}
-
-unsigned long Start_CHS_To_LBA( Partition_Table *pDrive, Partition *p )
-{
-   return CHS_To_LBA( pDrive, p->start_cyl, p->start_head, p->start_sect );
-}
-
-unsigned long End_CHS_To_LBA( Partition_Table *pDrive, Partition *p )
-{
-   return CHS_To_LBA( pDrive, p->end_cyl, p->end_head, p->end_sect );
-}
-*/
-
 /* Create Logical Drive */
 /* Returns a 0 if successful and a 1 if unsuccessful */
 int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )

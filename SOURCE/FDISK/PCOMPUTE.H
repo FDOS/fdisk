@@ -23,13 +23,6 @@
 /////////////////////////////////////////////////////////////////////////////
 */
 
-/*
-unsigned long CHS_To_LBA(Partition_Table *pDrive, unsigned long cyl,
-                         unsigned long head, unsigned long sect);
-unsigned long Start_CHS_To_LBA( Partition_Table *pDrive, Partition *p );
-unsigned long End_CHS_To_LBA( Partition_Table *pDrive, Partition *p );
-*/
-
 int LBA_Partition_Type_To_Create( int standard_partition_type );
 int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB );
 int Create_Primary_Partition( int numeric_type, unsigned long size_in_MB );
