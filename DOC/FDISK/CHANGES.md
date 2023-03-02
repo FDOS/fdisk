@@ -4,22 +4,30 @@ Free FDISK Change Log
 
 Version 1.3.5 (unreleased)
 --------------------------
+Bugfixes:
  - CRITICAL: Fix FDISK loading wrong head and sector values from MBR if
      operating in LBA mode. The previous incorrect behaviuor was hardcoding
      them to cylinder boundaries instead of calculating them from LBA address,
      resulting in corrupt partition tables especially if used in combination
      with other disk utilities (since <= v0.9.9).
- - CRITICAL: Fix different calculation errors leading to overlapping
-     partitions, unnessessary free space between them, or partitions exceeding
-     the end of the disk.
+ - CRITICAL: Position and size calculation for new logical drives is broken if
+     the extended partition is not aligned to cylinder boundaries.
+     The current "fix" is to only let the user create logical drives if the
+     extended partition is apropriately aligned, which is always the case if
+     the exdended partition is created by FDISK itself.
  - CRITICAL: Fix a bug resulting in detecting non-existant extra cylinders
      when using ext INT 13 function (since v1.1).
  - CRITICAL: Fix a partition location and size calculation error triggered
      when creating a new logical partition after deleting the first logical
-     partition (since v1.2.1).
+     partition and there are logical partitions left (since v1.2.1).
+ - CRITICAL: Fix different calculation errors leading to overlapping
+     partitions, unnessessary free space between them, or partitions exceeding
+     the end of the disk resulting from off-by-one and off-by-two errors.
  - MEDIUM: Fix a cylinder off by one error in partition type determination.
  - LOW: Fix color handling for background colors other than black.
- 
+ - LOW: Fix various flaws in the input handling routine.
+
+Other changes:
  - Write LBA marker entry 1023/254/63 into CHS partition table entries if
      CHS value otherwise would overflow.
  - Warn if user tries to use FDISK with a disk size of >2TB, because it can
