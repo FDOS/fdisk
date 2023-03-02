@@ -8,15 +8,15 @@ Version 1.3.5 (unreleased)
      operating in LBA mode. The previous incorrect behaviuor was hardcoding
      them to cylinder boundaries instead of calculating them from LBA address,
      resulting in corrupt partition tables especially if used in combination
-     with other disk utilities.
+     with other disk utilities (since <= v0.9.9).
  - CRITICAL: Fix different calculation errors leading to overlapping
      partitions, unnessessary free space between them, or partitions exceeding
      the end of the disk.
  - CRITICAL: Fix a bug resulting in detecting non-existant extra cylinders
-     if detection of extra cylinders is enabled.
+     when using ext INT 13 function (since v1.1).
  - CRITICAL: Fix a partition location and size calculation error triggered
      when creating a new logical partition after deleting the first logical
-     partition (since <= 1.2.1).
+     partition (since v1.2.1).
  - MEDIUM: Fix a cylinder off by one error in partition type determination.
  - LOW: Fix color handling for background colors other than black.
  

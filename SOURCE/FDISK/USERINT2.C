@@ -392,6 +392,27 @@ int Create_Logical_Drive_Interface( void )
 
    Determine_Free_Space();
 
+   /* size and position calculation for logical drives is flawed if the
+      extended partition does not start on a cylinder boundary. So to play
+      save we prevent the user to create logical partitions in this case. */
+   if ( pDrive->ptr_ext_part->start_head != 0 ||
+        pDrive->ptr_ext_part->start_sect != 1) {
+
+         Clear_Screen( 0 );
+
+         Print_At( 4, 4, "The extended partition does not start on a cylinder boundary!");
+         Print_At( 4, 6, "At the moment " FD_NAME " is not able to handle this. The creation");
+         Print_At( 4, 7, "of logical drives is therefore disabled to prevent data loss.");
+         Print_At( 4, 9, "The extended partition was propably created with another disk");
+         Print_At( 4, 10, "utility. You may delete and recreate the extended partition and");
+         Print_At( 4, 11, "the logical drives using Free FDISK or otherwise stick with using");
+         Print_At( 4, 12, "another disk utility to handle the logical drives.");
+
+         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+
+         return( 1 );
+   }
+
    if ( pDrive->ext_part_largest_free_space >= 2 ) {
       do {
          if ( flags.fprmt == TRUE ) {

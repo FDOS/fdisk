@@ -102,6 +102,24 @@ void Clear_Extended_Partition_Table( int drive )
    } while ( index < 23 );
 }
 
+/*
+unsigned long CHS_To_LBA( Partition_Table *pDrive, unsigned long cyl,
+                         unsigned long head, unsigned long sect )
+{
+   return ( cyl * (pDrive->total_head + 1) + head ) * pDrive->total_sect + sect - 1;
+}
+
+unsigned long Start_CHS_To_LBA( Partition_Table *pDrive, Partition *p )
+{
+   return CHS_To_LBA( pDrive, p->start_cyl, p->start_head, p->start_sect );
+}
+
+unsigned long End_CHS_To_LBA( Partition_Table *pDrive, Partition *p )
+{
+   return CHS_To_LBA( pDrive, p->end_cyl, p->end_head, p->end_sect );
+}
+*/
+
 /* Create Logical Drive */
 /* Returns a 0 if successful and a 1 if unsuccessful */
 int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
@@ -1174,6 +1192,13 @@ void Determine_Free_Space( void )
                   pDrive->ptr_ext_part->end_cyl;
                pDrive->log_drive_largest_free_space_location =
                   last_used_partition + 1;
+               if (pDrive->ptr_ext_part->end_head != pDrive->total_head ||
+                   pDrive->ptr_ext_part->end_sect != pDrive->total_sect) {
+               /* reduce free space by one cylinder if exdended does not end on a
+                  cylinder boundary */
+                  pDrive->log_drive_free_space_end_cyl -= 1;
+                  pDrive->ext_part_largest_free_space -= 1;
+               }
             }
          }
 
@@ -1198,17 +1223,21 @@ void Determine_Free_Space( void )
          pDrive->ext_part_largest_free_space =
             ( pDrive->ptr_ext_part->end_cyl ) -
             pDrive->ptr_ext_part->start_cyl + 1;
-         pDrive->log_drive_free_space_start_cyl =
-            pDrive->ptr_ext_part->start_cyl;
-         
-         if (pDrive->ptr_ext_part->end_head == pDrive->total_head &&
-            pDrive->ptr_ext_part->end_sect == pDrive->total_sect) {
-            pDrive->log_drive_free_space_end_cyl = pDrive->ptr_ext_part->end_cyl;
-         }
-         else {
+         pDrive->log_drive_free_space_start_cyl = pDrive->ptr_ext_part->start_cyl;         
+         pDrive->log_drive_free_space_end_cyl = pDrive->ptr_ext_part->end_cyl;
+
+         if (pDrive->ptr_ext_part->start_head != 0 ||
+             pDrive->ptr_ext_part->start_sect != 1) {
+           /* currently we depend on the extended partition to be aligned to
+               a cylinder boundary. If not move free space to next cylinder */
+            pDrive->log_drive_free_space_start_cyl += 1;
+            pDrive->ext_part_largest_free_space -= 1;
+         }         
+         if (pDrive->ptr_ext_part->end_head != pDrive->total_head ||
+             pDrive->ptr_ext_part->end_sect != pDrive->total_sect) {
          /* reduce free space by one cylinder if exdended does not end on a
             cylinder boundary */
-            pDrive->log_drive_free_space_end_cyl = pDrive->ptr_ext_part->end_cyl - 1;
+            pDrive->log_drive_free_space_end_cyl -= 1;
             pDrive->ext_part_largest_free_space -= 1;
          }
 

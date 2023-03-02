@@ -63,7 +63,8 @@ PEXTERN unsigned long translated_sector;
 /////////////////////////////////////////////////////////////////////////////
 */
 
-struct Partition {
+#define REL_END_SECT( p ) ( (p).rel_sect + (p).num_sect - 1 )
+typedef struct Partition {
    int active_status;
 
    int num_type;
@@ -80,7 +81,7 @@ struct Partition {
    unsigned long num_sect;
 
    unsigned long size_in_MB;
-};
+} Partition;
 
 /* Partition Table Structure...Created 5/6/1999 */
 typedef struct part_table_structure {
@@ -117,8 +118,11 @@ typedef struct part_table_structure {
    unsigned long pp_largest_free_space_start_cyl;
    unsigned long pp_largest_free_space_start_head;
    unsigned long pp_largest_free_space_start_sect;
-
    unsigned long pp_largest_free_space_end_cyl;
+
+   /* LBA sector info of free primary partition space */
+   unsigned long pp_free_space_start;
+   unsigned long pp_free_space_size;
 
    /* Extended Partition Table */
    struct Partition *ptr_ext_part;
@@ -130,6 +134,8 @@ typedef struct part_table_structure {
    int log_drive_largest_free_space_location;
    unsigned long log_drive_free_space_start_cyl;
    unsigned long log_drive_free_space_end_cyl;
+   unsigned long log_free_space_rel_start;
+   unsigned long log_free_space_size;
 
    int num_of_log_drives;
    int num_of_non_dos_log_drives;
