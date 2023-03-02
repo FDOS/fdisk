@@ -45,7 +45,7 @@ OBJ = main.obj cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pdiskio.obj \
 AS=nasm
 
 PACKER=upx
-PACKERFLAGS=--qq --best --8086
+PACKERFLAGS=-qq --best --8086
 
 
 # build targets:
