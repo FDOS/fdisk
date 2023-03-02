@@ -195,7 +195,7 @@ void Exit_Screen( void )
          Color_Print_At( 4, 13, "AFTER" );
          printf( " you restart." );
 
-         Input( 0, 0, 0, ESC, 0, 0, ESCE, 0, 0, NULL, NULL );
+         Input( 0, 0, 0, ESC, 0, 0, ESCE, 0, 0, '\0', '\0' );
          Clear_Screen( NOEXTRAS );
       }
       else {
@@ -320,7 +320,7 @@ void Interactive_User_Interface( void )
 
             Color_Print_At( 4, 22, "No space to create a DOS partition." );
 
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
       }
@@ -340,7 +340,7 @@ void Interactive_User_Interface( void )
 
             Color_Print_At( 4, 22, "Extended DOS Partition already exists." );
 
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
          }
          else {
             Create_DOS_Partition_Interface( EXTENDED );
@@ -354,7 +354,7 @@ void Interactive_User_Interface( void )
             Color_Print_At(
                4, 23, "an Extended DOS Partition on the current drive." );
             Print_At( 4, 24, "                                        " );
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
          else {
@@ -383,7 +383,7 @@ void Interactive_User_Interface( void )
          if ( counter == 0 ) {
             Color_Print_At( 4, 22, "No Primary DOS Partition to delete." );
             Print_At( 4, 24, "                                        " );
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
          /* */
@@ -396,7 +396,7 @@ void Interactive_User_Interface( void )
          if ( pDrive->ptr_ext_part == NULL ) {
             Color_Print_At( 4, 22, "No Extended DOS Partition to delete." );
             Print_At( 4, 24, "                                        " );
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
          else {
@@ -409,7 +409,7 @@ void Interactive_User_Interface( void )
               ( pDrive->ptr_ext_part == NULL ) ) {
             Color_Print_At( 4, 22, "No Logical DOS Drive(s) to delete." );
             Print_At( 4, 24, "                                        " );
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
          else {
@@ -434,7 +434,7 @@ void Interactive_User_Interface( void )
          if ( counter == 0 ) {
             Color_Print_At( 4, 22, "No Non-DOS Partition to delete." );
             Print_At( 4, 24, "                                        " );
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
          else {
@@ -452,7 +452,7 @@ void Interactive_User_Interface( void )
       if ( menu == BMBR ) {
          Create_BootEasy_MBR();
          Color_Print_At( 4, 22, "BootEasy MBR has been created." );
-         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
 
       if ( menu == AMBR ) {
@@ -479,19 +479,19 @@ void Interactive_User_Interface( void )
             Color_Print_At( 4, 22,
                             "MBR has been written using \"boot.mbr\"" );
          }
-         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
 
       if ( menu == SMBR ) {
          Save_MBR();
          Color_Print_At( 4, 22, "MBR has been saved to \"boot.mbr\"" );
-         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
 
       if ( menu == RMBR ) {
          Remove_MBR();
          Color_Print_At( 4, 22, "MBR has been removed from the hard disk." );
-         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
 
       if ( menu != EXIT ) {
@@ -590,8 +590,8 @@ int Standard_Menu( int menu )
    char option_4[60] = "";
    char option_5[60] = "Change current fixed disk drive";
 
-   char optional_char_1[1] = { '\0' };
-   char optional_char_2[1] = { '\0' };
+   char optional_char_1 = '\0';
+   char optional_char_2 = '\0';
 
    for ( ;; ) {
       Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
@@ -705,7 +705,7 @@ int Standard_Menu( int menu )
          if ( counter == 0 ) {
             Color_Print_At( 4, 22, "No partitions to delete." );
             Print_At( 4, 24, "                                        " );
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
             return ( menu );
          }
@@ -742,20 +742,20 @@ int Standard_Menu( int menu )
          Color_Print_At( 50, 15, "M.  " );
          printf( "MBR maintenance" );
 
-         optional_char_1[0] = 'M';
+         optional_char_1 = 'M';
       }
       else {
-         optional_char_1[0] = '\0';
+         optional_char_1 = '\0';
       }
 
       if ( ( menu == MM ) && ( flags.allow_abort == TRUE ) ) {
          Color_Print_At( 50, 16, "A.  " );
          printf( "Abort changes and exit" );
 
-         optional_char_2[0] = 'A';
+         optional_char_2 = 'A';
       }
       else {
-         optional_char_2[0] = '\0';
+         optional_char_2 = '\0';
       }
 
       /* Display Special Messages */
@@ -785,7 +785,7 @@ int Standard_Menu( int menu )
       }
       else {
          input = (int)Input( 1, 19, 17, NUM, 1, maximum_number_of_options,
-                             ESCR, -1, 0, NULL, NULL );
+                             ESCR, -1, 0, '\0', '\0' );
       }
 
       /* Process the input */

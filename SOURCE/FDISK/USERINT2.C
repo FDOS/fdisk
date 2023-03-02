@@ -111,7 +111,7 @@ void Ask_User_About_FAT32_Support( void )
    Print_At(
       4, 17, "Do you want to use large disk (FAT32) support (Y/N)....?");
 
-   flags.fat32 = (int)Input( 1, 62, 17, YN, 0, 0, NONE, 1, 0, NULL, NULL );
+   flags.fat32 = (int)Input( 1, 62, 17, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
 
 }
 
@@ -152,7 +152,7 @@ int Inform_About_Trimmed_Disk( void )
       4, 17,
       "Are you sure you want to continue (Y/N).................?");
 
-   return (int)Input( 1, 62, 17, YN, 0, 0, NONE, 1, 0, NULL, NULL );
+   return (int)Input( 1, 62, 17, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
 }
 
 /* Change Current Fixed Disk Drive */
@@ -172,7 +172,7 @@ void Change_Current_Fixed_Disk_Drive( void )
 
    new_drive_number =
       (int)Input( 1, 62, 21, NUM, 1, ( flags.maximum_drive_number - 127 ),
-                  ESCR, ( flags.drive_number - 127 ), 0, NULL, NULL );
+                  ESCR, ( flags.drive_number - 127 ), 0, '\0', '\0' );
 
    if ( ( new_drive_number <= 0 ) ||
         ( new_drive_number > ( flags.maximum_drive_number - 127 ) ) ) {
@@ -222,7 +222,7 @@ int Create_DOS_Partition_Interface( int type )
       }
 
       flags.esc = FALSE;
-      input = Input( 1, 62, 9, YN, 0, 0, ESCR, 1, 0, NULL, NULL );
+      input = Input( 1, 62, 9, YN, 0, 0, ESCR, 1, 0, '\0', '\0' );
       if ( flags.esc == TRUE ) {
          return ( 1 );
       }
@@ -239,7 +239,7 @@ int Create_DOS_Partition_Interface( int type )
                4, 22,
                "This drive is a FAT32 by default, switch to FAT16 (Y/N)?    " );
             flags.fat32 =
-               !Input( 1, 61, 22, YN, 0, 0, NONE, 1, 0, NULL, NULL );
+               !Input( 1, 61, 22, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
          }
 
          /* Use the maximum available free space to create a DOS Partition */
@@ -311,12 +311,12 @@ int Create_DOS_Partition_Interface( int type )
            ( flags.version == 6 ) ) {
          input = Input( 4, 69, 19, NUMP, 1, maximum_partition_size_in_MB,
                         ESCR, maximum_partition_size_in_MB,
-                        maximum_possible_percentage, NULL, NULL );
+                        maximum_possible_percentage, '\0', '\0' );
       }
       else {
          input = Input( 7, 69, 19, NUMP, 1, maximum_partition_size_in_MB,
                         ESCR, maximum_partition_size_in_MB,
-                        maximum_possible_percentage, NULL, NULL );
+                        maximum_possible_percentage, '\0', '\0' );
       }
 
       if ( flags.esc == TRUE ) {
@@ -328,7 +328,7 @@ int Create_DOS_Partition_Interface( int type )
          Print_At(
             4, 22,
             "This drive is a FAT32 by default, switch to FAT16 (Y/N)?    " );
-         flags.fat32 = !Input( 1, 61, 22, YN, 0, 0, NONE, 1, 0, NULL, NULL );
+         flags.fat32 = !Input( 1, 61, 22, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
       }
 
       if ( type == PRIMARY ) {
@@ -367,7 +367,7 @@ int Create_DOS_Partition_Interface( int type )
       Color_Print( "Extended DOS Partition created" );
    }
 
-   Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+   Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
 
    if ( type == EXTENDED ) {
       Create_Logical_Drive_Interface();
@@ -406,9 +406,9 @@ int Create_Logical_Drive_Interface( void )
          Print_At( 4, 9, "The extended partition was propably created with another disk");
          Print_At( 4, 10, "utility. You may delete and recreate the extended partition and");
          Print_At( 4, 11, "the logical drives using Free FDISK or otherwise stick with using");
-         Print_At( 4, 12, "another disk utility to handle the logical drives.");
+         Print_At( 4, 12, "another disk utility for creating logical drives.");
 
-         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
 
          return( 1 );
    }
@@ -441,7 +441,7 @@ int Create_Logical_Drive_Interface( void )
                "                                                           " );
             Color_Print_At(
                4, 22, "Maximum number of Logical DOS Drives installed." );
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             if ( flags.fprmt == TRUE ) {
                flags.fat32 = FALSE;
             }
@@ -487,12 +487,12 @@ int Create_Logical_Drive_Interface( void )
               ( flags.version == 6 ) ) {
             input = Input( 4, 69, 20, NUMP, 1, maximum_partition_size_in_MB,
                            ESCR, maximum_partition_size_in_MB,
-                           maximum_possible_percentage, NULL, NULL );
+                           maximum_possible_percentage, '\0', '\0' );
          }
          else {
             input = Input( 7, 69, 20, NUMP, 1, maximum_partition_size_in_MB,
                            ESCR, maximum_partition_size_in_MB,
-                           maximum_possible_percentage, NULL, NULL );
+                           maximum_possible_percentage, '\0', '\0' );
          }
 
          if ( flags.esc == TRUE ) {
@@ -508,7 +508,7 @@ int Create_Logical_Drive_Interface( void )
                4, 21,
                "This drive is a FAT32 by default, switch to FAT16 (Y/N)?    " );
             flags.fat32 =
-               !Input( 1, 61, 21, YN, 0, 0, NONE, 1, 0, NULL, NULL );
+               !Input( 1, 61, 21, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
          }
 
          numeric_type = 6;
@@ -529,7 +529,7 @@ int Create_Logical_Drive_Interface( void )
    Color_Print_At( 4, 22,
                    "All available space in the Extended DOS Partition" );
    Color_Print_At( 4, 23, "is assigned to logical drives." );
-   Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+   Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
 
    if ( flags.fprmt == TRUE ) {
       flags.fat32 = FALSE;
@@ -556,7 +556,7 @@ void Delete_Extended_DOS_Partition_Interface( void )
    Print_At( 4, 19, "Do you wish to continue (Y/N).................? " );
 
    flags.esc = FALSE;
-   input = (int)Input( 1, 52, 19, YN, 0, 0, ESCR, 0, 0, NULL, NULL );
+   input = (int)Input( 1, 52, 19, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
 
    if ( ( flags.esc == FALSE ) && ( input == TRUE ) ) {
       Delete_Primary_Partition(
@@ -571,15 +571,13 @@ void Delete_Extended_DOS_Partition_Interface( void )
 
       Print_At( 4, 24, "                                    " );
 
-      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
 }
 
 /* Delete Logical Drive Interface */
 int Delete_Logical_Drive_Interface( void )
 {
-   char char_number[2];
-
    int drive_to_delete = 0;
    int index = 0;
    int input = 0;
@@ -615,13 +613,13 @@ int Delete_Logical_Drive_Interface( void )
          if ( pDrive->num_of_non_dos_log_drives > 9 ) {
             pDrive->num_of_non_dos_log_drives = 9;
          }
-         itoa( pDrive->num_of_non_dos_log_drives, char_number, 10 );
-         input = (int)Input( 1, 69, 20, CHAR, 67, 90, ESCR, 0, 0, "1",
-                             char_number );
+
+         input = (int)Input( 1, 69, 20, CHAR, 67, 90, ESCR, 0, 0, '1',
+                             pDrive->num_of_non_dos_log_drives + '0' );
       }
       else {
          input =
-            (int)Input( 1, 69, 20, CHAR, 67, 90, ESCR, 0, 0, NULL, NULL );
+            (int)Input( 1, 69, 20, CHAR, 67, 90, ESCR, 0, 0, '\0', '\0' );
       }
       /* Note:  min_range and max_range will need adjusted!!!!! */
       /* Changes will have to be made because the first logical drive letter */
@@ -655,7 +653,7 @@ int Delete_Logical_Drive_Interface( void )
 
    Print_At( 4, 22, "Are you sure (Y/N)..............................? " );
    flags.esc = FALSE;
-   input = (int)Input( 1, 54, 22, YN, 0, 0, ESCR, 0, 0, NULL, NULL );
+   input = (int)Input( 1, 54, 22, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
 
    if ( ( input == TRUE ) && ( flags.esc == FALSE ) ) {
       Delete_Logical_Drive( drive_to_delete );
@@ -665,7 +663,7 @@ int Delete_Logical_Drive_Interface( void )
          1, "Delete Logical DOS Drive(s) in the Extended DOS Partition",
          BOLD );
       Display_Extended_Partition_Information_SS();
-      input = (int)Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+      input = (int)Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
 
    return ( 0 );
@@ -688,8 +686,8 @@ void Delete_N_DOS_Partition_Interface( void )
 
    flags.esc = FALSE;
    input =
-      (int)Input( 1, 52, 19, NUM, 1, 4, ESCR, -1, 0, NULL,
-                  NULL ); /* 4 needs changed to the max num of partitions */
+      (int)Input( 1, 52, 19, NUM, 1, 4, ESCR, -1, 0, '\0',
+                  '\0' ); /* 4 needs changed to the max num of partitions */
 
    if ( flags.esc == FALSE ) {
       Delete_Primary_Partition( input - 1 );
@@ -700,7 +698,7 @@ void Delete_N_DOS_Partition_Interface( void )
       Color_Print_At( 4, 21, "Non-DOS Partition deleted" );
       Print_At( 4, 24, "                                    " );
 
-      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
 }
 
@@ -722,15 +720,15 @@ void Delete_Primary_DOS_Partition_Interface( void )
 
    flags.esc = FALSE;
    input =
-      (int)Input( 1, 52, 20, NUM, 1, 4, ESCR, -1, 0, NULL,
-                  NULL ); /* 4 needs changed to the max num of partitions */
+      (int)Input( 1, 52, 20, NUM, 1, 4, ESCR, -1, 0, '\0',
+                  '\0' ); /* 4 needs changed to the max num of partitions */
 
    if ( flags.esc == FALSE ) {
       partition_to_delete = input - 1;
 
       Print_At( 4, 22, "Are you sure (Y/N)..............................? " );
       flags.esc = FALSE;
-      input = (int)Input( 1, 54, 22, YN, 0, 0, ESCR, 0, 0, NULL, NULL );
+      input = (int)Input( 1, 54, 22, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
 
       if ( ( input == TRUE ) && ( flags.esc == FALSE ) ) {
          Delete_Primary_Partition( partition_to_delete );
@@ -742,7 +740,7 @@ void Delete_Primary_DOS_Partition_Interface( void )
          Display_Primary_Partition_Information_SS();
          Color_Print_At( 4, 21, "Primary DOS Partition deleted" );
 
-         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
    }
 }
@@ -1117,8 +1115,6 @@ void Display_Extended_Partition_Information_SS( void )
 /* Display Or Modify Logical Drive Information in the extended partition */
 void Display_Or_Modify_Logical_Drive_Information( void )
 {
-   char char_number[1];
-
    int continue_loop;
    int index;
    int input;
@@ -1140,7 +1136,7 @@ Beginning:
    Display_Extended_Partition_Information_SS();
 
    if ( flags.extended_options_flag == FALSE ) {
-      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
    else {
       Print_At(
@@ -1158,13 +1154,13 @@ Beginning:
             if ( pDrive->num_of_non_dos_log_drives > 9 ) {
                pDrive->num_of_non_dos_log_drives = 9;
             }
-            itoa( pDrive->num_of_non_dos_log_drives, char_number, 10 );
-            input = (int)Input( 1, 69, 18, CHAR, 68, 90, ESCC, 0, 0, "1",
-                                char_number );
+
+            input = (int)Input( 1, 69, 18, CHAR, 68, 90, ESCC, 0, 0, '1',
+                                pDrive->num_of_non_dos_log_drives + '0' );
          }
          else {
             input =
-               (int)Input( 1, 69, 18, CHAR, 68, 90, ESCC, 0, 0, NULL, NULL );
+               (int)Input( 1, 69, 18, CHAR, 68, 90, ESCC, 0, 0, '\0', '\0' );
          }
 
          if ( flags.esc == FALSE ) {
@@ -1230,7 +1226,7 @@ Beginning:
             4, 19,
             "  (Optional:  Type the number of the partition to modify.)" );
 
-         input = (int)Input( 1, 69, 18, YN, 0, 0, ESCR, 1, 0, "1", "4" );
+         input = (int)Input( 1, 69, 18, YN, 0, 0, ESCR, 1, 0, '1', '4' );
 
          if ( ( ( input - 48 ) >= 1 ) && ( ( input - 48 ) <= 4 ) ) {
             Modify_Primary_Partition_Information( ( input - 48 ) );
@@ -1238,7 +1234,7 @@ Beginning:
          }
       }
       else {
-         input = (int)Input( 1, 69, 18, YN, 0, 0, ESCR, 1, 0, NULL, NULL );
+         input = (int)Input( 1, 69, 18, YN, 0, 0, ESCR, 1, 0, '\0', '\0' );
       }
 
       if ( input == TRUE ) {
@@ -1250,7 +1246,7 @@ Beginning:
    }
    else {
       if ( flags.extended_options_flag == FALSE ) {
-         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
       else {
          Print_At(
@@ -1258,7 +1254,7 @@ Beginning:
             "Enter the number of the partition you want to modify (1-4)......?" );
 
          flags.esc = FALSE;
-         input = (int)Input( 1, 69, 18, NUM, 1, 4, ESCR, 1, 0, NULL, NULL );
+         input = (int)Input( 1, 69, 18, NUM, 1, 4, ESCR, 1, 0, '\0', '\0' );
 
          if ( flags.esc == FALSE ) {
             Modify_Primary_Partition_Information( input );
@@ -1559,7 +1555,7 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
       Print_At( 4, 17, "Enter choice: " );
 
       flags.esc = FALSE;
-      input = (int)Input( 1, 19, 17, NUM, 1, 3, ESCC, -1, 0, NULL, NULL );
+      input = (int)Input( 1, 19, 17, NUM, 1, 3, ESCC, -1, 0, '\0', '\0' );
       if ( flags.esc == TRUE ) {
          input = 99;
          finished = TRUE;
@@ -1573,7 +1569,7 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
 
          flags.esc = FALSE;
          input =
-            (int)Input( 3, 71, 19, NUM, 1, 255, ESCC, -1, 0, NULL, NULL );
+            (int)Input( 3, 71, 19, NUM, 1, 255, ESCC, -1, 0, '\0', '\0' );
          if ( flags.esc == FALSE ) {
             pDrive->log_drive[logical_drive_number].num_type = input;
 
@@ -1690,7 +1686,7 @@ void Modify_Primary_Partition_Information( int partition_number )
       Print_At( 4, 17, "Enter choice: " );
 
       flags.esc = FALSE;
-      input = (int)Input( 1, 19, 17, NUM, 1, 4, ESCC, -1, 0, NULL, NULL );
+      input = (int)Input( 1, 19, 17, NUM, 1, 4, ESCC, -1, 0, '\0', '\0' );
       if ( flags.esc == TRUE ) {
          input = 99;
          finished = TRUE;
@@ -1704,7 +1700,7 @@ void Modify_Primary_Partition_Information( int partition_number )
 
          flags.esc = FALSE;
          input =
-            (int)Input( 3, 71, 19, NUM, 1, 255, ESCC, -1, 0, NULL, NULL );
+            (int)Input( 3, 71, 19, NUM, 1, 255, ESCC, -1, 0, '\0', '\0' );
          if ( flags.esc == FALSE ) {
             Modify_Partition_Type( partition_number, input );
             input = 99;
@@ -1803,7 +1799,7 @@ int Set_Active_Partition_Interface( void )
    if ( available_partition_counter == 0 ) {
       Color_Print_At( 4, 22, "No partitions to make active." );
 
-      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
 
    if ( ( only_active_partition_active == FALSE ) &&
@@ -1814,7 +1810,7 @@ int Set_Active_Partition_Interface( void )
 
       for ( ;; ) {
          flags.esc = FALSE;
-         input = (int)Input( 1, 70, 16, NUM, 1, 4, ESCR, -1, 0, NULL, NULL );
+         input = (int)Input( 1, 70, 16, NUM, 1, 4, ESCR, -1, 0, '\0', '\0' );
          if ( flags.esc == TRUE ) {
             return ( 1 );
          }
@@ -1838,7 +1834,7 @@ int Set_Active_Partition_Interface( void )
       /* */
       Display_Primary_Partition_Information_SS();
 
-      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
 
    if ( only_active_partition_active == TRUE ) {
@@ -1847,7 +1843,7 @@ int Set_Active_Partition_Interface( void )
          "The only startable partition on Drive %d is already set active.",
          ( flags.drive_number - 127 ) );
 
-      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
 
    return ( 0 );
