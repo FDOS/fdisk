@@ -190,7 +190,7 @@ void Check_For_INT13_Extensions( void )
 }
 
 /* Clear the Boot Sector of a partition */
-void Clear_Boot_Sector( int drive, long cylinder, long head, long sector )
+void Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head, unsigned long sector )
 {
    unsigned char stored_sector_buffer[512];
    long index;
@@ -1441,9 +1441,9 @@ int Write_Partition_Tables( void )
 
    int drive_index = 0;
 
-   long extended_cylinder;
-   long extended_head;
-   long extended_sector;
+   unsigned long extended_cylinder;
+   unsigned long extended_head;
+   unsigned long extended_sector;
 
    for ( drive_index = 0; drive_index < 7; drive_index++ ) {
       Partition_Table *pDrive = &part_table[drive_index];

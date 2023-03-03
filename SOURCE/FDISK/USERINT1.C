@@ -140,14 +140,14 @@ void Display_Information( void )
    }
 
 #ifndef RELEASE
-   Position_Cursor( 2, 0 );
-   Color_Print( "DEVELOPMENT BUILD" );
-   Position_Cursor( 61, 0 );
-   Color_Print( "DEVELOPMENT BUILD" );
+   Position_Cursor( 0, flags.extended_options_flag ? 1 : 0 );
+   Color_Print( "NON-RELEASE BUILD" );
+   Position_Cursor( 63, flags.extended_options_flag ? 1 : 0 );
+   Color_Print( "NON-RELEASE BUILD" );
 #endif
 
 #ifdef DEBUG
-   Color_Print_At( 60, 0, "DEBUG" );
+   Color_Print_At( 60, 1, "DEBUG" );
 
    if ( debug.emulate_disk > 0 ) {
       Color_Print_At( 66, 0, "E%1d", debug.emulate_disk );

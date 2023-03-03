@@ -904,14 +904,14 @@ void Display_CL_Partition_Table( void )
    printf( "\n\nCurrent fixed disk drive: %1d",
            ( flags.drive_number - 127 ) );
    if ( flags.extended_options_flag == TRUE ) {
-      printf( "                  (TC: %4d", pDrive->total_cyl );
-      printf( " TH: %3d", pDrive->total_head );
-      printf( " TS: %3d)", pDrive->total_sect );
+      printf( "                  (TC: %6lu", pDrive->total_cyl );
+      printf( " TH: %3lu", pDrive->total_head );
+      printf( " TS: %3lu)", pDrive->total_sect );
    }
 
-   printf( "\n\nPartition   Status   Mbytes   Description     Usage  " );
+   printf( "\n\nPartition   Status   Mbytes   Description      Usage" );
    if ( flags.extended_options_flag == TRUE ) {
-      printf( "Start Cyl  End Cyl" );
+      printf( "  Start Cyl  End Cyl" );
    }
    printf( "\n" );
 
@@ -960,14 +960,14 @@ void Display_CL_Partition_Table( void )
          usage = Convert_To_Percentage( pDrive->pri_part[index].size_in_MB,
                                         pDrive->total_disk_size_in_MB );
 
-         printf( "   %3d%%", usage );
+         printf( "   %3lu%%", usage );
 
          if ( flags.extended_options_flag == TRUE ) {
             /* Starting Cylinder */
-            printf( "    %4d", pDrive->pri_part[index].start_cyl );
+            printf( "     %6lu", pDrive->pri_part[index].start_cyl );
 
             /* Ending Cylinder */
-            printf( "      %4d", pDrive->pri_part[index].end_cyl );
+            printf( "   %6lu", pDrive->pri_part[index].end_cyl );
          }
          printf( "\n" );
       }
@@ -979,7 +979,11 @@ void Display_CL_Partition_Table( void )
    if ( ( brief_partition_table[( flags.drive_number - 128 )][4] > 0 ) ||
         ( brief_partition_table[( flags.drive_number - 128 )][5] > 0 ) ) {
       printf( "\nContents of Extended DOS Partition:\n" );
-      printf( "Drv Volume Label  Mbytes  System  Usage\n" );
+      printf( "Drv Volume Label  Mbytes  System   Usage" );
+      if ( flags.extended_options_flag == TRUE ) {
+         printf( "  Start Cyl  End Cyl" );
+      }
+      printf("\n");
 
       /* Display information for each Logical DOS Drive */
       index = 4;
@@ -1013,7 +1017,15 @@ void Display_CL_Partition_Table( void )
                Convert_To_Percentage( pDrive->log_drive[index - 4].num_sect,
                                       pDrive->ext_part_num_sect );
 
-            printf( "  %3d%%", usage );
+            printf( "  %3lu%%", usage );
+
+            if ( flags.extended_options_flag == TRUE ) {
+               /* Starting Cylinder */
+               printf( "     %6lu", pDrive->log_drive[index - 4].start_cyl );
+   
+               /* Ending Cylinder */
+               printf( "   %6lu", pDrive->log_drive[index - 4].end_cyl );
+            }
 
             printf( "\n" );
          }
@@ -1286,7 +1298,7 @@ void Display_Primary_Partition_Information_SS( void )
       if ( flags.extended_options_flag == FALSE ) {
          Print_At(
             4, 8,
-            "Partition  Status   Type    Volume Label   Mbytes  System    Usage" );
+            "Partition  Status  Type     Volume Label   Mbytes  System    Usage" );
 
          for ( index = 0; index < 4; index++ ) {
             if ( pDrive->pri_part[index].num_type > 0 ) {
@@ -1305,7 +1317,7 @@ void Display_Primary_Partition_Information_SS( void )
 
                /* Status */
                if ( pDrive->pri_part[index].active_status > 0 ) {
-                  Print_At( 18, ( cursor_offset + 9 ), "A" );
+                  Print_At( 15, ( cursor_offset + 9 ), "ACTIVE" );
                }
 
                /* Type */
@@ -1325,7 +1337,7 @@ void Display_Primary_Partition_Information_SS( void )
                Print_At( 23, ( cursor_offset + 9 ), type );
 
                /* Volume Label */
-               Print_At( 33, ( cursor_offset + 9 ), "%11s",
+               Print_At( 32, ( cursor_offset + 9 ), "%11s",
                          pDrive->pri_part[index].vol_label );
 
                /* Mbytes */

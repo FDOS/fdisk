@@ -40,8 +40,6 @@ unsigned long Extract_Cylinder_From_LBA_Value( unsigned long lba_value,
                                                Partition_Table *pDrive );
 unsigned long Extract_Sector( unsigned long hex1, unsigned long hex2 );
 void Clear_Active_Partition( void );
-void Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head, 
-                        unsigned long sector );
 void Clear_Extended_Partition_Table( int drive );
 void Delete_Logical_Drive( int logical_drive_number );
 void Delete_Primary_Partition( int partition_number );

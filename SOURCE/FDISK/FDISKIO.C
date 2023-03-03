@@ -1174,14 +1174,9 @@ void Process_Fdiskini_File( void )
 /* Remove MBR */
 void Remove_MBR( void )
 {
-   int index = 0;
-
    Read_Physical_Sectors( ( flags.drive_number ), 0, 0, 1, 1 );
 
-   do {
-      sector_buffer[index] = 0x00;
-      index++;
-   } while ( index < 0x1be );
+   memset( sector_buffer, 0, 0x1be );
 
    Write_Physical_Sectors( ( flags.drive_number ), 0, 0, 1, 1 );
 }

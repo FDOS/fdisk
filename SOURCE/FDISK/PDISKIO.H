@@ -165,7 +165,8 @@ int Write_Logical_Sectors( unsigned char drive_letter[2],
 int Write_Partition_Tables( void );
 int Write_Physical_Sectors( int drive, long cylinder, long head, long sector,
                             int number_of_sectors );
-
+void Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head, 
+                        unsigned long sector );
 unsigned long Decimal_Number( unsigned long hex1, unsigned long hex2,
                               unsigned long hex3, unsigned long hex4 );
 

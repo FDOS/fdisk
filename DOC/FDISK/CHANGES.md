@@ -19,7 +19,7 @@ Bugfixes:
      when using ext INT 13 function (since v1.1).
  - CRITICAL: Fix a partition location and size calculation error triggered
      when creating a new logical partition after deleting the first logical
-     partition and there are logical partitions left (since v1.2.1).
+     partition while there are still logical partitions left (since v1.2.1).
  - CRITICAL: Fix different calculation errors leading to overlapping
      partitions, unnessessary free space between them, or partitions exceeding
      the end of the disk resulting from off-by-one and off-by-two errors.
