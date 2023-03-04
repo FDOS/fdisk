@@ -22,6 +22,7 @@
 #define PEXTERN extern
 #endif
 
+#define MAX_LOGICAL_DRIVES 23
 /*
 /////////////////////////////////////////////////////////////////////////////
 //  SPECIAL
@@ -63,7 +64,7 @@ PEXTERN unsigned long translated_sector;
 /////////////////////////////////////////////////////////////////////////////
 */
 
-#define REL_END_SECT( p ) ( (p).rel_sect + (p).num_sect - 1 )
+#define REL_END_SECT( p ) ( ( p ).rel_sect + ( p ).num_sect - 1 )
 typedef struct Partition {
    int active_status;
 
@@ -73,9 +74,9 @@ typedef struct Partition {
    unsigned long start_cyl;
    unsigned long start_head;
    unsigned long start_sect;
-   unsigned long end_cyl;     /* inclusive ! */
-   unsigned long end_head;    /* inclusive ! */
-   unsigned long end_sect;    /* inclusive ! */
+   unsigned long end_cyl;  /* inclusive ! */
+   unsigned long end_head; /* inclusive ! */
+   unsigned long end_sect; /* inclusive ! */
 
    unsigned long rel_sect;
    unsigned long num_sect;
@@ -134,15 +135,15 @@ typedef struct part_table_structure {
    int num_of_log_drives;
    int num_of_non_dos_log_drives;
 
-   struct Partition log_drive[23];
+   struct Partition log_drive[MAX_LOGICAL_DRIVES];
 
-   int log_drive_created[23];
+   int log_drive_created[MAX_LOGICAL_DRIVES];
 
-   int next_ext_exists[23];
+   int next_ext_exists[MAX_LOGICAL_DRIVES];
 
-   struct Partition next_ext[23];
+   struct Partition next_ext[MAX_LOGICAL_DRIVES];
 
-   int size_truncated;  /* true if disk size > 32-bit unsigned long */
+   int size_truncated; /* true if disk size > 32-bit unsigned long */
 } Partition_Table;
 
 PEXTERN Partition_Table part_table[8];
@@ -159,13 +160,10 @@ int Determine_Drive_Letters( void );
 int Read_Partition_Tables( void );
 int Read_Physical_Sectors( int drive, long cylinder, long head, long sector,
                            int number_of_sectors );
-int Write_Logical_Sectors( unsigned char drive_letter[2],
-                           unsigned long logical_sector_number,
-                           int number_of_sectors );
 int Write_Partition_Tables( void );
 int Write_Physical_Sectors( int drive, long cylinder, long head, long sector,
                             int number_of_sectors );
-void Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head, 
+void Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head,
                         unsigned long sector );
 unsigned long Decimal_Number( unsigned long hex1, unsigned long hex2,
                               unsigned long hex3, unsigned long hex4 );
@@ -176,5 +174,13 @@ void Initialize_LBA_Structures( void );
 void Load_Brief_Partition_Table( void );
 
 int IsRecognizedFatPartition( unsigned );
+
+/* LBA<->CHS conversion functions */
+unsigned long lba_to_cyl( unsigned long lba_value, Partition_Table *pDrive );
+void lba_to_chs( unsigned long lba_value, Partition_Table *pDrive,
+                 unsigned long *cyl, unsigned long *head,
+                 unsigned long *sect );
+unsigned long chs_to_lba( Partition_Table *pDrive, unsigned long cylinder,
+                          unsigned long head, unsigned long sector );
 
 #endif /* PDISKIO_H */

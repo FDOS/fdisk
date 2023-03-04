@@ -36,8 +36,8 @@ unsigned long Max_Pri_Part_Size_In_MB( int type );
 unsigned long Combine_Cylinder_and_Sector( unsigned long cylinder,
                                            unsigned long sector );
 unsigned long Extract_Cylinder( unsigned long hex1, unsigned long hex2 );
-unsigned long Extract_Cylinder_From_LBA_Value( unsigned long lba_value, 
-                                               Partition_Table *pDrive );
+unsigned long lba_to_cyl( unsigned long lba_value, 
+                          Partition_Table *pDrive );
 unsigned long Extract_Sector( unsigned long hex1, unsigned long hex2 );
 void Clear_Active_Partition( void );
 void Clear_Extended_Partition_Table( int drive );

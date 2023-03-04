@@ -32,7 +32,7 @@ make -f makefile.bor -DCC=tcc
 ```
 
 ### Building a release version
-To build a release version to get rid of the "development build" nag invoke:
+To build a release version to get rid of the "NON-RELEASE BUILD" nag invoke:
 ```
 wmake -f makefile.wat RELEASE=1
 ```

@@ -147,7 +147,7 @@ void Display_Information( void )
 #endif
 
 #ifdef DEBUG
-   Color_Print_At( 60, 1, "DEBUG" );
+   Color_Print_At( 60, 0, "DEBUG" );
 
    if ( debug.emulate_disk > 0 ) {
       Color_Print_At( 66, 0, "E%1d", debug.emulate_disk );
