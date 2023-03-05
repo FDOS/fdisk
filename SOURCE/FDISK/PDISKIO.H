@@ -1,18 +1,3 @@
-/*
-// Program:  Free FDISK
-// Module:  PDISKIO.H
-// Module Description:  PDISKIO.C Header File
-// Written By:  Brian E. Reifsnyder
-// Module Version:  3.0
-// Copyright:  1998-2001 under the terms of the GNU GPL, Version 2
-*/
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  DEFINES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
 #ifndef PDISKIO_H
 #define PDISKIO_H
 
@@ -174,6 +159,16 @@ void Initialize_LBA_Structures( void );
 void Load_Brief_Partition_Table( void );
 
 int IsRecognizedFatPartition( unsigned );
+int Is_Extended_Partition( Partition *p );
+
+unsigned long Combine_Cylinder_and_Sector( unsigned long cylinder,
+                                           unsigned long sector );
+unsigned long Extract_Cylinder( unsigned long hex1, unsigned long hex2 );
+unsigned long Extract_Sector( unsigned long hex1, unsigned long hex2 );
+
+/* sets all partition values to zero */
+void Clear_Partition( Partition *p );
+void Copy_Partition( Partition *dst, Partition *src );
 
 /* LBA<->CHS conversion functions */
 unsigned long lba_to_cyl( unsigned long lba_value, Partition_Table *pDrive );

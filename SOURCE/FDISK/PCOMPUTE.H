@@ -1,18 +1,3 @@
-/*
-// Program:  Free FDISK
-// Module:  PCOMPUTE.H
-// Module Description:  Header File for PCOMPUTE.C
-// Written By:  Brian E. Reifsnyder
-// Version:  1.2.1
-// Copyright:  1998-2001 under the terms of the GNU GPL, Version 2
-*/
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  SPECIAL
-/////////////////////////////////////////////////////////////////////////////
-*/
-
 #ifndef PCOMPUTE_H
 #define PCOMPUTE_H
 
@@ -33,13 +18,7 @@ int Partition_Type_To_Create( unsigned long size_in_mb,
 unsigned long Max_Log_Part_Size_In_MB( void );
 unsigned long Max_Pri_Part_Size_In_MB( int type );
 
-unsigned long Combine_Cylinder_and_Sector( unsigned long cylinder,
-                                           unsigned long sector );
-unsigned long Extract_Cylinder( unsigned long hex1, unsigned long hex2 );
-unsigned long lba_to_cyl( unsigned long lba_value, 
-                          Partition_Table *pDrive );
-unsigned long Extract_Sector( unsigned long hex1, unsigned long hex2 );
-void Clear_Active_Partition( void );
+void Deactivate_Active_Partition( void );
 void Clear_Extended_Partition_Table( int drive );
 void Delete_Logical_Drive( int logical_drive_number );
 void Delete_Primary_Partition( int partition_number );

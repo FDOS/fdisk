@@ -16,7 +16,6 @@ int biosdisk( unsigned function, unsigned drive, unsigned head,
               void __far *sector_buffer );
 char *searchpath( char *fn );
 
-
 int Color_Print( char *text );
 int Color_Printf( const char *format, ... );
 
@@ -24,7 +23,6 @@ int Color_Printf( const char *format, ... );
 void textattr( int color );
 void textcolor( int color );
 void textbackground( int background );
-
 
 #else /* Borland / Turbo C */
 

@@ -77,10 +77,11 @@ unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
                                  unsigned long total_heads,
                                  unsigned long total_sect )
 {
-   unsigned long mb1 = ( num_cyl * total_heads  * total_sect ) / 2048ul;
-   unsigned long mb2 = ( (num_cyl - 1)  * total_heads  * total_sect ) / 2048ul;
-   
-   return (mb1 > mb2) ? mb1 : mb2;
+   unsigned long mb1 = ( num_cyl * total_heads * total_sect ) / 2048ul;
+   unsigned long mb2 =
+      ( ( num_cyl - 1 ) * total_heads * total_sect ) / 2048ul;
+
+   return ( mb1 > mb2 ) ? mb1 : mb2;
 }
 
 unsigned long Convert_Sect_To_MB( unsigned long num_sect )
@@ -101,8 +102,8 @@ unsigned long Convert_To_Percentage( unsigned long small_num,
    }
 
    percentage = 100 * small_num / large_num;
-   
-   if ( (100 * small_num % large_num ) >= large_num / 2 ) {
+
+   if ( ( 100 * small_num % large_num ) >= large_num / 2 ) {
       percentage++;
    }
    if ( percentage > 100 ) {
@@ -638,7 +639,7 @@ void Re_Initialization( void )
 
 extern void cdecl far int24_handler( void );
 
-void ( interrupt far *old_int24 )( void );
+void( interrupt far *old_int24 )( void );
 
 void restore_int24( void ) { setvect( 0x24, old_int24 ); }
 
@@ -646,7 +647,7 @@ void int24_init( void )
 {
 
    old_int24 = getvect( 0x24 );
-   setvect( 0x24, (void (interrupt far *)()) int24_handler );
+   setvect( 0x24, (void( interrupt far * )())int24_handler );
    atexit( restore_int24 );
 }
 
@@ -859,7 +860,7 @@ void main( int argc, char *argv[] )
 
          case 'D': {
             if ( 0 == strcmp( arg[0].choice, "DEACTIVATE" ) ) {
-               Clear_Active_Partition();
+               Deactivate_Active_Partition();
                Write_Partition_Tables();
                command_ok = TRUE;
 

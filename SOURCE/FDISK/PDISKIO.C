@@ -1,19 +1,3 @@
-/*
-// Module:  PDISKIO.C
-// Module Description:  Disk Input/Output Code Module
-//                      All functions that access the hard disk via
-//                      interrupt 0x13 are here, including LBA support.
-// Written By:  Brian E. Reifsnyder
-// Module Version:  3.1
-// Copyright:  2008 under the terms of the GNU GPL, Version 2
-*/
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  SPECIAL
-/////////////////////////////////////////////////////////////////////////////
-*/
-
 #define PDISKIO
 #include "main.h"
 
@@ -182,6 +166,11 @@ void Check_For_INT13_Extensions( void )
       Pause();
    }
 #endif
+}
+
+int Is_Extended_Partition( Partition *p )
+{
+   return p->num_type == 5 || p->num_type == 0x0f;
 }
 
 /* Clear the Boot Sector of a partition */
@@ -479,6 +468,28 @@ unsigned long Extract_Cylinder( unsigned long hex1, unsigned long hex2 )
         ( cylinder_and_sector / 256 ) );
 
    return ( extracted_cylinder );
+}
+
+void Clear_Partition( Partition *p )
+{
+   memset( p, 0, sizeof( Partition ) );
+   strcpy( p->vol_label, "           " );
+}
+
+void Copy_Partition( Partition *dst, Partition *src )
+{
+   dst->active_status = src->active_status;
+   dst->num_type = src->num_type;
+   dst->start_cyl = src->start_cyl;
+   dst->start_head = src->start_head;
+   dst->start_sect = src->start_sect;
+   dst->end_cyl = src->end_cyl;
+   dst->end_head = src->end_head;
+   dst->end_sect = src->end_sect;
+   dst->rel_sect = src->rel_sect;
+   dst->num_sect = src->num_sect;
+   dst->size_in_MB = src->size_in_MB;
+   strcpy( dst->vol_label, src->vol_label );
 }
 
 /* Extract the Cylinder from an LBA Value */
@@ -802,7 +813,7 @@ void Load_Brief_Partition_Table( void )
 
       /* Load the extended partitions into brief_partition_table[8] [27] */
 
-      for ( partnum = 0; partnum < 23; partnum++ ) {
+      for ( partnum = 0; partnum < MAX_LOGICAL_DRIVES; partnum++ ) {
          brief_partition_table[drivenum][partnum + 4] =
             pDrive->log_drive[partnum].num_type;
       }
@@ -906,14 +917,10 @@ int Read_Partition_Tables( void )
 
       pDrive->pp_largest_free_space_end_cyl = 0;
 
-      index = 0;
-      do {
-         memset( &pDrive->pri_part[index], 0, sizeof( pDrive->pri_part[0] ) );
-
+      for ( index = 0; index < 4; index++ ) {
+         Clear_Partition( &pDrive->pri_part[index] );
          pDrive->pri_part_created[index] = FALSE;
-
-         index++;
-      } while ( index < 4 );
+      }
 
       Clear_Extended_Partition_Table( drive );
 
@@ -1042,9 +1049,9 @@ int Read_Partition_Tables( void )
                         sector_buffer[entry_offset + 0x06],
                         sector_buffer[entry_offset + 0x07] );
                      p->end_head = sector_buffer[entry_offset + 0x05];
-                     p->end_sect = Extract_Sector(
-                        sector_buffer[entry_offset + 0x06],
-                        sector_buffer[entry_offset + 0x07] );
+                     p->end_sect =
+                        Extract_Sector( sector_buffer[entry_offset + 0x06],
+                                        sector_buffer[entry_offset + 0x07] );
                   }
 
                   p->rel_sect =

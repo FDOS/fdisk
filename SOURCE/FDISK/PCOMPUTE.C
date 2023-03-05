@@ -57,7 +57,7 @@ unsigned long Number_Of_Cylinders( unsigned long size );
 */
 
 /* Clear the Active Partition */
-void Clear_Active_Partition( void )
+void Deactivate_Active_Partition( void )
 {
    int index = 0;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
@@ -90,16 +90,13 @@ void Clear_Extended_Partition_Table( int drive )
    pDrive->num_of_log_drives = 0;
    pDrive->num_of_non_dos_log_drives = 0;
 
-   index = 0;
-   do {
-      memset( &pDrive->log_drive[index], 0, sizeof( pDrive->log_drive[0] ) );
+   for ( index = 0; index < MAX_LOGICAL_DRIVES; index++ ) {
+      Clear_Partition( &pDrive->log_drive[index] );
+      Clear_Partition( &pDrive->next_ext[index] );
 
       pDrive->next_ext_exists[index] = FALSE;
-
-      memset( &pDrive->next_ext[index], 0, sizeof( pDrive->next_ext[0] ) );
-
-      index++;
-   } while ( index < 23 );
+      pDrive->log_drive_created[index] = FALSE;
+   }
 }
 
 /* Create Logical Drive */
@@ -109,6 +106,8 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    int index;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+   Partition *ep = pDrive->ptr_ext_part;
+   Partition *p, *nep;
 
    unsigned long computed_ending_cylinder;
    unsigned long maximum_size_in_cylinders =
@@ -120,8 +119,6 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    int free_space_loc = pDrive->log_drive_largest_free_space_location;
    unsigned long cylinder_size =
       ( pDrive->total_head + 1 ) * ( pDrive->total_sect );
-
-   //Qprintf("Creating logical drive type %02x, size %lu MB\n",numeric_type, size_in_MB);
 
    /* Adjust the size of the partition to fit boundaries, if necessary. */
    if ( requested_size_in_cylinders > maximum_size_in_cylinders ) {
@@ -149,49 +146,43 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
 
    /* Make space in the part_table structure, if necessary. */
    if ( free_space_loc <= pDrive->num_of_log_drives && free_space_loc > 0 ) {
-      index = pDrive->num_of_log_drives + 1;
-      do {
-         memcpy( &pDrive->log_drive[index], &pDrive->log_drive[index - 1],
-                 sizeof( pDrive->log_drive[0] ) );
+
+      for ( index = pDrive->num_of_log_drives + 1; index > free_space_loc;
+            index-- ) {
+         Copy_Partition( &pDrive->log_drive[index],
+                         &pDrive->log_drive[index - 1] );
+         Copy_Partition( &pDrive->next_ext[index],
+                         &pDrive->next_ext[index - 1] );
 
          pDrive->next_ext_exists[index] = pDrive->next_ext_exists[index - 1];
-
-         memcpy( &pDrive->next_ext[index], &pDrive->next_ext[index - 1],
-                 sizeof( pDrive->next_ext[0] ) );
-
-         index--;
-      } while ( index >= free_space_loc );
+      }
    }
 
    /* Add the logical drive entry. */ /*????????????*/
-   pDrive->log_drive[free_space_loc].num_type = numeric_type;
-   strcpy( pDrive->log_drive[free_space_loc].vol_label, "" );
+   p = &pDrive->log_drive[free_space_loc];
+   p->num_type = numeric_type;
+   strcpy( p->vol_label, "" );
 
-   pDrive->log_drive[free_space_loc].start_cyl =
-      pDrive->log_drive_free_space_start_cyl;
-   pDrive->log_drive[free_space_loc].start_head = 1;
-   pDrive->log_drive[free_space_loc].start_sect = 1;
+   p->start_cyl = pDrive->log_drive_free_space_start_cyl;
+   p->start_head = 1;
+   p->start_sect = 1;
 
    /* Compute the ending cylinder */
    computed_ending_cylinder = pDrive->log_drive_free_space_start_cyl +
                               requested_size_in_cylinders - 1;
 
-   pDrive->log_drive[free_space_loc].end_cyl = computed_ending_cylinder;
-   pDrive->log_drive[free_space_loc].end_head = pDrive->total_head;
-   pDrive->log_drive[free_space_loc].end_sect = pDrive->total_sect;
+   p->end_cyl = computed_ending_cylinder;
+   p->end_head = pDrive->total_head;
+   p->end_sect = pDrive->total_sect;
 
-   if ( pDrive->log_drive[free_space_loc].end_cyl > 1023 &&
-        pDrive->ext_int_13 == TRUE ) {
-      pDrive->log_drive[free_space_loc].num_type =
-         LBA_Partition_Type_To_Create( numeric_type );
+   if ( p->end_cyl > 1023 && pDrive->ext_int_13 == TRUE ) {
+      p->num_type = LBA_Partition_Type_To_Create( numeric_type );
    }
 
-   pDrive->log_drive[free_space_loc].rel_sect = pDrive->total_sect;
-   pDrive->log_drive[free_space_loc].num_sect =
-      computed_partition_size - pDrive->log_drive[free_space_loc].rel_sect;
+   p->rel_sect = pDrive->total_sect;
+   p->num_sect = computed_partition_size - p->rel_sect;
 
-   pDrive->log_drive[free_space_loc].size_in_MB =
-      Convert_Sect_To_MB( computed_partition_size );
+   p->size_in_MB = Convert_Sect_To_MB( computed_partition_size );
 
    pDrive->num_of_log_drives++;
    pDrive->log_drive_created[free_space_loc] = TRUE;
@@ -202,47 +193,43 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    if ( pDrive->log_drive[free_space_loc + 1].num_type > 0 ) {
       pDrive->next_ext_exists[free_space_loc] = TRUE;
 
-      pDrive->next_ext[free_space_loc].num_type = 5;
+      nep = &pDrive->next_ext[free_space_loc];
 
-      pDrive->next_ext[free_space_loc].start_cyl =
-         pDrive->log_drive[free_space_loc + 1].start_cyl;
-      pDrive->next_ext[free_space_loc].start_head = 0;
-      pDrive->next_ext[free_space_loc].start_sect = 1;
+      nep->num_type = 5;
 
-      pDrive->next_ext[free_space_loc].end_cyl =
-         pDrive->log_drive[free_space_loc + 1].end_cyl;
-      pDrive->next_ext[free_space_loc].end_head = pDrive->total_head;
-      pDrive->next_ext[free_space_loc].end_sect = pDrive->total_sect;
+      nep->start_cyl = ( p + 1 )->start_cyl;
+      nep->start_head = 0;
+      nep->start_sect = 1;
 
-      pDrive->next_ext[free_space_loc].rel_sect =
-         ( pDrive->log_drive[free_space_loc + 1].start_cyl -
-           pDrive->ptr_ext_part->start_cyl ) *
-         ( pDrive->total_head + 1 ) * pDrive->total_sect;
-      pDrive->next_ext[free_space_loc].num_sect =
-         pDrive->log_drive[free_space_loc + 1].num_sect + pDrive->total_sect;
+      nep->end_cyl = ( p + 1 )->end_cyl;
+      nep->end_head = pDrive->total_head;
+      nep->end_sect = pDrive->total_sect;
+
+      nep->rel_sect = ( ( p + 1 )->start_cyl - ep->start_cyl ) *
+                      ( pDrive->total_head + 1 ) * pDrive->total_sect;
+      nep->num_sect = ( p + 1 )->num_sect + pDrive->total_sect;
    }
 
    /* Add the linkage entry if there is a logical drive before this one. */
    if ( free_space_loc > 0 ) {
       pDrive->next_ext_exists[free_space_loc - 1] = TRUE;
 
-      pDrive->next_ext[free_space_loc - 1].num_type = 5;
+      nep = &pDrive->next_ext[free_space_loc - 1];
 
-      pDrive->next_ext[free_space_loc - 1].start_cyl =
-         pDrive->log_drive_free_space_start_cyl;
-      pDrive->next_ext[free_space_loc - 1].start_head = 0;
-      pDrive->next_ext[free_space_loc - 1].start_sect = 1;
+      nep->num_type = 5;
 
-      pDrive->next_ext[free_space_loc - 1].end_cyl = computed_ending_cylinder;
-      pDrive->next_ext[free_space_loc - 1].end_head = pDrive->total_head;
-      pDrive->next_ext[free_space_loc - 1].end_sect = pDrive->total_sect;
+      nep->start_cyl = pDrive->log_drive_free_space_start_cyl;
+      nep->start_head = 0;
+      nep->start_sect = 1;
 
-      pDrive->next_ext[free_space_loc - 1].rel_sect =
-         ( pDrive->next_ext[free_space_loc - 1].start_cyl -
-           pDrive->ptr_ext_part->start_cyl ) *
-         ( pDrive->total_head + 1 ) * pDrive->total_sect;
+      nep->end_cyl = computed_ending_cylinder;
+      nep->end_head = pDrive->total_head;
+      nep->end_sect = pDrive->total_sect;
 
-      pDrive->next_ext[free_space_loc - 1].num_sect = computed_partition_size;
+      nep->rel_sect = ( nep->start_cyl - ep->start_cyl ) *
+                      ( pDrive->total_head + 1 ) * pDrive->total_sect;
+
+      nep->num_sect = computed_partition_size;
    }
 
    pDrive->part_values_changed = TRUE;
@@ -413,8 +400,8 @@ int Create_Primary_Partition( int numeric_type, unsigned long size_in_MB )
    /* Re-obtain a partition type, if applicable. */
    if ( ( numeric_type != 5 ) && ( numeric_type != 0x0f ) ) {
       numeric_type = Partition_Type_To_Create(
-         ( ( requested_size_in_cylinders *
-             ( pDrive->total_head + 1 ) * ( pDrive->total_sect ) ) /
+         ( ( requested_size_in_cylinders * ( pDrive->total_head + 1 ) *
+             ( pDrive->total_sect ) ) /
            2048 ),
          numeric_type );
    }
@@ -516,202 +503,83 @@ void Delete_Logical_Drive( int logical_drive_number )
    int index;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+   Partition *p, *nep;
 
-   /* Zero out the partition table entry for the logical drive. */
-   pDrive->log_drive[logical_drive_number].num_type = 0;
+   p = &pDrive->log_drive[logical_drive_number];
 
-   strcpy( pDrive->log_drive[logical_drive_number].vol_label, "           " );
-
-   pDrive->log_drive[logical_drive_number].start_cyl = 0;
-   pDrive->log_drive[logical_drive_number].start_head = 0;
-   pDrive->log_drive[logical_drive_number].start_sect = 0;
-
-   pDrive->log_drive[logical_drive_number].end_cyl = 0;
-   pDrive->log_drive[logical_drive_number].end_head = 0;
-   pDrive->log_drive[logical_drive_number].end_sect = 0;
-
-   pDrive->log_drive[logical_drive_number].rel_sect = 0;
-   pDrive->log_drive[logical_drive_number].num_sect = 0;
-
-   pDrive->log_drive[logical_drive_number].size_in_MB = 0;
-
-   /* If the logical drive to be deleted is not the first logical drive.     */
-   /* Assume that there are extended partition tables after this one.  If    */
-   /* there are not any more extended partition tables, nothing will be      */
-   /* harmed by the shift.                                                   */
+   /* If the logical drive to be deleted is not the first logical drive.   */
+   /* Assume that there are extended partition tables after this one. If   */
+   /* there are not any more extended partition tables, nothing will be    */
+   /* harmed by the shift. */
    if ( logical_drive_number > 0 ) {
-      /* Move the extended partition information from this table to the       */
-      /* previous table.                                                      */
-      pDrive->next_ext[logical_drive_number - 1].start_cyl =
-         pDrive->next_ext[logical_drive_number].start_cyl;
+      nep = &pDrive->next_ext[logical_drive_number];
 
-      pDrive->next_ext[logical_drive_number - 1].start_head =
-         pDrive->next_ext[logical_drive_number].start_head;
+      /* Move the extended partition information from this table to the    */
+      /* previous table.                                                   */
+      Copy_Partition( nep - 1, nep );
 
-      pDrive->next_ext[logical_drive_number - 1].start_sect =
-         pDrive->next_ext[logical_drive_number].start_sect;
+      /* Shift all the following extended partition tables left by 1.      */
+      for ( index = logical_drive_number; index < MAX_LOGICAL_DRIVES - 1;
+            index++ ) {
+         p = &pDrive->log_drive[index];
+         nep = &pDrive->next_ext[index];
 
-      pDrive->next_ext[logical_drive_number - 1].end_cyl =
-         pDrive->next_ext[logical_drive_number].end_cyl;
+         Copy_Partition( p, p + 1 );
+         Copy_Partition( nep, nep + 1 );
+         pDrive->log_drive_created[index] =
+            pDrive->log_drive_created[index + 1];
+         pDrive->next_ext_exists[index - 1] =
+            ( p->num_type > 0 ) ? TRUE : FALSE;
+      }
 
-      pDrive->next_ext[logical_drive_number - 1].end_head =
-         pDrive->next_ext[logical_drive_number].end_head;
-
-      pDrive->next_ext[logical_drive_number - 1].end_sect =
-         pDrive->next_ext[logical_drive_number].end_sect;
-
-      pDrive->next_ext[logical_drive_number - 1].rel_sect =
-         pDrive->next_ext[logical_drive_number].rel_sect;
-
-      pDrive->next_ext[logical_drive_number - 1].num_sect =
-         pDrive->next_ext[logical_drive_number].num_sect;
-
-      /* Shift all the following extended partition tables left by 1.         */
-      index = logical_drive_number;
-
-      do {
-         pDrive->log_drive[index].num_type =
-            pDrive->log_drive[index + 1].num_type;
-
-         strcpy( pDrive->log_drive[index].vol_label,
-                 pDrive->log_drive[index + 1].vol_label );
-
-         pDrive->log_drive[index].start_cyl =
-            pDrive->log_drive[index + 1].start_cyl;
-         pDrive->log_drive[index].start_head =
-            pDrive->log_drive[index + 1].start_head;
-         pDrive->log_drive[index].start_sect =
-            pDrive->log_drive[index + 1].start_sect;
-
-         pDrive->log_drive[index].end_cyl =
-            pDrive->log_drive[index + 1].end_cyl;
-         pDrive->log_drive[index].end_head =
-            pDrive->log_drive[index + 1].end_head;
-         pDrive->log_drive[index].end_sect =
-            pDrive->log_drive[index + 1].end_sect;
-
-         pDrive->log_drive[index].rel_sect =
-            pDrive->log_drive[index + 1].rel_sect;
-         pDrive->log_drive[index].num_sect =
-            pDrive->log_drive[index + 1].num_sect;
-
-         pDrive->log_drive[index].size_in_MB =
-            pDrive->log_drive[index + 1].size_in_MB;
-
-         pDrive->next_ext[index].num_type =
-            pDrive->next_ext[index + 1].num_type;
-
-         pDrive->next_ext[index].start_cyl =
-            pDrive->next_ext[index + 1].start_cyl;
-         pDrive->next_ext[index].start_head =
-            pDrive->next_ext[index + 1].start_head;
-         pDrive->next_ext[index].start_sect =
-            pDrive->next_ext[index + 1].start_sect;
-
-         pDrive->next_ext[index].end_cyl =
-            pDrive->next_ext[index + 1].end_cyl;
-         pDrive->next_ext[index].end_head =
-            pDrive->next_ext[index + 1].end_head;
-         pDrive->next_ext[index].end_sect =
-            pDrive->next_ext[index + 1].end_sect;
-
-         pDrive->next_ext[index].rel_sect =
-            pDrive->next_ext[index + 1].rel_sect;
-         pDrive->next_ext[index].num_sect =
-            pDrive->next_ext[index + 1].num_sect;
-
-         if ( pDrive->log_drive[index].num_type > 0 ) {
-            pDrive->next_ext_exists[index - 1] = TRUE;
-         }
-         else {
-            pDrive->next_ext_exists[index - 1] = FALSE;
-         }
-
-         index++;
-      } while ( index < 22 );
+      Clear_Partition( &pDrive->log_drive[MAX_LOGICAL_DRIVES - 1] );
+      Clear_Partition( &pDrive->next_ext[MAX_LOGICAL_DRIVES - 1] );
+      pDrive->log_drive_created[MAX_LOGICAL_DRIVES - 1] = FALSE;
+      pDrive->next_ext_exists[MAX_LOGICAL_DRIVES - 1] = FALSE;
    }
+   else {
+      /* Delete the first logical partition */
+      Clear_Partition( p );
+      pDrive->log_drive_created[0] = FALSE;
+   }
+
    pDrive->num_of_log_drives--;
+   pDrive->part_values_changed = TRUE;
+   flags.partitions_have_changed = TRUE;
 
    /* If there aren't any more logical drives, clear the extended        */
    /* partition table to prevent lockups by any other partition utils.   */
+
+   /* unneeded ?!? 
    if ( pDrive->num_of_log_drives == 0 ) {
       index = 0;
       do {
-         pDrive->log_drive[index].num_type = 0;
+         p = &pDrive->log_drive[index];
+         nep = &pDrive->next_ext[index];
 
-         pDrive->log_drive[index].start_cyl = 0;
-         pDrive->log_drive[index].start_head = 0;
-         pDrive->log_drive[index].start_sect = 0;
+         Clear_Partition( p );
+         Clear_Partition( nep );
 
-         pDrive->log_drive[index].end_cyl = 0;
-         pDrive->log_drive[index].end_head = 0;
-         pDrive->log_drive[index].end_sect = 0;
-
-         pDrive->log_drive[index].rel_sect = 0;
-         pDrive->log_drive[index].num_sect = 0;
-
-         pDrive->log_drive[index].size_in_MB = 0;
          pDrive->log_drive_created[index] = FALSE;
-
          pDrive->next_ext_exists[index] = FALSE;
 
-         pDrive->next_ext[index].num_type = 0;
-
-         pDrive->next_ext[index].start_cyl = 0;
-         pDrive->next_ext[index].start_head = 0;
-         pDrive->next_ext[index].start_sect = 0;
-
-         pDrive->next_ext[index].end_cyl = 0;
-         pDrive->next_ext[index].end_head = 0;
-         pDrive->next_ext[index].end_sect = 0;
-
-         pDrive->next_ext[index].rel_sect = 0;
-         pDrive->next_ext[index].num_sect = 0;
-
          index++;
-      } while ( index < 24 );
-   }
-
-   pDrive->part_values_changed = TRUE;
-   flags.partitions_have_changed = TRUE;
+      } while ( index < MAX_LOGICAL_DRIVES + 1 );
+   }*/
 }
 
 /* Delete Primary Partition */
 void Delete_Primary_Partition( int partition_number )
 {
-   int index;
-   Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+   int drive = flags.drive_number - 0x80;
+   Partition_Table *pDrive = &part_table[drive];
+   Partition *p = &pDrive->pri_part[partition_number];
 
-   /* If partition_number is an extended partition, first delete the */
-   /* extended partition.                                            */
-   if ( ( pDrive->pri_part[partition_number].num_type == 5 ) ||
-        ( pDrive->pri_part[partition_number].num_type == 0x0f ) ) {
-      pDrive->ptr_ext_part = NULL;
-
-      pDrive->ext_part_size_in_MB = 0;
-      pDrive->ext_part_num_sect = 0;
-      pDrive->ext_part_largest_free_space = 0;
-
-      pDrive->log_drive_largest_free_space_location = 0;
-      pDrive->log_drive_free_space_start_cyl = 0;
-      pDrive->log_drive_free_space_end_cyl = 0;
-
-      pDrive->num_of_log_drives = 0;
-
-      index = 0;
-      do {
-         memset( pDrive->log_drive, 0, sizeof( pDrive->log_drive[0] ) );
-
-         pDrive->next_ext_exists[index] = 0;
-
-         memset( pDrive->next_ext, 0, sizeof( pDrive->next_ext[0] ) );
-
-         index++;
-      } while ( index < 23 );
+   if ( Is_Extended_Partition( p ) ) {
+      Clear_Extended_Partition_Table( drive );
    }
 
-   memset( &pDrive->pri_part[partition_number], 0,
-           sizeof( pDrive->pri_part[0] ) );
+   Clear_Partition( p );
    flags.partitions_have_changed = TRUE;
 }
 
@@ -1159,7 +1027,7 @@ void Determine_Free_Space( void )
 
          /* Determine if there is any free space after the last logical drive  */
          /* in the extended partition.                                         */
-         if ( ( last_used_partition < 23 ) &&
+         if ( ( last_used_partition < MAX_LOGICAL_DRIVES ) &&
               ( pDrive->log_drive[last_used_partition].end_cyl <
                 pDrive->ptr_ext_part->end_cyl ) ) {
             if ( pDrive->ptr_ext_part->end_cyl >
@@ -1174,9 +1042,9 @@ void Determine_Free_Space( void )
                   pDrive->ptr_ext_part->end_cyl;
                pDrive->log_drive_largest_free_space_location =
                   last_used_partition + 1;
-               if (pDrive->ptr_ext_part->end_head != pDrive->total_head ||
-                   pDrive->ptr_ext_part->end_sect != pDrive->total_sect) {
-               /* reduce free space by one cylinder if exdended does not end on a
+               if ( pDrive->ptr_ext_part->end_head != pDrive->total_head ||
+                    pDrive->ptr_ext_part->end_sect != pDrive->total_sect ) {
+                  /* reduce free space by one cylinder if exdended does not end on a
                   cylinder boundary */
                   pDrive->log_drive_free_space_end_cyl -= 1;
                   pDrive->ext_part_largest_free_space -= 1;
@@ -1205,19 +1073,20 @@ void Determine_Free_Space( void )
          pDrive->ext_part_largest_free_space =
             ( pDrive->ptr_ext_part->end_cyl ) -
             pDrive->ptr_ext_part->start_cyl + 1;
-         pDrive->log_drive_free_space_start_cyl = pDrive->ptr_ext_part->start_cyl;         
+         pDrive->log_drive_free_space_start_cyl =
+            pDrive->ptr_ext_part->start_cyl;
          pDrive->log_drive_free_space_end_cyl = pDrive->ptr_ext_part->end_cyl;
 
-         if (pDrive->ptr_ext_part->start_head != 0 ||
-             pDrive->ptr_ext_part->start_sect != 1) {
-           /* currently we depend on the extended partition to be aligned to
+         if ( pDrive->ptr_ext_part->start_head != 0 ||
+              pDrive->ptr_ext_part->start_sect != 1 ) {
+            /* currently we depend on the extended partition to be aligned to
                a cylinder boundary. If not move free space to next cylinder */
             pDrive->log_drive_free_space_start_cyl += 1;
             pDrive->ext_part_largest_free_space -= 1;
-         }         
-         if (pDrive->ptr_ext_part->end_head != pDrive->total_head ||
-             pDrive->ptr_ext_part->end_sect != pDrive->total_sect) {
-         /* reduce free space by one cylinder if exdended does not end on a
+         }
+         if ( pDrive->ptr_ext_part->end_head != pDrive->total_head ||
+              pDrive->ptr_ext_part->end_sect != pDrive->total_sect ) {
+            /* reduce free space by one cylinder if exdended does not end on a
             cylinder boundary */
             pDrive->log_drive_free_space_end_cyl -= 1;
             pDrive->ext_part_largest_free_space -= 1;

@@ -70,8 +70,9 @@ $set 4
 
 /* Get input from keyboard */
 unsigned long Input( int size_of_field, int x_position, int y_position,
-                     int type, unsigned long min_range, unsigned long max_range,
-                     int return_message, long default_value,
+                     int type, unsigned long min_range,
+                     unsigned long max_range, int return_message,
+                     long default_value,
                      unsigned long maximum_possible_percentage,
                      char optional_char_1, char optional_char_2 )
 {
@@ -360,7 +361,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
 
             if ( percent_entered == TRUE ) {
                if ( maximum_possible_percentage ) {
-                  data = ( data * data_max_range ) / maximum_possible_percentage;
+                  data =
+                     ( data * data_max_range ) / maximum_possible_percentage;
                }
                else {
                   data = 0;
@@ -474,8 +476,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       }
 
       /* Process optional character fields. */
-      if ( ( type == NUM ) && ( ( optional_char_1 != '\0' ) ||
-                                ( optional_char_2 != '\0' ) ) ) {
+      if ( ( type == NUM ) &&
+           ( ( optional_char_1 != '\0' ) || ( optional_char_2 != '\0' ) ) ) {
          if ( ( input == optional_char_1 ) ||
               ( ( input - 32 ) == optional_char_1 ) ) {
             if ( input >= 97 ) {
@@ -522,8 +524,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       }
 
       if ( ( ( type == YN ) || ( type == NUMYN ) ) &&
-           ( optional_char_1 != NULL ) &&
-           ( optional_char_2 != NULL ) ) {
+           ( optional_char_1 != NULL ) && ( optional_char_2 != NULL ) ) {
          char_max_range = optional_char_2 - '0';
 
          if ( ( input >= '1' ) && ( input <= ( char_max_range + 48 ) ) ) {

@@ -79,78 +79,72 @@ void Ask_User_About_FAT32_Support( void )
 {
    static int already_asked = 0;
 
-   if ( already_asked ) return;
+   if ( already_asked ) {
+      return;
+   }
    already_asked = 1;
 
    Clear_Screen( 0 );
 
-   Print_At(
-      4, 5, 
-      FD_NAME " is capable of using large disk support to allow you to");
+   Print_At( 4, 5,
+             FD_NAME
+             " is capable of using large disk support to allow you to" );
    Print_At(
       4, 6,
-      "create partitions that are greater than 2,048 MB by using FAT32");
+      "create partitions that are greater than 2,048 MB by using FAT32" );
    Print_At(
       4, 7,
-      "partitions.  If you enable large disk support, any partitions or");
+      "partitions.  If you enable large disk support, any partitions or" );
    Print_At(
       4, 8,
-      "logical drives greater than 512 MB will be created using FAT32.");
+      "logical drives greater than 512 MB will be created using FAT32." );
    Print_At(
       4, 10,
-      "IMPORTANT:  If you enable large disk support, some operating systems"
-      );
+      "IMPORTANT:  If you enable large disk support, some operating systems" );
    Print_At(
       4, 11,
-      "will be unable to access the partitions and logical drives that are");
-   Print_At(
-      4, 12,
-      "over 512 MB in size."
-      );
+      "will be unable to access the partitions and logical drives that are" );
+   Print_At( 4, 12, "over 512 MB in size." );
 
-   Print_At(
-      4, 17, "Do you want to use large disk (FAT32) support (Y/N)....?");
+   Print_At( 4, 17,
+             "Do you want to use large disk (FAT32) support (Y/N)....?" );
 
    flags.fat32 = (int)Input( 1, 62, 17, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
-
 }
 
 int Inform_About_Trimmed_Disk( void )
 {
    static int already_asked = 0;
 
-   if ( already_asked ) return 1;
+   if ( already_asked ) {
+      return 1;
+   }
    already_asked = 1;
 
    Clear_Screen( 0 );
 
-   Color_Print_At( 35, 3, "WARNING");
+   Color_Print_At( 35, 3, "WARNING" );
 
-   Print_At(
-      4, 5, 
-      "You have at least one disk larger than 2,097,152 MB.  " FD_NAME " can");
-   Print_At(
-      4, 6,
-      "NOT handle partitions exceeding this barrier!");
+   Print_At( 4, 5,
+             "You have at least one disk larger than 2,097,152 MB.  " FD_NAME
+             " can" );
+   Print_At( 4, 6, "NOT handle partitions exceeding this barrier!" );
    Print_At(
       4, 8,
-      "You may proceed but are in risk of data loss, especially if there");
+      "You may proceed but are in risk of data loss, especially if there" );
    Print_At(
       4, 9,
-      "are already partitions created with other tools exceeding the barrier.");
+      "are already partitions created with other tools exceeding the barrier." );
    Print_At(
       4, 10,
-      "It should be ok if Free FDISK is the only partitioning tool you are");
+      "It should be ok if Free FDISK is the only partitioning tool you are" );
    Print_At(
       4, 11,
-      "using, but we recommend using another disk utility to handle this type");
-   Print_At(
-      4, 12,
-      "of disk.");
+      "using, but we recommend using another disk utility to handle this type" );
+   Print_At( 4, 12, "of disk." );
 
-   Print_At(
-      4, 17,
-      "Are you sure you want to continue (Y/N).................?");
+   Print_At( 4, 17,
+             "Are you sure you want to continue (Y/N).................?" );
 
    return (int)Input( 1, 62, 17, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
 }
@@ -396,21 +390,33 @@ int Create_Logical_Drive_Interface( void )
       extended partition does not start on a cylinder boundary. So to play
       save we prevent the user to create logical partitions in this case. */
    if ( pDrive->ptr_ext_part->start_head != 0 ||
-        pDrive->ptr_ext_part->start_sect != 1) {
+        pDrive->ptr_ext_part->start_sect != 1 ) {
 
-         Clear_Screen( 0 );
+      Clear_Screen( 0 );
 
-         Print_At( 4, 4, "The extended partition does not start on a cylinder boundary!");
-         Print_At( 4, 6, "At the moment " FD_NAME " is not able to handle this.  The creation");
-         Print_At( 4, 7, "of logical drives is therefore disabled to prevent data loss.");
-         Print_At( 4, 9, "The extended partition was propably created with another disk");
-         Print_At( 4, 10, "utility.  You may delete and recreate the extended partition and");
-         Print_At( 4, 11, "the logical drives using Free FDISK or otherwise stick with using");
-         Print_At( 4, 12, "another disk utility for creating logical drives.");
+      Print_At(
+         4, 4,
+         "The extended partition does not start on a cylinder boundary!" );
+      Print_At( 4, 6,
+                "At the moment " FD_NAME
+                " is not able to handle this.  The creation" );
+      Print_At(
+         4, 7,
+         "of logical drives is therefore disabled to prevent data loss." );
+      Print_At(
+         4, 9,
+         "The extended partition was propably created with another disk" );
+      Print_At(
+         4, 10,
+         "utility.  You may delete and recreate the extended partition and" );
+      Print_At(
+         4, 11,
+         "the logical drives using Free FDISK or otherwise stick with using" );
+      Print_At( 4, 12, "another disk utility for creating logical drives." );
 
-         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
+      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
 
-         return( 1 );
+      return ( 1 );
    }
 
    if ( pDrive->ext_part_largest_free_space >= 2 ) {
@@ -561,7 +567,6 @@ void Delete_Extended_DOS_Partition_Interface( void )
    if ( ( flags.esc == FALSE ) && ( input == TRUE ) ) {
       Delete_Primary_Partition(
          (int)( pDrive->ptr_ext_part - pDrive->pri_part ) );
-      Clear_Extended_Partition_Table( flags.drive_number - 128 );
 
       Clear_Screen( 0 );
       Print_Centered( 4, "Delete Extended DOS Partition", BOLD );
@@ -983,7 +988,7 @@ void Display_CL_Partition_Table( void )
       if ( flags.extended_options_flag == TRUE ) {
          printf( "  Start Cyl  End Cyl" );
       }
-      printf("\n");
+      printf( "\n" );
 
       /* Display information for each Logical DOS Drive */
       index = 4;
@@ -1022,7 +1027,7 @@ void Display_CL_Partition_Table( void )
             if ( flags.extended_options_flag == TRUE ) {
                /* Starting Cylinder */
                printf( "     %6lu", pDrive->log_drive[index - 4].start_cyl );
-   
+
                /* Ending Cylinder */
                printf( "   %6lu", pDrive->log_drive[index - 4].end_cyl );
             }
@@ -1740,7 +1745,7 @@ void Modify_Primary_Partition_Information( int partition_number )
 
       if ( input == 4 ) {
          /* Remove active status */
-         Clear_Active_Partition();
+         Deactivate_Active_Partition();
       }
 
    } while ( finished == FALSE );

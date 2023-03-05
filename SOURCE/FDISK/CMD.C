@@ -173,7 +173,7 @@ void Command_Line_Create_Extended_Partition( void )
       /* Determine partition size. */
       if ( maximum_possible_percentage > 0 ) {
          arg[0].value = ( arg[0].value * maximum_partition_size_in_MB ) /
-                     maximum_possible_percentage;
+                        maximum_possible_percentage;
       }
       else {
          arg[0].value = 0;
@@ -222,7 +222,7 @@ void Command_Line_Create_Logical_DOS_Drive( void )
       /* Determine partition size. */
       if ( maximum_possible_percentage > 0 ) {
          arg[0].value = ( arg[0].value * maximum_partition_size_in_MB ) /
-                     maximum_possible_percentage;
+                        maximum_possible_percentage;
       }
       else {
          arg[0].value = 0;
@@ -286,7 +286,7 @@ void Command_Line_Create_Primary_Partition( void )
       /* Determine partition size. */
       if ( maximum_possible_percentage > 0 ) {
          arg[0].value = ( arg[0].value * maximum_partition_size_in_MB ) /
-                     maximum_possible_percentage;
+                        maximum_possible_percentage;
       }
       else {
          arg[0].value = 0;
@@ -660,32 +660,32 @@ int Get_Options( char *argv[], int argc )
 
       argptr++;
 
-      if ( isdigit( *argptr) ) {
+      if ( isdigit( *argptr ) ) {
          arg[number_of_options].value = atol( argptr );
-   
+
          while ( isdigit( *argptr ) ) { /* skip number */
             argptr++;
          }
-   
+
          if ( *argptr == 0 ) { /* done */
             continue;
          }
-   
+
          if ( *argptr != ',' ) {
             printf( "<%s> ',' expected; terminated\n", argptr );
             exit( 9 );
          }
-   
+
          argptr++;
-   
+
          arg[number_of_options].extra_value = (int)atol( argptr );
-   
+
          while ( isdigit( *argptr ) ) { /* skip number */
             argptr++;
-         }         
+         }
       }
       else {
-         if ( !stricmp( argptr, "MAX") ) {
+         if ( !stricmp( argptr, "MAX" ) ) {
             arg[number_of_options].value = 100;
             arg[number_of_options].extra_value = 100;
             argptr += 3;

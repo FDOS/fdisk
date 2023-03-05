@@ -24,17 +24,13 @@ char *searchpath( char *fn )
 static unsigned short _textattr = 0x07;
 
 /* Watcom C does not have this */
-void textattr( int color )
+void textattr( int color ) { _textattr = color & 0xff; }
+
+void textcolor( int color ) { _textattr = _textattr & 0x70 | color & 0x8f; }
+
+void textbackground( int background )
 {
-   _textattr = color & 0xff;
-}
-
-void textcolor( int color ) {
-   _textattr = _textattr & 0x70 | color & 0x8f;
-}
-
-void textbackground( int background ) {
-   _textattr = _textattr & 0x8f | (background << 4) & 0x70;
+   _textattr = _textattr & 0x8f | ( background << 4 ) & 0x70;
 }
 
 /* Watcom C does have biosdisk equivalent _bios_disk */

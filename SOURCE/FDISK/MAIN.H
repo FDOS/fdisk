@@ -20,14 +20,14 @@
 */
 
 #ifdef FD_FREEDOS
-   #define FD_NAME "FreeDOS FDISK"
+#define FD_NAME "FreeDOS FDISK"
 #endif
 
 #define VERSION  "1.3.5 BETA"
 #define COPYLEFT "1998 - 2023"
 
 #ifndef FD_NAME
-#define FD_NAME  "Free FDISK"
+#define FD_NAME "Free FDISK"
 #endif
 
 //#define DEBUG
@@ -318,13 +318,6 @@ int Color_Print_At( int column, int row, char *, ... );
 int BlinkPrintAt( int column, int row, char *format, ... );
 
 ulong GetPercentOfLargeNumber( int percent, ulong number );
-
-typedef struct {
-   char *string;
-   int *flag;
-} OnOffTable;
-
-OnOffTable *FindOnOffTable( char *flagname );
 
 unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
                                  unsigned long total_heads,

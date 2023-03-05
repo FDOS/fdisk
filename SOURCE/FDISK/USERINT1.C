@@ -55,11 +55,11 @@
 /* Clear Screen */
 void Clear_Screen( int type ) /* Clear screen code as suggested by     */
 {                             /* Ralf Quint                            */
-   if (flags.monochrome == TRUE) {
-      Clear_Screen_With_Attr( type, 0x07 );      
+   if ( flags.monochrome == TRUE ) {
+      Clear_Screen_With_Attr( type, 0x07 );
    }
    else {
-      Clear_Screen_With_Attr( type, flags.screen_color );      
+      Clear_Screen_With_Attr( type, flags.screen_color );
    }
 }
 
@@ -74,9 +74,9 @@ void Clear_Screen_With_Attr( int type, unsigned char attr )
     mov ah, 0x06 /* scroll up */
     mov al, 0x00 /* 0 rows, clear whole window */
     mov bh, BYTE PTR attr /* set color */
-    xor cx, cx   /* coordinates of upper left corner of screen */
-   /*    mov dh,25    */ /* maximum row */
-    mov dl, 79   /* maximum column */
+    xor cx, cx /* coordinates of upper left corner of screen */
+         /*    mov dh,25    */ /* maximum row */
+    mov dl, 79 /* maximum column */
     int 0x10
    }
 
@@ -142,8 +142,8 @@ void Display_Information( void )
 #ifndef RELEASE
    Position_Cursor( 0, flags.extended_options_flag ? 1 : 0 );
    Color_Print( "NON-RELEASE BUILD" );
-   Position_Cursor( 63, flags.extended_options_flag ? 1 : 0 );
-   Color_Print( "NON-RELEASE BUILD" );
+   Position_Cursor( 60, flags.extended_options_flag ? 1 : 0 );
+   Color_Print( __DATE__ " " __TIME__ );
 #endif
 
 #ifdef DEBUG
@@ -228,9 +228,9 @@ void Interactive_User_Interface( void )
 
    /* abort if user decides so after beeing informed of FDISK not able
       to correctly handle disks too large */
-   for (index = 0; index <= flags.maximum_drive_number - 0x80; ++index) {
-      if (part_table[index].size_truncated) {
-         if (!Inform_About_Trimmed_Disk()) {
+   for ( index = 0; index <= flags.maximum_drive_number - 0x80; ++index ) {
+      if ( part_table[index].size_truncated ) {
+         if ( !Inform_About_Trimmed_Disk() ) {
             goto ret;
          }
       }
@@ -602,7 +602,7 @@ int Standard_Menu( int menu )
 
       strcpy( program_description, "Fixed Disk Setup Program" );
       strcpy( copyleft, "GNU GPL (c) " COPYLEFT " by Brian E. Reifsnyder"
-         " and The FreeDOS Community" );
+                        " and The FreeDOS Community" );
 
       if ( menu == MM ) {
          maximum_number_of_options = 4;

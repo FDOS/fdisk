@@ -23,6 +23,9 @@ Bugfixes:
  - CRITICAL: Fix different calculation errors leading to overlapping
      partitions, unnessessary free space between them, or partitions exceeding
      the end of the disk resulting from off-by-one and off-by-two errors.
+ - MEDIUM: Fix a bug where FDISK gets confused which boot sectors to clear
+     if logical drives are created and deleted during the same program
+     invocation.
  - MEDIUM: Fix a cylinder off by one error in partition type determination.
  - LOW: Fix color handling for background colors other than black.
  - LOW: Fix various flaws in the input handling routine.
