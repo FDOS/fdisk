@@ -10,7 +10,7 @@
 
 int LBA_Partition_Type_To_Create( int standard_partition_type );
 int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB );
-int Create_Primary_Partition( int numeric_type, unsigned long size_in_MB );
+int Create_Primary_Partition( int num_type, unsigned long size_in_MB );
 int More_Than_One_Hard_Disk( void );
 int Partition_Type_To_Create( unsigned long size_in_mb,
                               int requested_partition_type );

@@ -145,7 +145,7 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    //Qprintf("calculated type is %02x\n",numeric_type);
 
    /* Make space in the part_table structure, if necessary. */
-   if ( free_space_loc <= pDrive->num_of_log_drives && free_space_loc > 0 ) {
+   if ( free_space_loc < pDrive->num_of_log_drives && free_space_loc > 0 ) {
 
       for ( index = pDrive->num_of_log_drives + 1; index > free_space_loc;
             index-- ) {
@@ -155,6 +155,8 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
                          &pDrive->next_ext[index - 1] );
 
          pDrive->next_ext_exists[index] = pDrive->next_ext_exists[index - 1];
+         pDrive->log_drive_created[index] =
+            pDrive->log_drive_created[index - 1];
       }
    }
 
@@ -336,133 +338,124 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    return ( 0 );
 }
 
+/* unused by now 
+static unsigned long align_down( unsigned long sect )
+{
+   return sect & 0xfffffff8;
+}
+*/
+
+static unsigned long align_up( unsigned long sect )
+{
+   return ( ( sect & 7 ) == 0 ) ? sect : ( sect & 0xfffffff8ul ) + 8;
+}
+
 /* Create a Primary Partition */
 /* Returns partition number if successful and a 99 if unsuccessful */
-int Create_Primary_Partition( int numeric_type, unsigned long size_in_MB )
+int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
 {
    int index;
-   int empty_partition_number;
-   struct Partition *newPartition;
+   int empty_part_num;
+   struct Partition *np;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
-   unsigned long computed_ending_cylinder;
-   unsigned long maximum_size_in_cylinders =
-      pDrive->pri_part_largest_free_space;
-   unsigned long requested_size_in_cylinders =
-      Number_Of_Cylinders( size_in_MB * 2048 );
+   unsigned long start_cyl = pDrive->pp_largest_free_space_start_cyl;
+   unsigned long end_cyl;
+   unsigned long max_sz_cyl = pDrive->pri_part_largest_free_space;
+   unsigned long req_sz_cyl = Number_Of_Cylinders( size_in_MB * 2048 );
 
-   unsigned long computed_partition_size;
-   unsigned long cylinder_size =
-      ( pDrive->total_head + 1 ) * ( pDrive->total_sect );
+   unsigned long start_sect;
+   unsigned long end_sect;
+   unsigned long part_sz;
 
    if ( pDrive->pri_part_largest_free_space == 0 ) {
-      //Qprintf("no space left for primary partitions\n");
       return 99;
    }
 
-   //Qprintf("Creating primary partition type %02x size %luMB\n",numeric_type,size_in_MB);
-
    /* Ensure that an empty primary partition exists. */
-   for ( empty_partition_number = 99, index = 0; index < 4; index++ ) {
+   empty_part_num = 99;
+   for ( index = 0; index < 4; index++ ) {
       if ( pDrive->pri_part[index].num_type == 0 ) {
-         empty_partition_number = index;
+         empty_part_num = index;
          break;
       }
    }
 
    /* If all primary partitions are full, report failure. */
-   if ( empty_partition_number == 99 ) {
+   if ( empty_part_num == 99 ) {
       return ( 99 );
    }
+   np = &pDrive->pri_part[empty_part_num];
 
    /* Adjust the size of the partition to fit boundaries, if necessary. */
-   if ( requested_size_in_cylinders > maximum_size_in_cylinders ) {
-      requested_size_in_cylinders = maximum_size_in_cylinders;
+   if ( req_sz_cyl > max_sz_cyl ) {
+      req_sz_cyl = max_sz_cyl;
    }
 
    /* If the requested size of the partition is close to the end of the */
    /* maximum available space, fill the maximum available space.        */
    /* This ensures more aggressive use of the hard disk.                */
-   if ( ( maximum_size_in_cylinders - 3 ) <= requested_size_in_cylinders ) {
-      requested_size_in_cylinders = maximum_size_in_cylinders;
+   if ( ( max_sz_cyl - 3 ) <= req_sz_cyl ) {
+      req_sz_cyl = max_sz_cyl;
    }
 
    /* Make sure the starting cylinder of an extended partition is at least  */
-   /* 1.  If the cylinder number is 0, increment it to 1.                   */
-   if ( ( numeric_type == 5 ) || ( numeric_type == 0x0f ) ) {
-      if ( pDrive->pp_largest_free_space_start_cyl == 0 ) {
-         pDrive->pp_largest_free_space_start_cyl = 1;
-         requested_size_in_cylinders--;
+   /* one. */
+   if ( ( num_type == 5 ) || ( num_type == 0x0f ) ) {
+      if ( start_cyl == 0 ) {
+         start_cyl = 1;
+         req_sz_cyl--;
       }
    }
 
-   /* Re-obtain a partition type, if applicable. */
-   if ( ( numeric_type != 5 ) && ( numeric_type != 0x0f ) ) {
-      numeric_type = Partition_Type_To_Create(
-         ( ( requested_size_in_cylinders * ( pDrive->total_head + 1 ) *
-             ( pDrive->total_sect ) ) /
-           2048 ),
-         numeric_type );
+   /* Do sector calculation in LBA, then convert back to CHS */
+   start_sect = chs_to_lba( pDrive, start_cyl, 0, 1 );
+   if ( start_cyl == 0 ) {
+      /* If the starting cylinder is 0, leave one track space for MBR etc. */
+      start_sect += pDrive->total_sect;
+   }
+   if ( flags.align_4k ) {
+      start_sect = align_up( start_sect );
    }
 
-   /* Compute the ending cylinder of the partition */
-   computed_ending_cylinder = pDrive->pp_largest_free_space_start_cyl +
-                              requested_size_in_cylinders - 1;
+   /* Compute the ending of the partition */
+   end_cyl = start_cyl + req_sz_cyl - 1;
+   end_sect =
+      chs_to_lba( pDrive, end_cyl, pDrive->total_head, pDrive->total_sect );
 
    /* Compute the size of the partition. */
-   computed_partition_size = (requested_size_in_cylinders)*cylinder_size;
+   part_sz = end_sect - start_sect + 1;
 
-   newPartition = &pDrive->pri_part[empty_partition_number];
-   newPartition->active_status = 0;
-   newPartition->num_type = numeric_type;
+   lba_to_chs( start_sect, pDrive, &np->start_cyl, &np->start_head,
+               &np->start_sect );
+   lba_to_chs( end_sect, pDrive, &np->end_cyl, &np->end_head, &np->end_sect );
+   np->rel_sect = start_sect;
+   np->num_sect = part_sz;
 
-   newPartition->start_cyl = pDrive->pp_largest_free_space_start_cyl;
+   np->size_in_MB = Convert_Sect_To_MB( part_sz );
 
-   /* If the starting cylinder is 0, then the starting head is 1...otherwise */
-   /* the starting head is 1.                                                */
-   if ( pDrive->pp_largest_free_space_start_cyl == 0 ) {
-      newPartition->start_head = 1;
-   }
-   else {
-      newPartition->start_head = 0;
-   }
-   newPartition->start_sect = 1;
+   /* Set partition type etc. */
+   np->active_status = 0;
 
-   newPartition->end_cyl = computed_ending_cylinder;
-   newPartition->end_head = pDrive->total_head;
-   newPartition->end_sect = pDrive->total_sect;
-
-   if ( newPartition->end_cyl > 1023 && ( pDrive->ext_int_13 == TRUE ) ) {
-      numeric_type = LBA_Partition_Type_To_Create( numeric_type );
-      newPartition->num_type = numeric_type;
+   /* Re-obtain a partition type, if applicable. */
+   if ( ( num_type != 5 ) || ( num_type != 0x0f ) ) {
+      num_type = Partition_Type_To_Create( part_sz / 2048, num_type );
    }
 
-   if ( newPartition->start_cyl > 0 ) {
-      newPartition->rel_sect = newPartition->start_cyl *
-                               ( pDrive->total_head + 1 ) *
-                               pDrive->total_sect;
+   if ( np->end_cyl > 1023 && ( pDrive->ext_int_13 == TRUE ) ) {
+      num_type = LBA_Partition_Type_To_Create( num_type );
    }
-   else {
-      newPartition->rel_sect = pDrive->total_sect;
-   }
-
-   if ( pDrive->pp_largest_free_space_start_cyl == 0 ) {
-      computed_partition_size = computed_partition_size - pDrive->total_sect;
-   }
-
-   newPartition->num_sect = computed_partition_size;
-
-   newPartition->size_in_MB = Convert_Sect_To_MB( computed_partition_size );
+   np->num_type = num_type;
 
    pDrive->part_values_changed = TRUE;
    flags.partitions_have_changed = TRUE;
 
-   pDrive->pri_part_created[empty_partition_number] = TRUE;
+   pDrive->pri_part_created[empty_part_num] = TRUE;
 
-   if ( ( numeric_type == 5 ) || ( numeric_type == 0x0f ) ) {
-      pDrive->ptr_ext_part = &pDrive->pri_part[empty_partition_number];
-      pDrive->ext_part_num_sect = computed_partition_size;
+   if ( ( num_type == 5 ) || ( num_type == 0x0f ) ) {
+      pDrive->ptr_ext_part = &pDrive->pri_part[empty_part_num];
+      pDrive->ext_part_num_sect = part_sz;
       pDrive->ext_part_size_in_MB = size_in_MB;
    }
 
@@ -470,31 +463,30 @@ int Create_Primary_Partition( int numeric_type, unsigned long size_in_MB )
    if ( debug.create_partition == TRUE ) {
       Clear_Screen( NOEXTRAS );
       Print_Centered(
-         1, "int Create_Primary_Partition(int numeric_type,long size_in_MB)",
+         1, "int Create_Primary_Partition(int num_type,long size_in_MB)",
          BOLD );
-      Print_At( 4, 3, "int numeric_type=%d", numeric_type );
+      Print_At( 4, 3, "int num_type=%d", num_type );
       Print_At( 4, 4, "long size_in_MB=%lu", size_in_MB );
-      Print_At( 4, 5, "empty_partition_number=%d", empty_partition_number );
+      Print_At( 4, 5, "empty_part_num=%d", empty_part_num );
 
       Print_At( 4, 8, "New Partition Information:" );
-      Print_At( 4, 10, "Starting Cylinder:  %lu", newPartition->start_cyl );
-      Print_At( 4, 11, "Starting Head:      %lu", newPartition->start_head );
-      Print_At( 4, 12, "Starting Sector:    %lu", newPartition->start_sect );
+      Print_At( 4, 10, "Starting Cylinder:  %lu", np->start_cyl );
+      Print_At( 4, 11, "Starting Head:      %lu", np->start_head );
+      Print_At( 4, 12, "Starting Sector:    %lu", np->start_sect );
 
-      Print_At( 40, 10, "Ending Cylinder:   %lu", newPartition->end_cyl );
-      Print_At( 40, 11, "Ending Head:       %lu", newPartition->end_head );
-      Print_At( 40, 12, "Ending Sector:     %lu", newPartition->end_sect );
+      Print_At( 40, 10, "Ending Cylinder:   %lu", np->end_cyl );
+      Print_At( 40, 11, "Ending Head:       %lu", np->end_head );
+      Print_At( 40, 12, "Ending Sector:     %lu", np->end_sect );
 
-      Print_At( 4, 14, "Relative Sectors:   %lu", newPartition->rel_sect );
+      Print_At( 4, 14, "Relative Sectors:   %lu", np->rel_sect );
 
-      Print_At( 40, 14, "Size of partition in MB:    %lu",
-                newPartition->size_in_MB );
+      Print_At( 40, 14, "Size of partition in MB:    %lu", np->size_in_MB );
 
       Pause();
    }
 #endif
 
-   return ( empty_partition_number );
+   return empty_part_num;
 }
 
 /* Delete Logical DOS Drive */
