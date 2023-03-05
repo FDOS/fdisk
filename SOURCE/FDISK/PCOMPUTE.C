@@ -133,9 +133,7 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
 
    int free_space_loc = pDrive->log_drive_largest_free_space_location;
 
-   if ( max_sz_cyl == 0 || req_sz_cyl == 0 ) {
-      return 99;
-   }
+   if ( max_sz_cyl == 0  || req_sz_cyl == 0 ) { return 99; }
 
    /* Adjust the size of the partition to fit boundaries, if necessary. */
    if ( req_sz_cyl > max_sz_cyl ) {
@@ -169,13 +167,14 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
 
    /* Adjust the partition type, if necessary. */
    numeric_type = Partition_Type_To_Create(
-      ( ( req_sz_cyl * ( pDrive->total_head + 1 ) * ( pDrive->total_sect ) ) /
+      ( ( req_sz_cyl * ( pDrive->total_head + 1 ) *
+          ( pDrive->total_sect ) ) /
         2048 ),
       numeric_type );
 
    p = &pDrive->log_drive[free_space_loc];
 
-   if ( free_space_loc == 0 ) {
+   if (  free_space_loc == 0 ) {
       nep = pDrive->ptr_ext_part;
    }
    else {
@@ -192,23 +191,22 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
       nep->end_head = pDrive->total_head;
       nep->end_sect = pDrive->total_sect;
 
-      nep->rel_sect = chs_to_lba( pDrive, nep->start_cyl, nep->start_head,
-                                  nep->start_sect ) -
-                      ep->rel_sect;
+      nep->rel_sect =
+      chs_to_lba( pDrive, nep->start_cyl, nep->start_head, nep->start_sect) -
+         ep->rel_sect;
       nep->num_sect =
-         chs_to_lba( pDrive, nep->end_cyl, nep->end_head, nep->end_sect ) -
-         chs_to_lba( pDrive, nep->start_cyl, nep->start_head,
-                     nep->start_sect ) +
+      chs_to_lba( pDrive, nep->end_cyl, nep->end_head, nep->end_sect) -
+         chs_to_lba( pDrive, nep->start_cyl, nep->start_head, nep->start_sect) +
          1;
    }
 
    /* calculate start sector from beginning of extended partition */
    ext_start_sect =
-      chs_to_lba( pDrive, nep->start_cyl, nep->start_head, nep->start_sect );
+      chs_to_lba( pDrive, nep->start_cyl, nep->start_head, nep->start_sect);
    start_sect = ext_start_sect + pDrive->total_sect;
    if ( flags.align_4k ) {
       start_sect = align_up( start_sect );
-   }
+   }  
    end_sect =
       chs_to_lba( pDrive, end_cyl, pDrive->total_head, pDrive->total_sect );
 
