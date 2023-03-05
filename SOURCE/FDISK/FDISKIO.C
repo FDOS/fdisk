@@ -420,6 +420,7 @@ void Process_Fdiskini_File( void )
    debug.write = UNCHANGED;
 #endif
 
+   flags.align_4k = UNCHANGED;
    flags.allow_4gb_fat16 = UNCHANGED;
    flags.allow_abort = UNCHANGED;
    flags.check_for_extra_cylinder = UNCHANGED;
@@ -542,6 +543,23 @@ void Process_Fdiskini_File( void )
             /* Process the command found in the line buffer */
 
             command_ok = FALSE;
+
+            /* Align partitions to 4k */
+            if ( 0 == stricmp( command_buffer, "ALIGN_4K" ) ) {
+               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
+                  flags.align_4k = TRUE;
+               }
+               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
+                  flags.align_4k = FALSE;
+               }
+               if ( flags.align_4k == UNCHANGED ) {
+                  printf(
+                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     line_counter );
+                  exit( 3 );
+               }
+               command_ok = TRUE;
+            }
 
             /* Check for the ALLOW_4GB_FAT16 statement */
             if ( 0 == stricmp( command_buffer, "ALLOW_4GB_FAT16" ) ) {
@@ -1098,6 +1116,9 @@ void Process_Fdiskini_File( void )
    }
 #endif
 
+   if ( flags.align_4k == UNCHANGED ) {
+      flags.align_4k = FALSE;
+   }
    if ( flags.allow_4gb_fat16 == UNCHANGED ) {
       flags.allow_4gb_fat16 = FALSE;
    }

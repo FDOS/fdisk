@@ -247,6 +247,7 @@ typedef struct flags_structure {
 
    char language[12];
 
+   int align_4k;
    int allow_4gb_fat16;
    int allow_abort;
    int del_non_dos_log_drives;

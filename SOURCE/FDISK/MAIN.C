@@ -308,6 +308,16 @@ int Get_Environment_Settings( char *environment[] )
 
       /* Process the command found in the line buffer */
 
+      /* Align partitions to 4K */
+      if ( 0 == strcmp( command_buffer, "FFD_ALIGN_4K" ) ) {
+         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
+            flags.align_4k = TRUE;
+         }
+         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
+            flags.align_4k = FALSE;
+         }
+      }
+
       /* Check for the ALLOW_4GB_FAT16 statement */
       if ( 0 == strcmp( command_buffer, "FFD_ALLOW_4GB_FAT16" ) ) {
          if ( 0 == strcmp( setting_buffer, "ON" ) ) {
