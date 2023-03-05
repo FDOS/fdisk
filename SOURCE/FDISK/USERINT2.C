@@ -374,11 +374,14 @@ int Create_DOS_Partition_Interface( int type )
 /* Returns a 0 if successful and a 1 if unsuccessful */
 int Create_Logical_Drive_Interface( void )
 {
+   static int allow_unaligned_ext = FALSE;
+
    long input = 0;
 
    int drive_created = FALSE;
    int maximum_possible_percentage;
    int numeric_type;
+   int yn;
 
    unsigned long maximum_partition_size_in_MB;
 
@@ -389,34 +392,34 @@ int Create_Logical_Drive_Interface( void )
    /* size and position calculation for logical drives is flawed if the
       extended partition does not start on a cylinder boundary. So to play
       save we prevent the user to create logical partitions in this case. */
-   if ( pDrive->ptr_ext_part->start_head != 0 ||
-        pDrive->ptr_ext_part->start_sect != 1 ) {
+   if ( (pDrive->ptr_ext_part->start_head != 0 ||
+        pDrive->ptr_ext_part->start_sect != 1) &&
+        flags.align_4k == FALSE && allow_unaligned_ext == FALSE ) {
 
       Clear_Screen( 0 );
 
-      Print_At(
-         4, 4,
-         "The extended partition does not start on a cylinder boundary!" );
-      Print_At( 4, 6,
-                "At the moment " FD_NAME
-                " is not able to handle this.  The creation" );
+      Color_Print_At(36, 4, "WARNING");
+      Print_At( 4, 6, FD_NAME " is currently in cylinder alignment mode, but the" );
       Print_At(
          4, 7,
-         "of logical drives is therefore disabled to prevent data loss." );
+         "extended partition does not start on a cylinder boundary!" );
       Print_At(
          4, 9,
-         "The extended partition was propably created with another disk" );
-      Print_At(
-         4, 10,
-         "utility.  You may delete and recreate the extended partition and" );
-      Print_At(
-         4, 11,
-         "the logical drives using Free FDISK or otherwise stick with using" );
-      Print_At( 4, 12, "another disk utility for creating logical drives." );
+         "While unlikely, this MAY result in compatibility problems." );
 
-      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
+      Print_At(4, 11,
+         "If your system depends on proper cylinder alignment you should");
+      Print_At(4, 12,
+         "consider re-creating the extended partition.");
 
-      return ( 1 );
+      Print_At( 4, 21, "Create logical drive in non-aligned extended partition...?"); 
+      yn = Input( 1, 63, 21, YN, 0, 0, NONE, 1, 0, 0, 0 );
+      if ( yn ) {
+         allow_unaligned_ext = TRUE;
+      }
+      else {
+         return ( 1 );         
+      }
    }
 
    if ( pDrive->ext_part_largest_free_space >= 2 ) {

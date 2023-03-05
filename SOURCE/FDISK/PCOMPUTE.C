@@ -99,6 +99,18 @@ void Clear_Extended_Partition_Table( int drive )
    }
 }
 
+/* unused by now 
+static unsigned long align_down( unsigned long sect )
+{
+   return sect & 0xfffffff8;
+}
+*/
+
+static unsigned long align_up( unsigned long sect )
+{
+   return ( ( sect & 7 ) == 0 ) ? sect : ( sect & 0xfffffff8ul ) + 8;
+}
+
 /* Create Logical Drive */
 /* Returns a 0 if successful and a 1 if unsuccessful */
 int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
@@ -109,40 +121,35 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    Partition *ep = pDrive->ptr_ext_part;
    Partition *p, *nep;
 
-   unsigned long computed_ending_cylinder;
-   unsigned long maximum_size_in_cylinders =
-      pDrive->ext_part_largest_free_space;
-   unsigned long requested_size_in_cylinders =
-      Number_Of_Cylinders( size_in_MB * 2048 );
+   unsigned long start_cyl = pDrive->log_drive_free_space_start_cyl;
+   unsigned long end_cyl;
+   unsigned long max_sz_cyl = pDrive->ext_part_largest_free_space;
+   unsigned long req_sz_cyl = Number_Of_Cylinders( size_in_MB * 2048 );
 
-   unsigned long computed_partition_size;
+   unsigned long ext_start_sect;
+   unsigned long start_sect;
+   unsigned long end_sect;
+   unsigned long part_sz;
+
    int free_space_loc = pDrive->log_drive_largest_free_space_location;
-   unsigned long cylinder_size =
-      ( pDrive->total_head + 1 ) * ( pDrive->total_sect );
+
+   if ( max_sz_cyl == 0 || req_sz_cyl == 0 ) {
+      return 99;
+   }
 
    /* Adjust the size of the partition to fit boundaries, if necessary. */
-   if ( requested_size_in_cylinders > maximum_size_in_cylinders ) {
-      requested_size_in_cylinders = maximum_size_in_cylinders;
+   if ( req_sz_cyl > max_sz_cyl ) {
+      req_sz_cyl = max_sz_cyl;
    }
 
    /* If the requested size of the partition is close to the end of the */
    /* maximum available space, fill the maximum available space.        */
    /* This ensures more aggressive use of the hard disk.                */
-   if ( ( maximum_size_in_cylinders - 3 ) <= requested_size_in_cylinders ) {
-      requested_size_in_cylinders = maximum_size_in_cylinders;
+   if ( ( max_sz_cyl - 3 ) <= req_sz_cyl ) {
+      req_sz_cyl = max_sz_cyl;
    }
 
-   /* Adjust the partition type, if necessary. */
-   numeric_type = Partition_Type_To_Create(
-      ( ( requested_size_in_cylinders * ( pDrive->total_head + 1 ) *
-          ( pDrive->total_sect ) ) /
-        2048 ),
-      numeric_type );
-
-   /* Compute the size of the partition. */
-   computed_partition_size = (requested_size_in_cylinders)*cylinder_size;
-
-   //Qprintf("calculated type is %02x\n",numeric_type);
+   end_cyl = start_cyl + req_sz_cyl - 1;
 
    /* Make space in the part_table structure, if necessary. */
    if ( free_space_loc < pDrive->num_of_log_drives && free_space_loc > 0 ) {
@@ -160,31 +167,68 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
       }
    }
 
-   /* Add the logical drive entry. */ /*????????????*/
+   /* Adjust the partition type, if necessary. */
+   numeric_type = Partition_Type_To_Create(
+      ( ( req_sz_cyl * ( pDrive->total_head + 1 ) * ( pDrive->total_sect ) ) /
+        2048 ),
+      numeric_type );
+
    p = &pDrive->log_drive[free_space_loc];
+
+   if ( free_space_loc == 0 ) {
+      nep = pDrive->ptr_ext_part;
+   }
+   else {
+      /* create extended partition for logical drive */
+      pDrive->next_ext_exists[free_space_loc - 1] = TRUE;
+      nep = &pDrive->next_ext[free_space_loc - 1];
+
+      nep->num_type = 5;
+      nep->start_cyl = start_cyl;
+      nep->start_head = 0;
+      nep->start_sect = 1;
+
+      nep->end_cyl = end_cyl;
+      nep->end_head = pDrive->total_head;
+      nep->end_sect = pDrive->total_sect;
+
+      nep->rel_sect = chs_to_lba( pDrive, nep->start_cyl, nep->start_head,
+                                  nep->start_sect ) -
+                      ep->rel_sect;
+      nep->num_sect =
+         chs_to_lba( pDrive, nep->end_cyl, nep->end_head, nep->end_sect ) -
+         chs_to_lba( pDrive, nep->start_cyl, nep->start_head,
+                     nep->start_sect ) +
+         1;
+   }
+
+   /* calculate start sector from beginning of extended partition */
+   ext_start_sect =
+      chs_to_lba( pDrive, nep->start_cyl, nep->start_head, nep->start_sect );
+   start_sect = ext_start_sect + pDrive->total_sect;
+   if ( flags.align_4k ) {
+      start_sect = align_up( start_sect );
+   }
+   end_sect =
+      chs_to_lba( pDrive, end_cyl, pDrive->total_head, pDrive->total_sect );
+
+   /* Compute the size of the partition. */
+   part_sz = end_sect - start_sect + 1;
+
+   lba_to_chs( start_sect, pDrive, &p->start_cyl, &p->start_head,
+               &p->start_sect );
+   lba_to_chs( end_sect, pDrive, &p->end_cyl, &p->end_head, &p->end_sect );
+   p->rel_sect = start_sect - ext_start_sect;
+   p->num_sect = part_sz;
+
+   p->size_in_MB = Convert_Sect_To_MB( part_sz );
+
    p->num_type = numeric_type;
    strcpy( p->vol_label, "" );
-
-   p->start_cyl = pDrive->log_drive_free_space_start_cyl;
-   p->start_head = 1;
-   p->start_sect = 1;
-
-   /* Compute the ending cylinder */
-   computed_ending_cylinder = pDrive->log_drive_free_space_start_cyl +
-                              requested_size_in_cylinders - 1;
-
-   p->end_cyl = computed_ending_cylinder;
-   p->end_head = pDrive->total_head;
-   p->end_sect = pDrive->total_sect;
 
    if ( p->end_cyl > 1023 && pDrive->ext_int_13 == TRUE ) {
       p->num_type = LBA_Partition_Type_To_Create( numeric_type );
    }
-
-   p->rel_sect = pDrive->total_sect;
-   p->num_sect = computed_partition_size - p->rel_sect;
-
-   p->size_in_MB = Convert_Sect_To_MB( computed_partition_size );
 
    pDrive->num_of_log_drives++;
    pDrive->log_drive_created[free_space_loc] = TRUE;
@@ -192,6 +236,7 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    /* Add the linkage entry. */
 
    /* Add the linkage entry if there is a logical drive after this one. */
+   /*
    if ( pDrive->log_drive[free_space_loc + 1].num_type > 0 ) {
       pDrive->next_ext_exists[free_space_loc] = TRUE;
 
@@ -199,20 +244,21 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
 
       nep->num_type = 5;
 
-      nep->start_cyl = ( p + 1 )->start_cyl;
-      nep->start_head = 0;
-      nep->start_sect = 1;
+      nep->start_cyl = ( nep + 1 )->start_cyl;
+      nep->start_head = ( nep + 1 )->start_head;
+      nep->start_sect = ( nep + 1 )->start_sect;
 
-      nep->end_cyl = ( p + 1 )->end_cyl;
-      nep->end_head = pDrive->total_head;
-      nep->end_sect = pDrive->total_sect;
+      nep->end_cyl = ( nep + 1 )->end_cyl;
+      nep->end_head = ( nep + 1 )->end_head;
+      nep->end_sect = ( nep + 1 )->end_sect;
 
-      nep->rel_sect = ( ( p + 1 )->start_cyl - ep->start_cyl ) *
+      nep->rel_sect = ( ( nep + 1 )->start_cyl - ep->start_cyl ) *
                       ( pDrive->total_head + 1 ) * pDrive->total_sect;
-      nep->num_sect = ( p + 1 )->num_sect + pDrive->total_sect;
-   }
+      nep->num_sect = ( nep + 1 )->num_sect + pDrive->total_sect;
+   }*/
 
    /* Add the linkage entry if there is a logical drive before this one. */
+   /*
    if ( free_space_loc > 0 ) {
       pDrive->next_ext_exists[free_space_loc - 1] = TRUE;
 
@@ -232,7 +278,7 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
                       ( pDrive->total_head + 1 ) * pDrive->total_sect;
 
       nep->num_sect = computed_partition_size;
-   }
+   }*/
 
    pDrive->part_values_changed = TRUE;
    flags.partitions_have_changed = TRUE;
@@ -338,18 +384,6 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    return ( 0 );
 }
 
-/* unused by now 
-static unsigned long align_down( unsigned long sect )
-{
-   return sect & 0xfffffff8;
-}
-*/
-
-static unsigned long align_up( unsigned long sect )
-{
-   return ( ( sect & 7 ) == 0 ) ? sect : ( sect & 0xfffffff8ul ) + 8;
-}
-
 /* Create a Primary Partition */
 /* Returns partition number if successful and a 99 if unsuccessful */
 int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
@@ -369,7 +403,7 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
    unsigned long end_sect;
    unsigned long part_sz;
 
-   if ( pDrive->pri_part_largest_free_space == 0 ) {
+   if ( max_sz_cyl == 0 || req_sz_cyl == 0 ) {
       return 99;
    }
 
@@ -401,15 +435,15 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
    }
 
    /* Make sure the starting cylinder of an extended partition is at least  */
-   /* one. */
-   if ( ( num_type == 5 ) || ( num_type == 0x0f ) ) {
+   /* one if 4k alignment is not activated. */
+   if ( Is_Extended_Partition( num_type ) && !flags.align_4k ) {
       if ( start_cyl == 0 ) {
          start_cyl = 1;
          req_sz_cyl--;
       }
    }
 
-   /* Do sector calculation in LBA, then convert back to CHS */
+   /* Do sector calculation in LBA, then later convert back to CHS */
    start_sect = chs_to_lba( pDrive, start_cyl, 0, 1 );
    if ( start_cyl == 0 ) {
       /* If the starting cylinder is 0, leave one track space for MBR etc. */
@@ -439,7 +473,7 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
    np->active_status = 0;
 
    /* Re-obtain a partition type, if applicable. */
-   if ( ( num_type != 5 ) || ( num_type != 0x0f ) ) {
+   if ( !Is_Extended_Partition( num_type ) ) {
       num_type = Partition_Type_To_Create( part_sz / 2048, num_type );
    }
 
@@ -453,7 +487,7 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
 
    pDrive->pri_part_created[empty_part_num] = TRUE;
 
-   if ( ( num_type == 5 ) || ( num_type == 0x0f ) ) {
+   if ( Is_Extended_Partition( num_type ) ) {
       pDrive->ptr_ext_part = &pDrive->pri_part[empty_part_num];
       pDrive->ext_part_num_sect = part_sz;
       pDrive->ext_part_size_in_MB = size_in_MB;
@@ -567,7 +601,7 @@ void Delete_Primary_Partition( int partition_number )
    Partition_Table *pDrive = &part_table[drive];
    Partition *p = &pDrive->pri_part[partition_number];
 
-   if ( Is_Extended_Partition( p ) ) {
+   if ( Is_Extended_Partition( p->num_type ) ) {
       Clear_Extended_Partition_Table( drive );
    }
 

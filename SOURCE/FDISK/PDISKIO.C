@@ -168,9 +168,9 @@ void Check_For_INT13_Extensions( void )
 #endif
 }
 
-int Is_Extended_Partition( Partition *p )
+int Is_Extended_Partition( int num_type )
 {
-   return p->num_type == 5 || p->num_type == 0x0f;
+   return num_type == 5 || num_type == 0x0f;
 }
 
 /* Clear the Boot Sector of a partition */

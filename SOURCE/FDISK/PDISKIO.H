@@ -159,7 +159,7 @@ void Initialize_LBA_Structures( void );
 void Load_Brief_Partition_Table( void );
 
 int IsRecognizedFatPartition( unsigned );
-int Is_Extended_Partition( Partition *p );
+int Is_Extended_Partition( int num_type );
 
 unsigned long Combine_Cylinder_and_Sector( unsigned long cylinder,
                                            unsigned long sector );
