@@ -23,6 +23,9 @@ Bugfixes:
  - CRITICAL: Fix different calculation errors leading to overlapping
      partitions, unnessessary free space between them, or partitions exceeding
      the end of the disk resulting from off-by-one and off-by-two errors.
+ - CRITICAL: Fix a bug triggered when deleting primary partitions created
+     within the same program invocation. In this case FDISK tried to clear the
+     boot sector IPL of a non-existing partition on leaving the program.
  - MEDIUM: Fix a bug where FDISK gets confused which boot sectors to clear
      if logical drives are created and deleted during the same program
      invocation.

@@ -604,6 +604,7 @@ void Delete_Primary_Partition( int partition_number )
    }
 
    Clear_Partition( p );
+   pDrive->pri_part_created[partition_number] = FALSE;
    flags.partitions_have_changed = TRUE;
 }
 
