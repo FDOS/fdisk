@@ -533,26 +533,26 @@ void Initialization( char *environment[] )
          index++;
       } while ( index <= 255 );
 
-      strcpy( partition_lookup_table_buffer_short[1], "FAT12   " );
-      strcpy( partition_lookup_table_buffer_short[4], "FAT16   " );
+      strcpy( partition_lookup_table_buffer_short[1], "FAT12" );
+      strcpy( partition_lookup_table_buffer_short[4], "FAT16" );
       strcpy( partition_lookup_table_buffer_short[5], "Extended" );
-      strcpy( partition_lookup_table_buffer_short[6], "FAT16   " );
-      strcpy( partition_lookup_table_buffer_short[7], "NTFS    " );
+      strcpy( partition_lookup_table_buffer_short[6], "FAT16" );
+      strcpy( partition_lookup_table_buffer_short[7], "NTFS" );
       strcpy( partition_lookup_table_buffer_short[11], "FAT32" );
-      strcpy( partition_lookup_table_buffer_short[12], "FAT32lba" );
+      strcpy( partition_lookup_table_buffer_short[12], "FAT32LBA" );
       /* */
-      strcpy( partition_lookup_table_buffer_short[14], "FAT16lba" );
-      strcpy( partition_lookup_table_buffer_short[15], "Extended" );
+      strcpy( partition_lookup_table_buffer_short[14], "FAT16LBA" );
+      strcpy( partition_lookup_table_buffer_short[15], "Ext. LBA" );
 
-      strcpy( partition_lookup_table_buffer_long[1], "FAT12          " );
-      strcpy( partition_lookup_table_buffer_long[4], "FAT16          " );
-      strcpy( partition_lookup_table_buffer_long[5], "Extended       " );
-      strcpy( partition_lookup_table_buffer_long[6], "FAT16          " );
-      strcpy( partition_lookup_table_buffer_long[7], "NTFS           " );
-      strcpy( partition_lookup_table_buffer_long[11], "FAT32         " );
+      strcpy( partition_lookup_table_buffer_long[1], "FAT12" );
+      strcpy( partition_lookup_table_buffer_long[4], "FAT16" );
+      strcpy( partition_lookup_table_buffer_long[5], "Extended" );
+      strcpy( partition_lookup_table_buffer_long[6], "FAT16" );
+      strcpy( partition_lookup_table_buffer_long[7], "NTFS" );
+      strcpy( partition_lookup_table_buffer_long[11], "FAT32" );
       strcpy( partition_lookup_table_buffer_long[12], "FAT32 LBA Int13" );
       strcpy( partition_lookup_table_buffer_long[14], "FAT16 LBA Int13" );
-      strcpy( partition_lookup_table_buffer_long[15], "Extended LBA   " );
+      strcpy( partition_lookup_table_buffer_long[15], "Extended LBA" );
    }
 
    Determine_Color_Video_Support();

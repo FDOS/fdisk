@@ -10,22 +10,22 @@ Bugfixes:
      them to cylinder boundaries instead of calculating them from LBA address,
      resulting in corrupt partition tables especially if used in combination
      with other disk utilities (since <= v0.9.9).
- - CRITICAL: Position and size calculation for new logical drives is broken if
-     the extended partition is not aligned to cylinder boundaries.
-     The current "fix" is to only let the user create logical drives if the
-     extended partition is appropriately aligned, which is always the case if
-     the extended partition is created by FDISK itself.
+ - CRITICAL: Position and size calculation for new logical drives was broken
+     if the extended partition was not aligned to cylinder boundaries. Leading
+     to all sorts of problems, including potential data loss.
  - CRITICAL: Fix a bug resulting in detecting non-existant extra cylinders
      when using ext INT 13 function (since v1.1).
  - CRITICAL: Fix a partition location and size calculation error triggered
      when creating a new logical partition after deleting the first logical
      partition while there are still logical partitions left (since v1.2.1).
+ - CRITICAL: Fix a bug triggered when deleting primary partitions created
+     within the same program invocation. The bug resulted from the created
+     flag not being cleared for the partition, making FDISK try to clear the
+     boot sector code for the non-existing partition on quit, leading to
+     unexpected behaviour and potention data loss.
  - CRITICAL: Fix different calculation errors leading to overlapping
      partitions, unnessessary free space between them, or partitions exceeding
      the end of the disk resulting from off-by-one and off-by-two errors.
- - CRITICAL: Fix a bug triggered when deleting primary partitions created
-     within the same program invocation. In this case FDISK tried to clear the
-     boot sector IPL of a non-existing partition on leaving the program.
  - MEDIUM: Fix a bug where FDISK gets confused which boot sectors to clear
      if logical drives are created and deleted during the same program
      invocation.
@@ -40,6 +40,7 @@ Other changes:
    not handle it properly. If the user decides to continue the disk size is
    truncated to 2TB, making sure nothing bad happens by some overflowing
    values.
+ - Adapt user interface to handle larger disks.
  - Free FDISK now compiles with Open Watcom C.
 
 
