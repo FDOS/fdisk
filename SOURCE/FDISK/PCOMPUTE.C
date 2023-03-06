@@ -165,20 +165,13 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
       }
    }
 
-   /* Adjust the partition type, if necessary. */
-   numeric_type = Partition_Type_To_Create(
-      ( ( req_sz_cyl * ( pDrive->total_head + 1 ) *
-          ( pDrive->total_sect ) ) /
-        2048 ),
-      numeric_type );
-
    p = &pDrive->log_drive[free_space_loc];
 
    if (  free_space_loc == 0 ) {
       nep = pDrive->ptr_ext_part;
    }
    else {
-      /* create extended partition for logical drive */
+      /* create nested extended partition for logical drive */
       pDrive->next_ext_exists[free_space_loc - 1] = TRUE;
       nep = &pDrive->next_ext[free_space_loc - 1];
 
@@ -221,12 +214,14 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
 
    p->size_in_MB = Convert_Sect_To_MB( part_sz );
 
-   p->num_type = numeric_type;
-   strcpy( p->vol_label, "" );
 
+   /* Adjust the partition type, if necessary. */
+   numeric_type = Partition_Type_To_Create( part_sz / 2048, numeric_type );
+   strcpy( p->vol_label, "" );
    if ( p->end_cyl > 1023 && pDrive->ext_int_13 == TRUE ) {
-      p->num_type = LBA_Partition_Type_To_Create( numeric_type );
+      numeric_type = LBA_Partition_Type_To_Create( numeric_type );
    }
+   p->num_type = numeric_type;
 
    pDrive->num_of_log_drives++;
    pDrive->log_drive_created[free_space_loc] = TRUE;
