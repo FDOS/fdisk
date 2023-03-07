@@ -216,6 +216,24 @@ void Exit_Screen( void )
    }
 }
 
+void Warn_Incompatible_Ext( void )
+{
+   Clear_Screen( NOEXTRAS );
+
+   Color_Print_At( 38, 4, "ERROR" );
+
+   Position_Cursor( 0, 7 );
+   printf(
+      "    More than one or an incompatible extended partition was detected on\n"
+      "    this disk. The following actions are therefore disabled:\n\n"
+      "      - creating logical drives\n"
+      "      - deleting logical drives\n\n"
+      "    You may re-create the extended partition to enable editing or\n"
+      "    use another disk utility to partition this disk.\n");
+
+   Input( 0, 0, 0, ESC, 0, 0, ESCR, 0, 0, '\0', '\0' );
+}
+
 /* Interactive User Interface Control Routine */
 void Interactive_User_Interface( void )
 {
@@ -329,7 +347,7 @@ void Interactive_User_Interface( void )
          Create_DOS_Partition_Interface( PRIMARY );
       }
       if ( menu == CEDP ) {
-         if ( pDrive->ptr_ext_part ) {
+         if ( Num_Ext_Part( pDrive ) > 0 ) {
             Clear_Screen( 0 );
 
             Print_Centered( 4, "Create Extended DOS Partition", BOLD );
@@ -356,6 +374,9 @@ void Interactive_User_Interface( void )
             Print_At( 4, 24, "                                        " );
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
+         }
+         else if ( !pDrive->ext_usable ) {
+            Warn_Incompatible_Ext();
          }
          else {
             Create_Logical_Drive_Interface();

@@ -551,31 +551,31 @@ int Create_Logical_Drive_Interface( void )
 void Delete_Extended_DOS_Partition_Interface( void )
 {
    int input = 0;
+   int index = 0;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    Clear_Screen( 0 );
 
-   Print_Centered( 4, "Delete Extended DOS Partition", BOLD );
+   Print_Centered( 4, "Delete Extended DOS Partition(s)", BOLD );
 
    Display_Primary_Partition_Information_SS();
 
    BlinkPrintAt( 4, 18, "WARNING!" );
 
-   printf( " Data in the deleted Extended DOS Partition will be lost." );
+   printf( " Data in the deleted Extended DOS Partition(s) will be lost." );
    Print_At( 4, 19, "Do you wish to continue (Y/N).................? " );
 
    flags.esc = FALSE;
    input = (int)Input( 1, 52, 19, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
 
    if ( ( flags.esc == FALSE ) && ( input == TRUE ) ) {
-      Delete_Primary_Partition(
-         (int)( pDrive->ptr_ext_part - pDrive->pri_part ) );
+      Delete_Extended_Partition();
 
       Clear_Screen( 0 );
-      Print_Centered( 4, "Delete Extended DOS Partition", BOLD );
+      Print_Centered( 4, "Delete Extended DOS Partition(s)", BOLD );
       Display_Primary_Partition_Information_SS();
 
-      Color_Print_At( 4, 21, "Extended DOS Partition deleted" );
+      Color_Print_At( 4, 21, "Extended DOS Partition(s) deleted" );
 
       Print_At( 4, 24, "                                    " );
 
@@ -715,6 +715,11 @@ void Delete_Primary_DOS_Partition_Interface( void )
 {
    int input = 0;
    int partition_to_delete;
+   int drive = flags.drive_number - 0x80;
+   Partition_Table *pDrive = &part_table[drive];
+   Partition *p;
+
+   int error_code;
 
    Clear_Screen( 0 );
 
@@ -733,24 +738,36 @@ void Delete_Primary_DOS_Partition_Interface( void )
 
    if ( flags.esc == FALSE ) {
       partition_to_delete = input - 1;
+      
+      p = &pDrive->pri_part[partition_to_delete];
+      if ( !Is_Supp_Ext_Part( p->num_type)  ) {
 
-      Print_At( 4, 22, "Are you sure (Y/N)..............................? " );
-      flags.esc = FALSE;
-      input = (int)Input( 1, 54, 22, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
+         if ( ( input == TRUE ) && ( flags.esc == FALSE ) ) {
+            Print_At( 4, 22, "Are you sure (Y/N)..............................? " );
+            flags.esc = FALSE;
+            input = (int)Input( 1, 54, 22, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
 
-      if ( ( input == TRUE ) && ( flags.esc == FALSE ) ) {
-         Delete_Primary_Partition( partition_to_delete );
+            Clear_Screen( 0 );
 
-         Clear_Screen( 0 );
+            Print_Centered( 4, "Delete Primary DOS Partition", BOLD );
 
-         Print_Centered( 4, "Delete Primary DOS Partition", BOLD );
-         /* */
-         Display_Primary_Partition_Information_SS();
-         Color_Print_At( 4, 21, "Primary DOS Partition deleted" );
+            error_code = Delete_Primary_Partition( partition_to_delete );
+            Display_Primary_Partition_Information_SS();
 
-         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
+            if ( !error_code ) {
+               Color_Print_At( 4, 21, "Primary DOS Partition deleted" );
+            }
+            else {
+               Color_Print_At( 4, 21, "Error deleting primary DOS Partition" );            
+            }
+         }
+      }
+      else {
+         Color_Print_At( 4, 22, "Refusing to delete extended partition!" );            
       }
    }
+
+   Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
 }
 
 /* Display information for all hard drives */
@@ -774,7 +791,7 @@ void Display_All_Drives( void )
 
    do {
       if (!part_table[drive - 1].usable) continue;
-      
+
       if ( current_line > 18 ) {
          current_line = 3;
          current_column_offset = 45;

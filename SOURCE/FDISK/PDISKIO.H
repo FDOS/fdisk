@@ -71,7 +71,7 @@ typedef struct Partition {
 
 /* Partition Table Structure...Created 5/6/1999 */
 typedef struct part_table_structure {
-   
+
    int usable; /* true if drive is found and primary partition coud be read */
 
    /* Hard disk Geometry */
@@ -140,7 +140,7 @@ PEXTERN Partition_Table part_table[8];
 //  PROTOTYPES
 /////////////////////////////////////////////////////////////////////////////
 */
-
+int Num_Ext_Part( Partition_Table *pDrive );
 int Determine_Drive_Letters( void );
 /*PEXTERN int Read_Logical_Sectors(unsigned char drive_letter[2]
  , unsigned long logical_sector_number, int number_of_sectors); */

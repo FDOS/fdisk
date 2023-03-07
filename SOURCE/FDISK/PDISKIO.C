@@ -73,7 +73,7 @@ void Initialize_LBA_Structures( void );
 void Load_Brief_Partition_Table( void );
 
 
-static int Read_Primary_Table( int drive, Partition_Table *pDrive );
+static int Read_Primary_Table( int drive, Partition_Table *pDrive, int *num_ext );
 static int Read_Extended_Table( int drive, Partition_Table *pDrive );
 static void Clear_Partition_Tables( Partition_Table *pDrive );
 
@@ -239,6 +239,18 @@ unsigned long combine_cs( unsigned long cylinder, unsigned long sector )
    }
 
    return ( value );
+}
+
+int Num_Ext_Part( Partition_Table *pDrive )
+{
+   int index;
+   int num_ext = 0;
+   for ( index = 0; index < 4; index++ ) {
+      if ( Is_Supp_Ext_Part( pDrive->pri_part[index].num_type ) ) {
+         num_ext++;
+      }
+   }
+   return num_ext;
 }
 
 /* Determine drive letters */
@@ -801,7 +813,7 @@ int Read_Partition_Tables( void )
 {
    Partition_Table *pDrive;
 
-   int drive, num_drives = 0;
+   int drive, num_drives = 0, num_ext = 0;
    int error_code = 0;
 
    flags.maximum_drive_number = 0;
@@ -830,17 +842,20 @@ int Read_Partition_Tables( void )
          Convert_Cyl_To_MB( ( pDrive->total_cyl + 1 ), pDrive->total_head + 1,
                             pDrive->total_sect );
 
-      error_code = Read_Primary_Table( drive, pDrive );
+      error_code = Read_Primary_Table( drive, pDrive, &num_ext );
       if ( error_code != 0 ) {
          continue;
       }
       pDrive->usable = TRUE;
       
-      error_code = Read_Extended_Table( drive, pDrive );
-      if ( error_code != 0 ) {
-         /* if there is an error processing the extended partition table
-            chain editing of logical drives will be disabled */
-         continue;
+      if ( num_ext == 1 ) {
+         error_code = Read_Extended_Table( drive, pDrive );
+
+         if ( error_code != 0 ) {
+            /* if there is an error processing the extended partition table
+               chain editing of logical drives will be disabled */
+            continue;
+         }         
       }
 
       flags.maximum_drive_number = drive + 0x80;
@@ -855,7 +870,7 @@ int Read_Partition_Tables( void )
    return 0;
 }
 
-static int Read_Primary_Table( int drive, Partition_Table *pDrive )
+static int Read_Primary_Table( int drive, Partition_Table *pDrive, int *num_ext )
 {
    Partition *p;
    int entry_offset;
@@ -923,10 +938,13 @@ static int Read_Primary_Table( int drive, Partition_Table *pDrive )
       /* Record the necessary information to easilly and quickly find the */
       /* extended partition when it is time to read it, but               */
       /* only process the first extended found. */
-      if ( !pDrive->ptr_ext_part && Is_Supp_Ext_Part( p->num_type ) ) {
-         pDrive->ptr_ext_part = p;
-         pDrive->ext_part_num_sect = p->num_sect;
-         pDrive->ext_part_size_in_MB = p->size_in_MB;
+      if ( Is_Supp_Ext_Part( p->num_type ) ) {
+         (*num_ext)++;
+         if ( !pDrive->ptr_ext_part ) {
+            pDrive->ptr_ext_part = p;
+            pDrive->ext_part_num_sect = p->num_sect;
+            pDrive->ext_part_size_in_MB = p->size_in_MB;            
+         }
       }
    }
 
@@ -942,6 +960,7 @@ static int Read_Extended_Table( int drive, Partition_Table *pDrive )
    int entry_offset;
 
    /* Read the Extended Partition Table, if applicable. */
+   pDrive->ext_usable = FALSE;
 
    if ( pDrive->ptr_ext_part ) {
       ep = pDrive->ptr_ext_part;

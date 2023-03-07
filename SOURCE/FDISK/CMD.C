@@ -157,7 +157,7 @@ void Command_Line_Create_Extended_Partition( void )
       printf( "\nExtended partition already exists...Operation terminated\n");
       exit( 9 );
    }
-   
+
    Determine_Free_Space();
 
    maximum_partition_size_in_MB = Max_Pri_Part_Size_In_MB( EXTENDED );
@@ -385,31 +385,8 @@ void Command_Line_Delete( void )
 
    /* Delete the extended partition */
    else if ( 0 == strcmp( arg[1].choice, "EXT" ) ) {
-      int index = 3;
+      error_code = Delete_Extended_Partition();
 
-      do {
-         if ( ( ( flags.version == FOUR ) || ( flags.version == FIVE ) ||
-                ( flags.version == SIX ) ) &&
-              ( pDrive->pri_part[index].num_type == 5 ) ) {
-            error_code = Delete_Primary_Partition( index );
-            break;
-         }
-         if ( ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
-                ( flags.version == W98 ) ) &&
-              ( ( pDrive->pri_part[index].num_type == 5 ) ||
-                ( pDrive->pri_part[index].num_type == 15 ) ) ) {
-            error_code = Delete_Primary_Partition( index );
-            break;
-         }
-
-         index--;
-      } while ( index >= 0 );
-
-      if ( index < 0 ) {
-         printf(
-            "\nExtended DOS Partition not found...no partition deleted.\n" );
-         exit( 0 );
-      }
       if ( error_code == 99 ) {
          printf( "\nError deleting extended partition\n" );
          exit( 9 );         

@@ -403,7 +403,7 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
    }
 
    /* Do not allow creation of extended partition if one already exists */
-   if ( Is_Ext_Part( num_type ) && pDrive->ptr_ext_part ) {
+   if ( Is_Ext_Part( num_type ) && Num_Ext_Part( pDrive ) > 0 ) {
       return 99;
    }
 
@@ -574,6 +574,30 @@ int Delete_Logical_Drive( int logical_drive_number )
    return 0;
 }
 
+int Delete_Extended_Partition( void )
+{
+   int drive = flags.drive_number - 0x80;
+   Partition_Table *pDrive = &part_table[drive];
+   Partition *p;
+   int index;
+
+   if ( !pDrive->usable ) return 99;
+
+   for ( index = 0; index < 3; index++ ) {
+      p = &pDrive->pri_part[index];
+
+      if ( Is_Supp_Ext_Part( p->num_type ) ) {
+         Clear_Partition( p );
+         Clear_Extended_Partition_Table( pDrive );
+
+         pDrive->pri_part_created[index] = FALSE;
+         flags.partitions_have_changed = TRUE;
+      }
+   }
+
+   return 0;
+}
+
 /* Delete Primary Partition */
 int Delete_Primary_Partition( int partition_number )
 {
@@ -583,8 +607,8 @@ int Delete_Primary_Partition( int partition_number )
 
    if ( !pDrive->usable ) return 99;
 
-   if ( Is_Ext_Part( p->num_type ) ) {
-      Clear_Extended_Partition_Table( pDrive );
+   if ( Is_Supp_Ext_Part( p->num_type ) ) {
+      return 99;
    }
 
    Clear_Partition( p );
