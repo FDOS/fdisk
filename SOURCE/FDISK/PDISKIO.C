@@ -842,7 +842,6 @@ int Read_Partition_Tables( void )
             chain editing of logical drives will be disabled */
          continue;
       }
-      pDrive->ext_usable = TRUE;
 
       flags.maximum_drive_number = drive + 0x80;
       num_drives++;
@@ -1055,6 +1054,7 @@ static int Read_Extended_Table( int drive, Partition_Table *pDrive )
             }
          }
       }
+      pDrive->ext_usable = TRUE;
    }
 
    return 0;

@@ -101,6 +101,7 @@ unsigned long Convert_To_Percentage( unsigned long small_num,
       large_num >>= 1;
    }
 
+   if ( !large_num ) return 0;
    percentage = 100 * small_num / large_num;
 
    if ( ( 100 * small_num % large_num ) >= large_num / 2 ) {

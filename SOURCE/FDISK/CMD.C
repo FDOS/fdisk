@@ -153,6 +153,11 @@ void Command_Line_Create_Extended_Partition( void )
       exit( 9 );
    }
 
+   if ( pDrive->ptr_ext_part ) {
+      printf( "\nExtended partition already exists...Operation terminated\n");
+      exit( 9 );
+   }
+   
    Determine_Free_Space();
 
    maximum_partition_size_in_MB = Max_Pri_Part_Size_In_MB( EXTENDED );
@@ -207,6 +212,11 @@ void Command_Line_Create_Logical_DOS_Drive( void )
       printf( "\n" );
       printf( catgets( cat, 2, 2, "Program Terminated" ) );
       printf( "\n" );
+      exit( 9 );
+   }
+
+   if ( !pDrive->ext_usable ) {
+      printf("\nNo usable extended partition found...Operation terminated\n");
       exit( 9 );
    }
 

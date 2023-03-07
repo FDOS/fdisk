@@ -402,6 +402,11 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
       req_sz_cyl = max_sz_cyl;
    }
 
+   /* Do not allow creation of extended partition if one already exists */
+   if ( Is_Ext_Part( num_type ) && pDrive->ptr_ext_part ) {
+      return 99;
+   }
+
    /* Make sure the starting cylinder of an extended partition is at least  */
    /* one if 4k alignment is not activated. */
    if ( Is_Ext_Part( num_type ) && !flags.align_4k ) {
