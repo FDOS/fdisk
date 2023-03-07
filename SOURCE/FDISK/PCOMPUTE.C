@@ -71,34 +71,6 @@ void Deactivate_Active_Partition( void )
    flags.partitions_have_changed = TRUE;
 }
 
-/* Clear the Extended Partition Table Buffers */
-void Clear_Extended_Partition_Table( int drive )
-{
-   int index;
-
-   Partition_Table *pDrive = &part_table[drive];
-
-   pDrive->ptr_ext_part = NULL;
-   pDrive->ext_part_size_in_MB = 0;
-   pDrive->ext_part_num_sect = 0;
-   pDrive->ext_part_largest_free_space = 0;
-
-   pDrive->log_drive_free_space_start_cyl = 0;
-   pDrive->log_drive_free_space_end_cyl = 0;
-
-   pDrive->log_drive_largest_free_space_location = 0;
-   pDrive->num_of_log_drives = 0;
-   pDrive->num_of_non_dos_log_drives = 0;
-
-   for ( index = 0; index < MAX_LOGICAL_DRIVES; index++ ) {
-      Clear_Partition( &pDrive->log_drive[index] );
-      Clear_Partition( &pDrive->next_ext[index] );
-
-      pDrive->next_ext_exists[index] = FALSE;
-      pDrive->log_drive_created[index] = FALSE;
-   }
-}
-
 /* unused by now 
 static unsigned long align_down( unsigned long sect )
 {
@@ -131,8 +103,10 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    unsigned long end_sect;
    unsigned long part_sz;
 
+
    int free_space_loc = pDrive->log_drive_largest_free_space_location;
 
+   if ( !pDrive->usable || !pDrive->ext_usable ) return 99;
    if ( max_sz_cyl == 0  || req_sz_cyl == 0 ) { return 99; }
 
    /* Adjust the size of the partition to fit boundaries, if necessary. */
@@ -374,7 +348,7 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    }
 #endif
 
-   return ( 0 );
+   return 0;
 }
 
 /* Create a Primary Partition */
@@ -386,7 +360,6 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
    struct Partition *np;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
-
    unsigned long start_cyl = pDrive->pp_largest_free_space_start_cyl;
    unsigned long end_cyl;
    unsigned long max_sz_cyl = pDrive->pri_part_largest_free_space;
@@ -395,6 +368,8 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
    unsigned long start_sect;
    unsigned long end_sect;
    unsigned long part_sz;
+
+   if ( !pDrive->usable ) return 99;
 
    if ( max_sz_cyl == 0 || req_sz_cyl == 0 ) {
       return 99;
@@ -429,7 +404,7 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
 
    /* Make sure the starting cylinder of an extended partition is at least  */
    /* one if 4k alignment is not activated. */
-   if ( Is_Extended_Partition( num_type ) && !flags.align_4k ) {
+   if ( Is_Ext_Part( num_type ) && !flags.align_4k ) {
       if ( start_cyl == 0 ) {
          start_cyl = 1;
          req_sz_cyl--;
@@ -466,7 +441,7 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
    np->active_status = 0;
 
    /* Re-obtain a partition type, if applicable. */
-   if ( !Is_Extended_Partition( num_type ) ) {
+   if ( !Is_Ext_Part( num_type ) ) {
       num_type = Partition_Type_To_Create( part_sz / 2048, num_type );
    }
 
@@ -480,10 +455,11 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
 
    pDrive->pri_part_created[empty_part_num] = TRUE;
 
-   if ( Is_Extended_Partition( num_type ) ) {
+   if ( Is_Ext_Part( num_type ) ) {
       pDrive->ptr_ext_part = &pDrive->pri_part[empty_part_num];
       pDrive->ext_part_num_sect = part_sz;
       pDrive->ext_part_size_in_MB = size_in_MB;
+      pDrive->ext_usable = TRUE;
    }
 
 #ifdef DEBUG
@@ -517,12 +493,16 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
 }
 
 /* Delete Logical DOS Drive */
-void Delete_Logical_Drive( int logical_drive_number )
+int Delete_Logical_Drive( int logical_drive_number )
 {
    int index;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
    Partition *p, *nep;
+
+   if ( !pDrive->usable || !pDrive->ext_usable ) {
+      return 99;
+   }
 
    p = &pDrive->log_drive[logical_drive_number];
 
@@ -585,22 +565,28 @@ void Delete_Logical_Drive( int logical_drive_number )
          index++;
       } while ( index < MAX_LOGICAL_DRIVES + 1 );
    }*/
+
+   return 0;
 }
 
 /* Delete Primary Partition */
-void Delete_Primary_Partition( int partition_number )
+int Delete_Primary_Partition( int partition_number )
 {
    int drive = flags.drive_number - 0x80;
    Partition_Table *pDrive = &part_table[drive];
    Partition *p = &pDrive->pri_part[partition_number];
 
-   if ( Is_Extended_Partition( p->num_type ) ) {
-      Clear_Extended_Partition_Table( drive );
+   if ( !pDrive->usable ) return 99;
+
+   if ( Is_Ext_Part( p->num_type ) ) {
+      Clear_Extended_Partition_Table( pDrive );
    }
 
    Clear_Partition( p );
    pDrive->pri_part_created[partition_number] = FALSE;
    flags.partitions_have_changed = TRUE;
+
+   return 0;
 }
 
 /* Determine the locations of free space in the partition table */

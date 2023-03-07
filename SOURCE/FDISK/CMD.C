@@ -140,6 +140,7 @@ void Command_Line_Create_Extended_Partition( void )
 {
    unsigned long maximum_possible_percentage;
    unsigned long maximum_partition_size_in_MB;
+   int error_code = 0;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
@@ -180,7 +181,12 @@ void Command_Line_Create_Extended_Partition( void )
       }
    }
 
-   Create_Primary_Partition( 5, arg[0].value );
+   error_code = Create_Primary_Partition( 5, arg[0].value );
+
+   if ( error_code == 99 ) {
+      printf("\nError creating extended partition\n");
+      exit( 9 );
+   }
 
    Shift_Command_Line_Options( 1 );
 }
@@ -191,6 +197,7 @@ void Command_Line_Create_Logical_DOS_Drive( void )
    unsigned long maximum_possible_percentage;
    unsigned long maximum_partition_size_in_MB;
    int option_count = 1;
+   int error_code;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
@@ -236,14 +243,18 @@ void Command_Line_Create_Logical_DOS_Drive( void )
    if ( 0 != strcmp( arg[1].choice, "SPEC" ) ) {
       /* If no special partition type is defined. */
 
-      Create_Logical_Drive( Partition_Type_To_Create( arg[0].value, 0 ),
-                            arg[0].value );
+      error_code = Create_Logical_Drive( Partition_Type_To_Create( arg[0].value, 0 ), arg[0].value );
    }
    else {
       /* If a special partition type is defined. */
       option_count = 2;
 
-      Create_Logical_Drive( (int)arg[1].value, arg[0].value );
+      error_code = Create_Logical_Drive( (int)arg[1].value, arg[0].value );
+   }
+
+   if ( error_code == 99 ) {
+      printf("\nError creating logical drive\n");
+      exit( 9 );
    }
 
    Shift_Command_Line_Options( option_count );
@@ -255,6 +266,8 @@ void Command_Line_Create_Primary_Partition( void )
    unsigned long maximum_possible_percentage;
    unsigned long maximum_partition_size_in_MB;
    int option_count = 1;
+   int part_no = 0;
+   int part_type = 0;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
@@ -294,17 +307,21 @@ void Command_Line_Create_Primary_Partition( void )
    }
 
    if ( 0 != strcmp( arg[1].choice, "SPEC" ) ) {
-      /* If no special partition type is defined. */
-
-      Set_Active_Partition_If_None_Is_Active( Create_Primary_Partition(
-         Partition_Type_To_Create( arg[0].value, 0 ), arg[0].value ) );
+      part_type = Partition_Type_To_Create( arg[0].value, 0 );
    }
    else {
       /* If a special partition type is defined. */
       option_count = 2;
-
-      Create_Primary_Partition( (int)arg[1].value, arg[0].value );
+      part_type = (int)arg[1].value;
    }
+
+   part_no = Create_Primary_Partition( part_type, arg[0].value );
+   if ( part_no == 99 ) {
+      printf("\nError creating logical drive\n");
+      exit( 9 );
+   }
+
+   Set_Active_Partition_If_None_Is_Active( part_no );
 
    Shift_Command_Line_Options( option_count );
 }
@@ -313,6 +330,7 @@ void Command_Line_Create_Primary_Partition( void )
 void Command_Line_Delete( void )
 {
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+   int error_code = 0;
 
    /* Delete the primary partition */
    if ( 0 == strcmp( arg[1].choice, "PRI" ) ) {
@@ -324,7 +342,7 @@ void Command_Line_Delete( void )
             exit( 9 );
          }
 
-         Delete_Primary_Partition( (int)( arg[1].value - 1 ) );
+         error_code = Delete_Primary_Partition( (int)( arg[1].value - 1 ) );
       }
       else { /* no number given, delete 'the' partition */
          int index, found, count;
@@ -346,27 +364,31 @@ void Command_Line_Delete( void )
             exit( 9 );
          }
          else {
-            Delete_Primary_Partition( found );
+            error_code = Delete_Primary_Partition( found );
          }
+      }
+      if ( error_code == 99 ) {
+         printf( "\nError deleting primary partition\n" );
+         exit( 9 );         
       }
    } /* end PRI */
 
    /* Delete the extended partition */
-   if ( 0 == strcmp( arg[1].choice, "EXT" ) ) {
+   else if ( 0 == strcmp( arg[1].choice, "EXT" ) ) {
       int index = 3;
 
       do {
          if ( ( ( flags.version == FOUR ) || ( flags.version == FIVE ) ||
                 ( flags.version == SIX ) ) &&
               ( pDrive->pri_part[index].num_type == 5 ) ) {
-            Delete_Primary_Partition( index );
+            error_code = Delete_Primary_Partition( index );
             break;
          }
          if ( ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
                 ( flags.version == W98 ) ) &&
               ( ( pDrive->pri_part[index].num_type == 5 ) ||
                 ( pDrive->pri_part[index].num_type == 15 ) ) ) {
-            Delete_Primary_Partition( index );
+            error_code = Delete_Primary_Partition( index );
             break;
          }
 
@@ -376,36 +398,51 @@ void Command_Line_Delete( void )
       if ( index < 0 ) {
          printf(
             "\nExtended DOS Partition not found...no partition deleted.\n" );
-         exit( 9 );
+         exit( 0 );
       }
+      if ( error_code == 99 ) {
+         printf( "\nError deleting extended partition\n" );
+         exit( 9 );         
+      }      
    }
 
    /* Delete a Logical DOS Drive */
-   if ( 0 == strcmp( arg[1].choice, "LOG" ) ) {
+   else if ( 0 == strcmp( arg[1].choice, "LOG" ) ) {
       if ( ( arg[1].value >= 1 ) && ( arg[1].value <= 23 ) ) {
-         Delete_Logical_Drive( (int)( arg[1].value - 1 ) );
+         error_code = Delete_Logical_Drive( (int)( arg[1].value - 1 ) );
       }
       else {
          printf(
-            "\nLogical drive number  (%d) is out of range...Operation Terminated\n",
+            "\nLogical drive number %d is out of range...Operation Terminated\n",
             arg[1].value );
          exit( 9 );
       }
    }
 
    /* Delete the partition by the number of the partition */
-   if ( 0 == strcmp( arg[1].choice, "NUM" ) ) {
+   else if ( 0 == strcmp( arg[1].choice, "NUM" ) ) {
       if ( ( arg[1].value >= 1 ) && ( arg[1].value <= 4 ) ) {
-         Delete_Primary_Partition( (int)( arg[1].value - 1 ) );
+         error_code = Delete_Primary_Partition( (int)( arg[1].value - 1 ) );
       }
       else if ( ( arg[1].value >= 5 ) && ( arg[1].value <= 28 ) ) {
-         Delete_Logical_Drive( (int)( arg[1].value - 5 ) );
+         error_code = Delete_Logical_Drive( (int)( arg[1].value - 5 ) );
       }
       else {
          printf(
             "\nPartition number is out of range...Operation Terminated\n" );
          exit( 9 );
       }
+   }
+
+   else {
+      printf(
+            "\nInvalid delete argument...Operation Terminated\n" );
+      exit( 9 );
+   }
+
+   if ( error_code != 0 ) {
+      printf("\nError deleting partition\n");
+      exit( 9 );
    }
 
    Shift_Command_Line_Options( 2 );
@@ -586,6 +623,10 @@ void Command_Line_X( void )
       Color_Print( "\n    Error reading partition tables.\n" );
       exit( 1 );
    }
+   if (flags.maximum_drive_number == 0) {
+      Color_Print( "\n    No fixed disks present.\n" );
+      exit( 6 );     
+   }
 
    Interactive_User_Interface();
 }
@@ -701,7 +742,8 @@ int Get_Options( char *argv[], int argc )
 
    /* check to make sure the drive is a legitimate number */
    if ( ( flags.drive_number < 0x80 ) ||
-        ( flags.drive_number > flags.maximum_drive_number ) ) {
+        ( flags.drive_number > flags.maximum_drive_number ) ||
+        ( !part_table[flags.drive_number - 0x80].usable ) ) {
       printf( "\nInvalid drive designation...Operation Terminated.\n" );
       exit( 5 );
    }

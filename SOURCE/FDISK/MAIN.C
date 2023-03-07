@@ -597,6 +597,11 @@ void Initialization( char *environment[] )
       exit( 1 );
    }
 
+   if ( flags.maximum_drive_number == 0 ) {
+      Color_Print( "\n    No fixed disks present.\n" );
+      exit( 6 );     
+   }
+
    if ( ( flags.flag_sector >
           part_table[( flags.drive_number - 128 )].total_sect ) &&
         ( flags.flag_sector != 0 ) ) {

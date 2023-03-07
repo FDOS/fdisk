@@ -773,6 +773,8 @@ void Display_All_Drives( void )
    Print_At( 2, 2, "Disk   Drv   Mbytes   Free   Usage" );
 
    do {
+      if (!part_table[drive - 1].usable) continue;
+      
       if ( current_line > 18 ) {
          current_line = 3;
          current_column_offset = 45;

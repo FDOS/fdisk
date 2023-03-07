@@ -17,6 +17,8 @@
 #include "compat.h"
 #include "pdiskio.h"
 
+extern char bootnormal_code[];
+
 extern void Pause( void );
 
 /*
@@ -70,9 +72,14 @@ void Clear_Sector_Buffer( void );
 void Initialize_LBA_Structures( void );
 void Load_Brief_Partition_Table( void );
 
+
+static int Read_Primary_Table( int drive, Partition_Table *pDrive );
+static int Read_Extended_Table( int drive, Partition_Table *pDrive );
+static void Clear_Partition_Tables( Partition_Table *pDrive );
+
+
 /* External Prototype Declarations */
 /* ******************************* */
-extern void Clear_Extended_Partition_Table( int drive );
 extern void Clear_Screen( int type );
 /*  extern void Convert_Long_To_Integer(long number);*/
 extern void Pause( void );
@@ -168,9 +175,13 @@ void Check_For_INT13_Extensions( void )
 #endif
 }
 
-int Is_Extended_Partition( int num_type )
+int Is_Ext_Part( int num_type ) { return num_type == 5 || num_type == 0x0f; }
+
+int Is_Supp_Ext_Part( int num_type )
 {
-   return num_type == 5 || num_type == 0x0f;
+   return num_type == 5 || num_type == 0x0f && ( flags.version == W95 ||
+                                                 flags.version == W95B ||
+                                                 flags.version == W98 );
 }
 
 /* Clear the Boot Sector of a partition */
@@ -204,8 +215,7 @@ void Clear_Partition_Table_Area_Of_Sector_Buffer( void )
 void Clear_Sector_Buffer( void ) { memset( sector_buffer, 0, 512 ); }
 
 /* Combine Cylinder and Sector Values */
-unsigned long Combine_Cylinder_and_Sector( unsigned long cylinder,
-                                           unsigned long sector )
+unsigned long combine_cs( unsigned long cylinder, unsigned long sector )
 {
    unsigned long value = 0;
 
@@ -271,10 +281,9 @@ int Determine_Drive_Letters( void )
 
    /* First, look for and assign drive letters to all active */
    /* primary partitions. */
-
-   index = 0;
-   do {
+   for ( index = 0; index < 8; index++ ) {
       Partition_Table *pDrive = &part_table[index];
+      if (!pDrive->usable) continue;
 
       sub_index = 0;
       do {
@@ -289,15 +298,14 @@ int Determine_Drive_Letters( void )
 
          sub_index++;
       } while ( sub_index < 4 );
-
-      index++;
-   } while ( index < 8 );
+   }
 
    /* Next, assign one drive letter for one existing primary partition   */
    /* if an active partition does not exist on that hard disk.           */
+   for ( index = 0; index < 8; index ++ ) {
+      Partition_Table *pDrive = &part_table[index];
+      if (!pDrive->usable) continue;
 
-   index = 0;
-   do {
       if ( active_part_found[index] == 0 ) {
          sub_index = 0;
          do {
@@ -311,13 +319,13 @@ int Determine_Drive_Letters( void )
             sub_index++;
          } while ( sub_index < 4 );
       }
-
-      index++;
-   } while ( index < 8 );
+   }
 
    /* Next assign drive letters to applicable extended partitions... */
-   index = 0;
-   do {
+   for ( index = 0; index < 8; index++ ) {
+      Partition_Table *pDrive = &part_table[index];
+      if (!pDrive->usable) continue;
+
       sub_index = 4;
       do {
          if ( IsRecognizedFatPartition(
@@ -328,13 +336,13 @@ int Determine_Drive_Letters( void )
 
          sub_index++;
       } while ( sub_index < 27 );
-
-      index++;
-   } while ( index < 8 );
+   }
 
    /* Return to the primary partitions... */
-   index = 0;
-   do {
+   for ( index = 0; index < 8; index++ ) {
+      Partition_Table *pDrive = &part_table[index];
+      if (!pDrive->usable) continue;
+
       sub_index = 0;
 
       do {
@@ -347,14 +355,12 @@ int Determine_Drive_Letters( void )
          }
          sub_index++;
       } while ( sub_index < 4 );
-
-      index++;
-   } while ( index < 8 );
+   }
 
    /* Find the Non-DOS Logical Drives in the Extended Partition Table */
-   index = 0;
-   do {
+   for ( index = 0; index < 8; index ++ ) {
       Partition_Table *pDrive = &part_table[index];
+      if (!pDrive->usable) continue;
 
       pDrive->num_of_non_dos_log_drives = 0;
       non_dos_partition_counter = '1';
@@ -379,9 +385,7 @@ int Determine_Drive_Letters( void )
          }
          sub_index++;
       } while ( sub_index < 27 );
-
-      index++;
-   } while ( index < 8 );
+   }
 
    return ( current_letter - 1 );
 }
@@ -459,17 +463,6 @@ void Error_Handler( int error )
    exit( error );
 }
 
-/* Extract Cylinder */
-unsigned long Extract_Cylinder( unsigned long hex1, unsigned long hex2 )
-{
-   unsigned long cylinder_and_sector = ( ( 256 * hex2 ) + hex1 );
-   unsigned long extracted_cylinder =
-      ( ( ( cylinder_and_sector * 4 ) & 768 ) +
-        ( cylinder_and_sector / 256 ) );
-
-   return ( extracted_cylinder );
-}
-
 void Clear_Partition( Partition *p )
 {
    memset( p, 0, sizeof( Partition ) );
@@ -507,13 +500,20 @@ void lba_to_chs( unsigned long lba_value, Partition_Table *pDrive,
    *cyl = lba_value / ( ( pDrive->total_head + 1 ) * pDrive->total_sect );
 }
 
-/* Extract Sector */
-unsigned long Extract_Sector( unsigned long hex1, unsigned long hex2 )
+void extract_chs( unsigned char *p, unsigned long *cyl, unsigned long *head,
+                  unsigned long *sect )
 {
-   unsigned long cylinder_and_sector = ( ( 256 * hex2 ) + hex1 );
-   unsigned long extracted_sector = cylinder_and_sector % 64;
+   unsigned short cs = *(unsigned short *)( p + 1 );
 
-   return ( extracted_sector );
+   if ( cyl ) {
+      *cyl = ( cs >> 8 ) | ( cs << 2 ) & 0x0300u;
+   }
+   if ( head ) {
+      *head = *p;
+   }
+   if ( sect ) {
+      *sect = cs & 0x3f;
+   }
 }
 
 /* Get the parameters of the hard disk */
@@ -796,6 +796,270 @@ void Initialize_LBA_Structures( void )
    result_buffer[0] = 26;
 }
 
+/* Load the Partition Tables and get information on all drives */
+int Read_Partition_Tables( void )
+{
+   Partition_Table *pDrive;
+
+   int drive, num_drives = 0;
+   int error_code = 0;
+
+   flags.maximum_drive_number = 0;
+   flags.more_than_one_drive = FALSE;
+
+   for ( drive = 0; drive < 8; drive++ ) {
+      pDrive = &part_table[drive];
+
+      Clear_Partition_Tables( pDrive );
+
+      /* Get the hard drive parameters and ensure that the drive exists. */
+      error_code = Get_Hard_Drive_Parameters( drive + 0x80 );
+
+      if ( error_code != 0 ) {
+         pDrive->total_cyl = 0;
+         pDrive->total_head = 0;
+         pDrive->total_sect = 0;
+
+         continue;
+      }
+
+      pDrive->total_disk_size_in_log_sectors = ( pDrive->total_cyl + 1 ) *
+                                               ( pDrive->total_head + 1 ) *
+                                               pDrive->total_sect;
+      pDrive->total_disk_size_in_MB =
+         Convert_Cyl_To_MB( ( pDrive->total_cyl + 1 ), pDrive->total_head + 1,
+                            pDrive->total_sect );
+
+      error_code = Read_Primary_Table( drive, pDrive );
+      if ( error_code != 0 ) {
+         continue;
+      }
+      pDrive->usable = TRUE;
+      
+      error_code = Read_Extended_Table( drive, pDrive );
+      if ( error_code != 0 ) {
+         /* if there is an error processing the extended partition table
+            chain editing of logical drives will be disabled */
+         continue;
+      }
+      pDrive->ext_usable = TRUE;
+
+      flags.maximum_drive_number = drive + 0x80;
+      num_drives++;
+   }
+
+   flags.more_than_one_drive = num_drives > 1;
+
+   Determine_Drive_Letters();
+   Get_Partition_Information();
+
+   return 0;
+}
+
+static int Read_Primary_Table( int drive, Partition_Table *pDrive )
+{
+   Partition *p;
+   int entry_offset;
+   int index;
+   int error_code;
+
+   /* Read the Primary Partition Table. */
+   error_code = Read_Physical_Sectors( drive + 0x80, 0, 0, 1, 1 );
+
+   if ( error_code != 0 ) {
+      return error_code;
+   }
+
+   if ( *(unsigned short *)(sector_buffer + 510) != 0xAA55 ) {
+      /* do we have a partition table? */
+      return 0;
+   }
+
+   for ( index = 0; index < 4; index++ ) {
+      /* process all four slots in MBR */
+
+      p = &pDrive->pri_part[index];
+      entry_offset = 0x1be + ( index * 16 );
+
+      p->active_status = sector_buffer[entry_offset + 0x00];
+      p->num_type = sector_buffer[entry_offset + 0x04];
+
+      if ( pDrive->ext_int_13 == FALSE ) {
+         /* If int 0x13 extensions are not used get the CHS values. */
+         extract_chs( sector_buffer + entry_offset + 0x01, &p->start_cyl,
+                      &p->start_head, &p->start_sect );
+
+         extract_chs( sector_buffer + entry_offset + 0x05, &p->end_cyl,
+                      &p->end_head, &p->end_sect );
+      }
+
+      p->rel_sect = *(_u32 *)( sector_buffer + entry_offset + 0x08 );
+      p->num_sect = *(_u32 *)( sector_buffer + entry_offset + 0x0c );
+
+      if ( ( pDrive->ext_int_13 == TRUE ) && ( p->num_type != 0 ) ) {
+         /* If int 0x13 extensions are used compute the virtual CHS values. */
+         lba_to_chs( p->rel_sect, pDrive, &p->start_cyl, &p->start_head,
+                     &p->start_sect );
+         lba_to_chs( p->rel_sect + p->num_sect - 1, pDrive, &p->end_cyl,
+                     &p->end_head, &p->end_sect );
+         /*
+                     a protective GPT partition starts at sector
+                     1 and has a size of 0xffffffff
+                     
+                     unfortunately rel_sect+num_sect is 0 then.
+                     
+                     so we FORCE this down to the last cylinder
+                     */
+
+         if ( p->num_sect == 0xfffffffful ) {
+            // printf("correcting cyl %lu -> %lu\n", pDrive->pri_part[index].end_cyl, pDrive->total_cyl);
+            p->end_cyl = pDrive->total_cyl;
+         }
+      }
+
+      p->size_in_MB =
+         Convert_Cyl_To_MB( p->end_cyl - p->start_cyl + 1,
+                            pDrive->total_head + 1, pDrive->total_sect );
+
+      /* Record the necessary information to easilly and quickly find the */
+      /* extended partition when it is time to read it, but               */
+      /* only process the first extended found. */
+      if ( !pDrive->ptr_ext_part && Is_Supp_Ext_Part( p->num_type ) ) {
+         pDrive->ptr_ext_part = p;
+         pDrive->ext_part_num_sect = p->num_sect;
+         pDrive->ext_part_size_in_MB = p->size_in_MB;
+      }
+   }
+
+   return 0;
+}
+
+static int Read_Extended_Table( int drive, Partition_Table *pDrive )
+{
+   Partition *p, *ep, *nep;
+   int error_code = 0;
+   int index;
+
+   int entry_offset;
+
+   /* Read the Extended Partition Table, if applicable. */
+
+   if ( pDrive->ptr_ext_part ) {
+      ep = pDrive->ptr_ext_part;
+
+      error_code = Read_Physical_Sectors( drive + 0x80, ep->start_cyl,
+                                          ep->start_head, ep->start_sect, 1 );
+      if ( error_code != 0 ) {
+         return error_code;
+      }
+
+      /* Ensure that the sector has a valid partition table before  */
+      /* any information is loaded into pDrive->           */
+      if ( ( sector_buffer[0x1fe] == 0x55 ) &&
+           ( sector_buffer[0x1ff] == 0xaa ) ) {
+
+         for ( index = 0; index < MAX_LOGICAL_DRIVES; index++ ) {
+            p = &pDrive->log_drive[index];
+            nep = &pDrive->next_ext[index];
+            entry_offset = 0x1be;
+
+            if ( sector_buffer[entry_offset + 0x04] > 0 ) {
+               pDrive->num_of_log_drives++;
+            }
+
+            p->num_type = sector_buffer[entry_offset + 0x04];
+
+            if ( pDrive->ext_int_13 == FALSE ) {
+               /* If int 0x13 extensions are not used get the CHS values. */
+               extract_chs( sector_buffer + entry_offset + 0x01,
+                            &p->start_cyl, &p->start_head, &p->start_sect );
+
+               extract_chs( sector_buffer + entry_offset + 0x05, &p->end_cyl,
+                            &p->end_head, &p->end_sect );
+            }
+
+            p->rel_sect = *(_u32 *)( sector_buffer + entry_offset + 0x08 );
+            p->num_sect = *(_u32 *)( sector_buffer + entry_offset + 0x0c );
+
+            if ( ( pDrive->ext_int_13 == TRUE ) && ( p->num_type != 0 ) ) {
+               /* If int 0x13 extensions are used compute the virtual
+                        CHS values. */
+               if ( index == 0 ) {
+                  lba_to_chs( ep->rel_sect + p->rel_sect, pDrive,
+                              &p->start_cyl, &p->start_head, &p->start_sect );
+                  lba_to_chs( ep->rel_sect + p->rel_sect + p->num_sect - 1,
+                              pDrive, &p->end_cyl, &p->end_head,
+                              &p->end_sect );
+               }
+               else {
+                  lba_to_chs(
+                     ep->rel_sect + ( nep - 1 )->rel_sect + p->rel_sect,
+                     pDrive, &p->start_cyl, &p->start_head, &p->start_sect );
+                  lba_to_chs( ep->rel_sect + ( nep - 1 )->rel_sect +
+                                 p->rel_sect + p->num_sect - 1,
+                              pDrive, &p->end_cyl, &p->end_head,
+                              &p->end_sect );
+               }
+            }
+
+            p->size_in_MB = Convert_Cyl_To_MB( p->end_cyl - p->start_cyl + 1,
+                                               pDrive->total_head + 1,
+                                               pDrive->total_sect );
+
+            entry_offset = entry_offset + 16;
+            if ( sector_buffer[entry_offset + 0x04] == 0x05 ) {
+               pDrive->next_ext_exists[index] = TRUE;
+
+               nep->num_type = sector_buffer[entry_offset + 0x04];
+
+               if ( pDrive->ext_int_13 == FALSE ) {
+                  /* If int 0x13 extensions are not used get the CHS values. */
+
+                  extract_chs( sector_buffer + entry_offset + 0x01,
+                               &nep->start_cyl, &nep->start_head,
+                               &nep->start_sect );
+
+                  extract_chs( sector_buffer + entry_offset + 0x05,
+                               &nep->end_cyl, &nep->end_head,
+                               &nep->end_sect );
+               }
+
+               nep->rel_sect =
+                  *(_u32 *)( sector_buffer + entry_offset + 0x08 );
+
+               nep->num_sect =
+                  *(_u32 *)( sector_buffer + entry_offset + 0x0c );
+
+               if ( ( pDrive->ext_int_13 == TRUE ) &&
+                    ( nep->num_type != 0 ) ) {
+                  /* If int 0x13 extensions are used compute the virtual CHS values. */
+                  lba_to_chs( ep->rel_sect + nep->rel_sect, pDrive,
+                              &nep->start_cyl, &nep->start_head,
+                              &nep->start_sect );
+                  lba_to_chs(
+                     ep->rel_sect + nep->rel_sect + nep->num_sect - 1, pDrive,
+                     &nep->end_cyl, &nep->end_head, &nep->end_sect );
+               }
+
+               error_code = Read_Physical_Sectors(
+                  drive + 0x80, nep->start_cyl, nep->start_head,
+                  nep->start_sect, 1 );
+
+               if ( error_code != 0 ) {
+                  return error_code;
+               }
+            }
+            else {
+               /* no EMBR link entry in second slot -> end of chain */
+               break;
+            }
+         }
+      }
+   }
+
+   return 0;
+}
+
 /* Load the brief_partition_table[8] [27] */
 void Load_Brief_Partition_Table( void )
 {
@@ -820,339 +1084,51 @@ void Load_Brief_Partition_Table( void )
    } /*while(drivenum<8);*/
 }
 
-/* Load the Partition Tables and get information on all drives */
-int Read_Partition_Tables( void )
+static void Clear_Partition_Tables( Partition_Table *pDrive )
 {
-   int drive;
-   int error_code = 0;
    int index;
 
-   int entry_offset;
+   pDrive->usable = FALSE;
 
-   int physical_drive;
+   /* Clear the partition_table_structure structure. */
+   pDrive->pri_part_largest_free_space = 0;
+   pDrive->pp_largest_free_space_start_cyl = 0;
+   pDrive->pp_largest_free_space_start_head = 0;
+   pDrive->pp_largest_free_space_start_sect = 0;
+   pDrive->pp_largest_free_space_end_cyl = 0;
 
-   Partition *p, *ep, *nep;
+   for ( index = 0; index < 4; index++ ) {
+      Clear_Partition( &pDrive->pri_part[index] );
+      pDrive->pri_part_created[index] = FALSE;
+   }
+   Clear_Extended_Partition_Table( pDrive );
+}
 
-   flags.more_than_one_drive = FALSE;
+/* Clear the Extended Partition Table Buffers */
+void Clear_Extended_Partition_Table( Partition_Table *pDrive )
+{
+   int index;
 
-   for ( drive = 0; drive < 8; drive++ ) {
-      Partition_Table *pDrive = &part_table[drive];
-      physical_drive = drive + 0x80;
+   pDrive->ext_usable = FALSE;
+   pDrive->ptr_ext_part = NULL;
+   pDrive->ext_part_size_in_MB = 0;
+   pDrive->ext_part_num_sect = 0;
+   pDrive->ext_part_largest_free_space = 0;
 
-      /* Get the hard drive parameters and ensure that the drive exists. */
-      error_code = Get_Hard_Drive_Parameters( physical_drive );
+   pDrive->log_drive_free_space_start_cyl = 0;
+   pDrive->log_drive_free_space_end_cyl = 0;
 
-      /* If there was an error accessing the drive, skip that drive. */
-      /* If this drive is emulated, then load the emulation values instead. */
-      if ( ( error_code == 0 )
-#ifdef DEBUG
-           && ( debug.emulate_disk != ( drive + 1 ) )
-#endif
-      ) {
-         /* Pre-compute the total size of the hard drive */
-         /* */
-         pDrive->total_disk_size_in_log_sectors = ( pDrive->total_cyl + 1 ) *
-                                                  ( pDrive->total_head + 1 ) *
-                                                  pDrive->total_sect;
+   pDrive->log_drive_largest_free_space_location = 0;
+   pDrive->num_of_log_drives = 0;
+   pDrive->num_of_non_dos_log_drives = 0;
 
-         pDrive->total_disk_size_in_MB =
-            Convert_Cyl_To_MB( ( pDrive->total_cyl + 1 ),
-                               pDrive->total_head + 1, pDrive->total_sect );
-      }
-      else {
-#ifdef DEBUG
-         if ( debug.emulate_disk == ( drive + 1 ) ) {
-            /* If this is an emulated drive, set it up. */
-            if ( ( flags.version == FOUR ) || ( flags.version == FIVE ) ||
-                 ( flags.version == SIX ) ) {
-#pragma warn - ccc
-#pragma warn - rch
-               if ( EMULATED_CYLINDERS > 1023 ) {
-                  pDrive->total_cyl = 1023;
-               }
-#pragma warn + ccc
-#pragma warn + rch
-            }
-            else {
-               pDrive->total_cyl = EMULATED_CYLINDERS;
-            }
+   for ( index = 0; index < MAX_LOGICAL_DRIVES; index++ ) {
+      Clear_Partition( &pDrive->log_drive[index] );
+      Clear_Partition( &pDrive->next_ext[index] );
 
-            pDrive->total_head = EMULATED_HEADS;
-            pDrive->total_sect = EMULATED_SECTORS;
-
-            pDrive->total_disk_size_in_log_sectors =
-               ( pDrive->total_cyl + 1 ) * ( pDrive->total_head + 1 ) *
-               pDrive->total_sect;
-
-            pDrive->total_disk_size_in_MB = Convert_Cyl_To_MB(
-               ( pDrive->total_cyl + 1 ), pDrive->total_head + 1,
-               pDrive->total_sect );
-
-            flags.maximum_drive_number = drive + 128;
-
-            if ( drive > 0 ) {
-               flags.more_than_one_drive = TRUE;
-            }
-         }
-         else {
-#endif
-            if ( drive == 0 ) {
-               Color_Print( "\n    No fixed disks present.\n" );
-               exit( 6 );
-            }
-            pDrive->total_cyl = 0;
-            pDrive->total_head = 0;
-            pDrive->total_sect = 0;
-#ifdef DEBUG
-         }
-#endif
-      }
-
-      /* Clear the partition_table_structure structure. */
-      pDrive->pri_part_largest_free_space = 0;
-
-      pDrive->pp_largest_free_space_start_cyl = 0;
-      pDrive->pp_largest_free_space_start_head = 0;
-      pDrive->pp_largest_free_space_start_sect = 0;
-
-      pDrive->pp_largest_free_space_end_cyl = 0;
-
-      for ( index = 0; index < 4; index++ ) {
-         Clear_Partition( &pDrive->pri_part[index] );
-         pDrive->pri_part_created[index] = FALSE;
-      }
-
-      Clear_Extended_Partition_Table( drive );
-
-      /* Read the Primary Partition Table. */
-      if ( error_code == 0 ) {
-         error_code = Read_Physical_Sectors( physical_drive, 0, 0, 1, 1 );
-
-         if ( error_code != 0 ) {
-            return ( error_code );
-         }
-
-         flags.maximum_drive_number = drive + 128;
-
-         if ( drive > 0 ) {
-            flags.more_than_one_drive = TRUE;
-         }
-
-         index = 0;
-         do {
-            p = &pDrive->pri_part[index];
-            entry_offset = 0x1be + ( index * 16 );
-
-            p->active_status = sector_buffer[entry_offset + 0x00];
-            p->num_type = sector_buffer[entry_offset + 0x04];
-
-            if ( pDrive->ext_int_13 == FALSE ) {
-               /* If int 0x13 extensions are not used get the CHS values. */
-               p->start_cyl =
-                  Extract_Cylinder( sector_buffer[entry_offset + 0x02],
-                                    sector_buffer[entry_offset + 0x03] );
-               p->start_head = sector_buffer[entry_offset + 0x01];
-               p->start_sect =
-                  Extract_Sector( sector_buffer[entry_offset + 0x02],
-                                  sector_buffer[entry_offset + 0x03] );
-
-               p->end_cyl =
-                  Extract_Cylinder( sector_buffer[entry_offset + 0x06],
-                                    sector_buffer[entry_offset + 0x07] );
-               p->end_head = sector_buffer[entry_offset + 0x05];
-               p->end_sect =
-                  Extract_Sector( sector_buffer[entry_offset + 0x06],
-                                  sector_buffer[entry_offset + 0x07] );
-            }
-
-            p->rel_sect = *(_u32 *)( sector_buffer + entry_offset + 0x08 );
-            p->num_sect = *(_u32 *)( sector_buffer + entry_offset + 0x0c );
-
-            if ( ( pDrive->ext_int_13 == TRUE ) && ( p->num_type != 0 ) ) {
-               /* If int 0x13 extensions are used compute the virtual CHS values. */
-               lba_to_chs( p->rel_sect, pDrive, &p->start_cyl, &p->start_head,
-                           &p->start_sect );
-               lba_to_chs( p->rel_sect + p->num_sect - 1, pDrive, &p->end_cyl,
-                           &p->end_head, &p->end_sect );
-               /*
-							a protective GPT partition starts at sector
-							1 and has a size of 0xffffffff
-							
-							unfortunately rel_sect+num_sect is 0 then.
-							
-							so we FORCE this down to the last cylinder
-							*/
-
-               if ( p->num_sect == 0xfffffffful ) {
-                  // printf("correcting cyl %lu -> %lu\n", pDrive->pri_part[index].end_cyl, pDrive->total_cyl);
-                  p->end_cyl = pDrive->total_cyl;
-               }
-            }
-
-            p->size_in_MB = Convert_Cyl_To_MB( p->end_cyl - p->start_cyl + 1,
-                                               pDrive->total_head + 1,
-                                               pDrive->total_sect );
-
-            /* Record the necessary information to easilly and quickly find the */
-            /* extended partition when it is time to read it.                   */
-            if ( ( p->num_type == 0x05 ) ||
-                 ( ( p->num_type == 0x0f ) &&
-                   ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
-                     ( flags.version == W98 ) ) ) ) {
-               pDrive->ptr_ext_part = p;
-               pDrive->ext_part_num_sect = p->num_sect;
-               pDrive->ext_part_size_in_MB = p->size_in_MB;
-            }
-
-            index++;
-         } while ( index < 4 );
-
-         /* Read the Extended Partition Table, if applicable. */
-         if ( pDrive->ptr_ext_part ) {
-            ep = pDrive->ptr_ext_part;
-
-            error_code =
-               Read_Physical_Sectors( physical_drive, ep->start_cyl,
-                                      ep->start_head, ep->start_sect, 1 );
-
-            if ( error_code != 0 ) {
-               return ( error_code );
-            }
-
-            /* Ensure that the sector has a valid partition table before        */
-            /* any information is loaded into pDrive->           */
-            if ( ( sector_buffer[0x1fe] == 0x55 ) &&
-                 ( sector_buffer[0x1ff] == 0xaa ) ) {
-               index = 0;
-               do {
-                  p = &pDrive->log_drive[index];
-                  nep = &pDrive->next_ext[index];
-                  entry_offset = 0x1be;
-
-                  if ( sector_buffer[entry_offset + 0x04] > 0 ) {
-                     pDrive->num_of_log_drives++;
-                  }
-
-                  p->num_type = sector_buffer[entry_offset + 0x04];
-
-                  if ( pDrive->ext_int_13 == FALSE ) {
-                     /* If int 0x13 extensions are not used get the CHS values. */
-
-                     p->start_cyl = Extract_Cylinder(
-                        sector_buffer[entry_offset + 0x02],
-                        sector_buffer[entry_offset + 0x03] );
-                     p->start_head = sector_buffer[entry_offset + 0x01];
-                     p->start_sect =
-                        Extract_Sector( sector_buffer[entry_offset + 0x02],
-                                        sector_buffer[entry_offset + 0x03] );
-                     p->end_cyl = Extract_Cylinder(
-                        sector_buffer[entry_offset + 0x06],
-                        sector_buffer[entry_offset + 0x07] );
-                     p->end_head = sector_buffer[entry_offset + 0x05];
-                     p->end_sect =
-                        Extract_Sector( sector_buffer[entry_offset + 0x06],
-                                        sector_buffer[entry_offset + 0x07] );
-                  }
-
-                  p->rel_sect =
-                     *(_u32 *)( sector_buffer + entry_offset + 0x08 );
-                  p->num_sect =
-                     *(_u32 *)( sector_buffer + entry_offset + 0x0c );
-
-                  if ( ( pDrive->ext_int_13 == TRUE ) &&
-                       ( p->num_type != 0 ) ) {
-                     /* If int 0x13 extensions are used compute the virtual CHS values. */
-                     if ( index == 0 ) {
-                        lba_to_chs( ep->rel_sect + p->rel_sect, pDrive,
-                                    &p->start_cyl, &p->start_head,
-                                    &p->start_sect );
-                        lba_to_chs(
-                           ep->rel_sect + p->rel_sect + p->num_sect - 1,
-                           pDrive, &p->end_cyl, &p->end_head, &p->end_sect );
-                     }
-                     else {
-                        lba_to_chs( ep->rel_sect + ( nep - 1 )->rel_sect +
-                                       p->rel_sect,
-                                    pDrive, &p->start_cyl, &p->start_head,
-                                    &p->start_sect );
-                        lba_to_chs( ep->rel_sect + ( nep - 1 )->rel_sect +
-                                       p->rel_sect + p->num_sect - 1,
-                                    pDrive, &p->end_cyl, &p->end_head,
-                                    &p->end_sect );
-                     }
-                  }
-
-                  p->size_in_MB = Convert_Cyl_To_MB(
-                     p->end_cyl - p->start_cyl + 1, pDrive->total_head + 1,
-                     pDrive->total_sect );
-
-                  entry_offset = entry_offset + 16;
-                  if ( sector_buffer[entry_offset + 0x04] == 0x05 ) {
-                     pDrive->next_ext_exists[index] = TRUE;
-
-                     nep->num_type = sector_buffer[entry_offset + 0x04];
-
-                     if ( pDrive->ext_int_13 == FALSE ) {
-                        /* If int 0x13 extensions are not used get the CHS values. */
-
-                        nep->start_cyl = Extract_Cylinder(
-                           sector_buffer[entry_offset + 0x02],
-                           sector_buffer[entry_offset + 0x03] );
-                        nep->start_head = sector_buffer[entry_offset + 0x01];
-                        nep->start_sect = Extract_Sector(
-                           sector_buffer[entry_offset + 0x02],
-                           sector_buffer[entry_offset + 0x03] );
-
-                        nep->end_cyl = Extract_Cylinder(
-                           sector_buffer[entry_offset + 0x06],
-                           sector_buffer[entry_offset + 0x07] );
-                        nep->end_head = sector_buffer[entry_offset + 0x05];
-                        nep->end_sect = Extract_Sector(
-                           sector_buffer[entry_offset + 0x06],
-                           sector_buffer[entry_offset + 0x07] );
-                     }
-
-                     nep->rel_sect =
-                        *(_u32 *)( sector_buffer + entry_offset + 0x08 );
-
-                     nep->num_sect =
-                        *(_u32 *)( sector_buffer + entry_offset + 0x0c );
-
-                     if ( ( pDrive->ext_int_13 == TRUE ) &&
-                          ( nep->num_type != 0 ) ) {
-                        /* If int 0x13 extensions are used compute the virtual CHS values. */
-                        lba_to_chs( ep->rel_sect + nep->rel_sect, pDrive,
-                                    &nep->start_cyl, &nep->start_head,
-                                    &nep->start_sect );
-                        lba_to_chs( ep->rel_sect + nep->rel_sect +
-                                       nep->num_sect - 1,
-                                    pDrive, &nep->end_cyl, &nep->end_head,
-                                    &nep->end_sect );
-                     }
-
-                     error_code = Read_Physical_Sectors(
-                        physical_drive, nep->start_cyl, nep->start_head,
-                        nep->start_sect, 1 );
-
-                     if ( error_code != 0 ) {
-                        return ( error_code );
-                     }
-                  }
-                  else {
-                     index = 24;
-                  }
-
-                  index++;
-               } while ( index < MAX_LOGICAL_DRIVES );
-            }
-         }
-      }
-   } /* while(drive<8); */
-
-   Determine_Drive_Letters();
-
-   Get_Partition_Information();
-   return ( 0 );
+      pDrive->next_ext_exists[index] = FALSE;
+      pDrive->log_drive_created[index] = FALSE;
+   }
 }
 
 /* Read_Physical_Sector */
@@ -1320,8 +1296,6 @@ int Write_Partition_Tables( void )
          continue; /* nothing done, continue with next drive */
       }
 
-      index = 0;
-
       Clear_Sector_Buffer();
 
 #ifdef DEBUG
@@ -1338,9 +1312,14 @@ int Write_Partition_Tables( void )
          return ( error_code );
       }
 
+      if ( *(unsigned short *) sector_buffer + 510 != 0x55AA ) {
+         /* install MBR code if we install a new MBR */
+         memcpy( sector_buffer, bootnormal_code, SIZE_OF_MBR );
+      }
+
       Clear_Partition_Table_Area_Of_Sector_Buffer();
 
-      do {
+      for ( index = 0; index < 4; index++ ) {
          /* If this partition was just created, clear its boot sector. */
          if ( pDrive->pri_part_created[index] == TRUE ) {
             Clear_Boot_Sector( ( drive_index + 128 ),
@@ -1358,9 +1337,7 @@ int Write_Partition_Tables( void )
 
          StorePartitionInSectorBuffer( &sector_buffer[0x1be + index * 16],
                                        &pDrive->pri_part[index] );
-
-         index++;
-      } while ( index < 4 );
+      }
 
       /* Add the partition table marker values */
       sector_buffer[0x1fe] = 0x55;
@@ -1375,8 +1352,7 @@ int Write_Partition_Tables( void )
       /* Write the Extended Partition Table, if applicable. */
 
       if ( pDrive->ptr_ext_part ) {
-         index = 0;
-         do {
+         for ( index = 0; index < MAX_LOGICAL_DRIVES; index++ ) {
             /* If this logical drive was just created, clear its boot sector. */
             if ( pDrive->log_drive_created[index] == TRUE ) {
                if ( pDrive->log_drive[index].start_cyl !=
@@ -1421,9 +1397,7 @@ int Write_Partition_Tables( void )
             extended_cylinder = pDrive->next_ext[index].start_cyl;
             extended_head = pDrive->next_ext[index].start_head;
             extended_sector = pDrive->next_ext[index].start_sect;
-
-            index++;
-         } while ( index < MAX_LOGICAL_DRIVES );
+         }
       }
 
    } /* for (drive_index) */
@@ -1658,15 +1632,13 @@ void StorePartitionInSectorBuffer( char *sector_buffer,
    sector_buffer[0x00] = pPart->active_status;
    sector_buffer[0x01] = start_head;
 
-   *(_u16 *)( sector_buffer + 0x02 ) =
-      Combine_Cylinder_and_Sector( start_cyl, start_sect );
+   *(_u16 *)( sector_buffer + 0x02 ) = combine_cs( start_cyl, start_sect );
 
    sector_buffer[0x04] = pPart->num_type;
 
    sector_buffer[0x05] = end_head;
 
-   *(_u16 *)( sector_buffer + 0x06 ) =
-      Combine_Cylinder_and_Sector( end_cyl, end_sect );
+   *(_u16 *)( sector_buffer + 0x06 ) = combine_cs( end_cyl, end_sect );
 
    *(_u32 *)( sector_buffer + 0x08 ) = pPart->rel_sect;
    *(_u32 *)( sector_buffer + 0x0c ) = pPart->num_sect;

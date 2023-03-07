@@ -71,6 +71,8 @@ typedef struct Partition {
 
 /* Partition Table Structure...Created 5/6/1999 */
 typedef struct part_table_structure {
+   
+   int usable; /* true if drive is found and primary partition coud be read */
 
    /* Hard disk Geometry */
    /* total_cyl and total_head are actually not the total but the highest
@@ -88,8 +90,8 @@ typedef struct part_table_structure {
    unsigned long total_disk_size_in_log_sectors;
    unsigned long total_disk_size_in_MB;
 
+   int ext_usable;   /* true if extended partition is compatible */
    int part_values_changed;
-   int pri_part_exists;
 
    /* Primary Partition Table */
 
@@ -150,6 +152,7 @@ int Write_Physical_Sectors( int drive, long cylinder, long head, long sector,
                             int number_of_sectors );
 void Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head,
                         unsigned long sector );
+void Clear_Extended_Partition_Table( Partition_Table *pDrive );
 unsigned long Decimal_Number( unsigned long hex1, unsigned long hex2,
                               unsigned long hex3, unsigned long hex4 );
 
@@ -159,12 +162,13 @@ void Initialize_LBA_Structures( void );
 void Load_Brief_Partition_Table( void );
 
 int IsRecognizedFatPartition( unsigned );
-int Is_Extended_Partition( int num_type );
+int Is_Ext_Part( int num_type );
+int Is_Supp_Ext_Part( int num_tyoe ); /* detects 0x0f type only if in >W95 mode */
 
-unsigned long Combine_Cylinder_and_Sector( unsigned long cylinder,
-                                           unsigned long sector );
-unsigned long Extract_Cylinder( unsigned long hex1, unsigned long hex2 );
-unsigned long Extract_Sector( unsigned long hex1, unsigned long hex2 );
+unsigned long combine_cs( unsigned long cylinder,
+                          unsigned long sector );
+void extract_chs( unsigned char *p, unsigned long *cyl, unsigned long *head,
+                  unsigned long *sect );
 
 /* sets all partition values to zero */
 void Clear_Partition( Partition *p );

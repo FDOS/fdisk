@@ -19,9 +19,8 @@ unsigned long Max_Log_Part_Size_In_MB( void );
 unsigned long Max_Pri_Part_Size_In_MB( int type );
 
 void Deactivate_Active_Partition( void );
-void Clear_Extended_Partition_Table( int drive );
-void Delete_Logical_Drive( int logical_drive_number );
-void Delete_Primary_Partition( int partition_number );
+int Delete_Logical_Drive( int logical_drive_number );
+int Delete_Primary_Partition( int partition_number );
 void Determine_Free_Space( void );
 void Modify_Extended_Partition_Information( int logical_drive_number );
 void Modify_Partition_Type( int partition_number, int type_number );
