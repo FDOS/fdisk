@@ -1147,6 +1147,34 @@ int LBA_Partition_Type_To_Create( int standard_partition_type )
    return ( standard_partition_type ); /* could be undefined */
 }
 
+unsigned long Max_Pri_Free_Space_In_MB( void )
+{
+   unsigned long maximum_partition_size_in_MB;
+   Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+
+   Determine_Free_Space();
+
+   maximum_partition_size_in_MB =
+      Convert_Cyl_To_MB( ( pDrive->pri_part_largest_free_space ),
+                         pDrive->total_head + 1, pDrive->total_sect );
+
+   return maximum_partition_size_in_MB;
+}
+
+unsigned long Max_Log_Free_Space_In_MB( void )
+{
+   unsigned long maximum_partition_size_in_MB;
+   Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+
+   Determine_Free_Space();
+
+   maximum_partition_size_in_MB =
+      Convert_Cyl_To_MB( ( pDrive->ext_part_largest_free_space ),
+                         pDrive->total_head + 1, pDrive->total_sect );
+
+   return maximum_partition_size_in_MB;
+}
+
 /* Get the maximum size of the logical drive, in MB. */
 unsigned long Max_Log_Part_Size_In_MB( void )
 {

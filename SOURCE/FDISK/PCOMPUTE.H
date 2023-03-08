@@ -15,6 +15,8 @@ int More_Than_One_Hard_Disk( void );
 int Partition_Type_To_Create( unsigned long size_in_mb,
                               int requested_partition_type );
 
+unsigned long Max_Pri_Free_Space_In_MB( void );
+unsigned long Max_Log_Free_Space_In_MB( void );
 unsigned long Max_Log_Part_Size_In_MB( void );
 unsigned long Max_Pri_Part_Size_In_MB( int type );
 

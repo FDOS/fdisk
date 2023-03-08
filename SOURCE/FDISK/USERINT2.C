@@ -1009,6 +1009,8 @@ void Display_CL_Partition_Table( void )
 
       index++;
    } while ( index < 4 );
+   printf("\nLargest continious free space for primary partition: %lu MBytes\n", 
+          Max_Pri_Free_Space_In_MB() );
 
    /* Check to see if there are any drives to display */
    if ( ( brief_partition_table[( flags.drive_number - 128 )][4] > 0 ) ||
@@ -1073,8 +1075,8 @@ void Display_CL_Partition_Table( void )
 
          index++;
       } while ( index < 27 );
-      printf("\nLargest free space in extended partition: %lu MBytes\n", 
-             Max_Log_Part_Size_In_MB() );
+      printf("\nLargest continious free space in extended partition: %lu MBytes\n", 
+             Max_Log_Free_Space_In_MB() );
    }
 }
 

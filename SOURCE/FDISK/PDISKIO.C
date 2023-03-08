@@ -525,7 +525,7 @@ void extract_chs( unsigned char *p, unsigned long *cyl, unsigned long *head,
    unsigned short cs = *(unsigned short *)( p + 1 );
 
    if ( cyl ) {
-      *cyl = ( ( cs >> 8 ) | ( cs << 2 ) ) & 0x0300u;
+      *cyl = ( cs >> 8 ) | ( ( cs << 2 ) & 0x0300u );
    }
    if ( head ) {
       *head = *p;
@@ -546,6 +546,8 @@ int Get_Hard_Drive_Parameters( int physical_drive )
    unsigned long total_heads = 0;
    unsigned long total_sectors = 0;
    Partition_Table *pDrive = &part_table[physical_drive - 0x80];
+
+   pDrive->size_truncated = FALSE;
 
    if ( ( physical_drive - 0x80 ) >= flags.total_number_hard_disks ) {
       return ( 255 );
@@ -855,7 +857,6 @@ int Read_Partition_Tables( void )
          pDrive->total_cyl = 0;
          pDrive->total_head = 0;
          pDrive->total_sect = 0;
-
          continue;
       }
 
@@ -1013,18 +1014,21 @@ static int Read_Extended_Table( int drive, Partition_Table *pDrive )
          logical partition, because EMBR entry stores relativ values */
       rel_sect = ep->rel_sect + ( ( nep != ep ) ? nep->rel_sect : 0 );
       Read_Table_Entry( sector_buffer + 0x1be, pDrive, p, rel_sect);
-      num_drives += 1;
 
       nep = (nep == ep) ? pDrive->next_ext : nep + 1;
 
       Read_Table_Entry( sector_buffer + 0x1be + 16, pDrive, nep, ep->rel_sect);
       if ( Is_Supp_Ext_Part( nep->num_type ) ) {
-         pDrive->next_ext_exists[num_drives - 1] = TRUE;
+         pDrive->next_ext_exists[num_drives] = TRUE;
       }
       else if ( nep->num_type != 0 ) {
          /* No valid EMBR link in second entry found and not end of chain.
             Treat as an error condition */
          return 1;
+      }
+
+      if ( p->num_type != 0 || nep->num_type != 0 ) {
+         num_drives += 1;
       }
 
       if ( sector_buffer[0x1c2 + 32] != 0 || sector_buffer[0x1c2 + 48] != 0 ) {
