@@ -771,16 +771,18 @@ void Delete_Primary_DOS_Partition_Interface( void )
                   Color_Print_At( 4, 21,
                                   "Error deleting primary DOS Partition" );
                }
+               Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             }
          }
       }
       else if ( Is_Supp_Ext_Part( p->num_type ) ) {
          Color_Print_At( 4, 22, "Refusing to delete extended partition!" );
+         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
       else {
          Color_Print_At( 4, 22, "Not a DOS partition!" );         
+         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
-      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
 }
 
