@@ -972,8 +972,14 @@ static void Read_Table_Entry( unsigned char *buf, Partition_Table *pDrive,
    }
    else {
       /* If int 0x13 extensions are used compute the virtual CHS values. */
-      lba_to_chs( p->rel_sect + lba_offset, pDrive, &p->start_cyl, &p->start_head, &p->start_sect );
-      lba_to_chs( p->rel_sect + lba_offset + p->num_sect - 1, pDrive, &p->end_cyl, &p->end_head, &p->end_sect );
+      if ( p->rel_sect == 0 && p->num_sect == 0 ) {
+         p->start_cyl = p->start_head = p->start_sect = 0;
+         p->end_cyl = p->end_head = p->end_sect = 0;
+      }
+      else {
+         lba_to_chs( p->rel_sect + lba_offset, pDrive, &p->start_cyl, &p->start_head, &p->start_sect );
+         lba_to_chs( p->rel_sect + lba_offset + p->num_sect - 1, pDrive, &p->end_cyl, &p->end_head, &p->end_sect );
+      }
    }
 
    if ( p->num_sect == 0xfffffffful ) {
@@ -1308,6 +1314,8 @@ int Read_Physical_Sectors_LBA( int drive, long cylinder, long head,
 unsigned long chs_to_lba( Partition_Table *pDrive, unsigned long cylinder,
                           unsigned long head, unsigned long sector )
 {
+   if ( cylinder == 0 && head == 0 && sector == 0 ) return 0;
+
    return ( ( ( cylinder * ( pDrive->total_head + 1 ) + head ) *
                  pDrive->total_sect +
               sector - 1 ) );
