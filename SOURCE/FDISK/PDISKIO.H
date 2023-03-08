@@ -173,6 +173,7 @@ void extract_chs( unsigned char *p, unsigned long *cyl, unsigned long *head,
 /* sets all partition values to zero */
 void Clear_Partition( Partition *p );
 void Copy_Partition( Partition *dst, Partition *src );
+int Delete_EMBR_Chain_Node( Partition_Table *pDrive, int logical_drive_number );
 
 /* LBA<->CHS conversion functions */
 unsigned long lba_to_cyl( unsigned long lba_value, Partition_Table *pDrive );

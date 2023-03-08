@@ -817,8 +817,61 @@ void Initialize_LBA_Structures( void )
    result_buffer[0] = 26;
 }
 
-/* from PCOMPUTE.C, not nice but better than duplicating functionality */
-extern int Delete_Logical_Drive( int logical_drive_number );
+
+int Delete_EMBR_Chain_Node( Partition_Table *pDrive, int logical_drive_number )
+{
+   int index;
+
+   Partition *p, *nep;
+
+   if ( logical_drive_number >= pDrive->num_of_log_drives ) {
+      return 99;
+   }
+
+   p = &pDrive->log_drive[logical_drive_number];
+
+   /* If the logical drive to be deleted is not the first logical drive.   */
+   /* Assume that there are extended partition tables after this one. If   */
+   /* there are not any more extended partition tables, nothing will be    */
+   /* harmed by the shift. */
+   if ( logical_drive_number > 0 ) {
+      nep = &pDrive->next_ext[logical_drive_number];
+
+      /* Move the extended partition information from this table to the    */
+      /* previous table.                                                   */
+      Copy_Partition( nep - 1, nep );
+
+      /* Shift all the following extended partition tables left by 1.      */
+      for ( index = logical_drive_number; index < MAX_LOGICAL_DRIVES - 1;
+            index++ ) {      
+         p = &pDrive->log_drive[index];
+         nep = &pDrive->next_ext[index];
+
+         Copy_Partition( p, p + 1 );
+         Copy_Partition( nep, nep + 1 );
+         pDrive->log_drive_created[index] =
+            pDrive->log_drive_created[index + 1];
+         pDrive->next_ext_exists[index - 1] =
+            ( p->num_type > 0 ) ? TRUE : FALSE;
+      }
+
+      Clear_Partition( &pDrive->log_drive[MAX_LOGICAL_DRIVES - 1] );
+      Clear_Partition( &pDrive->next_ext[MAX_LOGICAL_DRIVES - 1] );
+      pDrive->log_drive_created[MAX_LOGICAL_DRIVES - 1] = FALSE;
+      pDrive->next_ext_exists[MAX_LOGICAL_DRIVES - 1] = FALSE;
+   }
+   else {
+      /* Delete the first logical partition */
+      Clear_Partition( p );
+      pDrive->log_drive_created[0] = FALSE;
+   }
+
+   pDrive->num_of_log_drives--;
+   pDrive->part_values_changed = TRUE;
+   flags.partitions_have_changed = TRUE;
+
+   return 0;
+}
 
 void Normalize_Log_Table( Partition_Table *pDrive )
 {
@@ -826,7 +879,7 @@ void Normalize_Log_Table( Partition_Table *pDrive )
 
    while ( index < pDrive->num_of_log_drives ) {
       if ( pDrive->log_drive[index].num_type == 0 ) {
-         Delete_Logical_Drive( index );
+         Delete_EMBR_Chain_Node( pDrive, index );
       }
       else {
          index++;
