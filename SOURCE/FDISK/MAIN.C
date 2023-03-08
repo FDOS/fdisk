@@ -81,7 +81,7 @@ unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
    unsigned long mb2 =
       ( ( num_cyl - 1 ) * total_heads * total_sect ) / 2048ul;
 
-   return ( mb1 > mb2 ) ? mb1 : mb2;
+   return ( mb1 > mb2 || num_cyl == 0 ) ? mb1 : mb2;
 }
 
 unsigned long Convert_Sect_To_MB( unsigned long num_sect )

@@ -270,6 +270,8 @@ int Determine_Drive_Letters( void )
    Load_Brief_Partition_Table();
 
    /* Clear drive_lettering_buffer[8] [27] */
+   memset( drive_lettering_buffer, 0, sizeof( drive_lettering_buffer ) );
+#if 0
    index = 0;
    do {
       sub_index = 0;
@@ -281,13 +283,18 @@ int Determine_Drive_Letters( void )
 
       index++;
    } while ( index < 8 );
+#endif
 
    /* Set all active_part_found[] values to 0. */
+   memset( active_part_found, 0, sizeof( active_part_found ) );
+ 
+#if 0 
    index = 0;
    do {
       active_part_found[index] = 0;
       index++;
    } while ( index < 8 );
+#endif
 
    /* Begin placement of drive letters */
 
@@ -304,8 +311,8 @@ int Determine_Drive_Letters( void )
               ( pDrive->pri_part[sub_index].active_status == 0x80 ) ) {
             drive_lettering_buffer[index][sub_index] = current_letter;
             active_part_found[index] = 1;
-            sub_index = 5; /* get out of loop */
             current_letter++;
+            break;
          }
 
          sub_index++;
@@ -314,7 +321,7 @@ int Determine_Drive_Letters( void )
 
    /* Next, assign one drive letter for one existing primary partition   */
    /* if an active partition does not exist on that hard disk.           */
-   for ( index = 0; index < 8; index ++ ) {
+   for ( index = 0; index < 8; index++ ) {
       Partition_Table *pDrive = &part_table[index];
       if (!pDrive->usable) continue;
 
@@ -518,7 +525,7 @@ void extract_chs( unsigned char *p, unsigned long *cyl, unsigned long *head,
    unsigned short cs = *(unsigned short *)( p + 1 );
 
    if ( cyl ) {
-      *cyl = ( cs >> 8 ) | ( cs << 2 ) & 0x0300u;
+      *cyl = ( ( cs >> 8 ) | ( cs << 2 ) ) & 0x0300u;
    }
    if ( head ) {
       *head = *p;
@@ -808,6 +815,23 @@ void Initialize_LBA_Structures( void )
    result_buffer[0] = 26;
 }
 
+/* from PCOMPUTE.C, not nice but better than duplicating functionality */
+extern int Delete_Logical_Drive( int logical_drive_number );
+
+void Normalize_Log_Table( Partition_Table *pDrive )
+{
+   int index = 1;
+
+   while ( index < pDrive->num_of_log_drives ) {
+      if ( pDrive->log_drive[index].num_type == 0 ) {
+         Delete_Logical_Drive( index );
+      }
+      else {
+         index++;
+      }
+   }
+}
+
 /* Load the Partition Tables and get information on all drives */
 int Read_Partition_Tables( void )
 {
@@ -859,11 +883,17 @@ int Read_Partition_Tables( void )
          pDrive->ext_usable = TRUE;
       }
 
+      /* remove link-only EMBRs with no logical partition in it */
+      Normalize_Log_Table( pDrive );
+
+      pDrive->part_values_changed = FALSE;
       flags.maximum_drive_number = drive + 0x80;
+
       num_drives++;
    }
 
    flags.more_than_one_drive = num_drives > 1;
+   flags.partitions_have_changed = FALSE;
 
    Determine_Drive_Letters();
    Get_Partition_Information();
@@ -958,6 +988,8 @@ static int Read_Extended_Table( int drive, Partition_Table *pDrive )
 
    /* consider ext part incompatible until opposite is proofed */
    pDrive->ext_usable = FALSE;
+   pDrive->num_of_log_drives = 0;
+   pDrive->num_of_non_dos_log_drives = 0;
 
    /* no EMBR eintry in MBR, abort */
    if ( !pDrive->ptr_ext_part ) return 0;
@@ -1006,40 +1038,6 @@ static int Read_Extended_Table( int drive, Partition_Table *pDrive )
 
    pDrive->num_of_log_drives = num_drives;
 
-#if 0
-
-   /* Ensure that the sector has a valid partition table before  */
-   /* any information is loaded into pDrive->           */
-   if ( ( sector_buffer[0x1fe] == 0x55 ) &&
-        ( sector_buffer[0x1ff] == 0xaa ) ) {
-      for ( index = 0; index < MAX_LOGICAL_DRIVES; ) {
-         p = &pDrive->log_drive[index];
-         nep = &pDrive->next_ext[index];
-         entry_offset = 0x1be;
-         Read_Table_Entry( sector_buffer + entry_offset, pDrive, p, rel_sect);
-         entry_offset = entry_offset + 16;
-         if ( sector_buffer[entry_offset + 0x04] == 0x05 ) {
-            pDrive->next_ext_exists[index] = TRUE;
-            Read_Table_Entry( sector_buffer + entry_offset, pDrive, nep, ep->rel_sect );
-            if ( p->num_type > 0 ) {
-               pDrive->num_of_log_drives++;
-               index++;
-            }
-            error_code = Read_Physical_Sectors(
-               drive + 0x80, nep->start_cyl, nep->start_head,
-               nep->start_sect, 1 );
-            if ( error_code != 0 ) {
-               return error_code;
-            }
-         }
-         else {
-            /* no EMBR link entry in second slot -> end of chain */
-            break;
-         }
-      }
-      pDrive->ext_usable = TRUE;
-   }
-#endif
    return 0;
 }
 
@@ -1059,12 +1057,11 @@ void Load_Brief_Partition_Table( void )
       }
 
       /* Load the extended partitions into brief_partition_table[8] [27] */
-
       for ( partnum = 0; partnum < MAX_LOGICAL_DRIVES; partnum++ ) {
          brief_partition_table[drivenum][partnum + 4] =
             pDrive->log_drive[partnum].num_type;
       }
-   } /*while(drivenum<8);*/
+   }
 }
 
 static void Clear_Partition_Tables( Partition_Table *pDrive )

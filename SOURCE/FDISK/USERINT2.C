@@ -418,7 +418,7 @@ int Create_Logical_Drive_Interface( void )
          "consider re-creating the extended partition.");
 
       Print_At( 4, 21, "Create logical drive in non-aligned extended partition...?"); 
-      yn = Input( 1, 63, 21, YN, 0, 0, NONE, 1, 0, 0, 0 );
+      yn = (int) Input( 1, 63, 21, YN, 0, 0, NONE, 1, 0, 0, 0 );
       if ( yn ) {
          allow_unaligned_ext = TRUE;
       }
@@ -556,8 +556,6 @@ int Create_Logical_Drive_Interface( void )
 void Delete_Extended_DOS_Partition_Interface( void )
 {
    int input = 0;
-   int index = 0;
-   Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    Clear_Screen( 0 );
 
@@ -1075,6 +1073,8 @@ void Display_CL_Partition_Table( void )
 
          index++;
       } while ( index < 27 );
+      printf("\nLargest free space in extended partition: %lu MBytes\n", 
+             Max_Log_Part_Size_In_MB() );
    }
 }
 

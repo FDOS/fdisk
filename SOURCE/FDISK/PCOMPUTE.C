@@ -552,26 +552,6 @@ int Delete_Logical_Drive( int logical_drive_number )
    pDrive->part_values_changed = TRUE;
    flags.partitions_have_changed = TRUE;
 
-   /* If there aren't any more logical drives, clear the extended        */
-   /* partition table to prevent lockups by any other partition utils.   */
-
-   /* unneeded ?!? 
-   if ( pDrive->num_of_log_drives == 0 ) {
-      index = 0;
-      do {
-         p = &pDrive->log_drive[index];
-         nep = &pDrive->next_ext[index];
-
-         Clear_Partition( p );
-         Clear_Partition( nep );
-
-         pDrive->log_drive_created[index] = FALSE;
-         pDrive->next_ext_exists[index] = FALSE;
-
-         index++;
-      } while ( index < MAX_LOGICAL_DRIVES + 1 );
-   }*/
-
    return 0;
 }
 
