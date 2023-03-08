@@ -749,36 +749,39 @@ void Delete_Primary_DOS_Partition_Interface( void )
       partition_to_delete = input - 1;
 
       p = &pDrive->pri_part[partition_to_delete];
-      if ( !Is_Supp_Ext_Part( p->num_type ) ) {
+      if ( Is_Dos_Part( p->num_type ) ) {
 
-         if ( ( input == TRUE ) && ( flags.esc == FALSE ) ) {
+         if ( input && ( flags.esc == FALSE ) ) {
             Print_At( 4, 22,
                       "Are you sure (Y/N)..............................? " );
             flags.esc = FALSE;
             input = (int)Input( 1, 54, 22, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
-
-            Clear_Screen( 0 );
-
-            Print_Centered( 4, "Delete Primary DOS Partition", BOLD );
-
-            error_code = Delete_Primary_Partition( partition_to_delete );
-            Display_Primary_Partition_Information_SS();
-
-            if ( !error_code ) {
-               Color_Print_At( 4, 21, "Primary DOS Partition deleted" );
-            }
-            else {
-               Color_Print_At( 4, 21,
-                               "Error deleting primary DOS Partition" );
+            if ( input ) {
+               Clear_Screen( 0 );
+   
+               Print_Centered( 4, "Delete Primary DOS Partition", BOLD );
+   
+               error_code = Delete_Primary_Partition( partition_to_delete );
+               Display_Primary_Partition_Information_SS();
+   
+               if ( !error_code ) {
+                  Color_Print_At( 4, 21, "Primary DOS Partition deleted" );
+               }
+               else {
+                  Color_Print_At( 4, 21,
+                                  "Error deleting primary DOS Partition" );
+               }
             }
          }
       }
-      else {
+      else if ( Is_Supp_Ext_Part( p->num_type ) ) {
          Color_Print_At( 4, 22, "Refusing to delete extended partition!" );
       }
+      else {
+         Color_Print_At( 4, 22, "Not a DOS partition!" );         
+      }
+      Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
-
-   Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
 }
 
 /* Display information for all hard drives */

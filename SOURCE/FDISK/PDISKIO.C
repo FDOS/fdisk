@@ -176,11 +176,17 @@ void Check_For_INT13_Extensions( void )
 
 int Is_Ext_Part( int num_type ) { return num_type == 5 || num_type == 0x0f; }
 
+int Is_Dos_Part( int num_type )
+{
+   return num_type == 0x01 ||num_type == 0x04 || num_type == 0x06 || 
+          num_type == 0x0b || num_type == 0x0c || num_type == 0x0e;
+}
+
 int Is_Supp_Ext_Part( int num_type )
 {
-   return num_type == 5 || num_type == 0x0f && ( flags.version == W95 ||
+   return num_type == 5 || ( num_type == 0x0f && ( flags.version == W95 ||
                                                  flags.version == W95B ||
-                                                 flags.version == W98 );
+                                                 flags.version == W98 ) );
 }
 
 /* Clear the Boot Sector of a partition */

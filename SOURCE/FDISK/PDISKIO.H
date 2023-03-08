@@ -165,7 +165,7 @@ int IsRecognizedFatPartition( unsigned );
 int Is_Ext_Part( int num_type );
 int Is_Supp_Ext_Part(
    int num_tyoe ); /* detects 0x0f type only if in >W95 mode */
-
+int Is_Dos_Part( int part_type );
 unsigned long combine_cs( unsigned long cylinder, unsigned long sector );
 void extract_chs( unsigned char *p, unsigned long *cyl, unsigned long *head,
                   unsigned long *sect );
