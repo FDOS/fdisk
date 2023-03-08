@@ -938,17 +938,13 @@ void Display_CL_Partition_Table( void )
 
    printf( "\n\nCurrent fixed disk drive: %1d",
            ( flags.drive_number - 127 ) );
-   if ( flags.extended_options_flag == TRUE ) {
+
       printf( "      (sectors: %lu, geometry: %lu/%03lu/%02lu)", 
          pDrive->total_disk_size_in_log_sectors, pDrive->total_cyl + 1,
          pDrive->total_head + 1, pDrive->total_sect );
-   }
 
    printf( "\n\nPartition   Status   Mbytes   Description      Usage" );
-   if ( flags.extended_options_flag == TRUE ) {
-      printf( "    Start CHS       End CHS" );
-   }
-   printf( "\n" );
+      printf( "    Start CHS       End CHS\n" );
 
    index = 0;
    do {
@@ -966,13 +962,8 @@ void Display_CL_Partition_Table( void )
          /* Partition Number */
          printf( " %1d", ( index + 1 ) );
 
-         if ( flags.extended_options_flag == TRUE ) {
             /* Partition Type */
-            printf( " %3d", ( pDrive->pri_part[index].num_type ) );
-         }
-         else {
-            printf( "    " );
-         }
+         printf( " %3d", ( pDrive->pri_part[index].num_type ) );
 
          /* Status */
          if ( pDrive->pri_part[index].active_status > 0 ) {
@@ -997,13 +988,11 @@ void Display_CL_Partition_Table( void )
 
          printf( "   %3lu%%", usage );
 
-         if ( flags.extended_options_flag == TRUE ) {
             /* Starting Cylinder */
             printf( "%6lu/%03lu/%02lu", pDrive->pri_part[index].start_cyl, pDrive->pri_part[index].start_head, pDrive->pri_part[index].start_sect );
 
             /* Ending Cylinder */
             printf( " %6lu/%03lu/%02lu", pDrive->pri_part[index].end_cyl, pDrive->pri_part[index].end_head, pDrive->pri_part[index].end_sect );
-         }
          printf( "\n" );
       }
 
@@ -1017,10 +1006,7 @@ void Display_CL_Partition_Table( void )
         ( brief_partition_table[( flags.drive_number - 128 )][5] > 0 ) ) {
       printf( "\nContents of Extended DOS Partition:\n" );
       printf( "Drv Volume Label  Mbytes  System   Usage" );
-      if ( flags.extended_options_flag == TRUE ) {
-         printf( "    Start CHS      End CHS" );
-      }
-      printf( "\n" );
+         printf( "    Start CHS      End CHS\n" );
 
       /* Display information for each Logical DOS Drive */
       index = 4;
@@ -1056,7 +1042,6 @@ void Display_CL_Partition_Table( void )
 
             printf( "  %3lu%%", usage );
 
-            if ( flags.extended_options_flag == TRUE ) {
                /* Starting Cylinder */
                printf( "%6lu/%03lu/%02lu", 
                   pDrive->log_drive[index - 4].start_cyl, 
@@ -1068,10 +1053,9 @@ void Display_CL_Partition_Table( void )
                   pDrive->log_drive[index - 4].end_cyl,
                   pDrive->log_drive[index - 4].end_head,
                   pDrive->log_drive[index - 4].end_sect );
+            printf( "\n" );
             }
 
-            printf( "\n" );
-         }
 
          index++;
       } while ( index < 27 );
