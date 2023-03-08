@@ -46,7 +46,8 @@ void Display_Help_Screen( void )
    printf( "Syntax:\n" );
    printf( "                    Runs in interactive mode.\n", filename,
            name );
-   printf( "  /INFO [/TECH]     Displays partition information from <drive#>\n" );
+   printf(
+      "  /INFO             Displays partition information from <drive#>\n" );
    printf( "  /REBOOT           Reboots the Computer\n" );
    printf( "\n" );
    printf(
@@ -117,8 +118,10 @@ void Display_Help_Screen( void )
    printf( "  /FPRMT   Prompts for FAT32/FAT16 in interactive mode.\n" );
    printf( "  /X       Do not use LBA partitions.\n" );
    printf( "\n" );
-   printf( "This program is Copyright %s, by Brian E. Reifsnyder and\n"
-           "The FreeDOS Community, under the terms of the GNU General Public License,\n", COPYLEFT );
+   printf(
+      "This program is Copyright %s, by Brian E. Reifsnyder and\n"
+      "The FreeDOS Community, under the terms of the GNU General Public License,\n",
+      COPYLEFT );
    printf( "version 2.\n" );
    printf(
       "\nThis program comes as-is and without warranty of any kind.  The author of\n" );
@@ -127,5 +130,4 @@ void Display_Help_Screen( void )
    printf(
       "this software.  By using this software, the operator is understood to be\n" );
    printf( "agreeing to the terms of the above.\n" );
-
 }

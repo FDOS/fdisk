@@ -90,7 +90,7 @@ typedef struct part_table_structure {
    unsigned long total_disk_size_in_log_sectors;
    unsigned long total_disk_size_in_MB;
 
-   int ext_usable;   /* true if extended partition is compatible */
+   int ext_usable; /* true if extended partition is compatible */
    int part_values_changed;
 
    /* Primary Partition Table */
@@ -163,17 +163,18 @@ void Load_Brief_Partition_Table( void );
 
 int IsRecognizedFatPartition( unsigned );
 int Is_Ext_Part( int num_type );
-int Is_Supp_Ext_Part( int num_tyoe ); /* detects 0x0f type only if in >W95 mode */
+int Is_Supp_Ext_Part(
+   int num_tyoe ); /* detects 0x0f type only if in >W95 mode */
 
-unsigned long combine_cs( unsigned long cylinder,
-                          unsigned long sector );
+unsigned long combine_cs( unsigned long cylinder, unsigned long sector );
 void extract_chs( unsigned char *p, unsigned long *cyl, unsigned long *head,
                   unsigned long *sect );
 
 /* sets all partition values to zero */
 void Clear_Partition( Partition *p );
 void Copy_Partition( Partition *dst, Partition *src );
-int Delete_EMBR_Chain_Node( Partition_Table *pDrive, int logical_drive_number );
+int Delete_EMBR_Chain_Node( Partition_Table *pDrive,
+                            int logical_drive_number );
 
 /* LBA<->CHS conversion functions */
 unsigned long lba_to_cyl( unsigned long lba_value, Partition_Table *pDrive );

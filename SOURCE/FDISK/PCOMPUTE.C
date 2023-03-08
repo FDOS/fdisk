@@ -103,11 +103,14 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    unsigned long end_sect;
    unsigned long part_sz;
 
-
    int free_space_loc = pDrive->log_drive_largest_free_space_location;
 
-   if ( !pDrive->usable || !pDrive->ext_usable ) return 99;
-   if ( max_sz_cyl == 0  || req_sz_cyl == 0 ) { return 99; }
+   if ( !pDrive->usable || !pDrive->ext_usable ) {
+      return 99;
+   }
+   if ( max_sz_cyl == 0 || req_sz_cyl == 0 ) {
+      return 99;
+   }
 
    /* Adjust the size of the partition to fit boundaries, if necessary. */
    if ( req_sz_cyl > max_sz_cyl ) {
@@ -141,7 +144,7 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
 
    p = &pDrive->log_drive[free_space_loc];
 
-   if (  free_space_loc == 0 ) {
+   if ( free_space_loc == 0 ) {
       nep = pDrive->ptr_ext_part;
    }
    else {
@@ -158,22 +161,23 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
       nep->end_head = pDrive->total_head;
       nep->end_sect = pDrive->total_sect;
 
-      nep->rel_sect =
-      chs_to_lba( pDrive, nep->start_cyl, nep->start_head, nep->start_sect) -
-         ep->rel_sect;
+      nep->rel_sect = chs_to_lba( pDrive, nep->start_cyl, nep->start_head,
+                                  nep->start_sect ) -
+                      ep->rel_sect;
       nep->num_sect =
-      chs_to_lba( pDrive, nep->end_cyl, nep->end_head, nep->end_sect) -
-         chs_to_lba( pDrive, nep->start_cyl, nep->start_head, nep->start_sect) +
+         chs_to_lba( pDrive, nep->end_cyl, nep->end_head, nep->end_sect ) -
+         chs_to_lba( pDrive, nep->start_cyl, nep->start_head,
+                     nep->start_sect ) +
          1;
    }
 
    /* calculate start sector from beginning of extended partition */
    ext_start_sect =
-      chs_to_lba( pDrive, nep->start_cyl, nep->start_head, nep->start_sect);
+      chs_to_lba( pDrive, nep->start_cyl, nep->start_head, nep->start_sect );
    start_sect = ext_start_sect + pDrive->total_sect;
    if ( flags.align_4k ) {
       start_sect = align_up( start_sect );
-   }  
+   }
    end_sect =
       chs_to_lba( pDrive, end_cyl, pDrive->total_head, pDrive->total_sect );
 
@@ -187,7 +191,6 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    p->num_sect = part_sz;
 
    p->size_in_MB = Convert_Sect_To_MB( part_sz );
-
 
    /* Adjust the partition type, if necessary. */
    numeric_type = Partition_Type_To_Create( part_sz / 2048, numeric_type );
@@ -369,7 +372,9 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
    unsigned long end_sect;
    unsigned long part_sz;
 
-   if ( !pDrive->usable ) return 99;
+   if ( !pDrive->usable ) {
+      return 99;
+   }
 
    if ( max_sz_cyl == 0 || req_sz_cyl == 0 ) {
       return 99;
@@ -502,7 +507,7 @@ int Delete_Logical_Drive( int logical_drive_number )
 {
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
-   if ( !pDrive->usable || !pDrive->ext_usable  ) {
+   if ( !pDrive->usable || !pDrive->ext_usable ) {
       return 99;
    }
 
@@ -516,7 +521,9 @@ int Delete_Extended_Partition( void )
    Partition *p;
    int index;
 
-   if ( !pDrive->usable ) return 99;
+   if ( !pDrive->usable ) {
+      return 99;
+   }
 
    for ( index = 0; index < 3; index++ ) {
       p = &pDrive->pri_part[index];
@@ -540,7 +547,9 @@ int Delete_Primary_Partition( int partition_number )
    Partition_Table *pDrive = &part_table[drive];
    Partition *p = &pDrive->pri_part[partition_number];
 
-   if ( !pDrive->usable ) return 99;
+   if ( !pDrive->usable ) {
+      return 99;
+   }
 
    if ( Is_Supp_Ext_Part( p->num_type ) ) {
       return 99;
@@ -1363,12 +1372,12 @@ int Set_Active_Partition( int partition_number )
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
    int index = 0;
 
-   if ( pDrive->pri_part[partition_number].num_type == 0) {
+   if ( pDrive->pri_part[partition_number].num_type == 0 ) {
       return 0;
    }
 
    do {
-      if ( index == partition_number  ) {
+      if ( index == partition_number ) {
          pDrive->pri_part[index].active_status = 0x80;
       }
       else {

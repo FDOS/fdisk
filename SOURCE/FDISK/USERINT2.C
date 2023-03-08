@@ -391,39 +391,40 @@ int Create_Logical_Drive_Interface( void )
       Warn_Incompatible_Ext();
       return 1;
    }
-   
+
    Determine_Free_Space();
 
    /* size and position calculation for logical drives is flawed if the
       extended partition does not start on a cylinder boundary. So to play
       save we prevent the user to create logical partitions in this case. */
-   if ( (pDrive->ptr_ext_part->start_head != 0 ||
-        pDrive->ptr_ext_part->start_sect != 1) &&
+   if ( ( pDrive->ptr_ext_part->start_head != 0 ||
+          pDrive->ptr_ext_part->start_sect != 1 ) &&
         flags.align_4k == FALSE && allow_unaligned_ext == FALSE ) {
 
       Clear_Screen( 0 );
 
-      Color_Print_At(36, 4, "WARNING");
-      Print_At( 4, 6, FD_NAME " is currently in cylinder alignment mode, but the" );
+      Color_Print_At( 36, 4, "WARNING" );
+      Print_At( 4, 6,
+                FD_NAME " is currently in cylinder alignment mode, but the" );
+      Print_At( 4, 7,
+                "extended partition does not start on a cylinder boundary!" );
       Print_At(
-         4, 7,
-         "extended partition does not start on a cylinder boundary!" );
+         4, 9, "While unlikely, this MAY result in compatibility problems." );
+
       Print_At(
-         4, 9,
-         "While unlikely, this MAY result in compatibility problems." );
+         4, 11,
+         "If your system depends on proper cylinder alignment you should" );
+      Print_At( 4, 12, "consider re-creating the extended partition." );
 
-      Print_At(4, 11,
-         "If your system depends on proper cylinder alignment you should");
-      Print_At(4, 12,
-         "consider re-creating the extended partition.");
-
-      Print_At( 4, 21, "Create logical drive in non-aligned extended partition...?"); 
-      yn = (int) Input( 1, 63, 21, YN, 0, 0, NONE, 1, 0, 0, 0 );
+      Print_At(
+         4, 21,
+         "Create logical drive in non-aligned extended partition...?" );
+      yn = (int)Input( 1, 63, 21, YN, 0, 0, NONE, 1, 0, 0, 0 );
       if ( yn ) {
          allow_unaligned_ext = TRUE;
       }
       else {
-         return ( 1 );         
+         return ( 1 );
       }
    }
 
@@ -746,12 +747,13 @@ void Delete_Primary_DOS_Partition_Interface( void )
 
    if ( flags.esc == FALSE ) {
       partition_to_delete = input - 1;
-      
+
       p = &pDrive->pri_part[partition_to_delete];
-      if ( !Is_Supp_Ext_Part( p->num_type)  ) {
+      if ( !Is_Supp_Ext_Part( p->num_type ) ) {
 
          if ( ( input == TRUE ) && ( flags.esc == FALSE ) ) {
-            Print_At( 4, 22, "Are you sure (Y/N)..............................? " );
+            Print_At( 4, 22,
+                      "Are you sure (Y/N)..............................? " );
             flags.esc = FALSE;
             input = (int)Input( 1, 54, 22, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
 
@@ -766,12 +768,13 @@ void Delete_Primary_DOS_Partition_Interface( void )
                Color_Print_At( 4, 21, "Primary DOS Partition deleted" );
             }
             else {
-               Color_Print_At( 4, 21, "Error deleting primary DOS Partition" );            
+               Color_Print_At( 4, 21,
+                               "Error deleting primary DOS Partition" );
             }
          }
       }
       else {
-         Color_Print_At( 4, 22, "Refusing to delete extended partition!" );            
+         Color_Print_At( 4, 22, "Refusing to delete extended partition!" );
       }
    }
 
@@ -798,7 +801,9 @@ void Display_All_Drives( void )
    Print_At( 2, 2, "Disk   Drv   Mbytes   Free   Usage" );
 
    do {
-      if (!part_table[drive - 1].usable) continue;
+      if ( !part_table[drive - 1].usable ) {
+         continue;
+      }
 
       if ( current_line > 18 ) {
          current_line = 3;
@@ -939,12 +944,12 @@ void Display_CL_Partition_Table( void )
    printf( "\n\nCurrent fixed disk drive: %1d",
            ( flags.drive_number - 127 ) );
 
-      printf( "      (sectors: %lu, geometry: %lu/%03lu/%02lu)", 
-         pDrive->total_disk_size_in_log_sectors, pDrive->total_cyl + 1,
-         pDrive->total_head + 1, pDrive->total_sect );
+   printf( "      (sectors: %lu, geometry: %lu/%03lu/%02lu)",
+           pDrive->total_disk_size_in_log_sectors, pDrive->total_cyl + 1,
+           pDrive->total_head + 1, pDrive->total_sect );
 
    printf( "\n\nPartition   Status   Mbytes   Description      Usage" );
-      printf( "    Start CHS       End CHS\n" );
+   printf( "    Start CHS       End CHS\n" );
 
    index = 0;
    do {
@@ -962,7 +967,7 @@ void Display_CL_Partition_Table( void )
          /* Partition Number */
          printf( " %1d", ( index + 1 ) );
 
-            /* Partition Type */
+         /* Partition Type */
          printf( " %3d", ( pDrive->pri_part[index].num_type ) );
 
          /* Status */
@@ -988,25 +993,30 @@ void Display_CL_Partition_Table( void )
 
          printf( "   %3lu%%", usage );
 
-            /* Starting Cylinder */
-            printf( "%6lu/%03lu/%02lu", pDrive->pri_part[index].start_cyl, pDrive->pri_part[index].start_head, pDrive->pri_part[index].start_sect );
+         /* Starting Cylinder */
+         printf( "%6lu/%03lu/%02lu", pDrive->pri_part[index].start_cyl,
+                 pDrive->pri_part[index].start_head,
+                 pDrive->pri_part[index].start_sect );
 
-            /* Ending Cylinder */
-            printf( " %6lu/%03lu/%02lu", pDrive->pri_part[index].end_cyl, pDrive->pri_part[index].end_head, pDrive->pri_part[index].end_sect );
+         /* Ending Cylinder */
+         printf( " %6lu/%03lu/%02lu", pDrive->pri_part[index].end_cyl,
+                 pDrive->pri_part[index].end_head,
+                 pDrive->pri_part[index].end_sect );
          printf( "\n" );
       }
 
       index++;
    } while ( index < 4 );
-   printf("\nLargest continious free space for primary partition: %lu MBytes\n", 
-          Max_Pri_Free_Space_In_MB() );
+   printf(
+      "\nLargest continious free space for primary partition: %lu MBytes\n",
+      Max_Pri_Free_Space_In_MB() );
 
    /* Check to see if there are any drives to display */
    if ( ( brief_partition_table[( flags.drive_number - 128 )][4] > 0 ) ||
         ( brief_partition_table[( flags.drive_number - 128 )][5] > 0 ) ) {
       printf( "\nContents of Extended DOS Partition:\n" );
       printf( "Drv Volume Label  Mbytes  System   Usage" );
-         printf( "    Start CHS      End CHS\n" );
+      printf( "    Start CHS      End CHS\n" );
 
       /* Display information for each Logical DOS Drive */
       index = 4;
@@ -1042,25 +1052,24 @@ void Display_CL_Partition_Table( void )
 
             printf( "  %3lu%%", usage );
 
-               /* Starting Cylinder */
-               printf( "%6lu/%03lu/%02lu", 
-                  pDrive->log_drive[index - 4].start_cyl, 
-                  pDrive->log_drive[index - 4].start_head, 
-                  pDrive->log_drive[index - 4].start_sect );
+            /* Starting Cylinder */
+            printf( "%6lu/%03lu/%02lu",
+                    pDrive->log_drive[index - 4].start_cyl,
+                    pDrive->log_drive[index - 4].start_head,
+                    pDrive->log_drive[index - 4].start_sect );
 
-               /* Ending Cylinder */
-               printf( "%6lu/%03lu/%02lu", 
-                  pDrive->log_drive[index - 4].end_cyl,
-                  pDrive->log_drive[index - 4].end_head,
-                  pDrive->log_drive[index - 4].end_sect );
+            /* Ending Cylinder */
+            printf( "%6lu/%03lu/%02lu", pDrive->log_drive[index - 4].end_cyl,
+                    pDrive->log_drive[index - 4].end_head,
+                    pDrive->log_drive[index - 4].end_sect );
             printf( "\n" );
-            }
-
+         }
 
          index++;
       } while ( index < 27 );
-      printf("\nLargest continious free space in extended partition: %lu MBytes\n", 
-             Max_Log_Free_Space_In_MB() );
+      printf(
+         "\nLargest continious free space in extended partition: %lu MBytes\n",
+         Max_Log_Free_Space_In_MB() );
    }
 }
 

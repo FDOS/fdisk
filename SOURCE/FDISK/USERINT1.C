@@ -229,7 +229,7 @@ void Warn_Incompatible_Ext( void )
       "      - creating logical drives\n"
       "      - deleting logical drives\n\n"
       "    You may re-create the extended partition to enable editing or\n"
-      "    use another disk utility to partition this disk.\n");
+      "    use another disk utility to partition this disk.\n" );
 
    Input( 0, 0, 0, ESC, 0, 0, ESCR, 0, 0, '\0', '\0' );
 }

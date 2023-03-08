@@ -101,7 +101,9 @@ unsigned long Convert_To_Percentage( unsigned long small_num,
       large_num >>= 1;
    }
 
-   if ( !large_num ) return 0;
+   if ( !large_num ) {
+      return 0;
+   }
    percentage = 100 * small_num / large_num;
 
    if ( ( 100 * small_num % large_num ) >= large_num / 2 ) {
@@ -600,7 +602,7 @@ void Initialization( char *environment[] )
 
    if ( flags.maximum_drive_number == 0 ) {
       Color_Print( "\n    No fixed disks present.\n" );
-      exit( 6 );     
+      exit( 6 );
    }
 
    if ( ( flags.flag_sector >
@@ -802,10 +804,10 @@ void main( int argc, char *argv[] )
                   exit( 9 );
                }
 
-               if (! Set_Active_Partition( (int)( arg[0].value - 1 ) ) ) {
+               if ( !Set_Active_Partition( (int)( arg[0].value - 1 ) ) ) {
                   printf(
                      "\nCan not activate partition...Operation Terminated.\n" );
-                  exit( 9 );                  
+                  exit( 9 );
                }
                command_ok = TRUE;
 

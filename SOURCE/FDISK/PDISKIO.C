@@ -72,11 +72,10 @@ void Clear_Sector_Buffer( void );
 void Initialize_LBA_Structures( void );
 void Load_Brief_Partition_Table( void );
 
-
-static int Read_Primary_Table( int drive, Partition_Table *pDrive, int *num_ext );
+static int Read_Primary_Table( int drive, Partition_Table *pDrive,
+                               int *num_ext );
 static int Read_Extended_Table( int drive, Partition_Table *pDrive );
 static void Clear_Partition_Tables( Partition_Table *pDrive );
-
 
 /* External Prototype Declarations */
 /* ******************************* */
@@ -287,7 +286,7 @@ int Determine_Drive_Letters( void )
 
    /* Set all active_part_found[] values to 0. */
    memset( active_part_found, 0, sizeof( active_part_found ) );
- 
+
 #if 0 
    index = 0;
    do {
@@ -302,7 +301,9 @@ int Determine_Drive_Letters( void )
    /* primary partitions. */
    for ( index = 0; index < 8; index++ ) {
       Partition_Table *pDrive = &part_table[index];
-      if (!pDrive->usable) continue;
+      if ( !pDrive->usable ) {
+         continue;
+      }
 
       sub_index = 0;
       do {
@@ -323,7 +324,9 @@ int Determine_Drive_Letters( void )
    /* if an active partition does not exist on that hard disk.           */
    for ( index = 0; index < 8; index++ ) {
       Partition_Table *pDrive = &part_table[index];
-      if (!pDrive->usable) continue;
+      if ( !pDrive->usable ) {
+         continue;
+      }
 
       if ( active_part_found[index] == 0 ) {
          sub_index = 0;
@@ -343,7 +346,9 @@ int Determine_Drive_Letters( void )
    /* Next assign drive letters to applicable extended partitions... */
    for ( index = 0; index < 8; index++ ) {
       Partition_Table *pDrive = &part_table[index];
-      if (!pDrive->usable) continue;
+      if ( !pDrive->usable ) {
+         continue;
+      }
 
       sub_index = 4;
       do {
@@ -360,7 +365,9 @@ int Determine_Drive_Letters( void )
    /* Return to the primary partitions... */
    for ( index = 0; index < 8; index++ ) {
       Partition_Table *pDrive = &part_table[index];
-      if (!pDrive->usable) continue;
+      if ( !pDrive->usable ) {
+         continue;
+      }
 
       sub_index = 0;
 
@@ -377,9 +384,11 @@ int Determine_Drive_Letters( void )
    }
 
    /* Find the Non-DOS Logical Drives in the Extended Partition Table */
-   for ( index = 0; index < 8; index ++ ) {
+   for ( index = 0; index < 8; index++ ) {
       Partition_Table *pDrive = &part_table[index];
-      if (!pDrive->usable) continue;
+      if ( !pDrive->usable ) {
+         continue;
+      }
 
       pDrive->num_of_non_dos_log_drives = 0;
       non_dos_partition_counter = '1';
@@ -817,8 +826,8 @@ void Initialize_LBA_Structures( void )
    result_buffer[0] = 26;
 }
 
-
-int Delete_EMBR_Chain_Node( Partition_Table *pDrive, int logical_drive_number )
+int Delete_EMBR_Chain_Node( Partition_Table *pDrive,
+                            int logical_drive_number )
 {
    int index;
 
@@ -843,7 +852,7 @@ int Delete_EMBR_Chain_Node( Partition_Table *pDrive, int logical_drive_number )
 
       /* Shift all the following extended partition tables left by 1.      */
       for ( index = logical_drive_number; index < MAX_LOGICAL_DRIVES - 1;
-            index++ ) {      
+            index++ ) {
          p = &pDrive->log_drive[index];
          nep = &pDrive->next_ext[index];
 
@@ -925,7 +934,7 @@ int Read_Partition_Tables( void )
          continue;
       }
       pDrive->usable = TRUE;
-      
+
       if ( num_ext == 1 ) {
          error_code = Read_Extended_Table( drive, pDrive );
 
@@ -964,10 +973,10 @@ static void Read_Table_Entry( unsigned char *buf, Partition_Table *pDrive,
    p->rel_sect = *(unsigned long *)( buf + 0x08 );
    p->num_sect = *(unsigned long *)( buf + 0x0c );
 
-
    if ( pDrive->ext_int_13 == FALSE ) {
       /* If int 0x13 extensions are not used get the CHS values. */
-      extract_chs( buf + 0x01, &p->start_cyl, &p->start_head, &p->start_sect );
+      extract_chs( buf + 0x01, &p->start_cyl, &p->start_head,
+                   &p->start_sect );
       extract_chs( buf + 0x05, &p->end_cyl, &p->end_head, &p->end_sect );
    }
    else {
@@ -977,22 +986,26 @@ static void Read_Table_Entry( unsigned char *buf, Partition_Table *pDrive,
          p->end_cyl = p->end_head = p->end_sect = 0;
       }
       else {
-         lba_to_chs( p->rel_sect + lba_offset, pDrive, &p->start_cyl, &p->start_head, &p->start_sect );
-         lba_to_chs( p->rel_sect + lba_offset + p->num_sect - 1, pDrive, &p->end_cyl, &p->end_head, &p->end_sect );
+         lba_to_chs( p->rel_sect + lba_offset, pDrive, &p->start_cyl,
+                     &p->start_head, &p->start_sect );
+         lba_to_chs( p->rel_sect + lba_offset + p->num_sect - 1, pDrive,
+                     &p->end_cyl, &p->end_head, &p->end_sect );
       }
    }
 
    if ( p->num_sect == 0xfffffffful ) {
       /* a protective GPT partition starts at sector
-         1 and has a size of 0xffffffff */          
+         1 and has a size of 0xffffffff */
       p->end_cyl = pDrive->total_cyl;
    }
 
-   p->size_in_MB = Convert_Cyl_To_MB( p->end_cyl - p->start_cyl + 1,
-                          pDrive->total_head + 1, pDrive->total_sect );
+   p->size_in_MB =
+      Convert_Cyl_To_MB( p->end_cyl - p->start_cyl + 1,
+                         pDrive->total_head + 1, pDrive->total_sect );
 }
 
-static int Read_Primary_Table( int drive, Partition_Table *pDrive, int *num_ext )
+static int Read_Primary_Table( int drive, Partition_Table *pDrive,
+                               int *num_ext )
 {
    Partition *p;
    int entry_offset;
@@ -1006,7 +1019,7 @@ static int Read_Primary_Table( int drive, Partition_Table *pDrive, int *num_ext 
       return error_code;
    }
 
-   if ( *(unsigned short *)(sector_buffer + 510) != 0xAA55 ) {
+   if ( *(unsigned short *)( sector_buffer + 510 ) != 0xAA55 ) {
       /* do we have a partition table? */
       return 0;
    }
@@ -1017,15 +1030,15 @@ static int Read_Primary_Table( int drive, Partition_Table *pDrive, int *num_ext 
    for ( index = 0; index < 4; index++ ) {
       /* process all four slots in MBR */
 
-      Read_Table_Entry( sector_buffer + entry_offset, pDrive, p, 0);
+      Read_Table_Entry( sector_buffer + entry_offset, pDrive, p, 0 );
 
       if ( Is_Supp_Ext_Part( p->num_type ) ) {
          /* store pointer to first found ext part and count ext parts */
-         (*num_ext)++;
+         ( *num_ext )++;
          if ( !pDrive->ptr_ext_part ) {
             pDrive->ptr_ext_part = p;
             pDrive->ext_part_num_sect = p->num_sect;
-            pDrive->ext_part_size_in_MB = p->size_in_MB;            
+            pDrive->ext_part_size_in_MB = p->size_in_MB;
          }
       }
 
@@ -1038,9 +1051,9 @@ static int Read_Primary_Table( int drive, Partition_Table *pDrive, int *num_ext 
 
 static int Read_Extended_Table( int drive, Partition_Table *pDrive )
 {
-   Partition *ep;   /* EMBR entry of MBR, first in link chain */
-   Partition *nep;  /* current EMBR link chain poinrter */
-   Partition *p;    /* logical partition at entry 1 in current EMBR */
+   Partition *ep;  /* EMBR entry of MBR, first in link chain */
+   Partition *nep; /* current EMBR link chain poinrter */
+   Partition *p;   /* logical partition at entry 1 in current EMBR */
 
    unsigned long rel_sect;
    int error_code = 0;
@@ -1052,19 +1065,21 @@ static int Read_Extended_Table( int drive, Partition_Table *pDrive )
    pDrive->num_of_non_dos_log_drives = 0;
 
    /* no EMBR eintry in MBR, abort */
-   if ( !pDrive->ptr_ext_part ) return 0;
+   if ( !pDrive->ptr_ext_part ) {
+      return 0;
+   }
 
    nep = ep = pDrive->ptr_ext_part;
    p = pDrive->log_drive;
 
    do {
-      error_code = Read_Physical_Sectors( drive + 0x80, nep->start_cyl,
-                                       nep->start_head, nep->start_sect, 1 );
+      error_code = Read_Physical_Sectors(
+         drive + 0x80, nep->start_cyl, nep->start_head, nep->start_sect, 1 );
       if ( error_code != 0 ) {
          return error_code;
       }
 
-      if ( *(unsigned short *)(sector_buffer + 510) != 0xAA55 ) {
+      if ( *(unsigned short *)( sector_buffer + 510 ) != 0xAA55 ) {
          /* no valid EMBR signature, abort */
          return 1;
       }
@@ -1072,11 +1087,12 @@ static int Read_Extended_Table( int drive, Partition_Table *pDrive )
       /* determine LBA offset to calculate CHS values from for
          logical partition, because EMBR entry stores relativ values */
       rel_sect = ep->rel_sect + ( ( nep != ep ) ? nep->rel_sect : 0 );
-      Read_Table_Entry( sector_buffer + 0x1be, pDrive, p, rel_sect);
+      Read_Table_Entry( sector_buffer + 0x1be, pDrive, p, rel_sect );
 
-      nep = (nep == ep) ? pDrive->next_ext : nep + 1;
+      nep = ( nep == ep ) ? pDrive->next_ext : nep + 1;
 
-      Read_Table_Entry( sector_buffer + 0x1be + 16, pDrive, nep, ep->rel_sect);
+      Read_Table_Entry( sector_buffer + 0x1be + 16, pDrive, nep,
+                        ep->rel_sect );
       if ( Is_Supp_Ext_Part( nep->num_type ) ) {
          pDrive->next_ext_exists[num_drives] = TRUE;
       }
@@ -1090,7 +1106,8 @@ static int Read_Extended_Table( int drive, Partition_Table *pDrive )
          num_drives += 1;
       }
 
-      if ( sector_buffer[0x1c2 + 32] != 0 || sector_buffer[0x1c2 + 48] != 0 ) {
+      if ( sector_buffer[0x1c2 + 32] != 0 ||
+           sector_buffer[0x1c2 + 48] != 0 ) {
          /* third and forth entry in EMBR are not empty.
             Treat as an error condition. */
          return 1;
@@ -1314,7 +1331,9 @@ int Read_Physical_Sectors_LBA( int drive, long cylinder, long head,
 unsigned long chs_to_lba( Partition_Table *pDrive, unsigned long cylinder,
                           unsigned long head, unsigned long sector )
 {
-   if ( cylinder == 0 && head == 0 && sector == 0 ) return 0;
+   if ( cylinder == 0 && head == 0 && sector == 0 ) {
+      return 0;
+   }
 
    return ( ( ( cylinder * ( pDrive->total_head + 1 ) + head ) *
                  pDrive->total_sect +
@@ -1357,7 +1376,7 @@ int Write_Partition_Tables( void )
          return ( error_code );
       }
 
-      if ( *(unsigned short *) sector_buffer + 510 != 0x55AA ) {
+      if ( *(unsigned short *)sector_buffer + 510 != 0x55AA ) {
          /* install MBR code if we install a new MBR */
          memcpy( sector_buffer, bootnormal_code, SIZE_OF_MBR );
       }

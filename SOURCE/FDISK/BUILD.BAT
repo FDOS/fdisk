@@ -9,14 +9,14 @@ rem   Borland binary unter ..\..\PROGRAM\FDISK.EXE
 @echo
 wmake -h -f makefile.wat clobber
 wmake -h -f makefile.wat fdisk.exe
-move /Y fdisk.exe ..\..\program\fdiskw.exe
+move /Y fdisk.exe ..\..\program\fdiskwat.exe
 
 @echo
 @echo Building with Borland . . .
 @echo
 make -f makefile.bor clobber
 make -f makefile.bor fdisk.exe
-move /Y fdisk.exe ..\..\program\fdisk.exe
+move /Y fdisk.exe ..\..\program\fdiskbor.exe
 
 @echo
 @echo Clean up . . .
