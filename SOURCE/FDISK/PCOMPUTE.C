@@ -1358,13 +1358,17 @@ int Partition_Type_To_Create( unsigned long size_in_mb,
 }
 
 /* Set Active Partition */
-void Set_Active_Partition( int partition_number )
+int Set_Active_Partition( int partition_number )
 {
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
    int index = 0;
 
+   if ( pDrive->pri_part[partition_number].num_type == 0) {
+      return 0;
+   }
+
    do {
-      if ( index == partition_number ) {
+      if ( index == partition_number  ) {
          pDrive->pri_part[index].active_status = 0x80;
       }
       else {
@@ -1376,7 +1380,10 @@ void Set_Active_Partition( int partition_number )
 
    pDrive->part_values_changed = TRUE;
    flags.partitions_have_changed = TRUE;
+
+   return 1;
 }
+
 void Set_Active_Partition_If_None_Is_Active( int partition_number )
 {
    int index;

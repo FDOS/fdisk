@@ -30,7 +30,7 @@ void Modify_Partition_Type( int partition_number, int type_number );
 void Modify_Primary_Partition_Information( int logical_drive );
 void Primary_Partition_Slot_Transfer( int transfer_type, int source,
                                       int dest );
-void Set_Active_Partition( int partition_number );
+int Set_Active_Partition( int partition_number );
 void Set_Active_Partition_If_None_Is_Active( int partition_number );
 
 #endif /* PCOMPUTE_H */

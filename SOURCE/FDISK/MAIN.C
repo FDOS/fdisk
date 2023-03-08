@@ -802,7 +802,11 @@ void main( int argc, char *argv[] )
                   exit( 9 );
                }
 
-               Set_Active_Partition( (int)( arg[0].value - 1 ) );
+               if (! Set_Active_Partition( (int)( arg[0].value - 1 ) ) ) {
+                  printf(
+                     "\nCan not activate partition...Operation Terminated.\n" );
+                  exit( 9 );                  
+               }
                command_ok = TRUE;
 
                Shift_Command_Line_Options( 1 );
