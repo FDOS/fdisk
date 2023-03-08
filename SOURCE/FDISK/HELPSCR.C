@@ -42,34 +42,15 @@ void Display_Help_Screen( void )
    strcpy( version, "Version " );
    strcat( version, VERSION );
 
-   if ( flags.do_not_pause_help_information == FALSE ) {
-      Clear_Screen( NOEXTRAS );
-      Print_At( 0, 0, "\n" );
-   }
-
-   printf( "\n%-20s                   %40s\n", name, version );
-   printf( "Written By:  Brian E. Reifsnyder\n\n" );
-   printf( "Syntax:\n\n" );
+   printf( "%-20s                   %40s\n", name, version );
+   printf( "Syntax:\n" );
    printf( "                    Runs in interactive mode.\n", filename,
            name );
+   printf( "  /INFO [/TECH]     Displays partition information from <drive#>\n" );
    printf( "  /REBOOT           Reboots the Computer\n" );
-   printf( "  /? [/NOPAUSE]     Displays this help information.\n" );
    printf( "\n" );
-   printf( "Interactive user interface switches:\n", name );
    printf(
-      "  /MONO    Forces the user interface to run in monochrome mode.\n" );
-   printf( "  /XO      Enables extended options.\n" );
-   printf( "  /FPRMT   Prompts for FAT32/FAT16 in interactive mode.\n" );
-   printf( "  /X       Do not use LBA partitions.\n" );
-   printf( "\n" );
-   if ( flags.do_not_pause_help_information == FALSE ) {
-      printf( "\n\n" );
-      Pause();
-      Clear_Screen( NOEXTRAS );
-      Print_At( 0, 0, "\n" );
-   }
-   printf(
-      "Creating primary partitions and logical drives: sizes in MB or [,100] in percent\n" );
+      "Creating primary partitions and logical drives: sizes in MB or [,100] in percent" );
    printf(
       "  /PRI:<size>[,100] [/SPEC:<type#>] [drive#] Creates a primary partition\n" );
    printf(
@@ -84,8 +65,7 @@ void Display_Help_Screen( void )
    printf( "Activating/Deactivating partition tables\n" );
    printf( "  /ACTIVATE:<partition#> [drive#]  Sets <partition#> active.\n" );
    printf(
-      "  /DEACTIVATE            [drive#]  deactivates all partitions on <drive#>\n" );
-   printf( "\n" );
+      "  /DEACTIVATE            [drive#]  deactivates all partitions on <drive#>\n\n" );
    printf( "Deleting partitions - USE WITH CAUTION!\n" );
    printf( "  /CLEAR [drive#]                  Deletes all Partitions.\n" );
    printf(
@@ -93,11 +73,8 @@ void Display_Help_Screen( void )
    printf( "  /DELETE {/PRI[:#] | /EXT | /LOG:<partition#>\n" );
    printf(
       "           | /NUM:<partition#>} [drive#]   note: Logical drives start at /NUM=5\n" );
-   printf( "\n\n" );
    if ( flags.do_not_pause_help_information == FALSE ) {
       Pause();
-      Clear_Screen( NOEXTRAS );
-      Print_At( 0, 0, "\n" );
    }
    printf( "MBR (Master Boot Record) modification:\n" );
    printf( "  /MBR  [drive#]  Writes the standard MBR to <drive#>\n" );
@@ -118,30 +95,31 @@ void Display_Help_Screen( void )
       "  /MOVE:<source_partition#>,<dest_partition#> [drive#]  Moves or Swaps\n" );
    printf(
       "  /SWAP:<first_partition#>,<second_partition#> [drive#] primary partitions\n" );
-   printf( "\n\n" );
 
-   if ( flags.do_not_pause_help_information == FALSE ) {
-      Pause();
-      Clear_Screen( NOEXTRAS );
-      Print_At( 0, 0, "\n" );
-   }
-   printf( "For handling flags on a hard disk:\n" );
+   printf( "\nFor handling flags on a hard disk:\n" );
    printf(
       "  /CLEARFLAG[{:<flag#>} | /ALL} ] [drive#] Resets <flag#> or all on <drive#>\n" );
    printf(
       "  /SETFLAG:<flag#>[,<flag_value>] [drive#] Sets <flag#> to 1 or <flag_value>\n" );
    printf(
       "  /TESTFLAG:<flag#>[,<flag_value>] [drive#]Tests <flag#> for 1 or <flag_value>\n" );
-   printf( "\n" );
-   printf( "For obtaining information about the hard disk(s):\n" );
-   printf( "  /INFO [/TECH] Displays partition information from <drive#>\n" );
+   printf( "\nFor obtaining information about the hard disk(s):\n" );
    printf( "  /STATUS       Displays the current partition layout.\n" );
    printf(
       "  /DUMP         Dumps partition information from all hard disks(for debugging)\n" );
-   printf( "\n\n\n" );
-   printf( "This program is Copyright %s, by Brian E. Reifsnyder, under\n",
-           COPYLEFT );
-   printf( "the terms of the GNU General Public License, version 2.\n" );
+   if ( flags.do_not_pause_help_information == FALSE ) {
+      Pause();
+   }
+   printf( "Interactive user interface switches:\n", name );
+   printf(
+      "  /MONO    Forces the user interface to run in monochrome mode.\n" );
+   printf( "  /XO      Enables extended options.\n" );
+   printf( "  /FPRMT   Prompts for FAT32/FAT16 in interactive mode.\n" );
+   printf( "  /X       Do not use LBA partitions.\n" );
+   printf( "\n" );
+   printf( "This program is Copyright %s, by Brian E. Reifsnyder and\n"
+           "The FreeDOS Community, under the terms of the GNU General Public License,\n", COPYLEFT );
+   printf( "version 2.\n" );
    printf(
       "\nThis program comes as-is and without warranty of any kind.  The author of\n" );
    printf(
@@ -150,7 +128,4 @@ void Display_Help_Screen( void )
       "this software.  By using this software, the operator is understood to be\n" );
    printf( "agreeing to the terms of the above.\n" );
 
-   if ( flags.do_not_pause_help_information == FALSE ) {
-      printf( "\n\n" );
-   }
 }

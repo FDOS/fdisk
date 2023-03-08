@@ -47,7 +47,7 @@ ECHO=echo
 RM=del
 
 OBJ = main.obj cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pdiskio.obj \
-	pcompute.obj userint1.obj userint2.obj kitten.obj int24.obj \
+	pcompute.obj userint1.obj userint2.obj kitten.obj compat.obj int24.obj \
 	bootnorm.obj booteasy.obj smartmbr.obj
 
 AS=nasm

@@ -164,3 +164,11 @@ int Color_Print( char *text )
 }
 
 #endif /* __WATCOMC__ */
+
+void fmemcpy( void far *dest, void far *src, unsigned cnt )
+{
+   unsigned i;
+   for ( i = 0; i < cnt; i++ ) {
+      ( (unsigned char *)dest )[i] = ( (unsigned char *)src )[i];
+   }
+}

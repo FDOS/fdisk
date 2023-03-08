@@ -31,4 +31,6 @@ void textbackground( int background );
 
 #endif /* __WATCOMC__ */
 
+void fmemcpy( void far *dest, void far *src, unsigned cnt );
+
 #endif

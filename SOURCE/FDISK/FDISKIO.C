@@ -230,14 +230,6 @@ void Create_BootNormal_MBR( void )
    Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
 }
 
-void fmemcpy( void far *dest, void far *src, unsigned cnt )
-{
-   unsigned i;
-   for ( i = 0; i < cnt; i++ ) {
-      ( (unsigned char *)dest )[i] = ( (unsigned char *)src )[i];
-   }
-}
-
 /* Create Normal MBR */
 void Create_BootSmart_MBR( void )
 {
