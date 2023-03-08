@@ -21,6 +21,7 @@
 int Standard_Menu( int menu );
 void Clear_Screen( int type );
 void Clear_Screen_With_Attr( int type, unsigned char attr );
+void Warn_Incompatible_Ext( void );
 void Display_Information( void );
 void Display_Label( void );
 void Interactive_User_Interface( void );

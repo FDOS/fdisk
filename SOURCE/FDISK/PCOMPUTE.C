@@ -505,7 +505,8 @@ int Delete_Logical_Drive( int logical_drive_number )
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
    Partition *p, *nep;
 
-   if ( !pDrive->usable || !pDrive->ext_usable ) {
+   if ( !pDrive->usable || !pDrive->ext_usable ||
+      logical_drive_number >= pDrive->num_of_log_drives ) {
       return 99;
    }
 

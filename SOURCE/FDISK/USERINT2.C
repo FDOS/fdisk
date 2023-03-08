@@ -387,6 +387,11 @@ int Create_Logical_Drive_Interface( void )
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
+   if ( !pDrive->ext_usable ) {
+      Warn_Incompatible_Ext();
+      return 1;
+   }
+   
    Determine_Free_Space();
 
    /* size and position calculation for logical drives is flawed if the
@@ -591,6 +596,11 @@ int Delete_Logical_Drive_Interface( void )
    int input = 0;
    int input_ok;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+
+   if ( !pDrive->ext_usable ) {
+      Warn_Incompatible_Ext();
+      return 1;
+   }
 
    Clear_Screen( 0 );
 
@@ -931,14 +941,14 @@ void Display_CL_Partition_Table( void )
    printf( "\n\nCurrent fixed disk drive: %1d",
            ( flags.drive_number - 127 ) );
    if ( flags.extended_options_flag == TRUE ) {
-      printf( "                  (TC: %6lu", pDrive->total_cyl );
-      printf( " TH: %3lu", pDrive->total_head );
-      printf( " TS: %3lu)", pDrive->total_sect );
+      printf( "      (sectors: %lu, geometry: %lu/%03lu/%02lu)", 
+         pDrive->total_disk_size_in_log_sectors, pDrive->total_cyl + 1,
+         pDrive->total_head + 1, pDrive->total_sect );
    }
 
    printf( "\n\nPartition   Status   Mbytes   Description      Usage" );
    if ( flags.extended_options_flag == TRUE ) {
-      printf( "  Start Cyl  End Cyl" );
+      printf( "    Start CHS       End CHS" );
    }
    printf( "\n" );
 
@@ -979,7 +989,7 @@ void Display_CL_Partition_Table( void )
          Print_UL( pDrive->pri_part[index].size_in_MB );
 
          /* Description */
-         printf( "   %15s",
+         printf( "   %-15s",
                  partition_lookup_table_buffer_long[pDrive->pri_part[index]
                                                        .num_type] );
 
@@ -991,10 +1001,10 @@ void Display_CL_Partition_Table( void )
 
          if ( flags.extended_options_flag == TRUE ) {
             /* Starting Cylinder */
-            printf( "     %6lu", pDrive->pri_part[index].start_cyl );
+            printf( "%6lu/%03lu/%02lu", pDrive->pri_part[index].start_cyl, pDrive->pri_part[index].start_head, pDrive->pri_part[index].start_sect );
 
             /* Ending Cylinder */
-            printf( "   %6lu", pDrive->pri_part[index].end_cyl );
+            printf( " %6lu/%03lu/%02lu", pDrive->pri_part[index].end_cyl, pDrive->pri_part[index].end_head, pDrive->pri_part[index].end_sect );
          }
          printf( "\n" );
       }
@@ -1008,7 +1018,7 @@ void Display_CL_Partition_Table( void )
       printf( "\nContents of Extended DOS Partition:\n" );
       printf( "Drv Volume Label  Mbytes  System   Usage" );
       if ( flags.extended_options_flag == TRUE ) {
-         printf( "  Start Cyl  End Cyl" );
+         printf( "    Start CHS      End CHS" );
       }
       printf( "\n" );
 
@@ -1048,10 +1058,16 @@ void Display_CL_Partition_Table( void )
 
             if ( flags.extended_options_flag == TRUE ) {
                /* Starting Cylinder */
-               printf( "     %6lu", pDrive->log_drive[index - 4].start_cyl );
+               printf( "%6lu/%03lu/%02lu", 
+                  pDrive->log_drive[index - 4].start_cyl, 
+                  pDrive->log_drive[index - 4].start_head, 
+                  pDrive->log_drive[index - 4].start_sect );
 
                /* Ending Cylinder */
-               printf( "   %6lu", pDrive->log_drive[index - 4].end_cyl );
+               printf( "%6lu/%03lu/%02lu", 
+                  pDrive->log_drive[index - 4].end_cyl,
+                  pDrive->log_drive[index - 4].end_head,
+                  pDrive->log_drive[index - 4].end_sect );
             }
 
             printf( "\n" );

@@ -855,7 +855,8 @@ int Read_Partition_Tables( void )
             /* if there is an error processing the extended partition table
                chain editing of logical drives will be disabled */
             continue;
-         }         
+         }
+         pDrive->ext_usable = TRUE;
       }
 
       flags.maximum_drive_number = drive + 0x80;
@@ -868,6 +869,37 @@ int Read_Partition_Tables( void )
    Get_Partition_Information();
 
    return 0;
+}
+
+static void Read_Table_Entry( unsigned char *buf, Partition_Table *pDrive,
+                              Partition *p, unsigned long lba_offset )
+{
+   p->active_status = buf[0x00];
+
+   p->num_type = buf[0x04];
+   p->rel_sect = *(unsigned long *)( buf + 0x08 );
+   p->num_sect = *(unsigned long *)( buf + 0x0c );
+
+
+   if ( pDrive->ext_int_13 == FALSE ) {
+      /* If int 0x13 extensions are not used get the CHS values. */
+      extract_chs( buf + 0x01, &p->start_cyl, &p->start_head, &p->start_sect );
+      extract_chs( buf + 0x05, &p->end_cyl, &p->end_head, &p->end_sect );
+   }
+   else {
+      /* If int 0x13 extensions are used compute the virtual CHS values. */
+      lba_to_chs( p->rel_sect + lba_offset, pDrive, &p->start_cyl, &p->start_head, &p->start_sect );
+      lba_to_chs( p->rel_sect + lba_offset + p->num_sect - 1, pDrive, &p->end_cyl, &p->end_head, &p->end_sect );
+   }
+
+   if ( p->num_sect == 0xfffffffful ) {
+      /* a protective GPT partition starts at sector
+         1 and has a size of 0xffffffff */          
+      p->end_cyl = pDrive->total_cyl;
+   }
+
+   p->size_in_MB = Convert_Cyl_To_MB( p->end_cyl - p->start_cyl + 1,
+                          pDrive->total_head + 1, pDrive->total_sect );
 }
 
 static int Read_Primary_Table( int drive, Partition_Table *pDrive, int *num_ext )
@@ -889,56 +921,16 @@ static int Read_Primary_Table( int drive, Partition_Table *pDrive, int *num_ext 
       return 0;
    }
 
+   entry_offset = 0x1be;
+   p = pDrive->pri_part;
+
    for ( index = 0; index < 4; index++ ) {
       /* process all four slots in MBR */
 
-      p = &pDrive->pri_part[index];
-      entry_offset = 0x1be + ( index * 16 );
+      Read_Table_Entry( sector_buffer + entry_offset, pDrive, p, 0);
 
-      p->active_status = sector_buffer[entry_offset + 0x00];
-      p->num_type = sector_buffer[entry_offset + 0x04];
-
-      if ( pDrive->ext_int_13 == FALSE ) {
-         /* If int 0x13 extensions are not used get the CHS values. */
-         extract_chs( sector_buffer + entry_offset + 0x01, &p->start_cyl,
-                      &p->start_head, &p->start_sect );
-
-         extract_chs( sector_buffer + entry_offset + 0x05, &p->end_cyl,
-                      &p->end_head, &p->end_sect );
-      }
-
-      p->rel_sect = *(_u32 *)( sector_buffer + entry_offset + 0x08 );
-      p->num_sect = *(_u32 *)( sector_buffer + entry_offset + 0x0c );
-
-      if ( ( pDrive->ext_int_13 == TRUE ) && ( p->num_type != 0 ) ) {
-         /* If int 0x13 extensions are used compute the virtual CHS values. */
-         lba_to_chs( p->rel_sect, pDrive, &p->start_cyl, &p->start_head,
-                     &p->start_sect );
-         lba_to_chs( p->rel_sect + p->num_sect - 1, pDrive, &p->end_cyl,
-                     &p->end_head, &p->end_sect );
-         /*
-                     a protective GPT partition starts at sector
-                     1 and has a size of 0xffffffff
-                     
-                     unfortunately rel_sect+num_sect is 0 then.
-                     
-                     so we FORCE this down to the last cylinder
-                     */
-
-         if ( p->num_sect == 0xfffffffful ) {
-            // printf("correcting cyl %lu -> %lu\n", pDrive->pri_part[index].end_cyl, pDrive->total_cyl);
-            p->end_cyl = pDrive->total_cyl;
-         }
-      }
-
-      p->size_in_MB =
-         Convert_Cyl_To_MB( p->end_cyl - p->start_cyl + 1,
-                            pDrive->total_head + 1, pDrive->total_sect );
-
-      /* Record the necessary information to easilly and quickly find the */
-      /* extended partition when it is time to read it, but               */
-      /* only process the first extended found. */
       if ( Is_Supp_Ext_Part( p->num_type ) ) {
+         /* store pointer to first found ext part and count ext parts */
          (*num_ext)++;
          if ( !pDrive->ptr_ext_part ) {
             pDrive->ptr_ext_part = p;
@@ -946,6 +938,9 @@ static int Read_Primary_Table( int drive, Partition_Table *pDrive, int *num_ext 
             pDrive->ext_part_size_in_MB = p->size_in_MB;            
          }
       }
+
+      p++;
+      entry_offset += 16;
    }
 
    return 0;
@@ -953,129 +948,98 @@ static int Read_Primary_Table( int drive, Partition_Table *pDrive, int *num_ext 
 
 static int Read_Extended_Table( int drive, Partition_Table *pDrive )
 {
-   Partition *p, *ep, *nep;
+   Partition *ep;   /* EMBR entry of MBR, first in link chain */
+   Partition *nep;  /* current EMBR link chain poinrter */
+   Partition *p;    /* logical partition at entry 1 in current EMBR */
+
+   unsigned long rel_sect;
    int error_code = 0;
-   int index;
+   int num_drives = 0;
 
-   int entry_offset;
-
-   /* Read the Extended Partition Table, if applicable. */
+   /* consider ext part incompatible until opposite is proofed */
    pDrive->ext_usable = FALSE;
 
-   if ( pDrive->ptr_ext_part ) {
-      ep = pDrive->ptr_ext_part;
+   /* no EMBR eintry in MBR, abort */
+   if ( !pDrive->ptr_ext_part ) return 0;
 
-      error_code = Read_Physical_Sectors( drive + 0x80, ep->start_cyl,
-                                          ep->start_head, ep->start_sect, 1 );
+   nep = ep = pDrive->ptr_ext_part;
+   p = pDrive->log_drive;
+
+   do {
+      error_code = Read_Physical_Sectors( drive + 0x80, nep->start_cyl,
+                                       nep->start_head, nep->start_sect, 1 );
       if ( error_code != 0 ) {
          return error_code;
       }
 
-      /* Ensure that the sector has a valid partition table before  */
-      /* any information is loaded into pDrive->           */
-      if ( ( sector_buffer[0x1fe] == 0x55 ) &&
-           ( sector_buffer[0x1ff] == 0xaa ) ) {
+      if ( *(unsigned short *)(sector_buffer + 510) != 0xAA55 ) {
+         /* no valid EMBR signature, abort */
+         return 1;
+      }
 
-         for ( index = 0; index < MAX_LOGICAL_DRIVES; index++ ) {
-            p = &pDrive->log_drive[index];
-            nep = &pDrive->next_ext[index];
-            entry_offset = 0x1be;
+      /* determine LBA offset to calculate CHS values from for
+         logical partition, because EMBR entry stores relativ values */
+      rel_sect = ep->rel_sect + ( ( nep != ep ) ? nep->rel_sect : 0 );
+      Read_Table_Entry( sector_buffer + 0x1be, pDrive, p, rel_sect);
+      num_drives += 1;
 
-            if ( sector_buffer[entry_offset + 0x04] > 0 ) {
+      nep = (nep == ep) ? pDrive->next_ext : nep + 1;
+
+      Read_Table_Entry( sector_buffer + 0x1be + 16, pDrive, nep, ep->rel_sect);
+      if ( Is_Supp_Ext_Part( nep->num_type ) ) {
+         pDrive->next_ext_exists[num_drives - 1] = TRUE;
+      }
+      else if ( nep->num_type != 0 ) {
+         /* No valid EMBR link in second entry found and not end of chain.
+            Treat as an error condition */
+         return 1;
+      }
+
+      if ( sector_buffer[0x1c2 + 32] != 0 || sector_buffer[0x1c2 + 48] != 0 ) {
+         /* third and forth entry in EMBR are not empty.
+            Treat as an error condition. */
+         return 1;
+      }
+
+      p += 1;
+   } while ( nep->num_type != 0 );
+
+   pDrive->num_of_log_drives = num_drives;
+
+#if 0
+
+   /* Ensure that the sector has a valid partition table before  */
+   /* any information is loaded into pDrive->           */
+   if ( ( sector_buffer[0x1fe] == 0x55 ) &&
+        ( sector_buffer[0x1ff] == 0xaa ) ) {
+      for ( index = 0; index < MAX_LOGICAL_DRIVES; ) {
+         p = &pDrive->log_drive[index];
+         nep = &pDrive->next_ext[index];
+         entry_offset = 0x1be;
+         Read_Table_Entry( sector_buffer + entry_offset, pDrive, p, rel_sect);
+         entry_offset = entry_offset + 16;
+         if ( sector_buffer[entry_offset + 0x04] == 0x05 ) {
+            pDrive->next_ext_exists[index] = TRUE;
+            Read_Table_Entry( sector_buffer + entry_offset, pDrive, nep, ep->rel_sect );
+            if ( p->num_type > 0 ) {
                pDrive->num_of_log_drives++;
+               index++;
             }
-
-            p->num_type = sector_buffer[entry_offset + 0x04];
-
-            if ( pDrive->ext_int_13 == FALSE ) {
-               /* If int 0x13 extensions are not used get the CHS values. */
-               extract_chs( sector_buffer + entry_offset + 0x01,
-                            &p->start_cyl, &p->start_head, &p->start_sect );
-
-               extract_chs( sector_buffer + entry_offset + 0x05, &p->end_cyl,
-                            &p->end_head, &p->end_sect );
+            error_code = Read_Physical_Sectors(
+               drive + 0x80, nep->start_cyl, nep->start_head,
+               nep->start_sect, 1 );
+            if ( error_code != 0 ) {
+               return error_code;
             }
-
-            p->rel_sect = *(_u32 *)( sector_buffer + entry_offset + 0x08 );
-            p->num_sect = *(_u32 *)( sector_buffer + entry_offset + 0x0c );
-
-            if ( ( pDrive->ext_int_13 == TRUE ) && ( p->num_type != 0 ) ) {
-               /* If int 0x13 extensions are used compute the virtual
-                        CHS values. */
-               if ( index == 0 ) {
-                  lba_to_chs( ep->rel_sect + p->rel_sect, pDrive,
-                              &p->start_cyl, &p->start_head, &p->start_sect );
-                  lba_to_chs( ep->rel_sect + p->rel_sect + p->num_sect - 1,
-                              pDrive, &p->end_cyl, &p->end_head,
-                              &p->end_sect );
-               }
-               else {
-                  lba_to_chs(
-                     ep->rel_sect + ( nep - 1 )->rel_sect + p->rel_sect,
-                     pDrive, &p->start_cyl, &p->start_head, &p->start_sect );
-                  lba_to_chs( ep->rel_sect + ( nep - 1 )->rel_sect +
-                                 p->rel_sect + p->num_sect - 1,
-                              pDrive, &p->end_cyl, &p->end_head,
-                              &p->end_sect );
-               }
-            }
-
-            p->size_in_MB = Convert_Cyl_To_MB( p->end_cyl - p->start_cyl + 1,
-                                               pDrive->total_head + 1,
-                                               pDrive->total_sect );
-
-            entry_offset = entry_offset + 16;
-            if ( sector_buffer[entry_offset + 0x04] == 0x05 ) {
-               pDrive->next_ext_exists[index] = TRUE;
-
-               nep->num_type = sector_buffer[entry_offset + 0x04];
-
-               if ( pDrive->ext_int_13 == FALSE ) {
-                  /* If int 0x13 extensions are not used get the CHS values. */
-
-                  extract_chs( sector_buffer + entry_offset + 0x01,
-                               &nep->start_cyl, &nep->start_head,
-                               &nep->start_sect );
-
-                  extract_chs( sector_buffer + entry_offset + 0x05,
-                               &nep->end_cyl, &nep->end_head,
-                               &nep->end_sect );
-               }
-
-               nep->rel_sect =
-                  *(_u32 *)( sector_buffer + entry_offset + 0x08 );
-
-               nep->num_sect =
-                  *(_u32 *)( sector_buffer + entry_offset + 0x0c );
-
-               if ( ( pDrive->ext_int_13 == TRUE ) &&
-                    ( nep->num_type != 0 ) ) {
-                  /* If int 0x13 extensions are used compute the virtual CHS values. */
-                  lba_to_chs( ep->rel_sect + nep->rel_sect, pDrive,
-                              &nep->start_cyl, &nep->start_head,
-                              &nep->start_sect );
-                  lba_to_chs(
-                     ep->rel_sect + nep->rel_sect + nep->num_sect - 1, pDrive,
-                     &nep->end_cyl, &nep->end_head, &nep->end_sect );
-               }
-
-               error_code = Read_Physical_Sectors(
-                  drive + 0x80, nep->start_cyl, nep->start_head,
-                  nep->start_sect, 1 );
-
-               if ( error_code != 0 ) {
-                  return error_code;
-               }
-            }
-            else {
-               /* no EMBR link entry in second slot -> end of chain */
-               break;
-            }
+         }
+         else {
+            /* no EMBR link entry in second slot -> end of chain */
+            break;
          }
       }
       pDrive->ext_usable = TRUE;
    }
-
+#endif
    return 0;
 }
 
