@@ -968,7 +968,7 @@ void Display_CL_Partition_Table( void )
    printf( "\n\nCurrent fixed disk drive: %1d",
            ( flags.drive_number - 127 ) );
 
-   printf( "      (sectors: %lu, geometry: %lu/%03lu/%02lu)",
+   printf( "      %lu sectors   geometry %lu/%03lu/%02lu",
            pDrive->total_disk_size_in_log_sectors, pDrive->total_cyl + 1,
            pDrive->total_head + 1, pDrive->total_sect );
 
@@ -1032,7 +1032,7 @@ void Display_CL_Partition_Table( void )
       index++;
    } while ( index < 4 );
    printf(
-      "\nLargest continious free space for primary partition: %lu MBytes\n",
+      "\nLargest continious free space for primary partition = %lu MBytes\n",
       Max_Pri_Free_Space_In_MB() );
 
    /* Check to see if there are any drives to display */
@@ -1092,7 +1092,7 @@ void Display_CL_Partition_Table( void )
          index++;
       } while ( index < 27 );
       printf(
-         "\nLargest continious free space in extended partition: %lu MBytes\n",
+         "\nLargest continious free space in extended partition = %lu MBytes\n",
          Max_Log_Free_Space_In_MB() );
    }
 }
