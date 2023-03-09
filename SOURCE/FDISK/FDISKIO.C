@@ -509,14 +509,15 @@ void Process_Fdiskini_File( void )
 
                if ( ( object_found == TRUE ) &&
                     ( ( line_buffer[index] == 0x0a ) ||
-                      ( line_buffer[index] == ' ' ) ) ) {
+                      ( line_buffer[index] == ' ' ) ||
+                      ( line_buffer[index] == 0 ) ) ) {
                   done_looking = TRUE;
                   //setting_buffer[sub_buffer_index]=0x0a;
                }
 
                if ( index == 254 ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     "Error encountered on line %d of the \"fdisk.ini\" file.\n",
                      line_counter );
                   exit( 3 );
                }
