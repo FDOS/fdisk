@@ -33,6 +33,11 @@ void textbackground( int background )
    _textattr = _textattr & 0x8f | ( background << 4 ) & 0x70;
 }
 
+int gettextattr( void )
+{
+   return _textattr;
+}
+
 /* Watcom C does have biosdisk equivalent _bios_disk */
 int biosdisk( unsigned function, unsigned drive, unsigned head,
               unsigned cylinder, unsigned sector, unsigned number_of_sectors,
@@ -161,6 +166,18 @@ int Color_Print( char *text )
    }
 
    return (int)( p - text );
+}
+
+#else /* BORLANDC */
+
+#include <conio.h>
+
+int gettextattr( void )
+{
+   struct text_info ti;
+
+   gettextinfo( &ti );
+   return ti.attribute;
 }
 
 #endif /* __WATCOMC__ */

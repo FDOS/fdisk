@@ -184,7 +184,7 @@ int Is_Dos_Part( int num_type )
 
 int Is_Supp_Ext_Part( int num_type )
 {
-   return num_type == 5 || ( num_type == 0x0f && ( flags.version == W95 ||
+   return (num_type == 5) || ( num_type == 0x0f && ( flags.version == W95 ||
                                                  flags.version == W95B ||
                                                  flags.version == W98 ) );
 }
@@ -907,7 +907,7 @@ int Read_Partition_Tables( void )
 {
    Partition_Table *pDrive;
 
-   int drive, num_drives = 0, num_ext = 0;
+   int drive, num_ext, num_drives = 0;
    int error_code = 0;
 
    flags.maximum_drive_number = 0;
@@ -915,6 +915,7 @@ int Read_Partition_Tables( void )
 
    for ( drive = 0; drive < 8; drive++ ) {
       pDrive = &part_table[drive];
+      num_ext = 0;
 
       Clear_Partition_Tables( pDrive );
 
@@ -1051,7 +1052,7 @@ static int Read_Primary_Table( int drive, Partition_Table *pDrive,
       p++;
       entry_offset += 16;
    }
-
+ 
    return 0;
 }
 
@@ -1415,7 +1416,7 @@ int Write_Partition_Tables( void )
 
       error_code =
          Write_Physical_Sectors( ( drive_index + 0x80 ), 0, 0, 1, 1 );
-      if ( error_code > 0 ) {
+      if ( error_code != 0 ) {
          return ( error_code );
       }
 

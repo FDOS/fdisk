@@ -821,14 +821,14 @@ void main( int argc, char *argv[] )
             if ( 0 == strcmp( arg[0].choice, "ACTIVATE" ) ) {
                if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
                   printf(
-                     "\nPartition number is out of range (1-4)...Operation Terminated.\n" );
+                     "\nPartition number is out of range (1-4).\n" );
                   exit( 9 );
                }
 
                if ( !Set_Active_Partition( (int)( arg[0].value - 1 ) ) ) {
                   printf(
-                     "\nCan not activate partition...Operation Terminated.\n" );
-                  exit( 9 );
+                     "\nCan not activate partition.\n" );
+                  exit( 8 );
                }
                command_ok = TRUE;
 
@@ -845,14 +845,21 @@ void main( int argc, char *argv[] )
             }
 
             if ( 0 == strcmp( arg[0].choice, "AMBR" ) ) {
-               Create_Alternate_MBR();
+               if ( Create_Alternate_MBR() ) {
+                  printf(
+                     "\nError installing alternate MBR.\n" );
+                  exit( 8 );                  
+               }
                command_ok = TRUE;
 
                Shift_Command_Line_Options( 1 );
             }
 
             if ( 0 == strcmp( arg[0].choice, "AUTO" ) ) {
-               Automatically_Partition_Hard_Drive();
+               if ( Automatically_Partition_Hard_Drive() ) {
+                  printf( "\nError auto-partitioning hard drive.\n" );
+                  exit( 8 );                   
+               }
                command_ok = TRUE;
 
                Shift_Command_Line_Options( 1 );
@@ -862,12 +869,14 @@ void main( int argc, char *argv[] )
          case 'C': {
             if ( 0 == strcmp( arg[0].choice, "CLEAR" ) ) {
                if ( flags.using_default_drive_number == TRUE ) {
-                  printf(
-                     "\nNo drive number has been entered...Operation Terminated.\n" );
+                  printf( "\nNo drive number has been entered.\n" );
                   exit( 9 );
                }
 
-               Clear_Partition_Table();
+               if ( Clear_Partition_Table() != 0 ) {
+                  printf( "\nError clearing partition table.\n");
+                  exit( 8 );
+               }
                command_ok = TRUE;
 
                Re_Initialization();
@@ -877,11 +886,14 @@ void main( int argc, char *argv[] )
             if ( 0 == strcmp( arg[0].choice, "CLEARALL" ) ) {
                if ( flags.using_default_drive_number == TRUE ) {
                   printf(
-                     "\nNo drive number has been entered...Operation Terminated.\n" );
+                     "\nNo drive number has been entered.\n" );
                   exit( 9 );
                }
 
-               Clear_Entire_Sector_Zero();
+               if ( Clear_Entire_Sector_Zero() != 0 ) {
+                  printf( "\nError clearing sector 0.\n");
+                  exit( 8 );                  
+               }
                command_ok = TRUE;
 
                Re_Initialization();
@@ -894,7 +906,10 @@ void main( int argc, char *argv[] )
             }
 
             if ( 0 == strcmp( arg[0].choice, "CMBR" ) ) {
-               Create_MBR();
+               if ( Create_MBR() != 0 ) {
+                  printf( "\nError writing MBR.\n");
+                  exit( 8 );                                    
+               }
                command_ok = TRUE;
 
                Shift_Command_Line_Options( 1 );
@@ -903,8 +918,11 @@ void main( int argc, char *argv[] )
 
          case 'D': {
             if ( 0 == strcmp( arg[0].choice, "DEACTIVATE" ) ) {
-               Deactivate_Active_Partition();
-               Write_Partition_Tables();
+               if ( Deactivate_Active_Partition() != 0 ||
+                    Write_Partition_Tables() != 0 ) {
+                  printf( "\nError deactivating partition.\n");
+                  exit( 8 );                   
+               }
                command_ok = TRUE;
 
                Shift_Command_Line_Options( 1 );
@@ -976,7 +994,10 @@ void main( int argc, char *argv[] )
 
          case 'M': {
             if ( 0 == strcmp( arg[0].choice, "MBR" ) ) {
-               Create_MBR();
+               if ( Create_MBR() != 0 ) {
+                  printf("\nError writing MBR.\n");
+                  exit( 8 );
+               }
                command_ok = TRUE;
 
                Shift_Command_Line_Options( 1 );
@@ -1032,13 +1053,18 @@ void main( int argc, char *argv[] )
 
          case 'R': {
             if ( 0 == strcmp( arg[0].choice, "REBOOT" ) ) {
-               Write_Partition_Tables(); /* If no changes have been  */
-                                         /* made, then this function */
-               Reboot_PC();              /* will simply return       */
-            }                            /* without writing anything.*/
+               if ( Write_Partition_Tables() != 0 ) {
+                  printf(" \nError writing partition tables.\n" );
+                  exit( 8 );
+               }
+               Reboot_PC();
+            }
 
             if ( 0 == strcmp( arg[0].choice, "RMBR" ) ) {
-               Remove_MBR();
+               if ( Remove_MBR() != 0 ) {
+                  printf(" \nError removing MBR.\n" );
+                  exit( 8 );                  
+               }
                command_ok = TRUE;
 
                Shift_Command_Line_Options( 1 );
@@ -1046,23 +1072,16 @@ void main( int argc, char *argv[] )
          } break;
 
          case 'S': {
-            /*
-	  if(0==strcmp(arg[0].choice,"SAVE"))
-	    {
-	    Write_Partition_Tables();
-	    command_ok=TRUE;
-
-	    Shift_Command_Line_Options(1);
-	    }
-*/
-
             if ( 0 == strcmp( arg[0].choice, "SETFLAG" ) ) {
                Command_Line_Set_Flag();
                command_ok = TRUE;
             }
 
             if ( 0 == strcmp( arg[0].choice, "SMBR" ) ) {
-               Save_MBR();
+               if ( Save_MBR() != 0 ) {
+                  printf( "\nError saving MBR.\n" );
+                  exit( 8 );
+               }
                command_ok = TRUE;
 
                Shift_Command_Line_Options( 1 );
@@ -1071,13 +1090,6 @@ void main( int argc, char *argv[] )
             if ( 0 == strcmp( arg[0].choice, "SMARTMBR" ) ) {
                extern void Create_BootSmart_MBR( void );
                Create_BootSmart_MBR();
-               command_ok = TRUE;
-
-               Shift_Command_Line_Options( 1 );
-            }
-
-            if ( 0 == strcmp( arg[0].choice, "SMBR" ) ) {
-               Save_MBR();
                command_ok = TRUE;
 
                Shift_Command_Line_Options( 1 );
@@ -1131,13 +1143,13 @@ void main( int argc, char *argv[] )
          } break;
 
          default: {
-            printf( "\nSyntax Error...Operation Terminated.\n" );
+            printf( "\nSyntax Error.\n" );
             exit( 1 );
          }
          }
 
          if ( command_ok == FALSE ) {
-            printf( "\nSyntax Error...Operation Terminated.\n" );
+            printf( "\nSyntax Error.\n" );
             exit( 1 );
          }
 

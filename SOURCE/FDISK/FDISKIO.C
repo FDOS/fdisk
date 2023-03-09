@@ -67,9 +67,11 @@ extern void cdecl far BootSmart_code();
 */
 
 /* Automatically partition the selected hard drive */
-void Automatically_Partition_Hard_Drive( void )
+int Automatically_Partition_Hard_Drive( void )
 {
    int index = 0;
+   int part_no, error_code;
+
    /*  unsigned long maximum_partition_size_in_MB; */
    Partition_Table *pDrive = &part_table[( flags.drive_number - 128 )];
 
@@ -84,7 +86,7 @@ void Automatically_Partition_Hard_Drive( void )
              18 ) ) {
          printf(
             "\nThe hard drive has already been partitioned.\n" );
-         exit( 7 );
+         return 99;
       }
 
       index++;
@@ -93,79 +95,96 @@ void Automatically_Partition_Hard_Drive( void )
    /* Create a primary partition...if the size or type is incorrect,     */
    /* int Create_Primary_Partition(...) will adjust it automatically.    */
    Determine_Free_Space();
-   Set_Active_Partition( Create_Primary_Partition( 6, 2048 ) );
+   part_no = Create_Primary_Partition( 6, 2048 );
+   if ( part_no == 99 ) {
+      return error_code;
+   }
+   error_code = Set_Active_Partition( part_no );
 
    /* Create an extended partition, if space allows. */
    Determine_Free_Space();
    if ( pDrive->pri_part_largest_free_space > 0 ) {
-      Create_Primary_Partition( 5, 999999ul );
+      part_no = Create_Primary_Partition( 5, 999999ul );
+
+      if ( part_no == 99 ) {
+         return part_no;
+      }
 
       /* Fill the extended partition with logical drives. */
       Determine_Free_Space();
       do {
 
-         Create_Logical_Drive( 6, 2048 );
-
+         error_code = Create_Logical_Drive( 6, 2048 );
+         if ( error_code != 0 ) {
+            return error_code;
+         }
          Determine_Free_Space();
-         /*      maximum_partition_size_in_MB
-       = (pDrive->ext_part_largest_free_space+1)*
-	   (pDrive->total_head+1)*
-	   pDrive->total_sect / 2048; */
+         
       } while ( ( pDrive->ext_part_largest_free_space > 0 ) &&
                 ( Determine_Drive_Letters() < 'Z' ) );
    }
+
+   return 0;
 }
 
 /* Clear the first sector on the hard disk...removes the partitions and MBR. */
-void Clear_Entire_Sector_Zero( void )
+int Clear_Entire_Sector_Zero( void )
 {
    //Qprintf("Clearing boot sector of drive %x\n", flags.drive_number);
    Clear_Sector_Buffer();
-   Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+   return Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
 }
 
 /* Clear the Flag */
-void Clear_Flag( int flag_number )
+int Clear_Flag( int flag_number )
 {
+   int error_code;
+
    if ( flags.flag_sector != 0 ) {
-      Read_Physical_Sectors( ( flags.drive_number ), 0, 0,
+      error_code = Read_Physical_Sectors( ( flags.drive_number ), 0, 0,
                              ( flags.flag_sector ), 1 );
+
       sector_buffer[( 446 + ( flag_number - 1 ) )] = 0;
-      Write_Physical_Sectors( ( flags.drive_number ), 0, 0,
+
+      error_code |= Write_Physical_Sectors( ( flags.drive_number ), 0, 0,
                               ( flags.flag_sector ), 1 );
+      return error_code;
    }
    else {
       printf(
          "\nSector flagging functions have been disabled.\n" );
-      exit( 9 );
+      return 9;
    }
 }
 
 /* Clear Partition Table */
-void Clear_Partition_Table( void )
+int Clear_Partition_Table( void )
 {
-   //Qprintf("Clearing partitiontable for drive %02x..",flags.drive_number);
+   int error_code;
 
-   Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+   error_code = Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+   if ( error_code != 0 ) {
+      return error_code;
+   }
 
    memset( sector_buffer + 0x1be, 0, 4 * 16 );
 
-   Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
-
-   //Qprintf("done\n");
+   return Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
 }
 
 /* Create Alternate Master Boot Code */
-void Create_Alternate_MBR( void )
+int Create_Alternate_MBR( void )
 {
    char home_path[255];
    int index = 0;
-
+   int error_code;
    FILE *file_pointer;
 
    //Qprintf("Create_Alternate_MBR()\n");
 
-   Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+   if ( error_code = Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 ) ) {
+      return error_code;
+   }
 
    /* Clear old MBR, if any */
    memset( sector_buffer, 0x00, 0x1be );
@@ -183,7 +202,7 @@ void Create_Alternate_MBR( void )
    if ( !file_pointer ) {
       printf(
          "\nThe \"boot.mbr\" file has not been found.\n" );
-      exit( 8 );
+      return 99;
    }
 
    index = 0;
@@ -197,7 +216,9 @@ void Create_Alternate_MBR( void )
    sector_buffer[0x1fe] = 0x55;
    sector_buffer[0x1ff] = 0xaa;
 
-   Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+   error_code = Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+
+   return error_code;
 }
 
 /* Create Booteasy MBR */
@@ -216,18 +237,21 @@ void Create_BootEasy_MBR( void )
 }
 
 /* Create Normal MBR */
-void Create_BootNormal_MBR( void )
+int Create_BootNormal_MBR( void )
 {
-   //Qprintf("Creating normal MBR\n");
+   int error_code;
 
-   Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+   error_code = Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+   if ( error_code != 0 ) {
+      return error_code;
+   }
 
    memcpy( sector_buffer, bootnormal_code, SIZE_OF_MBR );
 
    sector_buffer[0x1fe] = 0x55;
    sector_buffer[0x1ff] = 0xaa;
 
-   Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+   return Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
 }
 
 /* Create Normal MBR */
@@ -246,15 +270,16 @@ void Create_BootSmart_MBR( void )
 }
 
 /* Create Master Boot Code */
-void Create_MBR( void )
+int Create_MBR( void )
 {
 
    if ( flags.use_ambr == TRUE ) {
-      Create_Alternate_MBR();
+      return Create_Alternate_MBR();
    }
    else {
-      Create_BootNormal_MBR(); /* BootEasy disabled */
+      return Create_BootNormal_MBR(); /* BootEasy disabled */
    }
+   return 0;
 }
 
 /* Create Master Boot Code if it is not present */
@@ -518,7 +543,7 @@ void Process_Fdiskini_File( void )
 
                if ( index == 254 ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -1187,79 +1212,79 @@ void Process_Fdiskini_File( void )
 }
 
 /* Remove MBR */
-void Remove_MBR( void )
+int Remove_MBR( void )
 {
-   if ( Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 ) != 0 ) {
-      printf(
-         "\nError reading MBR sector.\n" );
-      exit( 8 );      
+   int error_code;
+
+   error_code = Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+   if (  error_code != 0 ) {
+      return error_code;    
    }
 
    memset( sector_buffer, 0, 0x1be );
 
-   if ( Write_Physical_Sectors( ( flags.drive_number ), 0, 0, 1, 1 ) != 0 ) {
-      printf(
-         "\nError writing MBR sector.\n" );
-      exit( 8 );       
-   }
+   return Write_Physical_Sectors( ( flags.drive_number ), 0, 0, 1, 1 );
+
 }
 
 /* Save MBR */
-void Save_MBR( void )
+int Save_MBR( void )
 {
    int index = 0;
+   int error_code;
 
    FILE *file_pointer;
 
-   if ( Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 ) != 0 ) {
-      printf(
-         "\nError reading MBR sector.\n" );
-      exit( 8 );      
+   error_code = Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+   if ( error_code != 0 ) {
+      return error_code;     
    }
 
    file_pointer = fopen( "boot.mbr", "wb" );
 
    if ( !file_pointer ) {
-      printf(
-         "\nError opening or creating \"BOOT.MBR\" for writing.\n" );
-      exit( 8 );
+      return 8;
    }
 
    do {
-      fputc( sector_buffer[index], file_pointer );
+      if ( fputc( sector_buffer[index], file_pointer ) == EOF ) {
+         return 8;
+      }
       index++;
    } while ( index < 0x1be );
 
    do {
-      fputc( 0, file_pointer );
+      if ( fputc( 0, file_pointer ) == EOF ) {
+         return 8;
+      }
       index++;
    } while ( index < 512 );
 
    fclose( file_pointer );
+   return 0;
 }
 
 /* Set the flag */
-void Set_Flag( int flag_number, int flag_value )
+int Set_Flag( int flag_number, int flag_value )
 {
+   int error_code;
+
    if ( flags.flag_sector != 0 ) {
-      if ( Read_Physical_Sectors( ( flags.drive_number ), 0, 0,
-                             ( flags.flag_sector ), 1 ) != 0 ) {
-         printf(
-            "\nError reading sector.\n" );
-         exit( 8 );
+      error_code = Read_Physical_Sectors( ( flags.drive_number ), 0, 0,
+                             ( flags.flag_sector ), 1 );
+      if ( error_code != 0 ) {
+         return error_code;
       }
+
       sector_buffer[( 446 + ( flag_number - 1 ) )] = flag_value;
-      if ( Write_Physical_Sectors( ( flags.drive_number ), 0, 0,
-                              ( flags.flag_sector ), 1 ) != 0 ) {
-         printf(
-            "\nError writing sector.\n" );
-         exit( 8 );
-      }
+
+      return Write_Physical_Sectors( ( flags.drive_number ), 0, 0,
+                              ( flags.flag_sector ), 1 );
    }
    else {
       printf(
          "\nSector flagging functions have been disabled.\n" );
-      exit( 9 );
+      return 9;
    }
 }
 
