@@ -796,7 +796,6 @@ void main( int argc, char *argv[] )
       exit( 0 );
    }
    else {
-      flags.use_iui = FALSE;
       do {
 #ifdef DEBUG
          if ( debug.command_line_arguments == TRUE ) {
@@ -819,6 +818,7 @@ void main( int argc, char *argv[] )
          switch ( arg[0].choice[0] ) {
          case 'A': {
             if ( 0 == strcmp( arg[0].choice, "ACTIVATE" ) ) {
+               flags.use_iui = FALSE;
                if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
                   printf(
                      "\nPartition number is out of range (1-4).\n" );
@@ -831,7 +831,6 @@ void main( int argc, char *argv[] )
                   exit( 9 );
                }
                command_ok = TRUE;
-
                Shift_Command_Line_Options( 1 );
             }
 
@@ -839,35 +838,33 @@ void main( int argc, char *argv[] )
                if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
                   Ask_User_About_FAT32_Support();
                }
-
-               Interactive_User_Interface();
-               exit( 0 );
             }
 
             if ( 0 == strcmp( arg[0].choice, "AMBR" ) ) {
-               if ( Create_Alternate_MBR() ) {
+               flags.use_iui = FALSE;
+               if ( Create_Alternate_MBR() != 0 ) {
                   printf(
                      "\nError installing alternate MBR.\n" );
                   exit( 8 );                  
                }
                command_ok = TRUE;
-
                Shift_Command_Line_Options( 1 );
             }
 
             if ( 0 == strcmp( arg[0].choice, "AUTO" ) ) {
+               flags.use_iui = FALSE;
                if ( Automatically_Partition_Hard_Drive() ) {
                   printf( "\nError auto-partitioning hard drive.\n" );
                   exit( 9 );                   
                }
                command_ok = TRUE;
-
                Shift_Command_Line_Options( 1 );
             }
          } break;
 
          case 'C': {
             if ( 0 == strcmp( arg[0].choice, "CLEAR" ) ) {
+               flags.use_iui = FALSE;
                if ( flags.using_default_drive_number == TRUE ) {
                   printf( "\nNo drive number has been entered.\n" );
                   exit( 9 );
@@ -878,12 +875,12 @@ void main( int argc, char *argv[] )
                   exit( 9 );
                }
                command_ok = TRUE;
-
                Re_Initialization();
                Shift_Command_Line_Options( 1 );
             }
 
             if ( 0 == strcmp( arg[0].choice, "CLEARALL" ) ) {
+               flags.use_iui = FALSE;
                if ( flags.using_default_drive_number == TRUE ) {
                   printf(
                      "\nNo drive number has been entered.\n" );
@@ -895,45 +892,47 @@ void main( int argc, char *argv[] )
                   exit( 8 );                  
                }
                command_ok = TRUE;
-
                Re_Initialization();
                Shift_Command_Line_Options( 1 );
             }
 
             if ( 0 == strcmp( arg[0].choice, "CLEARFLAG" ) ) {
+               flags.use_iui = FALSE;
                Command_Line_Clear_Flag();
                command_ok = TRUE;
             }
 
             if ( 0 == strcmp( arg[0].choice, "CMBR" ) ) {
+               flags.use_iui = FALSE;
                if ( Create_MBR() != 0 ) {
                   printf( "\nError writing MBR.\n");
                   exit( 8 );                                    
                }
                command_ok = TRUE;
-
                Shift_Command_Line_Options( 1 );
             }
          } break;
 
          case 'D': {
             if ( 0 == strcmp( arg[0].choice, "DEACTIVATE" ) ) {
+               flags.use_iui = FALSE;
                if ( Deactivate_Active_Partition() != 0 ||
                     Write_Partition_Tables() != 0 ) {
                   printf( "\nError deactivating partition.\n");
                   exit( 9 );                   
                }
                command_ok = TRUE;
-
                Shift_Command_Line_Options( 1 );
             }
 
             if ( 0 == strcmp( arg[0].choice, "DELETE" ) ) {
+               flags.use_iui = FALSE;
                Command_Line_Delete();
                command_ok = TRUE;
             }
 
             if ( 0 == strcmp( arg[0].choice, "DUMP" ) ) {
+               flags.use_iui = FALSE;
                Dump_Partition_Information();
                command_ok = TRUE;
 
@@ -943,6 +942,7 @@ void main( int argc, char *argv[] )
 
          case 'E': {
             if ( 0 == strcmp( arg[0].choice, "EXT" ) ) {
+               flags.use_iui = FALSE;
                Command_Line_Create_Extended_Partition();
                command_ok = TRUE;
             }
@@ -953,37 +953,26 @@ void main( int argc, char *argv[] )
                if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
                   flags.fprmt = TRUE;
                }
-               Interactive_User_Interface();
-               exit( 0 );
             }
          } break;
 
          case 'I': {
             if ( 0 == strcmp( arg[0].choice, "INFO" ) ) {
+               flags.use_iui = FALSE;
                Command_Line_Info();
                command_ok = TRUE;
             }
-            /*
-    Add in the future.....
-	  if(0==strcmp(arg[0].choice,"IUI"))
-	    {
-	    flags.return_from_iui=TRUE;
-	    Interactive_User_Interface();
-	    flags.return_from_iui=FALSE;
-	    command_ok=TRUE;
-
-	    Shift_Command_Line_Options(1);
-	    }
-*/
          } break;
 
          case 'L': {
             if ( 0 == strcmp( arg[0].choice, "LOG" ) ) {
+               flags.use_iui = FALSE;
                Command_Line_Create_Logical_DOS_Drive();
                command_ok = TRUE;
             }
 
             if ( 0 == strcmp( arg[0].choice, "LOGO" ) ) {
+               flags.use_iui = FALSE;
                fat32_temp = flags.fat32;
                flags.fat32 = FALSE;
                Command_Line_Create_Logical_DOS_Drive();
@@ -994,6 +983,7 @@ void main( int argc, char *argv[] )
 
          case 'M': {
             if ( 0 == strcmp( arg[0].choice, "MBR" ) ) {
+               flags.use_iui = FALSE;
                if ( Create_MBR() != 0 ) {
                   printf("\nError writing MBR.\n");
                   exit( 8 );
@@ -1004,6 +994,7 @@ void main( int argc, char *argv[] )
             }
 
             if ( 0 == strcmp( arg[0].choice, "MODIFY" ) ) {
+               flags.use_iui = FALSE;
                Command_Line_Modify();
                command_ok = TRUE;
             }
@@ -1018,6 +1009,7 @@ void main( int argc, char *argv[] )
             }
 
             if ( 0 == strcmp( arg[0].choice, "MOVE" ) ) {
+               flags.use_iui = FALSE;
                Command_Line_Move();
                command_ok = TRUE;
             }
@@ -1025,11 +1017,13 @@ void main( int argc, char *argv[] )
 
          case 'P': {
             if ( 0 == strcmp( arg[0].choice, "PRI" ) ) {
+               flags.use_iui = FALSE;
                Command_Line_Create_Primary_Partition();
                command_ok = TRUE;
             }
 
             if ( 0 == strcmp( arg[0].choice, "PRIO" ) ) {
+               flags.use_iui = FALSE;
                fat32_temp = flags.fat32;
                flags.fat32 = FALSE;
                Command_Line_Create_Primary_Partition();
@@ -1045,14 +1039,12 @@ void main( int argc, char *argv[] )
                if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
                   Ask_User_About_FAT32_Support();
                }
-
-               Interactive_User_Interface();
-               exit( 0 );
             }
          } break;
 
          case 'R': {
             if ( 0 == strcmp( arg[0].choice, "REBOOT" ) ) {
+               flags.use_iui = FALSE;
                if ( Write_Partition_Tables() != 0 ) {
                   printf(" \nError writing partition tables.\n" );
                   exit( 8 );
@@ -1061,6 +1053,7 @@ void main( int argc, char *argv[] )
             }
 
             if ( 0 == strcmp( arg[0].choice, "RMBR" ) ) {
+               flags.use_iui = FALSE;
                if ( Remove_MBR() != 0 ) {
                   printf(" \nError removing MBR.\n" );
                   exit( 8 );                  
@@ -1073,11 +1066,13 @@ void main( int argc, char *argv[] )
 
          case 'S': {
             if ( 0 == strcmp( arg[0].choice, "SETFLAG" ) ) {
+               flags.use_iui = FALSE;
                Command_Line_Set_Flag();
                command_ok = TRUE;
             }
 
             if ( 0 == strcmp( arg[0].choice, "SMBR" ) ) {
+               flags.use_iui = FALSE;
                if ( Save_MBR() != 0 ) {
                   printf( "\nError saving MBR.\n" );
                   exit( 8 );
@@ -1088,19 +1083,24 @@ void main( int argc, char *argv[] )
             }
 
             if ( 0 == strcmp( arg[0].choice, "SMARTMBR" ) ) {
-               extern void Create_BootSmart_MBR( void );
-               Create_BootSmart_MBR();
+               flags.use_iui = FALSE;
+               if ( Create_BootSmart_MBR() != 0 ) {
+                  printf( "\nError writing MBR.\n");
+                  exit( 8 );
+               }
                command_ok = TRUE;
 
                Shift_Command_Line_Options( 1 );
             }
 
             if ( 0 == strcmp( arg[0].choice, "STATUS" ) ) {
+               flags.use_iui = FALSE;
                Command_Line_Status();
                command_ok = TRUE;
             }
 
             if ( 0 == strcmp( arg[0].choice, "SWAP" ) ) {
+               flags.use_iui = FALSE;
                Command_Line_Swap();
                command_ok = TRUE;
             }
@@ -1108,6 +1108,7 @@ void main( int argc, char *argv[] )
 
          case 'T': {
             if ( 0 == strcmp( arg[0].choice, "TESTFLAG" ) ) {
+               flags.use_iui = FALSE;
                Command_Line_Test_Flag();
                command_ok = TRUE;
             }
@@ -1116,7 +1117,9 @@ void main( int argc, char *argv[] )
          case 'X': {
             if ( 0 == strcmp( arg[0].choice, "X" ) ) {
                Command_Line_X();
-               exit( 0 );
+               Shift_Command_Line_Options( 1 );
+               command_ok = TRUE;
+               /*exit( 0 );*/
             }
 
             if ( 0 == strcmp( arg[0].choice, "XO" ) ) {
@@ -1124,7 +1127,6 @@ void main( int argc, char *argv[] )
                flags.allow_abort = TRUE;
                flags.del_non_dos_log_drives = TRUE;
                flags.set_any_pri_part_active = TRUE;
-               flags.use_iui = TRUE;
                command_ok = TRUE;
 
                Shift_Command_Line_Options( 1 );
@@ -1133,6 +1135,7 @@ void main( int argc, char *argv[] )
 
          case '?': {
             if ( 0 == strcmp( arg[1].choice, "NOPAUSE" ) ) {
+               flags.use_iui = FALSE;
                flags.do_not_pause_help_information = TRUE;
                Shift_Command_Line_Options( 1 );
             }

@@ -598,9 +598,9 @@ void Command_Line_X( void )
    int index;
 
    /* Ask the user if FAT32 is desired. */
-   if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
+   /*if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
       Ask_User_About_FAT32_Support();
-   }
+   }*/
 
    flags.use_extended_int_13 = FALSE;
    index = 0;
@@ -613,12 +613,12 @@ void Command_Line_X( void )
       Color_Print( "\n    Error reading partition tables.\n" );
       exit( 1 );
    }
-   if ( flags.maximum_drive_number == 0 ) {
+   /*if ( flags.maximum_drive_number == 0 ) {
       Color_Print( "\n    No fixed disks present.\n" );
       exit( 6 );
    }
 
-   Interactive_User_Interface();
+   Interactive_User_Interface();*/
 }
 
 /* Get the command line options */

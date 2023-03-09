@@ -26,9 +26,10 @@ int Clear_Flag( int flag_number );
 int Clear_Partition_Table( void );
 void Clear_Sector_Buffer( void );
 int Create_Alternate_MBR( void );
-void Create_BootEasy_MBR( void );
+/*void Create_BootEasy_MBR( void );*/
+int Create_BootSmart_MBR( void );
 int Create_MBR( void );
-void Create_MBR_If_Not_Present( void );
+int Create_MBR_If_Not_Present( void );
 void Load_External_Lookup_Table( void );
 void Process_Fdiskini_File( void );
 int Remove_MBR( void );

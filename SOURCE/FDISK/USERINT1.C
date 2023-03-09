@@ -468,9 +468,9 @@ void Interactive_User_Interface( void )
       }
 
       if ( menu == BMBR ) {
-         Create_BootEasy_MBR();
+/*         Create_BootEasy_MBR();
          Color_Print_At( 4, 22, "BootEasy MBR has been created." );
-         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
+         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );*/
       }
 
       if ( menu == AMBR ) {

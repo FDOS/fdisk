@@ -968,7 +968,7 @@ void Display_CL_Partition_Table( void )
    printf( "\n\nCurrent fixed disk drive: %1d",
            ( flags.drive_number - 127 ) );
 
-   printf( "      %lu sectors   geometry %lu/%03lu/%02lu",
+   printf( "   %lu sectors, geometry %lu/%03lu/%02lu",
            pDrive->total_disk_size_in_log_sectors, pDrive->total_cyl + 1,
            pDrive->total_head + 1, pDrive->total_sect );
 

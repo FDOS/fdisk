@@ -175,10 +175,11 @@ int Clear_Partition_Table( void )
 /* Create Alternate Master Boot Code */
 int Create_Alternate_MBR( void )
 {
+   FILE *file_pointer;
    char home_path[255];
    int index = 0;
    int error_code;
-   FILE *file_pointer;
+   int c;
 
    //Qprintf("Create_Alternate_MBR()\n");
    error_code = Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
@@ -202,12 +203,13 @@ int Create_Alternate_MBR( void )
    if ( !file_pointer ) {
       printf(
          "\nThe \"boot.mbr\" file has not been found.\n" );
-      return 99;
+      return 8;
    }
 
    index = 0;
    do {
-      sector_buffer[index] = fgetc( file_pointer );
+      c = fgetc( file_pointer );
+      sector_buffer[index] = ( c != EOF ) ? c : 0;
       index++;
    } while ( index < 0x1be );
 
@@ -222,10 +224,9 @@ int Create_Alternate_MBR( void )
 }
 
 /* Create Booteasy MBR */
+/* DISABLED
 void Create_BootEasy_MBR( void )
 {
-   //Qprintf("Create_BootEasy_MBR()\n");
-
    Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
 
    memcpy( sector_buffer, booteasy_code, SIZE_OF_MBR );
@@ -234,7 +235,7 @@ void Create_BootEasy_MBR( void )
    sector_buffer[0x1ff] = 0xaa;
 
    Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
-}
+}*/
 
 /* Create Normal MBR */
 int Create_BootNormal_MBR( void )
@@ -255,18 +256,23 @@ int Create_BootNormal_MBR( void )
 }
 
 /* Create Normal MBR */
-void Create_BootSmart_MBR( void )
+int Create_BootSmart_MBR( void )
 {
-   Qprintf( "Creating Drive Smart MBR for disk %x\n", flags.drive_number );
+   int error_code;
 
-   Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+   printf( "Creating Drive Smart MBR for disk %d\n", flags.drive_number - 0x80 );
+
+   error_code = Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+   if ( error_code != 0 ) {
+      return error_code;
+   }
 
    fmemcpy( sector_buffer, BootSmart_code, SIZE_OF_MBR );
 
    sector_buffer[0x1fe] = 0x55;
    sector_buffer[0x1ff] = 0xaa;
 
-   Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+   return Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
 }
 
 /* Create Master Boot Code */
@@ -282,14 +288,20 @@ int Create_MBR( void )
 }
 
 /* Create Master Boot Code if it is not present */
-void Create_MBR_If_Not_Present( void )
+int Create_MBR_If_Not_Present( void )
 {
-   Read_Physical_Sectors( 0x80, 0, 0, 1, 1 );
+   int error_code;
 
+   error_code = Read_Physical_Sectors( 0x80, 0, 0, 1, 1 );
+   if ( error_code != 0 ) {
+      return error_code;
+   }
    if ( ( sector_buffer[0x1fe] != 0x55 ) &&
         ( sector_buffer[0x1ff] != 0xaa ) ) {
-      Create_MBR();
+      return Create_MBR();
    }
+
+   return 0;
 }
 
 /* Load External Partition Type Lookup Table */
