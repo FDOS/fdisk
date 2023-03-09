@@ -198,6 +198,27 @@ int Color_Print_At( int column, int row, char *format, ... )
    return Color_Print( buffer );
 }
 
+
+int Normal_Print_At( int column, int row, char *format, ... )
+{
+   char buffer[256];
+   va_list arglist;
+   int res, attr;
+
+   attr = gettextattr();
+   textcolor( 7 );
+   Position_Cursor( column, row );
+
+   va_start( arglist, format );
+   vsprintf( buffer, format, arglist );
+   va_end( arglist );
+
+   res = Color_Print( buffer );
+   textattr( attr );
+
+   return res;
+}
+
 int BlinkPrintAt( int column, int row, char *format, ... )
 {
    char buffer[256];

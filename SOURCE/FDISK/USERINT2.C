@@ -595,6 +595,7 @@ int Delete_Logical_Drive_Interface( void )
    int input = 0;
    int input_ok;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+   int error_code;
 
    if ( !pDrive->ext_usable ) {
       Warn_Incompatible_Ext();
@@ -663,19 +664,30 @@ int Delete_Logical_Drive_Interface( void )
             index++;
          } while ( index <= 26 );
       }
+      if ( input_ok == FALSE ) {
+         Color_Print_At( 4, 22, "Illegal drive letter" );
+      }
 
    } while ( input_ok == FALSE );
 
    drive_to_delete = input;
 
-   Print_At( 4, 22, "Are you sure (Y/N)..............................? " );
+   Normal_Print_At( 4, 22, "Are you sure (Y/N)..............................? " );
    flags.esc = FALSE;
    input = (int)Input( 1, 54, 22, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
 
    if ( ( input == TRUE ) && ( flags.esc == FALSE ) ) {
-      Delete_Logical_Drive( drive_to_delete );
+      error_code = Delete_Logical_Drive( drive_to_delete );
 
       Clear_Screen( 0 );
+      
+      if ( !error_code ) {
+         Color_Print_At( 4, 22, "Logical drive deleted" );
+      }
+      else {
+         Color_Print_At( 4, 22, "Error deleting logical drive!" );                  
+      }
+
       Print_Centered(
          1, "Delete Logical DOS Drive(s) in the Extended DOS Partition",
          BOLD );
@@ -690,6 +702,7 @@ int Delete_Logical_Drive_Interface( void )
 void Delete_N_DOS_Partition_Interface( void )
 {
    int input = 0;
+   int error_code;
 
    Clear_Screen( 0 );
    Print_Centered( 4, "Delete Non-DOS Partition", BOLD );
@@ -707,12 +720,18 @@ void Delete_N_DOS_Partition_Interface( void )
                   '\0' ); /* 4 needs changed to the max num of partitions */
 
    if ( flags.esc == FALSE ) {
-      Delete_Primary_Partition( input - 1 );
+      error_code = Delete_Primary_Partition( input - 1 );
 
       Clear_Screen( 0 );
       Print_Centered( 4, "Delete Non-DOS Partition", BOLD );
       Display_Primary_Partition_Information_SS();
-      Color_Print_At( 4, 21, "Non-DOS Partition deleted" );
+      
+      if ( !error_code ) {
+         Color_Print_At( 4, 21, "Non-DOS Partition deleted" );
+      }
+      else {
+         Color_Print_At( 4, 21, "Error deleting Non-DOS Partition!" );         
+      }
       Print_At( 4, 24, "                                    " );
 
       Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
@@ -751,7 +770,7 @@ void Delete_Primary_DOS_Partition_Interface( void )
       p = &pDrive->pri_part[partition_to_delete];
       if ( Is_Dos_Part( p->num_type ) ) {
 
-         if ( input && ( flags.esc == FALSE ) ) {
+         if ( ( input == TRUE ) && ( flags.esc == FALSE ) ) {
             Print_At( 4, 22,
                       "Are you sure (Y/N)..............................? " );
             flags.esc = FALSE;
@@ -765,11 +784,11 @@ void Delete_Primary_DOS_Partition_Interface( void )
                Display_Primary_Partition_Information_SS();
    
                if ( !error_code ) {
-                  Color_Print_At( 4, 21, "Primary DOS Partition deleted" );
+                  Color_Print_At( 4, 22, "Primary DOS Partition deleted" );
                }
                else {
-                  Color_Print_At( 4, 21,
-                                  "Error deleting primary DOS Partition" );
+                  Color_Print_At( 4, 22,
+                                  "Error deleting primary DOS Partition!" );
                }
                Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             }

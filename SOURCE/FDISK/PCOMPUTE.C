@@ -57,10 +57,14 @@ unsigned long Number_Of_Cylinders( unsigned long size );
 */
 
 /* Clear the Active Partition */
-void Deactivate_Active_Partition( void )
+int Deactivate_Active_Partition( void )
 {
    int index = 0;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+
+   if ( !pDrive->usable ) {
+      return 99;
+   }
 
    do {
       pDrive->pri_part[index].active_status = 0x00;
@@ -69,6 +73,8 @@ void Deactivate_Active_Partition( void )
 
    pDrive->part_values_changed = TRUE;
    flags.partitions_have_changed = TRUE;
+
+   return 0;
 }
 
 /* unused by now 
@@ -1248,9 +1254,13 @@ unsigned long Max_Pri_Part_Size_In_MB( int type )
 }
 
 /* Modify Partition Type */
-void Modify_Partition_Type( int partition_number, int type_number )
+int Modify_Partition_Type( int partition_number, int type_number )
 {
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+
+   if ( pDrive->usable ) {
+      return 99;
+   }
 
    if ( partition_number < 4 ) {
       pDrive->pri_part[partition_number].num_type = type_number;
@@ -1261,6 +1271,8 @@ void Modify_Partition_Type( int partition_number, int type_number )
 
    pDrive->part_values_changed = TRUE;
    flags.partitions_have_changed = TRUE;
+
+   return 0;
 }
 
 /* Calculate number of cylinders */
@@ -1286,12 +1298,16 @@ unsigned long Number_Of_Cylinders( unsigned long size )
 }
 
 /* Transfer partition information from one slot to another */
-void Primary_Partition_Slot_Transfer( int transfer_type, int source,
-                                      int dest )
+int Primary_Partition_Slot_Transfer( int transfer_type, int source,
+                                     int dest )
 {
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    struct Partition temporaryPartition;
+
+   if ( !pDrive->usable ) {
+      return 99;
+   }
 
    source--;
    dest--;
@@ -1317,6 +1333,8 @@ void Primary_Partition_Slot_Transfer( int transfer_type, int source,
 
    pDrive->part_values_changed = TRUE;
    flags.partitions_have_changed = TRUE;
+
+   return 0;
 }
 
 /* Compute the partition type to create. */

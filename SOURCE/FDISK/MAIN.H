@@ -316,6 +316,7 @@ void Reboot_PC( void );
 
 int Print_At( int column, int row, char *, ... );
 int Color_Print_At( int column, int row, char *, ... );
+int Normal_Print_At( int column, int row, char *, ... );
 int BlinkPrintAt( int column, int row, char *format, ... );
 
 ulong GetPercentOfLargeNumber( int percent, ulong number );

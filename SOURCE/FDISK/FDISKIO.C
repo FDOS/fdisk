@@ -83,7 +83,7 @@ void Automatically_Partition_Hard_Drive( void )
            ( brief_partition_table[( flags.drive_number - 128 )][index] !=
              18 ) ) {
          printf(
-            "\nThe hard drive has already been partitioned...Program Terminated.\n" );
+            "\nThe hard drive has already been partitioned.\n" );
          exit( 7 );
       }
 
@@ -136,7 +136,7 @@ void Clear_Flag( int flag_number )
    }
    else {
       printf(
-         "\nSector flagging functions have been disabled...Program Terminated.\n" );
+         "\nSector flagging functions have been disabled.\n" );
       exit( 9 );
    }
 }
@@ -182,7 +182,7 @@ void Create_Alternate_MBR( void )
 
    if ( !file_pointer ) {
       printf(
-         "\nThe \"boot.mbr\" file has not been found...Program Terminated.\n" );
+         "\nThe \"boot.mbr\" file has not been found.\n" );
       exit( 8 );
    }
 
@@ -347,7 +347,7 @@ void Load_External_Lookup_Table( void )
 
          if ( ( index < 0 ) || ( index > 255 ) ) {
             printf(
-               "\nPartition type out of range in line %d of \"fdiskpt.ini\"...Program Terminated.\n",
+               "\nPartition type out of range in line %d of \"fdiskpt.ini\".\n",
                line_counter );
             exit( 9 );
          }
@@ -379,6 +379,7 @@ void Load_External_Lookup_Table( void )
 /* Read and process the fdisk.ini file */
 void Process_Fdiskini_File( void )
 {
+   static char *error_str = "Error encountered on line %d of the \"fdisk.ini\" file.\n";
    //  char char_number[2];
    char command_buffer[20];
    char home_path[255];
@@ -484,7 +485,7 @@ void Process_Fdiskini_File( void )
 
                if ( ( index == 254 ) || ( line_buffer[index] == 0x0a ) ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -547,7 +548,7 @@ void Process_Fdiskini_File( void )
                }
                if ( flags.align_4k == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -564,7 +565,7 @@ void Process_Fdiskini_File( void )
                }
                if ( flags.allow_4gb_fat16 == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -581,7 +582,7 @@ void Process_Fdiskini_File( void )
                }
                if ( flags.allow_abort == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -598,7 +599,7 @@ void Process_Fdiskini_File( void )
                }
                if ( flags.use_ambr == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -615,7 +616,7 @@ void Process_Fdiskini_File( void )
                }
                if ( flags.check_for_extra_cylinder == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -632,7 +633,7 @@ void Process_Fdiskini_File( void )
 
                if ( flags.screen_color == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -650,7 +651,7 @@ void Process_Fdiskini_File( void )
                }
                if ( debug.all == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -667,7 +668,7 @@ void Process_Fdiskini_File( void )
                }
                if ( debug.command_line_arguments == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -684,7 +685,7 @@ void Process_Fdiskini_File( void )
                }
                if ( debug.create_partition == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -701,7 +702,7 @@ void Process_Fdiskini_File( void )
                }
                if ( debug.determine_free_space == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -718,7 +719,7 @@ void Process_Fdiskini_File( void )
                }
                if ( debug.input_routine == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -735,7 +736,7 @@ void Process_Fdiskini_File( void )
                }
                if ( debug.lba == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -752,7 +753,7 @@ void Process_Fdiskini_File( void )
                }
                if ( debug.path == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -769,7 +770,7 @@ void Process_Fdiskini_File( void )
                }
                if ( debug.read_sector == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -787,7 +788,7 @@ void Process_Fdiskini_File( void )
                }
                if ( flags.del_non_dos_log_drives == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -869,7 +870,7 @@ void Process_Fdiskini_File( void )
                }
                if ( debug.emulate_disk == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -891,7 +892,7 @@ void Process_Fdiskini_File( void )
                }
                if ( flags.flag_sector == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -908,7 +909,7 @@ void Process_Fdiskini_File( void )
                }
                if ( flags.label == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -925,7 +926,7 @@ void Process_Fdiskini_File( void )
                }
                if ( flags.lba_marker == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -943,7 +944,7 @@ void Process_Fdiskini_File( void )
 
                if ( flags.monochrome == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -961,7 +962,7 @@ void Process_Fdiskini_File( void )
 
                if ( flags.reboot == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -979,7 +980,7 @@ void Process_Fdiskini_File( void )
 
                if ( flags.set_any_pri_part_active == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -1012,7 +1013,7 @@ void Process_Fdiskini_File( void )
                }
                if ( flags.version == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -1029,7 +1030,7 @@ void Process_Fdiskini_File( void )
                }
                if ( flags.extended_options_flag == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -1047,7 +1048,7 @@ void Process_Fdiskini_File( void )
                }
                if ( debug.write == UNCHANGED ) {
                   printf(
-                     "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                     error_str,
                      line_counter );
                   exit( 3 );
                }
@@ -1057,7 +1058,7 @@ void Process_Fdiskini_File( void )
 
             if ( command_ok == FALSE ) {
                printf(
-                  "Error encountered on line %d of the \"fdisk.ini\" file...Program Terminated.\n",
+                  error_str,
                   line_counter );
                exit( 3 );
             }
@@ -1188,11 +1189,19 @@ void Process_Fdiskini_File( void )
 /* Remove MBR */
 void Remove_MBR( void )
 {
-   Read_Physical_Sectors( ( flags.drive_number ), 0, 0, 1, 1 );
+   if ( Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 ) != 0 ) {
+      printf(
+         "\nError reading MBR sector.\n" );
+      exit( 8 );      
+   }
 
    memset( sector_buffer, 0, 0x1be );
 
-   Write_Physical_Sectors( ( flags.drive_number ), 0, 0, 1, 1 );
+   if ( Write_Physical_Sectors( ( flags.drive_number ), 0, 0, 1, 1 ) != 0 ) {
+      printf(
+         "\nError writing MBR sector.\n" );
+      exit( 8 );       
+   }
 }
 
 /* Save MBR */
@@ -1202,13 +1211,17 @@ void Save_MBR( void )
 
    FILE *file_pointer;
 
-   Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+   if ( Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 ) != 0 ) {
+      printf(
+         "\nError reading MBR sector.\n" );
+      exit( 8 );      
+   }
 
    file_pointer = fopen( "boot.mbr", "wb" );
 
    if ( !file_pointer ) {
       printf(
-         "\nError opening or creating \"BOOT.MBR\" for writing...Program Terminated.\n" );
+         "\nError opening or creating \"BOOT.MBR\" for writing.\n" );
       exit( 8 );
    }
 
@@ -1229,15 +1242,23 @@ void Save_MBR( void )
 void Set_Flag( int flag_number, int flag_value )
 {
    if ( flags.flag_sector != 0 ) {
-      Read_Physical_Sectors( ( flags.drive_number ), 0, 0,
-                             ( flags.flag_sector ), 1 );
+      if ( Read_Physical_Sectors( ( flags.drive_number ), 0, 0,
+                             ( flags.flag_sector ), 1 ) != 0 ) {
+         printf(
+            "\nError reading sector.\n" );
+         exit( 8 );
+      }
       sector_buffer[( 446 + ( flag_number - 1 ) )] = flag_value;
-      Write_Physical_Sectors( ( flags.drive_number ), 0, 0,
-                              ( flags.flag_sector ), 1 );
+      if ( Write_Physical_Sectors( ( flags.drive_number ), 0, 0,
+                              ( flags.flag_sector ), 1 ) != 0 ) {
+         printf(
+            "\nError writing sector.\n" );
+         exit( 8 );
+      }
    }
    else {
       printf(
-         "\nSector flagging functions have been disabled...Program Terminated.\n" );
+         "\nSector flagging functions have been disabled.\n" );
       exit( 9 );
    }
 }
@@ -1246,12 +1267,16 @@ void Set_Flag( int flag_number, int flag_value )
 int Test_Flag( int flag_number )
 {
    if ( flags.flag_sector != 0 ) {
-      Read_Physical_Sectors( ( flags.drive_number ), 0, 0,
-                             ( flags.flag_sector ), 1 );
+      if ( Read_Physical_Sectors( ( flags.drive_number ), 0, 0,
+                             ( flags.flag_sector ), 1 ) != 0 ) {
+         printf(
+            "\nError reading sector.\n" );
+         exit( 8 );
+      }
    }
    else {
       printf(
-         "\nSector flagging functions have been disabled...Program Terminated.\n" );
+         "\nSector flagging functions have been disabled.\n" );
       exit( 9 );
    }
    return ( sector_buffer[( 446 + flag_number - 1 )] );

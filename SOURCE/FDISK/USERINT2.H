@@ -40,7 +40,6 @@ void Interactive_User_Interface( void );
 void List_Partition_Types( void );
 void Menu_Routine( void );
 void Modify_Extended_Partition_Information( int logical_drive_number );
-void Modify_Partition_Type( int partition_number, int type_number );
 void Modify_Primary_Partition_Information( int logical_drive );
 void Pause( void );
 void Position_Cursor( int row, int column );
