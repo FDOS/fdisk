@@ -828,7 +828,7 @@ void main( int argc, char *argv[] )
                if ( !Set_Active_Partition( (int)( arg[0].value - 1 ) ) ) {
                   printf(
                      "\nCan not activate partition.\n" );
-                  exit( 8 );
+                  exit( 9 );
                }
                command_ok = TRUE;
 
@@ -858,7 +858,7 @@ void main( int argc, char *argv[] )
             if ( 0 == strcmp( arg[0].choice, "AUTO" ) ) {
                if ( Automatically_Partition_Hard_Drive() ) {
                   printf( "\nError auto-partitioning hard drive.\n" );
-                  exit( 8 );                   
+                  exit( 9 );                   
                }
                command_ok = TRUE;
 
@@ -875,7 +875,7 @@ void main( int argc, char *argv[] )
 
                if ( Clear_Partition_Table() != 0 ) {
                   printf( "\nError clearing partition table.\n");
-                  exit( 8 );
+                  exit( 9 );
                }
                command_ok = TRUE;
 
@@ -921,7 +921,7 @@ void main( int argc, char *argv[] )
                if ( Deactivate_Active_Partition() != 0 ||
                     Write_Partition_Tables() != 0 ) {
                   printf( "\nError deactivating partition.\n");
-                  exit( 8 );                   
+                  exit( 9 );                   
                }
                command_ok = TRUE;
 

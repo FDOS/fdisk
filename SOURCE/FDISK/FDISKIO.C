@@ -97,7 +97,7 @@ int Automatically_Partition_Hard_Drive( void )
    Determine_Free_Space();
    part_no = Create_Primary_Partition( 6, 2048 );
    if ( part_no == 99 ) {
-      return error_code;
+      return part_no;
    }
    error_code = Set_Active_Partition( part_no );
 
@@ -181,8 +181,8 @@ int Create_Alternate_MBR( void )
    FILE *file_pointer;
 
    //Qprintf("Create_Alternate_MBR()\n");
-
-   if ( error_code = Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 ) ) {
+   error_code = Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
+   if ( error_code != 0 ) {
       return error_code;
    }
 
@@ -279,7 +279,6 @@ int Create_MBR( void )
    else {
       return Create_BootNormal_MBR(); /* BootEasy disabled */
    }
-   return 0;
 }
 
 /* Create Master Boot Code if it is not present */

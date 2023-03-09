@@ -125,7 +125,7 @@ void Command_Line_Clear_Flag( void )
    else {
       if ( Clear_Flag( (int)arg[0].value ) != 0 ) {
          printf( "\nError clearing flag.\n");
-         exit( 8 );
+         exit( 9 );
       }
 
       printf( "\n" );
@@ -157,7 +157,7 @@ void Command_Line_Create_Extended_Partition( void )
    if ( pDrive->ptr_ext_part ) {
       printf(
          "\nExtended partition already exists.\n" );
-      exit( 8 );
+      exit( 9 );
    }
 
    Determine_Free_Space();
@@ -192,7 +192,7 @@ void Command_Line_Create_Extended_Partition( void )
 
    if ( error_code == 99 ) {
       printf( "\nError creating extended partition.\n" );
-      exit( 8 );
+      exit( 9 );
    }
 
    Shift_Command_Line_Options( 1 );
@@ -219,7 +219,7 @@ void Command_Line_Create_Logical_DOS_Drive( void )
    if ( !pDrive->ext_usable ) {
       printf(
          "\nNo usable extended partition found.\n" );
-      exit( 8 );
+      exit( 9 );
    }
 
    Determine_Free_Space();
@@ -263,7 +263,7 @@ void Command_Line_Create_Logical_DOS_Drive( void )
 
    if ( error_code == 99 ) {
       printf( "\nError creating logical drive.\n" );
-      exit( 8 );
+      exit( 9 );
    }
 
    Shift_Command_Line_Options( option_count );
@@ -326,7 +326,7 @@ void Command_Line_Create_Primary_Partition( void )
    part_no = Create_Primary_Partition( part_type, arg[0].value );
    if ( part_no == 99 ) {
       printf( "\nError creating primary partition.\n" );
-      exit( 8 );
+      exit( 9 );
    }
 
    Set_Active_Partition_If_None_Is_Active( part_no );
@@ -377,7 +377,7 @@ void Command_Line_Delete( void )
       }
       if ( error_code == 99 ) {
          printf( "\nError deleting primary partition.\n" );
-         exit( 8 );
+         exit( 9 );
       }
    } /* end PRI */
 
@@ -387,7 +387,7 @@ void Command_Line_Delete( void )
 
       if ( error_code == 99 ) {
          printf( "\nError deleting extended partition.\n" );
-         exit( 8 );
+         exit( 9 );
       }
    }
 
@@ -426,7 +426,7 @@ void Command_Line_Delete( void )
 
    if ( error_code != 0 ) {
       printf( "\nError deleting logical drive.\n" );
-      exit( 8 );
+      exit( 9 );
    }
 
    Shift_Command_Line_Options( 2 );
@@ -462,7 +462,7 @@ void Command_Line_Modify( void )
    if ( Modify_Partition_Type( (int)( arg[0].value - 1 ), arg[0].extra_value ) != 0 ) {
       printf(
          "\nError modifying partition type.\n" );
-      exit( 8 );      
+      exit( 9 );      
    }
 
    Shift_Command_Line_Options( 1 );
@@ -486,7 +486,7 @@ void Command_Line_Move( void )
    if ( Primary_Partition_Slot_Transfer( MOVE, (int)arg[0].value,
                                     arg[0].extra_value ) != 0 ) {
       printf( "\nError moving partition slot.\n" );
-      exit( 8 );   
+      exit( 9 );   
     }
 
    Shift_Command_Line_Options( 1 );
@@ -511,7 +511,7 @@ void Command_Line_Set_Flag( void )
 
    if ( Set_Flag( (int)arg[0].value, arg[0].extra_value ) != 0 ) {
       printf( "\nError setting flag.\n" );
-      exit( 8 );      
+      exit( 9 );      
    }
 
    printf( "\nFlag %d has been set to ", arg[0].value );
@@ -550,7 +550,7 @@ void Command_Line_Swap( void )
    if ( Primary_Partition_Slot_Transfer( SWAP, (int)arg[0].value,
                                     arg[0].extra_value ) != 0 ) {
       printf( "\nError swapping partitions.\n" );
-      exit( 8 );      
+      exit( 9 );      
    }
 
    Shift_Command_Line_Options( 1 );
