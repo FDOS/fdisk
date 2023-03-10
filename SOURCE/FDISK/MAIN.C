@@ -647,6 +647,8 @@ void Reboot_PC( void )
 }
 
 /* Re-Initialize LBA related functions. */
+/* UNUSED */
+#if 0
 void Re_Initialization( void )
 {
    /* Check for interrupt 0x13 extensions (If the proper version is set.) */
@@ -667,6 +669,7 @@ void Re_Initialization( void )
 
    Read_Partition_Tables();
 }
+#endif
 
 /*
 	if the C: drive has not been formatted, and fdisk
@@ -875,7 +878,7 @@ void main( int argc, char *argv[] )
                   exit( 9 );
                }
                command_ok = TRUE;
-               Re_Initialization();
+               Read_Partition_Tables();
                Shift_Command_Line_Options( 1 );
             }
 
@@ -892,7 +895,7 @@ void main( int argc, char *argv[] )
                   exit( 8 );                  
                }
                command_ok = TRUE;
-               Re_Initialization();
+               Read_Partition_Tables();
                Shift_Command_Line_Options( 1 );
             }
 
