@@ -490,25 +490,26 @@ void Interactive_User_Interface( void )
          if ( !file_pointer ) {
             Color_Print_At(
                4, 22,
-               "\nUnable to find the \"boot.mbr\" file...MBR has not been created.\n" );
+               "\nUnable to find the \"boot.mbr\" file...MBR has not been loaded.\n" );
          }
          else {
-            Create_Alternate_IPL();
+            Load_MBR( 0 );
             Color_Print_At( 4, 22,
                             "MBR has been written using \"boot.mbr\"" );
+            Read_Partition_Tables();
          }
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
 
       if ( menu == SMBR ) {
-         Save_IPL();
+         Save_MBR();
          Color_Print_At( 4, 22, "MBR has been saved to \"boot.mbr\"" );
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
 
       if ( menu == RMBR ) {
          Remove_IPL();
-         Color_Print_At( 4, 22, "MBR has been removed from the hard disk." );
+         Color_Print_At( 4, 22, "Boot code has been removed from MBR." );
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
 
@@ -665,10 +666,10 @@ int Standard_Menu( int menu )
       if ( menu == MBR ) {
          maximum_number_of_options = 4;
          strcpy( title, "MBR Maintenance" );
-         strcpy( option_1, "Create BootEasy MBR" );
-         strcpy( option_2, "Create MBR using the saved file" );
-         strcpy( option_3, "Save the MBR to a file" );
-         strcpy( option_4, "Remove the MBR from the disk" );
+         strcpy( option_1, "Create BootEasy MBR (disabled)" );
+         strcpy( option_2, "Load MBR (partitions and code) from saved file" );
+         strcpy( option_3, "Save the MBR (partitions and code) to a file" );
+         strcpy( option_4, "Remove boot code from the MBR" );
       }
 
       /* Display Program Name and Copyright Information */

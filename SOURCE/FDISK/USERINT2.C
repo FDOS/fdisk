@@ -274,7 +274,7 @@ int Create_DOS_Partition_Interface( int type )
          Print_UL_B( maximum_partition_size_in_MB );
       }
       else {
-         Color_Printf( "%4d", maximum_partition_size_in_MB );
+         Color_Printf( "%7lu", maximum_partition_size_in_MB );
       }
 
       printf( " Mbytes " );
@@ -467,7 +467,7 @@ int Create_Logical_Drive_Interface( void )
 
          if ( ( flags.version == 4 ) || ( flags.version == 5 ) ||
               ( flags.version == 6 ) ) {
-            Color_Printf( "%4d", pDrive->ext_part_size_in_MB );
+            Color_Printf( "%7lu", pDrive->ext_part_size_in_MB );
          }
          else {
             Print_UL_B( pDrive->ext_part_size_in_MB );
@@ -479,7 +479,7 @@ int Create_Logical_Drive_Interface( void )
 
          if ( ( flags.version == 4 ) || ( flags.version == 5 ) ||
               ( flags.version == 6 ) ) {
-            Color_Printf( "%4d", maximum_partition_size_in_MB );
+            Color_Printf( "%7lu", maximum_partition_size_in_MB );
          }
          else {
             Print_UL_B( maximum_partition_size_in_MB );
@@ -1180,7 +1180,7 @@ void Display_Extended_Partition_Information_SS( void )
    }
    else {
       Color_Printf(
-         "%4d",
+         "%7lu",
          ( part_table[flags.drive_number - 128].ext_part_size_in_MB ) );
    }
    printf( " Mbytes (1 Mbyte = 1048576 bytes)" );
@@ -1468,11 +1468,11 @@ void Display_Primary_Partition_Information_SS( void )
                Print_At( 51, ( cursor_offset + 9 ), "%3d%%", usage );
 
                /* Starting Cylinder */
-               Print_At( 59, ( cursor_offset + 9 ), "%4d",
+               Print_At( 60, ( cursor_offset + 9 ), "%6lu",
                          pDrive->pri_part[index].start_cyl );
 
                /* Ending Cylinder */
-               Print_At( 69, ( cursor_offset + 9 ), "%4d",
+               Print_At( 69, ( cursor_offset + 9 ), "%6lu",
                          pDrive->pri_part[index].end_cyl );
 
                cursor_offset++;
@@ -1492,7 +1492,7 @@ void Display_Primary_Partition_Information_SS( void )
       Print_UL_B( pDrive->total_disk_size_in_MB );
    }
    else {
-      Color_Printf( "%4d", pDrive->total_disk_size_in_MB );
+      Color_Printf( "%7lu", pDrive->total_disk_size_in_MB );
    }
 
    printf( " Mbytes (1 Mbyte = 1048576 bytes)" );
@@ -1607,11 +1607,11 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
       Print_At( 51, 9, "%3d%%", usage );
 
       /* Starting Cylinder */
-      Print_At( 59, 9, "%4d",
+      Print_At( 60, 9, "%6lu",
                 pDrive->log_drive[logical_drive_number].start_cyl );
 
       /* Ending Cylinder */
-      Print_At( 69, 9, "%4d",
+      Print_At( 69, 9, "%6lu",
                 pDrive->log_drive[logical_drive_number].end_cyl );
 
       Print_At( 4, 12, "Choose one of the following:" );
@@ -1741,10 +1741,10 @@ void Modify_Primary_Partition_Information( int partition_number )
       Print_At( 51, 9, "%3d%%", usage );
 
       /* Starting Cylinder */
-      Print_At( 59, 9, "%4d", pDrive->pri_part[partition_number].start_cyl );
+      Print_At( 60, 9, "%6lu", pDrive->pri_part[partition_number].start_cyl );
 
       /* Ending Cylinder */
-      Print_At( 69, 9, "%4d", pDrive->pri_part[partition_number].end_cyl );
+      Print_At( 69, 9, "%6lu", pDrive->pri_part[partition_number].end_cyl );
 
       Print_At( 4, 12, "Choose one of the following:" );
 

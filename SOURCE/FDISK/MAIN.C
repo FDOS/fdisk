@@ -693,6 +693,14 @@ void int24_init( void )
    atexit( restore_int24 );
 }
 
+void Ensure_Drive_Number( void ) {
+   if ( flags.using_default_drive_number == TRUE ) {
+      printf(
+         "\nNo drive number has been entered.\n" );
+      exit( 9 );
+   }   
+}
+
 /*
 /////////////////////////////////////////////////////////////////////////////
 //  MAIN ROUTINE
@@ -845,17 +853,6 @@ void main( int argc, char *argv[] )
                */
             }
 
-            if ( 0 == strcmp( arg[0].choice, "ALTIPL" ) ) {
-               flags.use_iui = FALSE;
-               if ( Create_Alternate_IPL() != 0 ) {
-                  printf(
-                     "\nError installing alternate MBR.\n" );
-                  exit( 8 );                  
-               }
-               command_ok = TRUE;
-               Shift_Command_Line_Options( 1 );
-            }
-
             if ( 0 == strcmp( arg[0].choice, "AUTO" ) ) {
                flags.use_iui = FALSE;
                if ( Automatically_Partition_Hard_Drive() ) {
@@ -870,10 +867,7 @@ void main( int argc, char *argv[] )
          case 'C': {
             if ( 0 == strcmp( arg[0].choice, "CLEAR" ) ) {
                flags.use_iui = FALSE;
-               if ( flags.using_default_drive_number == TRUE ) {
-                  printf( "\nNo drive number has been entered.\n" );
-                  exit( 9 );
-               }
+               Ensure_Drive_Number();
 
                if ( Clear_Partition_Table() != 0 ) {
                   printf( "\nError clearing partition table.\n");
@@ -884,16 +878,13 @@ void main( int argc, char *argv[] )
                Shift_Command_Line_Options( 1 );
             }
 
-            if ( 0 == strcmp( arg[0].choice, "CLEARALL" ) ) {
+            if ( 0 == strcmp( arg[0].choice, "CLEARALL" ) ||
+                 0 == strcmp( arg[0].choice, "CLEARMBR" ) ) {
                flags.use_iui = FALSE;
-               if ( flags.using_default_drive_number == TRUE ) {
-                  printf(
-                     "\nNo drive number has been entered.\n" );
-                  exit( 9 );
-               }
+               Ensure_Drive_Number();
 
                if ( Clear_Entire_Sector_Zero() != 0 ) {
-                  printf( "\nError clearing sector 0.\n");
+                  printf( "\nError clearing MBR sector.\n");
                   exit( 8 );                  
                }
                command_ok = TRUE;
@@ -909,6 +900,8 @@ void main( int argc, char *argv[] )
 
             if ( 0 == strcmp( arg[0].choice, "CLEARIPL" ) ) {
                flags.use_iui = FALSE;
+               Ensure_Drive_Number();
+
                if ( Remove_IPL() != 0 ) {
                   printf(" \nError removing IPL.\n" );
                   exit( 8 );                  
@@ -943,6 +936,8 @@ void main( int argc, char *argv[] )
 
             if ( 0 == strcmp( arg[0].choice, "DELETE" ) ) {
                flags.use_iui = FALSE;
+               Ensure_Drive_Number();
+
                Command_Line_Delete();
                command_ok = TRUE;
             }
@@ -981,6 +976,8 @@ void main( int argc, char *argv[] )
 
             if ( 0 == strcmp( arg[0].choice, "IPL" ) ) {
                flags.use_iui = FALSE;
+               Ensure_Drive_Number();
+
                if ( Create_MBR() != 0 ) {
                   printf( "\nError writing IPL.\n");
                   exit( 8 );                                    
@@ -991,6 +988,32 @@ void main( int argc, char *argv[] )
          } break;
 
          case 'L': {
+            if ( 0 == strcmp( arg[0].choice, "LOADIPL" ) ) {
+               flags.use_iui = FALSE;
+               Ensure_Drive_Number();
+
+               if ( Load_MBR( 1 ) != 0 ) {
+                  printf(
+                     "\nError installing IPL from file.\n" );
+                  exit( 8 );                  
+               }
+               command_ok = TRUE;
+               Shift_Command_Line_Options( 1 );
+            }
+
+            if ( 0 == strcmp( arg[0].choice, "LOADMBR" ) ) {
+               flags.use_iui = FALSE;
+               Ensure_Drive_Number();
+
+               if ( Load_MBR( 0 ) != 0 ) {
+                  printf(
+                     "\nError installing MBR from file.\n" );
+                  exit( 8 );                  
+               }
+               command_ok = TRUE;
+               Shift_Command_Line_Options( 1 );
+            }
+
             if ( 0 == strcmp( arg[0].choice, "LOG" ) ) {
                flags.use_iui = FALSE;
                Command_Line_Create_Logical_DOS_Drive();
@@ -1011,7 +1034,7 @@ void main( int argc, char *argv[] )
             if ( 0 == strcmp( arg[0].choice, "MBR" ) ) {
                flags.use_iui = FALSE;
                if ( Create_MBR() != 0 ) {
-                  printf("\nError writing IPL.\n");
+                  printf("\nError writing MBR.\n");
                   exit( 8 );
                }
                command_ok = TRUE;
@@ -1086,10 +1109,12 @@ void main( int argc, char *argv[] )
                command_ok = TRUE;
             }
 
-            if ( 0 == strcmp( arg[0].choice, "SAVEIPL" ) ) {
+            if ( 0 == strcmp( arg[0].choice, "SAVEMBR" ) ) {
                flags.use_iui = FALSE;
-               if ( Save_IPL() != 0 ) {
-                  printf( "\nError saving IPL.\n" );
+               Ensure_Drive_Number();
+
+               if ( Save_MBR() != 0 ) {
+                  printf( "\nError saving MBR.\n" );
                   exit( 8 );
                }
                command_ok = TRUE;
@@ -1099,6 +1124,8 @@ void main( int argc, char *argv[] )
 
             if ( 0 == strcmp( arg[0].choice, "SMARTIPL" ) ) {
                flags.use_iui = FALSE;
+               Ensure_Drive_Number();
+
                if ( Create_BootSmart_IPL() != 0 ) {
                   printf( "\nError writing Smart IPL.\n");
                   exit( 8 );
