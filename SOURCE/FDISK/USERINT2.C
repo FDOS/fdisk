@@ -1040,7 +1040,7 @@ void Display_CL_Partition_Table( void )
         ( brief_partition_table[( flags.drive_number - 128 )][5] > 0 ) ) {
       printf( "\nContents of Extended DOS Partition:\n" );
       printf( "Drv Volume Label  Mbytes  System   Usage" );
-      printf( "    Start CHS      End CHS\n" );
+      printf( "    Start CHS       End CHS\n" );
 
       /* Display information for each Logical DOS Drive */
       index = 4;
@@ -1083,7 +1083,7 @@ void Display_CL_Partition_Table( void )
                     pDrive->log_drive[index - 4].start_sect );
 
             /* Ending Cylinder */
-            printf( "%6lu/%03lu/%02lu", pDrive->log_drive[index - 4].end_cyl,
+            printf( " %6lu/%03lu/%02lu", pDrive->log_drive[index - 4].end_cyl,
                     pDrive->log_drive[index - 4].end_head,
                     pDrive->log_drive[index - 4].end_sect );
             printf( "\n" );

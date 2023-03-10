@@ -838,14 +838,16 @@ void main( int argc, char *argv[] )
             }
 
             if ( 0 == strcmp( arg[0].choice, "ACTOK" ) ) {
+               /*
                if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
                   Ask_User_About_FAT32_Support();
                }
+               */
             }
 
-            if ( 0 == strcmp( arg[0].choice, "AMBR" ) ) {
+            if ( 0 == strcmp( arg[0].choice, "ALTIPL" ) ) {
                flags.use_iui = FALSE;
-               if ( Create_Alternate_MBR() != 0 ) {
+               if ( Create_Alternate_IPL() != 0 ) {
                   printf(
                      "\nError installing alternate MBR.\n" );
                   exit( 8 );                  
@@ -905,10 +907,21 @@ void main( int argc, char *argv[] )
                command_ok = TRUE;
             }
 
+            if ( 0 == strcmp( arg[0].choice, "CLEARIPL" ) ) {
+               flags.use_iui = FALSE;
+               if ( Remove_IPL() != 0 ) {
+                  printf(" \nError removing IPL.\n" );
+                  exit( 8 );                  
+               }
+               command_ok = TRUE;
+
+               Shift_Command_Line_Options( 1 );
+            }
+
             if ( 0 == strcmp( arg[0].choice, "CMBR" ) ) {
                flags.use_iui = FALSE;
                if ( Create_MBR() != 0 ) {
-                  printf( "\nError writing MBR.\n");
+                  printf( "\nError writing IPL.\n");
                   exit( 8 );                                    
                }
                command_ok = TRUE;
@@ -965,6 +978,16 @@ void main( int argc, char *argv[] )
                Command_Line_Info();
                command_ok = TRUE;
             }
+
+            if ( 0 == strcmp( arg[0].choice, "IPL" ) ) {
+               flags.use_iui = FALSE;
+               if ( Create_MBR() != 0 ) {
+                  printf( "\nError writing IPL.\n");
+                  exit( 8 );                                    
+               }
+               command_ok = TRUE;
+               Shift_Command_Line_Options( 1 );
+            }
          } break;
 
          case 'L': {
@@ -988,7 +1011,7 @@ void main( int argc, char *argv[] )
             if ( 0 == strcmp( arg[0].choice, "MBR" ) ) {
                flags.use_iui = FALSE;
                if ( Create_MBR() != 0 ) {
-                  printf("\nError writing MBR.\n");
+                  printf("\nError writing IPL.\n");
                   exit( 8 );
                }
                command_ok = TRUE;
@@ -1054,17 +1077,6 @@ void main( int argc, char *argv[] )
                }
                Reboot_PC();
             }
-
-            if ( 0 == strcmp( arg[0].choice, "RMBR" ) ) {
-               flags.use_iui = FALSE;
-               if ( Remove_MBR() != 0 ) {
-                  printf(" \nError removing MBR.\n" );
-                  exit( 8 );                  
-               }
-               command_ok = TRUE;
-
-               Shift_Command_Line_Options( 1 );
-            }
          } break;
 
          case 'S': {
@@ -1074,10 +1086,10 @@ void main( int argc, char *argv[] )
                command_ok = TRUE;
             }
 
-            if ( 0 == strcmp( arg[0].choice, "SMBR" ) ) {
+            if ( 0 == strcmp( arg[0].choice, "SAVEIPL" ) ) {
                flags.use_iui = FALSE;
-               if ( Save_MBR() != 0 ) {
-                  printf( "\nError saving MBR.\n" );
+               if ( Save_IPL() != 0 ) {
+                  printf( "\nError saving IPL.\n" );
                   exit( 8 );
                }
                command_ok = TRUE;
@@ -1085,10 +1097,10 @@ void main( int argc, char *argv[] )
                Shift_Command_Line_Options( 1 );
             }
 
-            if ( 0 == strcmp( arg[0].choice, "SMARTMBR" ) ) {
+            if ( 0 == strcmp( arg[0].choice, "SMARTIPL" ) ) {
                flags.use_iui = FALSE;
-               if ( Create_BootSmart_MBR() != 0 ) {
-                  printf( "\nError writing MBR.\n");
+               if ( Create_BootSmart_IPL() != 0 ) {
+                  printf( "\nError writing Smart IPL.\n");
                   exit( 8 );
                }
                command_ok = TRUE;
@@ -1149,13 +1161,13 @@ void main( int argc, char *argv[] )
          } break;
 
          default: {
-            printf( "\nSyntax Error.\n" );
+            printf( "\nInvalid command or syntax error. Invoke FDISK /? for help.\n" );
             exit( 1 );
          }
          }
 
          if ( command_ok == FALSE ) {
-            printf( "\nSyntax Error.\n" );
+            printf( "\nInvalid command or syntax error. Invoke FDISK /? for help.\n" );
             exit( 1 );
          }
 

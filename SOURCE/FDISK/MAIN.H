@@ -57,14 +57,14 @@
 /* *****   Win 98          8                 */
 /* *****   FreeDOS:        100               */
 
-//#define SIZE_OF_MBR 445
+//#define SIZE_OF_IPL 445
 /* ***** This is the number of bytes for the */
 /* ***** boot code in the partition table.   */
 /* ***** If the boot code in the partition   */
 /* ***** table changes, this WILL need       */
 /* ***** changed.  (Start the count at 0.)   */
 // sectorsize - 4 tables - '55aa' - signature
-#define SIZE_OF_MBR ( 512 - 4 * 16 - 2 - 6 )
+#define SIZE_OF_IPL ( 512 - 4 * 16 - 2 - 6 )
 
 #define EMULATED_CYLINDERS 15000
 //#define EMULATED_CYLINDERS   784

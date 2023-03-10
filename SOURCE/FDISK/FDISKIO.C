@@ -173,7 +173,7 @@ int Clear_Partition_Table( void )
 }
 
 /* Create Alternate Master Boot Code */
-int Create_Alternate_MBR( void )
+int Create_Alternate_IPL( void )
 {
    FILE *file_pointer;
    char home_path[255];
@@ -181,28 +181,37 @@ int Create_Alternate_MBR( void )
    int error_code;
    int c;
 
-   //Qprintf("Create_Alternate_MBR()\n");
+   //Qprintf("Create_Alternate_IPL()\n");
    error_code = Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
    if ( error_code != 0 ) {
       return error_code;
    }
 
-   /* Clear old MBR, if any */
-   memset( sector_buffer, 0x00, 0x1be );
+   if ( sector_buffer[0x1fe] == 0x55 && sector_buffer[0x1ff] == 0xaa) {
+      /* Clear old IPL, if any */
+      memset( sector_buffer, 0x00, SIZE_OF_IPL );
+   }
+   else {
+      /* no MBR currently installed, clear whole sector */
+      memset( sector_buffer, 0, sizeof( sector_buffer ) );
+
+      sector_buffer[0x1fe] = 0x55;
+      sector_buffer[0x1ff] = 0xaa;
+   }
 
    strcpy( home_path, path );
-   strcat( home_path, "boot.mbr" );
+   strcat( home_path, "boot.ipl" );
    /* Search the directory Free FDISK resides in before searching the PATH */
    /* in the environment for the boot.mbr file.                            */
    file_pointer = fopen( home_path, "rb" );
 
    if ( !file_pointer ) {
-      file_pointer = fopen( searchpath( "boot.mbr" ), "rb" );
+      file_pointer = fopen( searchpath( "boot.ipl" ), "rb" );
    }
 
    if ( !file_pointer ) {
       printf(
-         "\nThe \"boot.mbr\" file has not been found.\n" );
+         "\nThe \"boot.ipl\" file has not been found.\n" );
       return 8;
    }
 
@@ -211,12 +220,9 @@ int Create_Alternate_MBR( void )
       c = fgetc( file_pointer );
       sector_buffer[index] = ( c != EOF ) ? c : 0;
       index++;
-   } while ( index < 0x1be );
+   } while ( index < SIZE_OF_IPL );
 
    fclose( file_pointer );
-
-   sector_buffer[0x1fe] = 0x55;
-   sector_buffer[0x1ff] = 0xaa;
 
    error_code = Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
 
@@ -229,7 +235,7 @@ void Create_BootEasy_MBR( void )
 {
    Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
 
-   memcpy( sector_buffer, booteasy_code, SIZE_OF_MBR );
+   memcpy( sector_buffer, booteasy_code, SIZE_OF_IPL );
 
    sector_buffer[0x1fe] = 0x55;
    sector_buffer[0x1ff] = 0xaa;
@@ -247,16 +253,21 @@ int Create_BootNormal_MBR( void )
       return error_code;
    }
 
-   memcpy( sector_buffer, bootnormal_code, SIZE_OF_MBR );
+   if ( sector_buffer[0x1fe] != 0x55 || sector_buffer[0x1ff] != 0xaa) {
+      /* no MBR currently installed, clear whole sector */
+      memset( sector_buffer, 0, sizeof( sector_buffer ) );
 
-   sector_buffer[0x1fe] = 0x55;
-   sector_buffer[0x1ff] = 0xaa;
+      sector_buffer[0x1fe] = 0x55;
+      sector_buffer[0x1ff] = 0xaa;
+   }
+
+   memcpy( sector_buffer, bootnormal_code, SIZE_OF_IPL );
 
    return Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
 }
 
 /* Create Normal MBR */
-int Create_BootSmart_MBR( void )
+int Create_BootSmart_IPL( void )
 {
    int error_code;
 
@@ -267,10 +278,15 @@ int Create_BootSmart_MBR( void )
       return error_code;
    }
 
-   fmemcpy( sector_buffer, BootSmart_code, SIZE_OF_MBR );
+   if ( sector_buffer[0x1fe] != 0x55 || sector_buffer[0x1ff] != 0xaa) {
+      /* no MBR currently installed, clear whole sector */
+      memset( sector_buffer, 0, sizeof( sector_buffer ) );
 
-   sector_buffer[0x1fe] = 0x55;
-   sector_buffer[0x1ff] = 0xaa;
+      sector_buffer[0x1fe] = 0x55;
+      sector_buffer[0x1ff] = 0xaa;
+   }
+
+   fmemcpy( sector_buffer, BootSmart_code, SIZE_OF_IPL );
 
    return Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
 }
@@ -280,7 +296,7 @@ int Create_MBR( void )
 {
 
    if ( flags.use_ambr == TRUE ) {
-      return Create_Alternate_MBR();
+      return Create_Alternate_IPL();
    }
    else {
       return Create_BootNormal_MBR(); /* BootEasy disabled */
@@ -296,7 +312,7 @@ int Create_MBR_If_Not_Present( void )
    if ( error_code != 0 ) {
       return error_code;
    }
-   if ( ( sector_buffer[0x1fe] != 0x55 ) &&
+   if ( ( sector_buffer[0x1fe] != 0x55 ) ||
         ( sector_buffer[0x1ff] != 0xaa ) ) {
       return Create_MBR();
    }
@@ -1223,7 +1239,7 @@ void Process_Fdiskini_File( void )
 }
 
 /* Remove MBR */
-int Remove_MBR( void )
+int Remove_IPL( void )
 {
    int error_code;
 
@@ -1232,14 +1248,14 @@ int Remove_MBR( void )
       return error_code;    
    }
 
-   memset( sector_buffer, 0, 0x1be );
+   memset( sector_buffer, 0, SIZE_OF_IPL );
 
    return Write_Physical_Sectors( ( flags.drive_number ), 0, 0, 1, 1 );
 
 }
 
 /* Save MBR */
-int Save_MBR( void )
+int Save_IPL( void )
 {
    int index = 0;
    int error_code;
@@ -1251,7 +1267,7 @@ int Save_MBR( void )
       return error_code;     
    }
 
-   file_pointer = fopen( "boot.mbr", "wb" );
+   file_pointer = fopen( "boot.ipl", "wb" );
 
    if ( !file_pointer ) {
       return 8;
@@ -1262,7 +1278,7 @@ int Save_MBR( void )
          return 8;
       }
       index++;
-   } while ( index < 0x1be );
+   } while ( index < SIZE_OF_IPL );
 
    do {
       if ( fputc( 0, file_pointer ) == EOF ) {

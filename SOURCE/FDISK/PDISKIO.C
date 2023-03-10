@@ -1385,7 +1385,7 @@ int Write_Partition_Tables( void )
 
       if ( *(unsigned short *)sector_buffer + 510 != 0x55AA ) {
          /* install MBR code if we install a new MBR */
-         memcpy( sector_buffer, bootnormal_code, SIZE_OF_MBR );
+         memcpy( sector_buffer, bootnormal_code, SIZE_OF_IPL );
       }
 
       Clear_Partition_Table_Area_Of_Sector_Buffer();

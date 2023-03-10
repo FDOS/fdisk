@@ -44,7 +44,7 @@ void Display_Help_Screen( void )
 
    printf( "%-20s                   %40s\n", name, version );
    printf( "Syntax: FDISK [argument]...\n" );
-   printf( "                    Runs in interactive mode.\n", filename,
+   printf( "  no argument       Runs in interactive mode\n", filename,
            name );
    printf(
       "  /INFO             Displays partition information from <drive#>\n" );
@@ -53,8 +53,8 @@ void Display_Help_Screen( void )
    printf( "\n" );
    printf("Commands for creating and deleting partitions:\n" );
    printf("    <size> is a number for megabytes or MAX for maximum size\n" );
-   printf("           or number,100 for number to be in percent\n" );
-   printf("    <type#> is a numeric partition type or FAT-12/16/32 if not given\n\n" );
+   printf("           or <number>,100 for <number> to be in percent\n" );
+   printf("    <type#> is a numeric partition type or FAT-12/16/32 if /SPEC not given\n\n" );
    printf(
       "  /PRI:<size> [/SPEC:<type#>] [drive#]     Creates a primary partition\n" );
    printf(
@@ -68,11 +68,11 @@ void Display_Help_Screen( void )
    printf( "\n" );
    printf( "  /DELETE {/PRI[:#] | /EXT | /LOG:<part#>  Deletes a partition\n" );
    printf(
-      "           | /NUM:<partition#>} [drive#]   Logical drives start at /NUM=5\n" );
+      "           | /NUM:<part#>} [drive#]        ...logical drives start at /NUM=5\n" );
    printf(
-      "  /CLEAR [drive#]                          Deletes all Partitions\n" );
+      "  /CLEAR [drive#]                          Deletes all Partitions from <drive#>\n" );
    printf(
-      "  /CLEARALL [drive#]                       Deletes whole MBR incl. partitions\n" );
+      "  /CLEARALL [drive#]                       Deletes all Partitions and IPL\n" );
    if ( flags.do_not_pause_help_information == FALSE ) {
       Pause();
    }
@@ -83,35 +83,36 @@ void Display_Help_Screen( void )
    printf(
       "  /DEACTIVATE [drive#]                 Deactivates all partitions\n\n" );
    printf( "MBR (Master Boot Record) modification:\n" );
-   printf( "  /MBR [drive#]       Writes the standard MBR to <drive#>\n" );
+   printf( "  /IPL      [drive#]       Writes the standard boot code into MBR <drive#>\n" );
+   printf("                           ...also as /MBR or /CMBR for compatibility\n");
 /*   printf( "  /BMBR [drive#]     \"    \"  BOOTEASY MBR to <drive#>\n" ); */
-   printf( "  /SMARTMBR [drive#]  Writes DriveSmart MBR to <drive#>\n" );
+   printf( "  /SMARTIPL [drive#]       Writes DriveSmart IPL into MBR <drive#>\n" );
    printf(
-      "  /AMBR [drive#]      Writes MBR stored in the \"boot.mbr\" file\n" );
+      "  /ALTIPL   [drive#]       Writes 440 bytes from IPL in \"boot.ipl\" file to MBR\n" );
    printf(
-      "  /SMBR [drive#]      Saves the current MBR on <drive#> into a \"boot.mbr\" file\n" );
-   printf( "  /RMBR [drive#]      Removes the MBR from <drive#>\n" );
+      "  /SAVEIPL  [drive#]       Saves IPL from MBR on <drive#> into \"boot.ipl\" file\n" );
+   printf( "  /CLEARIPL [drive#]       Removes the IPL from MBR <drive#>\n" );
 
    printf( "\nPartition table modification\n" );
    printf(
-      "  /MODIFY:<part#>,<type#> [drive#]       Changes partition type to <type#>\n" );
+      "  /MODIFY:<part#>,<type#> [drive#]           Changes partition type to <type#>\n" );
    printf(
-      "                                         ...logical drives start at \"5\"\n" );
+      "                                             ...logical drives start at \"5\"\n" );
    printf(
-      "  /MOVE:<srcpart#>,<destpart#> [drive#]  Moves primary partitions\n" );
+      "  /MOVE:<srcpart#>,<destpart#> [drive#]      Moves primary partitions\n" );
    printf(
-      "  /SWAP:<1stpart#>,<2ndpart#>  [drive#]  Swaps primary partitions\n" );
+      "  /SWAP:<1stpart#>,<2ndpart#>  [drive#]      Swaps primary partitions\n" );
 
    printf( "\nFor handling flags on a hard disk:\n" );
    printf(
-      "  /CLEARFLAG[{:<flag#>} | /ALL} ] [drive#]   Resets <flag#> or all on <drive#>\n" );
+      "  /CLEARFLAG[{:<flag#>} | /ALL}] [drive#]    Resets <flag#> or all on <drive#>\n" );
    printf(
       "  /SETFLAG:<flag#>[,<value>] [drive#]        Sets <flag#> to 1 or <value>\n" );
    printf(
       "  /TESTFLAG:<flag#>[,<value>] [drive#]       Tests <flag#> for 1 or <value>\n" );
 
    if ( flags.do_not_pause_help_information == FALSE ) {
-      printf("\n\n");
+      printf("\n");
       Pause();
    }
 

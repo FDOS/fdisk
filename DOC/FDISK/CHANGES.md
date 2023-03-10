@@ -47,6 +47,9 @@ Other changes:
    not handle it properly. If the user decides to continue the disk size is
    truncated to 2TB, making sure nothing bad happens by some overflowing
    values.
+ - Rename command line /SMBR to /SAVEIPL etc. to avoid confusion of what it
+   does: saving the boot code and NOT saving the whole MBR including the
+   partition table.
  - Adapt user interface to handle larger disks.
  - Support MAX quantifier in command line size arguments.
  - Rework command line argument handling.

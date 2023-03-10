@@ -493,7 +493,7 @@ void Interactive_User_Interface( void )
                "\nUnable to find the \"boot.mbr\" file...MBR has not been created.\n" );
          }
          else {
-            Create_Alternate_MBR();
+            Create_Alternate_IPL();
             Color_Print_At( 4, 22,
                             "MBR has been written using \"boot.mbr\"" );
          }
@@ -501,13 +501,13 @@ void Interactive_User_Interface( void )
       }
 
       if ( menu == SMBR ) {
-         Save_MBR();
+         Save_IPL();
          Color_Print_At( 4, 22, "MBR has been saved to \"boot.mbr\"" );
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
 
       if ( menu == RMBR ) {
-         Remove_MBR();
+         Remove_IPL();
          Color_Print_At( 4, 22, "MBR has been removed from the hard disk." );
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
