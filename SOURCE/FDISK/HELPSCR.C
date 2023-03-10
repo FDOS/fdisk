@@ -47,11 +47,10 @@ void Display_Help_Screen( void )
    printf( "  no argument       Runs in interactive mode\n", filename,
            name );
    printf(
-      "  /INFO             Displays partition information from <drive#>\n" );
+      "  /INFO [<drive#>]  Displays partition information from <drive#>\n" );
    printf( "  /REBOOT           Reboots the Computer\n" );
-   printf( "  /X                Disables ext. INT 13 and LBA for the following commands\n" );
    printf( "\n" );
-   printf("Commands for creating and deleting partitions:\n" );
+   printf("Commands to create and delete partitions:\n" );
    printf("    <size> is a number for megabytes or MAX for maximum size\n" );
    printf("           or <number>,100 for <number> to be in percent\n" );
    printf("    <type#> is a numeric partition type or FAT-12/16/32 if /SPEC not given\n\n" );
@@ -71,29 +70,35 @@ void Display_Help_Screen( void )
       "           | /NUM:<part#>} [drive#]        ...logical drives start at /NUM=5\n" );
    printf(
       "  /CLEAR [drive#]                          Deletes all Partitions from <drive#>\n" );
-   printf(
-      "  /CLEARALL [drive#]                       Deletes all Partitions and IPL\n" );
-   if ( flags.do_not_pause_help_information == FALSE ) {
-      Pause();
-   }
-
    printf("\nSetting active partitions:\n" );
    printf(
-      "  /ACTIVATE:<partition#> [drive#]      Sets <partition#> active\n" );
+      "  /ACTIVATE:<partition#> [drive#]          Sets <partition#> active\n" );
    printf(
-      "  /DEACTIVATE [drive#]                 Deactivates all partitions\n\n" );
-   printf( "MBR (Master Boot Record) modification:\n" );
+      "  /DEACTIVATE [drive#]                     Deactivates all partitions\n" );
+   if ( flags.do_not_pause_help_information == FALSE ) {
+      //printf("\n\n");
+      Pause();
+   }
+   else {
+      printf( "\n" );
+   }
+
+   printf( "MBR (Master Boot Record) management:\n" );
+   printf(
+      "  /CLEARMBR [drive#]       Fills MBR with zero: deletes all part. and code\n" );
+   printf( "  /LOADMBR  [drive#]       Loads part. table and code from \"boot.mbr\" into MBR\n" );
+   printf( "  /SAVEMBR  [drive#]       Saves partition table and code into file \"boot.mbr\"\n\n" );
+   printf( "MBR code modifications leaving partitions intact:\n" );
    printf( "  /IPL      [drive#]       Writes the standard boot code into MBR <drive#>\n" );
-   printf("                           ...also as /MBR or /CMBR for compatibility\n");
+   printf("                           ...same as /MBR and /CMBR for compatibility\n");
+   printf(
+      "  /CLEARIPL [drive#]       Zeros 440 code bytes of MBR\n" );
+   printf(
+      "  /LOADIPL  [drive#]       Writes 440 code bytes from \"boot.mbr\" into MBR\n" );
 /*   printf( "  /BMBR [drive#]     \"    \"  BOOTEASY MBR to <drive#>\n" ); */
    printf( "  /SMARTIPL [drive#]       Writes DriveSmart IPL into MBR <drive#>\n" );
-   printf(
-      "  /ALTIPL   [drive#]       Writes 440 bytes from IPL in \"boot.ipl\" file to MBR\n" );
-   printf(
-      "  /SAVEIPL  [drive#]       Saves IPL from MBR on <drive#> into \"boot.ipl\" file\n" );
-   printf( "  /CLEARIPL [drive#]       Removes the IPL from MBR <drive#>\n" );
 
-   printf( "\nPartition table modification\n" );
+   printf( "\nAdvanced partition table modification:\n" );
    printf(
       "  /MODIFY:<part#>,<type#> [drive#]           Changes partition type to <type#>\n" );
    printf(
@@ -102,7 +107,6 @@ void Display_Help_Screen( void )
       "  /MOVE:<srcpart#>,<destpart#> [drive#]      Moves primary partitions\n" );
    printf(
       "  /SWAP:<1stpart#>,<2ndpart#>  [drive#]      Swaps primary partitions\n" );
-
    printf( "\nFor handling flags on a hard disk:\n" );
    printf(
       "  /CLEARFLAG[{:<flag#>} | /ALL}] [drive#]    Resets <flag#> or all on <drive#>\n" );
@@ -112,7 +116,7 @@ void Display_Help_Screen( void )
       "  /TESTFLAG:<flag#>[,<value>] [drive#]       Tests <flag#> for 1 or <value>\n" );
 
    if ( flags.do_not_pause_help_information == FALSE ) {
-      printf("\n");
+      //printf("\n\n");
       Pause();
    }
 
@@ -123,11 +127,13 @@ void Display_Help_Screen( void )
 
    printf( "\nInteractive user interface switches:\n", name );
    printf(
-      "  /MONO    Forces the user interface to run in monochrome mode.\n" );
-   printf( "  /XO      Enables extended options.\n" );
-   printf( "  /FPRMT   Prompts for FAT32/FAT16 in interactive mode.\n" );
+      "  /MONO         Forces the user interface to run in monochrome mode.\n" );
+   printf( "  /XO           Enables extended options.\n" );
+   printf( "  /FPRMT        Prompts for FAT32/FAT16 in interactive mode.\n" );
+   printf( "\nCompatibility options:\n" );
+   printf( "  /X            Disables ext. INT 13 and LBA for the following commands\n" );
    if ( flags.do_not_pause_help_information == FALSE ) {
-      printf("\n\n\n\n\n\n");
+      printf("\n\n");
    }
    printf(
       "\nThis program is Copyright %s by Brian E. Reifsnyder and\n"

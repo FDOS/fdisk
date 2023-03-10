@@ -173,7 +173,7 @@ int Clear_Partition_Table( void )
 }
 
 /* Create Alternate Master Boot Code */
-int Create_Alternate_IPL( void )
+int Load_MBR( ipl_only )
 {
    FILE *file_pointer;
    char home_path[255];
@@ -181,7 +181,7 @@ int Create_Alternate_IPL( void )
    int error_code;
    int c;
 
-   //Qprintf("Create_Alternate_IPL()\n");
+   //Qprintf("Load_MBR()\n");
    error_code = Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
    if ( error_code != 0 ) {
       return error_code;
@@ -200,27 +200,41 @@ int Create_Alternate_IPL( void )
    }
 
    strcpy( home_path, path );
-   strcat( home_path, "boot.ipl" );
+   strcat( home_path, "boot.mbr" );
    /* Search the directory Free FDISK resides in before searching the PATH */
    /* in the environment for the boot.mbr file.                            */
    file_pointer = fopen( home_path, "rb" );
 
    if ( !file_pointer ) {
-      file_pointer = fopen( searchpath( "boot.ipl" ), "rb" );
+      file_pointer = fopen( searchpath( "boot.mbr" ), "rb" );
    }
 
    if ( !file_pointer ) {
       printf(
-         "\nThe \"boot.ipl\" file has not been found.\n" );
+         "\nThe \"boot.mbr\" file has not been found.\n" );
       return 8;
    }
 
    index = 0;
-   do {
-      c = fgetc( file_pointer );
-      sector_buffer[index] = ( c != EOF ) ? c : 0;
-      index++;
-   } while ( index < SIZE_OF_IPL );
+   if ( ipl_only ) {
+      do {
+         c = fgetc( file_pointer );
+         sector_buffer[index] = ( c != EOF ) ? c : 0;
+         index++;
+      } while ( index < SIZE_OF_IPL );
+   }
+   else {
+      do {
+         c = fgetc( file_pointer );
+         sector_buffer[index] = c;
+
+         if ( c == EOF ) {
+            fclose( file_pointer );
+            return 9;
+         }
+         index++;
+      } while ( index < 512 );      
+   }
 
    fclose( file_pointer );
 
@@ -296,7 +310,7 @@ int Create_MBR( void )
 {
 
    if ( flags.use_ambr == TRUE ) {
-      return Create_Alternate_IPL();
+      return Load_MBR( 1 );
    }
    else {
       return Create_BootNormal_MBR(); /* BootEasy disabled */
@@ -1255,7 +1269,7 @@ int Remove_IPL( void )
 }
 
 /* Save MBR */
-int Save_IPL( void )
+int Save_MBR( void )
 {
    int index = 0;
    int error_code;
@@ -1267,7 +1281,7 @@ int Save_IPL( void )
       return error_code;     
    }
 
-   file_pointer = fopen( "boot.ipl", "wb" );
+   file_pointer = fopen( "boot.mbr", "wb" );
 
    if ( !file_pointer ) {
       return 8;
@@ -1275,13 +1289,6 @@ int Save_IPL( void )
 
    do {
       if ( fputc( sector_buffer[index], file_pointer ) == EOF ) {
-         return 8;
-      }
-      index++;
-   } while ( index < SIZE_OF_IPL );
-
-   do {
-      if ( fputc( 0, file_pointer ) == EOF ) {
          return 8;
       }
       index++;
