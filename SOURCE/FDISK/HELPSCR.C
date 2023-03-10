@@ -47,7 +47,7 @@ void Display_Help_Screen( void )
    printf( "  no argument       Runs in interactive mode\n", filename,
            name );
    printf(
-      "  /INFO [<drive#>]  Displays partition information from <drive#>\n" );
+      "  /INFO [<drive#>]  Displays partition information of <drive#>\n" );
    printf( "  /REBOOT           Reboots the Computer\n" );
    printf( "\n" );
    printf("Commands to create and delete partitions:\n" );
@@ -128,8 +128,8 @@ void Display_Help_Screen( void )
    printf( "\nInteractive user interface switches:\n", name );
    printf(
       "  /MONO         Forces the user interface to run in monochrome mode.\n" );
-   printf( "  /XO           Enables extended options.\n" );
    printf( "  /FPRMT        Prompts for FAT32/FAT16 in interactive mode.\n" );
+   printf( "  /XO           Enables extended options.\n" );
    printf( "\nCompatibility options:\n" );
    printf( "  /X            Disables ext. INT 13 and LBA for the following commands\n" );
    if ( flags.do_not_pause_help_information == FALSE ) {
