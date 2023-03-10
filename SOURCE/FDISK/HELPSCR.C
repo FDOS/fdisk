@@ -43,84 +43,94 @@ void Display_Help_Screen( void )
    strcat( version, VERSION );
 
    printf( "%-20s                   %40s\n", name, version );
-   printf( "Syntax:\n" );
+   printf( "Syntax: FDISK [argument]...\n" );
    printf( "                    Runs in interactive mode.\n", filename,
            name );
    printf(
       "  /INFO             Displays partition information from <drive#>\n" );
    printf( "  /REBOOT           Reboots the Computer\n" );
+   printf( "  /X                Disables ext. INT 13 and LBA for the following commands\n" );
    printf( "\n" );
+   printf("Commands for creating and deleting partitions:\n" );
+   printf("    <size> is a number for megabytes or MAX for maximum size\n" );
+   printf("           or number,100 for number to be in percent\n" );
+   printf("    <type#> is a numeric partition type or FAT-12/16/32 if not given\n\n" );
    printf(
-      "Creating primary partitions and logical drives: sizes in MB or [,100] in percent" );
+      "  /PRI:<size> [/SPEC:<type#>] [drive#]     Creates a primary partition\n" );
    printf(
-      "  /PRI:<size>[,100] [/SPEC:<type#>] [drive#] Creates a primary partition\n" );
+      "  /EXT:<size> [drive#]                     Creates an Extended DOS Partition\n" );
    printf(
-      "  /EXT:<size>[,100]                 [drive#] Creates an Extended DOS Partition\n" );
+      "  /LOG:<size> [/SPEC:<type#>] [drive#]     Creates a logical drive\n" );
    printf(
-      "  /LOG:<size>[,100] [/SPEC:<type#>] [drive#] Creates a logical drive\n" );
+      "  /PRIO,/EXTO,/LOGO                        same as above, but avoids FAT32\n" );
    printf(
-      "  /PRIO,/EXTO,/LOGO                          same as above, but avoids FAT32\n" );
-   printf(
-      "  /AUTO [drive#]                   Automatically partitions the disk\n" );
+      "  /AUTO [drive#]                           Automatically partitions the disk\n" );
    printf( "\n" );
-   printf( "Activating/Deactivating partition tables\n" );
-   printf( "  /ACTIVATE:<partition#> [drive#]  Sets <partition#> active.\n" );
+   printf( "  /DELETE {/PRI[:#] | /EXT | /LOG:<part#>  Deletes a partition\n" );
    printf(
-      "  /DEACTIVATE            [drive#]  deactivates all partitions on <drive#>\n\n" );
-   printf( "Deleting partitions - USE WITH CAUTION!\n" );
-   printf( "  /CLEAR [drive#]                  Deletes all Partitions.\n" );
+      "           | /NUM:<partition#>} [drive#]   Logical drives start at /NUM=5\n" );
    printf(
-      "  /CLEARALL [drive#]                  \"     \"      \"    tables and MBR.\n" );
-   printf( "  /DELETE {/PRI[:#] | /EXT | /LOG:<partition#>\n" );
+      "  /CLEAR [drive#]                          Deletes all Partitions\n" );
    printf(
-      "           | /NUM:<partition#>} [drive#]   note: Logical drives start at /NUM=5\n" );
+      "  /CLEARALL [drive#]                       Deletes whole MBR incl. partitions\n" );
    if ( flags.do_not_pause_help_information == FALSE ) {
       Pause();
    }
+
+   printf("\nSetting active partitions:\n" );
+   printf(
+      "  /ACTIVATE:<partition#> [drive#]      Sets <partition#> active\n" );
+   printf(
+      "  /DEACTIVATE [drive#]                 Deactivates all partitions\n\n" );
    printf( "MBR (Master Boot Record) modification:\n" );
-   printf( "  /MBR  [drive#]  Writes the standard MBR to <drive#>\n" );
+   printf( "  /MBR [drive#]       Writes the standard MBR to <drive#>\n" );
 /*   printf( "  /BMBR [drive#]     \"    \"  BOOTEASY MBR to <drive#>\n" ); */
-   printf( "  /SMARTMBR [drive#] \"    \"  DriveSmart MBR to <drive#>\n" );
+   printf( "  /SMARTMBR [drive#]  Writes DriveSmart MBR to <drive#>\n" );
    printf(
-      "  /AMBR [drive#]     \"    \"  MBR stored in the \"boot.mbr\" file\n" );
+      "  /AMBR [drive#]      Writes MBR stored in the \"boot.mbr\" file\n" );
    printf(
-      "  /SMBR [drive#]  Saves the current MBR on <drive#>, into a \"boot.mbr\" file.\n" );
-   printf( "  /RMBR [drive#]  Removes the MBR from <drive#>.\n" );
-   printf( "\n" );
-   printf( "Partition table modification\n" );
+      "  /SMBR [drive#]      Saves the current MBR on <drive#> into a \"boot.mbr\" file\n" );
+   printf( "  /RMBR [drive#]      Removes the MBR from <drive#>\n" );
+
+   printf( "\nPartition table modification\n" );
    printf(
-      "  /MODIFY:<partition#>,<type#> [drive#]  Changes partition type to <type#>\n" );
+      "  /MODIFY:<part#>,<type#> [drive#]       Changes partition type to <type#>\n" );
    printf(
-      "                                         Logical drives start at \"5\"\n" );
+      "                                         ...logical drives start at \"5\"\n" );
    printf(
-      "  /MOVE:<source_partition#>,<dest_partition#> [drive#]  Moves or Swaps\n" );
+      "  /MOVE:<srcpart#>,<destpart#> [drive#]  Moves primary partitions\n" );
    printf(
-      "  /SWAP:<first_partition#>,<second_partition#> [drive#] primary partitions\n" );
+      "  /SWAP:<1stpart#>,<2ndpart#>  [drive#]  Swaps primary partitions\n" );
 
    printf( "\nFor handling flags on a hard disk:\n" );
    printf(
-      "  /CLEARFLAG[{:<flag#>} | /ALL} ] [drive#] Resets <flag#> or all on <drive#>\n" );
+      "  /CLEARFLAG[{:<flag#>} | /ALL} ] [drive#]   Resets <flag#> or all on <drive#>\n" );
    printf(
-      "  /SETFLAG:<flag#>[,<flag_value>] [drive#] Sets <flag#> to 1 or <flag_value>\n" );
+      "  /SETFLAG:<flag#>[,<value>] [drive#]        Sets <flag#> to 1 or <value>\n" );
    printf(
-      "  /TESTFLAG:<flag#>[,<flag_value>] [drive#]Tests <flag#> for 1 or <flag_value>\n" );
+      "  /TESTFLAG:<flag#>[,<value>] [drive#]       Tests <flag#> for 1 or <value>\n" );
+
+   if ( flags.do_not_pause_help_information == FALSE ) {
+      printf("\n\n");
+      Pause();
+   }
+
    printf( "\nFor obtaining information about the hard disk(s):\n" );
    printf( "  /STATUS       Displays the current partition layout.\n" );
    printf(
       "  /DUMP         Dumps partition information from all hard disks(for debugging)\n" );
-   if ( flags.do_not_pause_help_information == FALSE ) {
-      Pause();
-   }
-   printf( "Interactive user interface switches:\n", name );
+
+   printf( "\nInteractive user interface switches:\n", name );
    printf(
       "  /MONO    Forces the user interface to run in monochrome mode.\n" );
    printf( "  /XO      Enables extended options.\n" );
    printf( "  /FPRMT   Prompts for FAT32/FAT16 in interactive mode.\n" );
-   printf( "  /X       Do not use LBA partitions.\n" );
-   printf( "\n" );
+   if ( flags.do_not_pause_help_information == FALSE ) {
+      printf("\n\n\n\n\n\n");
+   }
    printf(
-      "This program is Copyright %s, by Brian E. Reifsnyder and\n"
-      "The FreeDOS Community, under the terms of the GNU General Public License,\n",
+      "\nThis program is Copyright %s by Brian E. Reifsnyder and\n"
+      "The FreeDOS Community under the terms of the GNU General Public License,\n",
       COPYLEFT );
    printf( "version 2.\n" );
    printf(
