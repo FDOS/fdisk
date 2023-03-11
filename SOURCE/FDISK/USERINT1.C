@@ -616,7 +616,7 @@ int Standard_Menu( int menu )
       Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
       strcpy( program_name, FD_NAME );
-      strcat( program_name, "     Version " );
+      strcat( program_name, " V" );
       strcat( program_name, VERSION );
 
       strcpy( program_description, "Fixed Disk Setup Program" );

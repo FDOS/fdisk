@@ -770,11 +770,13 @@ void Delete_Primary_DOS_Partition_Interface( void )
       p = &pDrive->pri_part[partition_to_delete];
       if ( Is_Dos_Part( p->num_type ) ) {
 
-         if ( ( input == TRUE ) && ( flags.esc == FALSE ) ) {
-            Print_At( 4, 22,
+         Print_At( 4, 22,
                       "Are you sure (Y/N)..............................? " );
-            flags.esc = FALSE;
-            input = (int)Input( 1, 54, 22, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
+         
+         flags.esc = FALSE;
+         input = (int)Input( 1, 54, 22, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
+
+         if ( ( input == TRUE ) && ( flags.esc == FALSE ) ) {
             if ( input ) {
                Clear_Screen( 0 );
    

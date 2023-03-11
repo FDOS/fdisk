@@ -1,7 +1,7 @@
 #ifndef COMPAT_H
 #define COMPAT_H
 
-#ifdef __WATCOMC__
+#if defined(__WATCOMC__)
 
 #define asm __asm
 
@@ -10,6 +10,8 @@
 
 #define setvect _dos_setvect
 #define getvect _dos_getvect
+
+#define far_memcpy _fmemcpy
 
 int biosdisk( unsigned function, unsigned drive, unsigned head,
               unsigned cylinder, unsigned sector, unsigned number_of_sectors,
@@ -24,15 +26,16 @@ void textattr( int color );
 void textcolor( int color );
 void textbackground( int background );
 
-#else /* Borland / Turbo C */
+#elif defined(__TURBOC__) /* Borland / Turbo C */
+
+#define far_memcpy _fmemcpy
 
 #define Color_Print  cputs
 #define Color_Printf cprintf
 
-#endif /* __WATCOMC__ */
-
-int gettextattr( void );
-
 #endif
 
-void fmemcpy( void far *dest, void far *src, unsigned cnt );
+int gettextattr( void );
+/*void far_memcpy( void far *dest, void far *src, unsigned cnt );*/
+
+#endif /* COMPAT_H */
