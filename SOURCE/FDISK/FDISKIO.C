@@ -285,7 +285,7 @@ int Create_BootSmart_IPL( void )
 {
    int error_code;
 
-   printf( "Creating Drive Smart MBR for disk %d\n", flags.drive_number - 0x80 );
+   printf( "Creating Drive Smart MBR for disk %d\n", flags.drive_number - 0x7F );
 
    error_code = Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
    if ( error_code != 0 ) {

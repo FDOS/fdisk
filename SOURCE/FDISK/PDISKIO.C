@@ -1383,7 +1383,7 @@ int Write_Partition_Tables( void )
          return ( error_code );
       }
 
-      if ( *(unsigned short *)(sector_buffer + 510) != 0xAA55 ) {
+      if ( *(unsigned short *)( sector_buffer + 510 ) != 0xAA55 ) {
          /* install MBR code if we install a new MBR */
          memcpy( sector_buffer, bootnormal_code, SIZE_OF_IPL );
       }
