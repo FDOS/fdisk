@@ -23,4 +23,4 @@ move /Y fdisk.exe ..\..\bin\fdiskbor.exe
 @echo
 wmake -h -f makefile.wat clobber
 
-dir ..\..\program
+dir ..\..\bin

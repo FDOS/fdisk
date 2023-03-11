@@ -1,5 +1,5 @@
 
-#ifdef __WATCOMC__
+#if defined(__WATCOMC__)
 
 #include "compat.h"
 #include <bios.h>
@@ -168,7 +168,7 @@ int Color_Print( char *text )
    return (int)( p - text );
 }
 
-#else /* BORLANDC */
+#elif defined(__TURBOC__) /* BORLANDC */
 
 #include <conio.h>
 
@@ -180,12 +180,4 @@ int gettextattr( void )
    return ti.attribute;
 }
 
-#endif /* __WATCOMC__ */
-
-void fmemcpy( void far *dest, void far *src, unsigned cnt )
-{
-   unsigned i;
-   for ( i = 0; i < cnt; i++ ) {
-      ( (unsigned char far *)dest )[i] = ( (unsigned char far *)src )[i];
-   }
-}
+#endif /* __TURBOC__ */

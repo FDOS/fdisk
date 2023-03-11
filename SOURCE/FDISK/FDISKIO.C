@@ -300,7 +300,7 @@ int Create_BootSmart_IPL( void )
       sector_buffer[0x1ff] = 0xaa;
    }
 
-   fmemcpy( sector_buffer, BootSmart_code, SIZE_OF_IPL );
+   far_memcpy( sector_buffer, BootSmart_code, SIZE_OF_IPL );
 
    return Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
 }
