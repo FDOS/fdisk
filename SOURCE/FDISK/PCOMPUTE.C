@@ -531,7 +531,7 @@ int Delete_Extended_Partition( void )
       return 99;
    }
 
-   for ( index = 0; index < 3; index++ ) {
+   for ( index = 0; index < 4; index++ ) {
       p = &pDrive->pri_part[index];
 
       if ( Is_Supp_Ext_Part( p->num_type ) ) {
