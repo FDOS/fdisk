@@ -42,18 +42,25 @@ Bugfixes:
 
 Other changes:
  - Write LBA marker entry 1023/254/63 into CHS partition table entries if
-     CHS value otherwise would overflow.
+   CHS value otherwise would overflow. This may be disabled via config  option
+   LBA_MARKER.
+ - FDISK contains experimental support for aligning partitions to 4K. This may
+   be enabled via config option ALIGN_4K.
  - Warn if user tries to use FDISK with a disk size of >2TB, because it can
    not handle it properly. If the user decides to continue the disk size is
    truncated to 2TB, making sure nothing bad happens by some overflowing
    values.
- - Rename command line /SMBR to /SAVEIPL etc. to avoid confusion of what it
-   does: saving the boot code and NOT saving the whole MBR including the
-   partition table.
  - Adapt user interface to handle larger disks.
- - Support MAX quantifier in command line size arguments.
- - Rework command line argument handling.
  - Free FDISK now compiles with Open Watcom C.
+ - Rework command line argument handling.
+ - /SMBR renamed to /SAVEIPL to avoid confusion of what it does:
+   saving the boot code and NOT saving the whole MBR including the
+   partition table.
+ - /SAVEMBR and /LOADMBR commands save or load a MBR from file. This includes
+   boot code and primary partitions.
+ - /CLEARALL command renamed to /CLEARMBR (still available under old name).
+ - /CLEAR command renamed to /DELETEALL (still available under old name).
+ - Support MAX quantifier in command line size arguments.
 
 
 Version 1.3.4 (2021-02-20)
