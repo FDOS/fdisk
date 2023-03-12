@@ -4,7 +4,7 @@
 #   for verison 1.3.4 and Open Watcom 1.9.
 
 CC       = wcc
-CFLAGS   = -q -0 -mm -bt=dos -w4
+CFLAGS   = -q -0 -ms -bt=dos -w4
 AS       = nasm
 ASFLAGS  = -t -f obj
 LD       = wlink
@@ -31,7 +31,7 @@ CFLAGS += -DFD_FREEDOS=$(FREEDOS)
 
 objs  = main.obj cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pdiskio.obj
 objs += pcompute.obj userint1.obj userint2.obj kitten.obj compat.obj
-objs += int24.obj bootnorm.obj booteasy.obj smartmbr.obj
+objs += int24.obj bootnorm.obj smartmbr.obj
 
 
 all : fdisk.exe test.exe
