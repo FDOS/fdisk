@@ -1,4 +1,4 @@
-# Free FDISK Command Line Symtax
+# Free FDISK Command Line Syntax
 ```
 Syntax: FDISK [argument]...
   no argument       Runs in interactive mode
