@@ -1,5 +1,5 @@
-# FreeDOS FDISK
-FreeDOS FDISK is a tool to manage the partitions on disks of up to
+# Free FDISK
+Free FDISK is a tool to manage the partitions on disks of up to
 2 TiB in size using a Master Boot Record (MBR) partition table.
 
 Please note that the software is targeted at IBM-PC compatible systems running
@@ -16,8 +16,8 @@ systems.
 
 ## Documentation
  - [Build Instructions](DOC/FDISK/INSTALL.md)
- - [Change Log](DOC/FDISK/CHANGES.md).
- - [Command Line Syntax](DOC/FDISK/USAGE.md).
+ - [Change Log](DOC/FDISK/CHANGES.md)
+ - [Command Line Syntax](DOC/FDISK/USAGE.md)
 
 ## Copyright
 
