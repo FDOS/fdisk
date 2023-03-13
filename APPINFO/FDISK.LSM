@@ -1,12 +1,15 @@
 Begin3
 Title:          Fdisk
-Version:        1.3.4a
-Entered-date:   2021-02-22
+Version:        1.3.5
+Entered-date:   2023-03-13
 Description:    Fixed disk partition tool
-Summary:		Fixed disk partition tool to create, delete and view hard disk partitions.
-Keywords:       fdisk, format, hard drive, partition, fat16, fat32, partition, mbr
-Author:         Brian E. Reifsnyder <breifsnyde -at- state.pa.us>
-Maintained-by:
+Summary:        Fixed disk partition tool to create, delete and view hard disk
+                partitions.
+Keywords:       fdisk, format, hard drive, partition, fat16, fat32, partition,
+                mbr
+Author:         Brian E. Reifsnyder <breifsnyde@state.pa.us>
+                Bernd Boeckmann <bernd-freedos@boeckmann.io>
+Maintained-by:  Bernd Boeckmann <bernd-freedos@boeckmann.io>
 Primary-site:   https://github.com/FDOS/fdisk
 Alternate-site:
 Platforms:      DOS, FreeDOS
