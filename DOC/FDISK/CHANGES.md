@@ -24,11 +24,6 @@ Bugfixes:
  - CRITICAL: Fix a partition location and size calculation error triggered
      when creating a new logical partition after deleting the first logical
      partition while there are still logical partitions left (since v1.2.1).
- - CRITICAL: Fix a bug triggered by creating and deleting primary partitions
-     within the same program invocation. The bug resulted from the created
-     flag not being cleared for the partition, making FDISK try to clear the
-     boot sector code for the non-existing partition on quit, leading to
-     unexpected behaviour and potention data loss.
  - CRITICAL: Fix different calculation errors leading to overlapping
      partitions, unnessessary free space between them, or partitions exceeding
      the end of the disk resulting from off-by-one and off-by-two errors.

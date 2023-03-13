@@ -9,16 +9,15 @@ The most significant is that it can not handle disks partitioned by a
 GUID Partition Table (GPT), which is the default on modern UEFI enabled
 systems.
 
-The minimum requirements to run the software are a 8086 compatible CPU, an
-operating system compatible with MS-DOS 3.3 and IBM-AT compatible INT 13H BIOS
-functions.
+## Minimum Requirements
+ - 8086 compatible CPU
+ - MS-DOS 3.3 compatible operating system
+ - IBM-XT compatible PC with 256k RAM and disk controller
 
-For build instructions see [INSTALL.MD](DOC/FDISK/INSTALL.md) in the
-`DOC\FDISK` directory. A history of changes can be found in 
-[CHANGES.MD](DOC/FDISK/CHANGES.md).
-
-A description of the command line symtax can be found in
-[USAGE.MD](DOC/FDISK/USAGE.md).
+## Documentation
+ - [Build Instructions](DOC/FDISK/INSTALL.md)
+ - [Change Log](DOC/FDISK/CHANGES.md).
+ - [Command Line Syntax](DOC/FDISK/USAGE.md).
 
 ## Copyright
 
