@@ -1,5 +1,5 @@
 
-#if defined(__WATCOMC__)
+#if defined( __WATCOMC__ )
 
 #include "compat.h"
 #include <bios.h>
@@ -33,10 +33,7 @@ void textbackground( int background )
    _textattr = _textattr & 0x8f | ( background << 4 ) & 0x70;
 }
 
-int gettextattr( void )
-{
-   return _textattr;
-}
+int gettextattr( void ) { return _textattr; }
 
 /* Watcom C does have biosdisk equivalent _bios_disk */
 int biosdisk( unsigned function, unsigned drive, unsigned head,
@@ -168,7 +165,7 @@ int Color_Print( char *text )
    return (int)( p - text );
 }
 
-#elif defined(__TURBOC__) /* BORLANDC */
+#elif defined( __TURBOC__ ) /* BORLANDC */
 
 #include <conio.h>
 

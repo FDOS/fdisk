@@ -1,7 +1,7 @@
 #ifndef COMPAT_H
 #define COMPAT_H
 
-#if defined(__WATCOMC__)
+#if defined( __WATCOMC__ )
 
 #define asm __asm
 
@@ -26,7 +26,7 @@ void textattr( int color );
 void textcolor( int color );
 void textbackground( int background );
 
-#elif defined(__TURBOC__) /* Borland / Turbo C */
+#elif defined( __TURBOC__ ) /* Borland / Turbo C */
 
 #define far_memcpy _fmemcpy
 

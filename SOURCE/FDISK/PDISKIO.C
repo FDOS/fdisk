@@ -178,15 +178,16 @@ int Is_Ext_Part( int num_type ) { return num_type == 5 || num_type == 0x0f; }
 
 int Is_Dos_Part( int num_type )
 {
-   return num_type == 0x01 ||num_type == 0x04 || num_type == 0x06 || 
+   return num_type == 0x01 || num_type == 0x04 || num_type == 0x06 ||
           num_type == 0x0b || num_type == 0x0c || num_type == 0x0e;
 }
 
 int Is_Supp_Ext_Part( int num_type )
 {
-   return (num_type == 5) || ( num_type == 0x0f && ( flags.version == W95 ||
-                                                 flags.version == W95B ||
-                                                 flags.version == W98 ) );
+   return ( num_type == 5 ) ||
+          ( num_type == 0x0f &&
+            ( flags.version == W95 || flags.version == W95B ||
+              flags.version == W98 ) );
 }
 
 /* Clear the Boot Sector of a partition */
@@ -576,12 +577,9 @@ int Get_Hard_Drive_Parameters( int physical_drive )
    }
 
    if ( user_defined_chs_settings[drive].defined == TRUE ) {
-      pDrive->total_cyl =
-         user_defined_chs_settings[drive].total_cylinders;
-      pDrive->total_head =
-         user_defined_chs_settings[drive].total_heads;
-      pDrive->total_sect =
-         user_defined_chs_settings[drive].total_sectors;
+      pDrive->total_cyl = user_defined_chs_settings[drive].total_cylinders;
+      pDrive->total_head = user_defined_chs_settings[drive].total_heads;
+      pDrive->total_sect = user_defined_chs_settings[drive].total_sectors;
       return 0;
    }
 
@@ -613,7 +611,8 @@ int Get_Hard_Drive_Parameters( int physical_drive )
     mov BYTE PTR total_heads, dh
    }
 
-   if ( flags.total_number_hard_disks == 255 ) {
+   if ( flags.total_number_hard_disks == 255 )
+   {
       flags.total_number_hard_disks = total_number_hard_disks;
    }
    if ( total_number_hard_disks == 0 ) {
@@ -1059,7 +1058,7 @@ static int Read_Primary_Table( int drive, Partition_Table *pDrive,
       p++;
       entry_offset += 16;
    }
- 
+
    return 0;
 }
 
@@ -1326,15 +1325,15 @@ int Write_Partition_Tables( void )
       Partition_Table *pDrive = &part_table[drive_index];
 
       if ( pDrive->part_values_changed != TRUE &&
-           flags.partitions_have_changed != TRUE ||
-           !pDrive->usable) {
+              flags.partitions_have_changed != TRUE ||
+           !pDrive->usable ) {
          continue; /* nothing done, continue with next drive */
       }
 
       Clear_Sector_Buffer();
 
-         error_code =
-            Read_Physical_Sectors( ( drive_index + 0x80 ), 0, 0, 1, 1 );
+      error_code =
+         Read_Physical_Sectors( ( drive_index + 0x80 ), 0, 0, 1, 1 );
 
       if ( error_code != 0 ) {
          return ( error_code );
@@ -1458,16 +1457,14 @@ int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
 {
    int error_code;
 
-
-      if ( number_of_sectors == 1 ) {
-         error_code =
-            biosdisk( 3, drive, (int)head, (int)cylinder, (int)sector,
-                      number_of_sectors, sector_buffer );
-      }
-      else {
-         printf( "sector != 1\n" );
-         exit( 1 );
-      }
+   if ( number_of_sectors == 1 ) {
+      error_code = biosdisk( 3, drive, (int)head, (int)cylinder, (int)sector,
+                             number_of_sectors, sector_buffer );
+   }
+   else {
+      printf( "sector != 1\n" );
+      exit( 1 );
+   }
 
    return ( error_code );
 }
@@ -1503,8 +1500,8 @@ int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
    /* Transfer LBA_address to disk_address_packet */
    *(_u32 *)( disk_address_packet + 8 ) = LBA_address;
 
-      /* Load the registers and call the interrupt. */
-      asm {
+   /* Load the registers and call the interrupt. */
+   asm {
       mov ah,0x43
       mov al,0x00
       mov dl,BYTE PTR drive
@@ -1512,7 +1509,7 @@ int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
       int 0x13
 
       mov BYTE PTR error_code,ah
-      }
+   }
 
    return ( error_code );
 }

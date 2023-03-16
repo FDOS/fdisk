@@ -124,7 +124,7 @@ void Command_Line_Clear_Flag( void )
    }
    else {
       if ( Clear_Flag( (int)arg[0].value ) != 0 ) {
-         printf( "\nError clearing flag.\n");
+         printf( "\nError clearing flag.\n" );
          exit( 9 );
       }
 
@@ -155,8 +155,7 @@ void Command_Line_Create_Extended_Partition( void )
    }
 
    if ( pDrive->ptr_ext_part ) {
-      printf(
-         "\nExtended partition already exists.\n" );
+      printf( "\nExtended partition already exists.\n" );
       exit( 9 );
    }
 
@@ -217,8 +216,7 @@ void Command_Line_Create_Logical_DOS_Drive( void )
    }
 
    if ( !pDrive->ext_usable ) {
-      printf(
-         "\nNo usable extended partition found.\n" );
+      printf( "\nNo usable extended partition found.\n" );
       exit( 9 );
    }
 
@@ -396,9 +394,8 @@ void Command_Line_Delete( void )
          error_code = Delete_Logical_Drive( (int)( arg[1].value - 1 ) );
       }
       else {
-         printf(
-            "\nLogical drive number %d is out of range.\n",
-            arg[1].value );
+         printf( "\nLogical drive number %d is out of range.\n",
+                 arg[1].value );
          exit( 9 );
       }
    }
@@ -412,8 +409,7 @@ void Command_Line_Delete( void )
          error_code = Delete_Logical_Drive( (int)( arg[1].value - 5 ) );
       }
       else {
-         printf(
-            "\nPartition number is out of range.\n" );
+         printf( "\nPartition number is out of range.\n" );
          exit( 9 );
       }
    }
@@ -453,15 +449,14 @@ void Command_Line_Modify( void )
 {
 
    if ( ( arg[0].extra_value == 0 ) || ( arg[0].extra_value > 255 ) ) {
-      printf(
-         "\nNew partition type is out of range.\n" );
+      printf( "\nNew partition type is out of range.\n" );
       exit( 9 );
    }
 
-   if ( Modify_Partition_Type( (int)( arg[0].value - 1 ), arg[0].extra_value ) != 0 ) {
-      printf(
-         "\nError modifying partition type.\n" );
-      exit( 9 );      
+   if ( Modify_Partition_Type( (int)( arg[0].value - 1 ),
+                               arg[0].extra_value ) != 0 ) {
+      printf( "\nError modifying partition type.\n" );
+      exit( 9 );
    }
 
    Shift_Command_Line_Options( 1 );
@@ -471,22 +466,20 @@ void Command_Line_Modify( void )
 void Command_Line_Move( void )
 {
    if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
-      printf(
-         "\nSource partition number is out of range.\n" );
+      printf( "\nSource partition number is out of range.\n" );
       exit( 9 );
    }
 
    if ( ( arg[0].extra_value < 1 ) || ( arg[0].extra_value > 4 ) ) {
-      printf(
-         "\nDestination partition number is out of range.\n" );
+      printf( "\nDestination partition number is out of range.\n" );
       exit( 9 );
    }
 
    if ( Primary_Partition_Slot_Transfer( MOVE, (int)arg[0].value,
-                                    arg[0].extra_value ) != 0 ) {
+                                         arg[0].extra_value ) != 0 ) {
       printf( "\nError moving partition slot.\n" );
-      exit( 9 );   
-    }
+      exit( 9 );
+   }
 
    Shift_Command_Line_Options( 1 );
 }
@@ -510,7 +503,7 @@ void Command_Line_Set_Flag( void )
 
    if ( Set_Flag( (int)arg[0].value, arg[0].extra_value ) != 0 ) {
       printf( "\nError setting flag.\n" );
-      exit( 9 );      
+      exit( 9 );
    }
 
    printf( "\nFlag %d has been set to ", arg[0].value );
@@ -535,21 +528,19 @@ void Command_Line_Status( void )
 void Command_Line_Swap( void )
 {
    if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
-      printf(
-         "\nSource partition number is out of range.\n" );
+      printf( "\nSource partition number is out of range.\n" );
       exit( 9 );
    }
 
    if ( ( arg[0].extra_value < 1 ) || ( arg[0].extra_value > 4 ) ) {
-      printf(
-         "\nDestination partition number is out of range.\n" );
+      printf( "\nDestination partition number is out of range.\n" );
       exit( 9 );
    }
 
    if ( Primary_Partition_Slot_Transfer( SWAP, (int)arg[0].value,
-                                    arg[0].extra_value ) != 0 ) {
+                                         arg[0].extra_value ) != 0 ) {
       printf( "\nError swapping partitions.\n" );
-      exit( 9 );      
+      exit( 9 );
    }
 
    Shift_Command_Line_Options( 1 );

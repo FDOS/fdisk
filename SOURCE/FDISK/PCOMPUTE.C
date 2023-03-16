@@ -103,9 +103,9 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    unsigned long end_cyl;
    unsigned long max_sz_cyl = pDrive->ext_part_largest_free_space;
    unsigned long req_sz_cyl = Number_Of_Cylinders( size_in_MB * 2048 );
-   unsigned long max_sz_mb = Convert_Cyl_To_MB(
-      pDrive->ext_part_largest_free_space,
-      pDrive->total_head + 1, pDrive->total_sect );
+   unsigned long max_sz_mb =
+      Convert_Cyl_To_MB( pDrive->ext_part_largest_free_space,
+                         pDrive->total_head + 1, pDrive->total_sect );
 
    unsigned long ext_start_sect;
    unsigned long start_sect;
@@ -129,8 +129,7 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    /* If the requested size of the partition is close to the end of the */
    /* maximum available space, fill the maximum available space.        */
    /* This ensures more aggressive use of the hard disk.                */
-   if ( ( max_sz_cyl - 3 ) <= req_sz_cyl ||
-        size_in_MB == max_sz_mb ) {
+   if ( ( max_sz_cyl - 3 ) <= req_sz_cyl || size_in_MB == max_sz_mb ) {
       req_sz_cyl = max_sz_cyl;
    }
 
@@ -231,9 +230,9 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
    unsigned long end_cyl;
    unsigned long max_sz_cyl = pDrive->pri_part_largest_free_space;
    unsigned long req_sz_cyl = Number_Of_Cylinders( size_in_MB * 2048 );
-   unsigned long max_sz_mb = Convert_Cyl_To_MB(
-      pDrive->pri_part_largest_free_space,
-      pDrive->total_head + 1, pDrive->total_sect );
+   unsigned long max_sz_mb =
+      Convert_Cyl_To_MB( pDrive->pri_part_largest_free_space,
+                         pDrive->total_head + 1, pDrive->total_sect );
 
    unsigned long start_sect;
    unsigned long end_sect;
@@ -270,8 +269,7 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
    /* If the requested size of the partition is close to the end of the */
    /* maximum available space, fill the maximum available space.        */
    /* This ensures more aggressive use of the hard disk.                */
-   if ( ( max_sz_cyl - 3 ) <= req_sz_cyl ||
-        size_in_MB == max_sz_mb ) {
+   if ( ( max_sz_cyl - 3 ) <= req_sz_cyl || size_in_MB == max_sz_mb ) {
       req_sz_cyl = max_sz_cyl;
    }
 
@@ -354,7 +352,6 @@ int Delete_Logical_Drive( int logical_drive_number )
 
    return Delete_EMBR_Chain_Node( pDrive, logical_drive_number );
 }
-
 
 int Delete_Extended_Partition( void )
 {
@@ -957,8 +954,7 @@ unsigned long Number_Of_Cylinders( unsigned long size )
 }
 
 /* Transfer partition information from one slot to another */
-int Primary_Partition_Slot_Transfer( int transfer_type, int source,
-                                     int dest )
+int Primary_Partition_Slot_Transfer( int transfer_type, int source, int dest )
 {
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 

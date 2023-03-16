@@ -43,7 +43,7 @@ void Display_Help_Screen( void )
    strcat( version, VERSION );
 
    printf( "%-20s                   %40s\n", name, version );
-   printf( 
+   printf(
       "Syntax: FDISK [argument]...\n"
       "  no argument       Runs in interactive mode\n"
       "  /INFO [<drive#>]  Displays partition information of <drive#>\n"
@@ -64,8 +64,8 @@ void Display_Help_Screen( void )
       "  /DELETEALL [drive#]                      Deletes all partitions from <drive#>\n"
       "\n"
       "Setting active partitions:\n"
-         "  /ACTIVATE:<partition#> [drive#]          Sets <partition#> active\n"
-         "  /DEACTIVATE [drive#]                     Deactivates all partitions\n");
+      "  /ACTIVATE:<partition#> [drive#]          Sets <partition#> active\n"
+      "  /DEACTIVATE [drive#]                     Deactivates all partitions\n" );
    if ( flags.do_not_pause_help_information == FALSE ) {
       //printf("\n\n");
       Pause();
@@ -84,7 +84,7 @@ void Display_Help_Screen( void )
       "  /IPL      [drive#]       Installs the standard boot code into MBR <drive#>\n"
       "                           ...same as /MBR and /CMBR for compatibility\n"
       "  /SMARTIPL [drive#]       Installs DriveSmart IPL into MBR <drive#>\n"
-/*      "  /CLEARIPL [drive#]       Zeros 440 code bytes of MBR\n"*/
+      /*      "  /CLEARIPL [drive#]       Zeros 440 code bytes of MBR\n"*/
       "  /LOADIPL  [drive#]       Writes 440 code bytes from \"boot.mbr\" into MBR\n"
       "\n"
       "Advanced partition table modification:\n"
@@ -98,7 +98,7 @@ void Display_Help_Screen( void )
       "  /SETFLAG:<flag#>[,<value>] [drive#]        Sets <flag#> to 1 or <value>\n"
       "  /TESTFLAG:<flag#>[,<value>] [drive#]       Tests <flag#> for 1 or <value>\n" );
    if ( flags.do_not_pause_help_information == FALSE ) {
-      printf("\n");
+      printf( "\n" );
       Pause();
    }
 
@@ -116,7 +116,7 @@ void Display_Help_Screen( void )
       "Compatibility options:\n"
       "  /X            Disables ext. INT 13 and LBA for the following commands\n" );
    if ( flags.do_not_pause_help_information == FALSE ) {
-      printf("\n");
+      printf( "\n" );
    }
    printf(
       "\nThis program is Copyright %s by Brian E. Reifsnyder and\n"

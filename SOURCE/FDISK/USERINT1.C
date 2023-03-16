@@ -66,17 +66,17 @@ void Clear_Screen( int type ) /* Clear screen code as suggested by     */
 void Clear_Screen_With_Attr( int type, unsigned char attr )
 {
    asm {
-    mov ah, 0x0f           /* get max column to clear */
+    mov ah, 0x0f /* get max column to clear */
     int 0x10
     mov dh, ah
 
-    mov ah, 0x06           /* scroll up */
-    mov al, 0x00           /* 0 rows, clear whole window */
-    mov bh, BYTE PTR attr  /* set color */
-    xor cx, cx             /* coordinates of upper left corner of screen */
-                           /*    mov dh,25    */ /* maximum row */
-    mov dl, 79             /* maximum column */
-    push bp                /* work arount IBM-XT BIOS bug */
+    mov ah, 0x06 /* scroll up */
+    mov al, 0x00 /* 0 rows, clear whole window */
+    mov bh, BYTE PTR attr /* set color */
+    xor cx, cx      /* coordinates of upper left corner of screen */
+         /*    mov dh,25    */ /* maximum row */
+    mov dl, 79 /* maximum column */
+    push bp /* work arount IBM-XT BIOS bug */
     int 0x10
     pop bp
    }
@@ -469,7 +469,7 @@ void Interactive_User_Interface( void )
       }
 
       if ( menu == BMBR ) {
-/*         Create_BootEasy_MBR();
+         /*         Create_BootEasy_MBR();
          Color_Print_At( 4, 22, "BootEasy MBR has been created." );
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );*/
       }
@@ -703,15 +703,16 @@ int Standard_Menu( int menu )
 
       /* Display Current Drive Number */
       Print_At( 4, 6, "Current fixed disk drive: " );
-      Color_Printf( "%d",  ( flags.drive_number - 127 ) );
+      Color_Printf( "%d", ( flags.drive_number - 127 ) );
 
       if ( part_table[flags.drive_number - 128].usable ) {
-         Color_Printf("   %lu",
-         part_table[flags.drive_number - 128].total_disk_size_in_MB);
-         printf(" Mbytes");
+         Color_Printf(
+            "   %lu",
+            part_table[flags.drive_number - 128].total_disk_size_in_MB );
+         printf( " Mbytes" );
       }
       else {
-         Color_Print(" is unusable!");
+         Color_Print( " is unusable!" );
          minimum_option = 5;
       }
 
@@ -764,7 +765,8 @@ int Standard_Menu( int menu )
          printf( "%s", option_5 );
       }
 
-      if ( menu == MM && flags.extended_options_flag == TRUE && minimum_option == 1 ) {
+      if ( menu == MM && flags.extended_options_flag == TRUE &&
+           minimum_option == 1 ) {
          Color_Print_At( 50, 15, "M.  " );
          printf( "MBR maintenance" );
 
@@ -774,7 +776,7 @@ int Standard_Menu( int menu )
          optional_char_1 = '\0';
       }
 
-      if ( menu == MM && flags.allow_abort == TRUE  && minimum_option == 1 ) {
+      if ( menu == MM && flags.allow_abort == TRUE && minimum_option == 1 ) {
          Color_Print_At( 50, 16, "A.  " );
          printf( "Abort changes and exit" );
 
@@ -806,8 +808,9 @@ int Standard_Menu( int menu )
       Print_At( 4, 17, "Enter choice: " );
 
       if ( menu == MM ) {
-         input = (int)Input( 1, 19, 17, NUM, minimum_option, maximum_number_of_options,
-                             ESCE, 1, 0, optional_char_1, optional_char_2 );
+         input = (int)Input( 1, 19, 17, NUM, minimum_option,
+                             maximum_number_of_options, ESCE, 1, 0,
+                             optional_char_1, optional_char_2 );
       }
       else {
          input = (int)Input( 1, 19, 17, NUM, 1, maximum_number_of_options,
