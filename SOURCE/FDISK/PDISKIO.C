@@ -193,21 +193,21 @@ int Is_Supp_Ext_Part( int num_type )
 void Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head,
                         unsigned long sector )
 {
-   unsigned char stored_sector_buffer[512];
+   unsigned char stored_sector_buffer[SECT_SIZE];
    long index;
 
    /* Save sector_buffer[512] into stored_sector_buffer[512] */
-   memcpy( stored_sector_buffer, sector_buffer, 512 );
+   memcpy( stored_sector_buffer, sector_buffer, SECT_SIZE );
 
    /* Write all 0xf6 values to sector_buffer[index] */
-   memset( sector_buffer, 0xf6, 512 );
+   memset( sector_buffer, 0xf6, SECT_SIZE );
 
    for ( index = 0; index < 16; index++ ) {
       Write_Physical_Sectors( drive, cylinder, head, ( sector + index ), 1 );
    }
 
    /* Restore sector_buffer[512] to its original contents */
-   memcpy( sector_buffer, stored_sector_buffer, 512 );
+   memcpy( sector_buffer, stored_sector_buffer, SECT_SIZE );
 }
 
 /* Clear The Partition Table Area Of sector_buffer only. */
@@ -217,7 +217,7 @@ void Clear_Partition_Table_Area_Of_Sector_Buffer( void )
 }
 
 /* Clear Sector Buffer */
-void Clear_Sector_Buffer( void ) { memset( sector_buffer, 0, 512 ); }
+void Clear_Sector_Buffer( void ) { memset( sector_buffer, 0, SECT_SIZE ); }
 
 /* Combine Cylinder and Sector Values */
 unsigned long combine_cs( unsigned long cylinder, unsigned long sector )
@@ -560,25 +560,29 @@ int Get_Hard_Drive_Parameters( int physical_drive )
    unsigned long total_cylinders = 0;
    unsigned long total_heads = 0;
    unsigned long total_sectors = 0;
+   unsigned short sector_size = 512;
+   int drive = physical_drive - 0x80;
+
    Partition_Table *pDrive = &part_table[physical_drive - 0x80];
 
+   pDrive->total_head = 0;
+   pDrive->total_sect = 0;
+   pDrive->total_cyl = 0;
    pDrive->size_truncated = FALSE;
+   pDrive->num_of_log_drives = 0;
 
-   if ( ( physical_drive - 0x80 ) >= flags.total_number_hard_disks ) {
-      return ( 255 );
+   if ( drive >= flags.total_number_hard_disks ) {
+      return 255;
    }
 
-   if ( user_defined_chs_settings[( physical_drive - 128 )].defined ==
-        TRUE ) {
+   if ( user_defined_chs_settings[drive].defined == TRUE ) {
       pDrive->total_cyl =
-         user_defined_chs_settings[( physical_drive - 0x80 )].total_cylinders;
+         user_defined_chs_settings[drive].total_cylinders;
       pDrive->total_head =
-         user_defined_chs_settings[( physical_drive - 0x80 )].total_heads;
+         user_defined_chs_settings[drive].total_heads;
       pDrive->total_sect =
-         user_defined_chs_settings[( physical_drive - 0x80 )].total_sectors;
-      pDrive->num_of_log_drives = 0;
-
-      return ( 0 );
+         user_defined_chs_settings[drive].total_sectors;
+      return 0;
    }
 
    /* Get the hard drive parameters with normal int 0x13 calls. */
@@ -609,14 +613,15 @@ int Get_Hard_Drive_Parameters( int physical_drive )
     mov BYTE PTR total_heads, dh
    }
 
-   if ( flags.total_number_hard_disks == 255 ) flags.total_number_hard_disks =
-      total_number_hard_disks;
+   if ( flags.total_number_hard_disks == 255 ) {
+      flags.total_number_hard_disks = total_number_hard_disks;
+   }
    if ( total_number_hard_disks == 0 ) {
-      return ( 255 );
+      return 255;
    }
 
    if ( error_code > 0 ) {
-      return ( error_code );
+      return error_code;
    }
 
    // USB CF card adapters simulate existing hard drives,
@@ -628,13 +633,12 @@ int Get_Hard_Drive_Parameters( int physical_drive )
 
    pDrive->total_head = total_heads;
    pDrive->total_sect = total_sectors;
-   pDrive->num_of_log_drives = 0;
 
    if ( pDrive->ext_int_13 == TRUE ) {
       /* Get the hard drive parameters with extended int 0x13 calls. */
 
-      /* Note:  Supported interrupt 0x13 extensions have already been        */
-      /* checked for in the function Check_For_INT13_Extensions().           */
+      /* Note:  Supported interrupt 0x13 extensions have already been      */
+      /* checked for in the function Check_For_INT13_Extensions().         */
 
       unsigned int result_buffer_segment = FP_SEG( result_buffer );
       unsigned int result_buffer_offset = FP_OFF( result_buffer );
@@ -661,6 +665,7 @@ int Get_Hard_Drive_Parameters( int physical_drive )
 
       number_of_physical_sectors = *(_u32 *)( result_buffer + 16 );
       number_of_physical_sectors_hi = *(_u32 *)( result_buffer + 20 );
+      sector_size = *(unsigned short *)( result_buffer + 24 );
 
       /* sector count too large to store in 32-bit (disk larger 2 TB)? */
       pDrive->size_truncated = number_of_physical_sectors_hi != 0;
@@ -678,6 +683,10 @@ int Get_Hard_Drive_Parameters( int physical_drive )
       }
    }
 
+   if ( sector_size != SECT_SIZE ) {
+      return 1;
+   }
+
    /* Check for an extra cylinder, but only if not using extended INT 13 */
    if ( flags.check_for_extra_cylinder == TRUE &&
         pDrive->ext_int_13 == FALSE ) {
@@ -689,7 +698,7 @@ int Get_Hard_Drive_Parameters( int physical_drive )
 
    pDrive->total_cyl = total_cylinders;
 
-   return ( 0 );
+   return 0;
 }
 
 // return physical start of a logical partition
@@ -907,7 +916,7 @@ int Read_Partition_Tables( void )
 {
    Partition_Table *pDrive;
 
-   int drive, num_ext, num_drives = 0;
+   int drive, num_ext;
    int error_code = 0;
 
    flags.maximum_drive_number = 0;
@@ -958,11 +967,9 @@ int Read_Partition_Tables( void )
 
       pDrive->part_values_changed = FALSE;
       flags.maximum_drive_number = drive + 0x80;
-
-      num_drives++;
    }
 
-   flags.more_than_one_drive = num_drives > 1;
+   flags.more_than_one_drive = flags.maximum_drive_number > 0x80;
    flags.partitions_have_changed = FALSE;
 
    Determine_Drive_Letters();
@@ -1216,49 +1223,6 @@ int Read_Physical_Sectors( int drive, long cylinder, long head, long sector,
                                               number_of_sectors );
    }
 
-#ifdef DEBUG
-   if ( debug.read_sector == TRUE ) {
-
-      Clear_Screen( NULL );
-      Print_Centered( 4, "Read_Physical_Sector() function debugging screen",
-                      BOLD );
-
-      Print_At( 4, 10, "Information passed to this function:" );
-
-      Print_At( 50, 11, "Drive:     0x%X", drive );
-      Print_At( 50, 12, "Cylinder:  %d", cylinder );
-      Print_At( 50, 13, "Head:      %d", head );
-      Print_At( 50, 14, "Sector:    %d", sector );
-      Print_At( 4, 16,
-                "Contents of partition table area in sector_buffer[]:" );
-
-      {
-         int index, offset, current_line = 0;
-
-         offset = 0x1be;
-         do {
-            index = 0;
-
-            Print_At( 4, current_line + 18, "%d:  ", ( current_line + 1 ) );
-            do {
-               printf( "%02X ", sector_buffer[( index + offset )] );
-               index++;
-            } while ( index < 16 );
-
-            current_line++;
-            offset = offset + 16;
-         } while ( offset < ( 0x1be + 64 ) );
-      }
-
-      Print_At( 4, 23, "Press any key to continue." );
-
-      asm {
-      mov ah,7
-      int 0x21
-      }
-   }
-#endif
-
    return ( error_code );
 }
 
@@ -1278,7 +1242,6 @@ int Read_Physical_Sectors_CHS( int drive, long cylinder, long head,
    else {
       printf( "sector != 1\n" );
       exit( 1 );
-      //    error_code=biosdisk(2, drive, (int)head, (int)cylinder, (int)sector, number_of_sectors, huge_sector_buffer);
    }
 
    return ( error_code );
@@ -1363,22 +1326,16 @@ int Write_Partition_Tables( void )
       Partition_Table *pDrive = &part_table[drive_index];
 
       if ( pDrive->part_values_changed != TRUE &&
-           flags.partitions_have_changed != TRUE ) {
+           flags.partitions_have_changed != TRUE ||
+           !pDrive->usable) {
          continue; /* nothing done, continue with next drive */
       }
 
       Clear_Sector_Buffer();
 
-#ifdef DEBUG
-      if ( debug.write == TRUE )
-#endif
          error_code =
             Read_Physical_Sectors( ( drive_index + 0x80 ), 0, 0, 1, 1 );
-#ifdef DEBUG
-      else {
-         error_code = 0;
-      }
-#endif
+
       if ( error_code != 0 ) {
          return ( error_code );
       }
@@ -1501,9 +1458,6 @@ int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
 {
    int error_code;
 
-#ifdef DEBUG
-   if ( debug.write == TRUE ) {
-#endif
 
       if ( number_of_sectors == 1 ) {
          error_code =
@@ -1513,63 +1467,7 @@ int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
       else {
          printf( "sector != 1\n" );
          exit( 1 );
-         //      error_code=biosdisk(3, drive, (int)head, (int)cylinder, (int)sector, number_of_sectors, huge_sector_buffer);
       }
-
-#ifdef DEBUG
-   }
-#endif
-
-#ifdef DEBUG
-   else {
-      int current_line = 0;
-
-      int index = 0;
-      int offset = 0x1be;
-
-      Clear_Screen( NULL );
-      Print_Centered(
-         4, "Write_Physical_Sector_CHS() function debugging screen", BOLD );
-      Print_At(
-         6, 6,
-         "Note:  WRITE=OFF is set or an emulated disk is in existence...no" );
-      Print_At(
-         4, 7,
-         "       changes will be made.  Please check the \"fdisk.ini\" file" );
-      Print_At( 4, 8, "       for details." );
-
-      Print_At( 4, 10, "Information passed to this function:" );
-
-      Print_At( 50, 11, "Drive:     0x%X", drive );
-      Print_At( 50, 12, "Cylinder:  %d", cylinder );
-      Print_At( 50, 13, "Head:      %d", head );
-      Print_At( 50, 14, "Sector:    %d", sector );
-      Print_At( 4, 16,
-                "Contents of partition table area in sector_buffer[]:" );
-
-      do {
-         index = 0;
-
-         Print_At( 4, current_line + 18, "%d:  ", ( current_line + 1 ) );
-         do {
-            printf( "%02X ", sector_buffer[( index + offset )] );
-            index++;
-         } while ( index < 16 );
-
-         current_line++;
-         offset = offset + 16;
-      } while ( offset < ( 0x1be + 64 ) );
-
-      Print_At( 4, 23, "Press any key to continue." );
-
-      asm {
-      mov ah,7
-      int 0x21
-      }
-
-      error_code = 0;
-   }
-#endif
 
    return ( error_code );
 }
@@ -1600,15 +1498,10 @@ int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
    else {
       printf( "sector != 1\n" );
       exit( 1 );
-      //    *(void far **)(disk_address_packet+4) = huge_sector_buffer;
    }
 
    /* Transfer LBA_address to disk_address_packet */
    *(_u32 *)( disk_address_packet + 8 ) = LBA_address;
-
-#ifdef DEBUG
-   if ( debug.write == TRUE ) {
-#endif
 
       /* Load the registers and call the interrupt. */
       asm {
@@ -1620,60 +1513,6 @@ int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
 
       mov BYTE PTR error_code,ah
       }
-#ifdef DEBUG
-   }
-#endif
-
-#ifdef DEBUG
-   else {
-      int current_line = 0;
-      int index = 0;
-
-      int offset = 0x1be;
-
-      Clear_Screen( NULL );
-      Print_Centered(
-         4, "Write_Physical_Sector_LBA() function debugging screen", BOLD );
-      Print_At(
-         4, 6,
-         "Note:  WRITE=OFF is set or an emulated disk is in existence...no" );
-      Print_At(
-         4, 7,
-         "       changes will be made.  Please check the \"fdisk.ini\" file" );
-      Print_At( 4, 8, "       for details." );
-
-      Print_At( 4, 10, "Information passed to this function:" );
-
-      Print_At( 50, 11, "Drive:     0x%X", drive );
-      Print_At( 50, 12, "Cylinder:  %d", cylinder );
-      Print_At( 50, 13, "Head:      %d", head );
-      Print_At( 50, 14, "Sector:    %d", sector );
-      Print_At( 4, 16,
-                "Contents of partition table area in sector_buffer[]:" );
-
-      do {
-         index = 0;
-
-         Print_At( 4, current_line + 18, "%d:  ", ( current_line + 1 ) );
-         do {
-            printf( "%02X ", sector_buffer[( index + offset )] );
-            index++;
-         } while ( index < 16 );
-
-         current_line++;
-         offset = offset + 16;
-      } while ( offset < ( 0x1be + 64 ) );
-
-      Print_At( 4, 23, "Press any key to continue." );
-
-      asm {
-      mov ah,7
-      int 0x21
-      }
-
-      error_code = 0;
-   }
-#endif
 
    return ( error_code );
 }

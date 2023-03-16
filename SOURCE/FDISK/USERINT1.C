@@ -595,6 +595,7 @@ int Standard_Menu( int menu )
 
    int input;
 
+   int minimum_option;
    int maximum_number_of_options = 0;
 
    char copyleft[80] = "";
@@ -615,6 +616,7 @@ int Standard_Menu( int menu )
 
    for ( ;; ) {
       Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+      minimum_option = 1;
 
       strcpy( program_name, FD_NAME );
       strcat( program_name, " V" );
@@ -701,7 +703,17 @@ int Standard_Menu( int menu )
 
       /* Display Current Drive Number */
       Print_At( 4, 6, "Current fixed disk drive: " );
-      Color_Printf( "%d", ( flags.drive_number - 127 ) );
+      Color_Printf( "%d",  ( flags.drive_number - 127 ) );
+
+      if ( part_table[flags.drive_number - 128].usable ) {
+         Color_Printf("   %lu",
+         part_table[flags.drive_number - 128].total_disk_size_in_MB);
+         printf(" Mbytes");
+      }
+      else {
+         Color_Print(" is unusable!");
+         minimum_option = 5;
+      }
 
       if ( menu == DP ) {
          /* Ensure that primary partitions are available to delete. */
@@ -727,20 +739,21 @@ int Standard_Menu( int menu )
       /* Display Menu */
       Print_At( 4, 8, "Choose one of the following:" );
 
-      Color_Print_At( 4, 10, "1.  " );
-      printf( "%s", option_1 );
-
-      if ( maximum_number_of_options > 1 ) {
+      if ( minimum_option <= 1 ) {
+         Color_Print_At( 4, 10, "1.  " );
+         printf( "%s", option_1 );
+      }
+      if ( maximum_number_of_options > 1 && minimum_option <= 2 ) {
          Color_Print_At( 4, 11, "2.  " );
          printf( "%s", option_2 );
       }
 
-      if ( maximum_number_of_options > 2 ) {
+      if ( maximum_number_of_options > 2 && minimum_option <= 3 ) {
          Color_Print_At( 4, 12, "3.  " );
          printf( "%s", option_3 );
       }
 
-      if ( maximum_number_of_options > 3 ) {
+      if ( maximum_number_of_options > 3 && minimum_option <= 4 ) {
          Color_Print_At( 4, 13, "4.  " );
          printf( "%s", option_4 );
       }
@@ -751,7 +764,7 @@ int Standard_Menu( int menu )
          printf( "%s", option_5 );
       }
 
-      if ( ( menu == MM ) && ( flags.extended_options_flag == TRUE ) ) {
+      if ( menu == MM && flags.extended_options_flag == TRUE && minimum_option == 1 ) {
          Color_Print_At( 50, 15, "M.  " );
          printf( "MBR maintenance" );
 
@@ -761,7 +774,7 @@ int Standard_Menu( int menu )
          optional_char_1 = '\0';
       }
 
-      if ( ( menu == MM ) && ( flags.allow_abort == TRUE ) ) {
+      if ( menu == MM && flags.allow_abort == TRUE  && minimum_option == 1 ) {
          Color_Print_At( 50, 16, "A.  " );
          printf( "Abort changes and exit" );
 
@@ -793,7 +806,7 @@ int Standard_Menu( int menu )
       Print_At( 4, 17, "Enter choice: " );
 
       if ( menu == MM ) {
-         input = (int)Input( 1, 19, 17, NUM, 1, maximum_number_of_options,
+         input = (int)Input( 1, 19, 17, NUM, minimum_option, maximum_number_of_options,
                              ESCE, 1, 0, optional_char_1, optional_char_2 );
       }
       else {

@@ -8,6 +8,9 @@
 #endif
 
 #define MAX_LOGICAL_DRIVES 23
+
+#define SECT_SIZE     512
+
 /*
 /////////////////////////////////////////////////////////////////////////////
 //  SPECIAL
@@ -21,19 +24,13 @@
 */
 
 /* Buffers */
-PEXTERN unsigned char sector_buffer[512];
-//PEXTERN unsigned char far huge_sector_buffer[(512*32)];
+PEXTERN unsigned char sector_buffer[SECT_SIZE];
 
 /* Brief partition type table buffer for computing drive letters. */
 PEXTERN int brief_partition_table[8][27];
 
 /* Buffer containing drive letters. */
 PEXTERN char drive_lettering_buffer[8][27];
-
-/* Integers converted from long numbers */
-/*PEXTERN int integer1;
-PEXTERN int integer2;
-*/
 
 /* LBA Specific Global Variables */
 PEXTERN unsigned char disk_address_packet[16];

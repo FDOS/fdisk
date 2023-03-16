@@ -824,18 +824,14 @@ void Display_All_Drives( void )
 
    Determine_Drive_Letters();
 
-   Print_At( 2, 2, "Disk   Drv   Mbytes   Free   Usage" );
+   Print_At( 2, 2, "Disk   Drv   Mbytes    Free  Usage" );
 
-   do {
-      if ( !part_table[drive - 1].usable ) {
-         continue;
-      }
-
+   for ( drive = 1; drive <= flags.maximum_drive_number - 127; drive++ ) {
       if ( current_line > 18 ) {
          current_line = 3;
          current_column_offset = 45;
 
-         Print_At( 43, 2, "Disk   Drv   Mbytes   Free   Usage" );
+         Print_At( 43, 2, "Disk   Drv   Mbytes    Free  Usage" );
       }
 
       /* Print physical drive information */
@@ -848,35 +844,36 @@ void Display_All_Drives( void )
       Position_Cursor( current_column_offset_of_general_drive_information,
                        current_line );
       Color_Printf( "%d", drive );
-
+      
       /* Print size of drive */
+
+      if ( !part_table[drive - 1].usable ) {
+         printf("    -------- unusable ---------");
+         current_line++;
+         continue;
+      }
+
       Position_Cursor(
          ( current_column_offset_of_general_drive_information + 10 ),
          current_line );
       Print_UL( part_table[drive - 1].total_disk_size_in_MB );
 
       /* Get space_used_on_drive_in_MB */
-      index = 0;
-      do {
+      for ( index = 0; index <= 3; index++ ) {
          if ( ( part_table[drive - 1].pri_part[index].num_type != 5 ) &&
               ( part_table[drive - 1].pri_part[index].num_type != 15 ) &&
               ( part_table[drive - 1].pri_part[index].num_type != 0 ) ) {
             space_used_on_drive_in_MB +=
                part_table[drive - 1].pri_part[index].size_in_MB;
          }
+      }
 
-         index++;
-      } while ( index <= 3 );
-
-      index = 0;
-      do {
+      for ( index = 0; index < MAX_LOGICAL_DRIVES; index++ ) {
          if ( part_table[drive - 1].log_drive[index].num_type > 0 ) {
             space_used_on_drive_in_MB +=
                part_table[drive - 1].log_drive[index].size_in_MB;
          }
-
-         index++;
-      } while ( index <= 22 );
+      }
 
       /* Print logical drives on disk, if applicable */
 
@@ -952,8 +949,7 @@ void Display_All_Drives( void )
       printf( "%3d%%", usage );
 
       current_line++;
-      drive++;
-   } while ( drive <= ( flags.maximum_drive_number - 127 ) );
+   }
 
    Print_At( 4, 20, "(1 Mbyte = 1048576 bytes)" );
 }

@@ -328,7 +328,6 @@ void Command_Line_Create_Primary_Partition( void )
       printf( "\nError creating primary partition.\n" );
       exit( 9 );
    }
-
    Set_Active_Partition_If_None_Is_Active( part_no );
 
    Shift_Command_Line_Options( option_count );
@@ -732,8 +731,7 @@ int Get_Options( char *argv[], int argc )
 
    /* check to make sure the drive is a legitimate number */
    if ( ( flags.drive_number < 0x80 ) ||
-        ( flags.drive_number > flags.maximum_drive_number ) ||
-        ( !part_table[flags.drive_number - 0x80].usable ) ) {
+        ( flags.drive_number > flags.maximum_drive_number ) ) {
       printf( "\nInvalid drive designation.\n" );
       exit( 5 );
    }

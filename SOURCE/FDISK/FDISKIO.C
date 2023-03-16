@@ -140,21 +140,20 @@ int Clear_Flag( int flag_number )
 {
    int error_code;
 
-   if ( flags.flag_sector != 0 ) {
-      error_code = Read_Physical_Sectors( ( flags.drive_number ), 0, 0,
-                             ( flags.flag_sector ), 1 );
-
-      sector_buffer[( 446 + ( flag_number - 1 ) )] = 0;
-
-      error_code |= Write_Physical_Sectors( ( flags.drive_number ), 0, 0,
-                              ( flags.flag_sector ), 1 );
-      return error_code;
-   }
-   else {
-      printf(
-         "\nSector flagging functions have been disabled.\n" );
+   if ( flags.flag_sector == 0 ) {
       return 9;
    }
+   else if ( flags.flag_sector >
+          part_table[( flags.drive_number - 128 )].total_sect ) {
+      return 3;
+   }
+
+   error_code = Read_Physical_Sectors( ( flags.drive_number ), 0, 0,
+                          ( flags.flag_sector ), 1 );
+   sector_buffer[( 446 + ( flag_number - 1 ) )] = 0;
+   error_code |= Write_Physical_Sectors( ( flags.drive_number ), 0, 0,
+                           ( flags.flag_sector ), 1 );
+   return error_code;
 }
 
 /* Clear Partition Table */
@@ -233,7 +232,7 @@ int Load_MBR( ipl_only )
             return 9;
          }
          index++;
-      } while ( index < 512 );      
+      } while ( index < SECT_SIZE );      
    }
 
    fclose( file_pointer );
@@ -1292,7 +1291,7 @@ int Save_MBR( void )
          return 8;
       }
       index++;
-   } while ( index < 512 );
+   } while ( index < SECT_SIZE );
 
    fclose( file_pointer );
    return 0;
@@ -1302,24 +1301,23 @@ int Save_MBR( void )
 int Set_Flag( int flag_number, int flag_value )
 {
    int error_code;
-
-   if ( flags.flag_sector != 0 ) {
-      error_code = Read_Physical_Sectors( ( flags.drive_number ), 0, 0,
-                             ( flags.flag_sector ), 1 );
-      if ( error_code != 0 ) {
-         return error_code;
-      }
-
-      sector_buffer[( 446 + ( flag_number - 1 ) )] = flag_value;
-
-      return Write_Physical_Sectors( ( flags.drive_number ), 0, 0,
-                              ( flags.flag_sector ), 1 );
-   }
-   else {
-      printf(
-         "\nSector flagging functions have been disabled.\n" );
+   
+   if ( flags.flag_sector == 0 ) {
       return 9;
    }
+   else if ( flags.flag_sector >
+          part_table[( flags.drive_number - 128 )].total_sect ) {
+      return 3;
+   }
+
+   error_code = Read_Physical_Sectors( ( flags.drive_number ), 0, 0,
+                          ( flags.flag_sector ), 1 );
+   if ( error_code != 0 ) {
+      return error_code;
+   }
+   sector_buffer[( 446 + ( flag_number - 1 ) )] = flag_value;
+   return Write_Physical_Sectors( ( flags.drive_number ), 0, 0,
+                           ( flags.flag_sector ), 1 );
 }
 
 /* Test the flag */
