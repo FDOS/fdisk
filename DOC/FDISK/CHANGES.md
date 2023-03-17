@@ -56,6 +56,7 @@ Other changes:
  - /CLEARALL command renamed to /CLEARMBR (still available under old name).
  - /CLEAR command renamed to /DELETEALL (still available under old name).
  - Support MAX quantifier in command line size arguments.
+ - Make disks n+m, m>0, accessible if disk n is not accessible.
 
 
 Version 1.3.4 (2021-02-20)

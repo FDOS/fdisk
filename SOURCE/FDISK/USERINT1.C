@@ -128,7 +128,7 @@ void Display_Information( void )
 }
 
 /* Display Label */
-/*
+/* unused
 void Display_Label( void )
 {
    if ( flags.label == TRUE ) {
