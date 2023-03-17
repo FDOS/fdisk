@@ -4,7 +4,7 @@
 #   for verison 1.3.4 and Open Watcom 1.9.
 
 CC       = wcc
-CFLAGS   = -q -0 -ms -bt=dos -w4
+CFLAGS   = -q -0 -bt=dos -w4
 AS       = nasm
 ASFLAGS  = -t -f obj
 LD       = wlink
@@ -16,9 +16,9 @@ PACKER      = upx
 PACKERFLAGS = -qq --best --8086
 
 !ifdef DEBUG
-CFLAGS += -d2
+CFLAGS += -d2 -mm
 !else
-CFLAGS += -os -s
+CFLAGS += -os -s -ms
 !endif
 
 !ifdef RELEASE
