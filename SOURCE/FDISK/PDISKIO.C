@@ -1,11 +1,6 @@
 #define PDISKIO
-#include "main.h"
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  INCLUDES
-/////////////////////////////////////////////////////////////////////////////
-*/
+#include "main.h"
 
 #include <bios.h>
 #include <conio.h>
@@ -21,11 +16,6 @@ extern char bootnormal_code[];
 
 extern void Pause( void );
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  PROTOTYPES
-/////////////////////////////////////////////////////////////////////////////
-*/
 
 /* Module Prototype Declarations */
 /* ***************************** */
@@ -50,7 +40,7 @@ void Check_For_INT13_Extensions( void );
 void Convert_Logical_To_Physical( unsigned long sector,
                                   unsigned long total_heads,
                                   unsigned long total_sectors );
-void Error_Handler( int error );
+/*void Error_Handler( int error );*/
 void Get_Partition_Information( void );
 
 int Determine_Drive_Letters( void );
@@ -426,6 +416,7 @@ int Determine_Drive_Letters( void )
 }
 
 /* Error Handler */
+/*
 void Error_Handler( int error )
 {
    if ( error == 0x11 ) {
@@ -497,7 +488,7 @@ void Error_Handler( int error )
 
    exit( error );
 }
-
+*/
 void Clear_Partition( Partition *p )
 {
    memset( p, 0, sizeof( Partition ) );
@@ -518,12 +509,6 @@ void Copy_Partition( Partition *dst, Partition *src )
    dst->num_sect = src->num_sect;
    dst->size_in_MB = src->size_in_MB;
    strcpy( dst->vol_label, src->vol_label );
-}
-
-/* Extract the Cylinder from an LBA Value */
-unsigned long lba_to_cyl( unsigned long lba_value, Partition_Table *pDrive )
-{
-   return lba_value / ( pDrive->total_sect * ( pDrive->total_head + 1 ) );
 }
 
 void lba_to_chs( unsigned long lba_value, Partition_Table *pDrive,
@@ -1265,7 +1250,6 @@ int Read_Physical_Sectors_LBA_only( int drive, ulong LBA_address,
    else {
       printf( "sector != 1\n" );
       exit( 1 );
-      //    *(void far **)(disk_address_packet+4)=huge_sector_buffer;
    }
 
    /* Transfer LBA_address to disk_address_packet */

@@ -255,7 +255,7 @@ void Create_BootEasy_MBR( void )
 }*/
 
 /* Create Normal MBR */
-int Create_BootNormal_MBR( void )
+static int Create_BootNormal_MBR( void )
 {
    int error_code;
 

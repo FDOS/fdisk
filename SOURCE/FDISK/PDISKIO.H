@@ -11,18 +11,6 @@
 
 #define SECT_SIZE 512
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  SPECIAL
-/////////////////////////////////////////////////////////////////////////////
-*/
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  GLOBAL VARIABLES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
 /* Buffers */
 PEXTERN unsigned char sector_buffer[SECT_SIZE];
 
@@ -36,15 +24,6 @@ PEXTERN char drive_lettering_buffer[8][27];
 PEXTERN unsigned char disk_address_packet[16];
 PEXTERN unsigned char result_buffer[26];
 
-PEXTERN unsigned long translated_cylinder;
-PEXTERN unsigned long translated_head;
-PEXTERN unsigned long translated_sector;
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-// GLOBAL STRUCTURES
-/////////////////////////////////////////////////////////////////////////////
-*/
 
 #define REL_END_SECT( p ) ( ( p ).rel_sect + ( p ).num_sect - 1 )
 typedef struct Partition {
@@ -132,11 +111,7 @@ typedef struct part_table_structure {
 
 PEXTERN Partition_Table part_table[8];
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  PROTOTYPES
-/////////////////////////////////////////////////////////////////////////////
-*/
+
 int Num_Ext_Part( Partition_Table *pDrive );
 int Determine_Drive_Letters( void );
 /*PEXTERN int Read_Logical_Sectors(unsigned char drive_letter[2]
@@ -174,7 +149,6 @@ int Delete_EMBR_Chain_Node( Partition_Table *pDrive,
                             int logical_drive_number );
 
 /* LBA<->CHS conversion functions */
-unsigned long lba_to_cyl( unsigned long lba_value, Partition_Table *pDrive );
 void lba_to_chs( unsigned long lba_value, Partition_Table *pDrive,
                  unsigned long *cyl, unsigned long *head,
                  unsigned long *sect );

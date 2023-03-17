@@ -1,20 +1,5 @@
-/*
-// Program:  Free FDISK
-// Module:  USERINT2.H
-// Module Description:  Header File for USERINT2.C
-// Written By:  Brian E. Reifsnyder
-// Version:  1.2.1
-// Copyright:  1998-2001 under the terms of the GNU GPL, Version 2
-*/
-
 #ifndef USERINT2_H
 #define USERINT2_H
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  PROTOTYPES
-/////////////////////////////////////////////////////////////////////////////
-*/
 
 int Create_DOS_Partition_Interface( int type );
 int Create_Logical_Drive_Interface( void );

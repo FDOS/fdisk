@@ -1,10 +1,8 @@
 /*
 // Program:  Free FDISK
 // Written By:  Brian E. Reifsnyder
-// Module:  MAIN.C
-// Module Description:  Main Free FDISK Code Module and Misc. Functions
-// Version:  1.3.1
-// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
+// Version:  1.3.5
+// Copyright:  1998-2023 under the terms of the GNU GPL, Version 2
 */
 
 /*
@@ -16,19 +14,7 @@ $set 1
 
 */
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  DEFINES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
 #define MAIN
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  INCLUDES
-/////////////////////////////////////////////////////////////////////////////
-*/
 
 #include <conio.h>
 #include <ctype.h>
@@ -47,30 +33,6 @@ $set 1
 #include "pdiskio.h"
 #include "userint1.h"
 #include "userint2.h"
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  GLOBAL VARIABLES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
-//extern char **environ;
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  GLOBAL VARIABLES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
-/* Ending Mapping Variables */
-long computed_ending_cylinder;
-unsigned long computed_partition_size;
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  FUNCTIONS
-/////////////////////////////////////////////////////////////////////////////
-*/
 
 /* convert cylinder count to MB and do overflow checking */
 unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
@@ -114,33 +76,6 @@ unsigned long Convert_To_Percentage( unsigned long small_num,
    }
 
    return percentage;
-}
-
-unsigned long Convert_Percent_To_MB( unsigned long percent,
-                                     unsigned long total_cyl )
-{
-   unsigned long num_cyl;
-   Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
-
-   /* first convert percent to cylinders */
-   num_cyl = ( percent * total_cyl ) / 100;
-   if ( ( ( percent * total_cyl ) % 100 ) != 0 ) {
-      num_cyl++;
-   }
-
-   /* return the result of converting cyl to mb */
-   return ( Convert_Cyl_To_MB( num_cyl, pDrive->total_head + 1,
-                               pDrive->total_sect ) );
-}
-
-ulong GetPercentOfLargeNumber( int percent, ulong number )
-{
-   if ( number > 0x7ffffffl / 100 ) {
-      return number / 100 * percent;
-   }
-   else {
-      return number * percent / 100;
-   }
 }
 
 /* Determine if the video display will support boldfacing text */
@@ -675,7 +610,7 @@ void( interrupt far *old_int24 )( void );
 
 void restore_int24( void ) { setvect( 0x24, old_int24 ); }
 
-void int24_init( void )
+static void int24_init( void )
 {
 
    old_int24 = getvect( 0x24 );
@@ -683,7 +618,7 @@ void int24_init( void )
    atexit( restore_int24 );
 }
 
-void Ensure_Drive_Number( void )
+static void Ensure_Drive_Number( void )
 {
    if ( flags.using_default_drive_number == TRUE ) {
       printf( "\nNo drive number has been entered.\n" );

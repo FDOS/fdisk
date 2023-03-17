@@ -1,23 +1,3 @@
-/*
-// Program:  Free FDISK
-// Module:  MAIN.H
-// Module Description:  Header File for MAIN.C
-// Written By:  Brian E. Reifsnyder
-// Version:  1.2.1
-// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
-*/
-
-/* Phil Brutsche - November 20, 1998
-
-   * Created some preprocessor directives to simplify the help screens.
-
-*/
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  DEFINES FOR MAINTENANCE AND CUSTOMIZATION
-/////////////////////////////////////////////////////////////////////////////
-*/
 
 #ifdef FD_FREEDOS
 #define FD_NAME "FreeDOS FDISK"
@@ -207,8 +187,6 @@ MEXTERN char filename[256];
 MEXTERN char path[256];
 MEXTERN char language_filename[15];
 
-MEXTERN char partition_label[16];
-
 MEXTERN int number_of_command_line_options;
 
 /* Buffers */
@@ -319,13 +297,9 @@ int Color_Print_At( int column, int row, char *, ... );
 int Normal_Print_At( int column, int row, char *, ... );
 int BlinkPrintAt( int column, int row, char *format, ... );
 
-ulong GetPercentOfLargeNumber( int percent, ulong number );
-
 unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
                                  unsigned long total_heads,
                                  unsigned long total_sect );
 unsigned long Convert_Sect_To_MB( unsigned long num_sect );
 unsigned long Convert_To_Percentage( unsigned long small_num,
                                      unsigned long large_num );
-unsigned long Convert_Percent_To_MB( unsigned long percent,
-                                     unsigned long total_cyl );
