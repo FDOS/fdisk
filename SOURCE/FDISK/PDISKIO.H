@@ -1,29 +1,18 @@
 #ifndef PDISKIO_H
 #define PDISKIO_H
 
-#ifdef PDISKIO
-#define PEXTERN
-#else
-#define PEXTERN extern
-#endif
-
 #define MAX_LOGICAL_DRIVES 23
 
 #define SECT_SIZE 512
 
 /* Buffers */
-PEXTERN unsigned char sector_buffer[SECT_SIZE];
+extern unsigned char sector_buffer[SECT_SIZE];
 
 /* Brief partition type table buffer for computing drive letters. */
-PEXTERN int brief_partition_table[8][27];
+extern int brief_partition_table[8][27];
 
 /* Buffer containing drive letters. */
-PEXTERN char drive_lettering_buffer[8][27];
-
-/* LBA Specific Global Variables */
-PEXTERN unsigned char disk_address_packet[16];
-PEXTERN unsigned char result_buffer[26];
-
+extern char drive_lettering_buffer[8][27];
 
 #define REL_END_SECT( p ) ( ( p ).rel_sect + ( p ).num_sect - 1 )
 typedef struct Partition {
@@ -109,38 +98,31 @@ typedef struct part_table_structure {
    int size_truncated; /* true if disk size > 32-bit unsigned long */
 } Partition_Table;
 
-PEXTERN Partition_Table part_table[8];
+extern Partition_Table part_table[8];
 
-
-int Num_Ext_Part( Partition_Table *pDrive );
-int Determine_Drive_Letters( void );
-/*PEXTERN int Read_Logical_Sectors(unsigned char drive_letter[2]
- , unsigned long logical_sector_number, int number_of_sectors); */
 int Read_Partition_Tables( void );
 int Read_Physical_Sectors( int drive, long cylinder, long head, long sector,
                            int number_of_sectors );
 int Write_Partition_Tables( void );
 int Write_Physical_Sectors( int drive, long cylinder, long head, long sector,
                             int number_of_sectors );
-void Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head,
-                        unsigned long sector );
-void Clear_Extended_Partition_Table( Partition_Table *pDrive );
+
+void Check_For_INT13_Extensions( void );
+
+int Num_Ext_Part( Partition_Table *pDrive );
+int Determine_Drive_Letters( void );
+
 unsigned long Decimal_Number( unsigned long hex1, unsigned long hex2,
                               unsigned long hex3, unsigned long hex4 );
 
-void Check_For_INT13_Extensions( void );
 void Clear_Sector_Buffer( void );
+void Clear_Extended_Partition_Table( Partition_Table *pDrive );
 void Initialize_LBA_Structures( void );
-void Load_Brief_Partition_Table( void );
-
 int IsRecognizedFatPartition( unsigned );
-int Is_Ext_Part( int num_type );
-int Is_Supp_Ext_Part(
-   int num_tyoe ); /* detects 0x0f type only if in >W95 mode */
 int Is_Dos_Part( int part_type );
-unsigned long combine_cs( unsigned long cylinder, unsigned long sector );
-void extract_chs( unsigned char *p, unsigned long *cyl, unsigned long *head,
-                  unsigned long *sect );
+int Is_Ext_Part( int num_type );
+/* detects 0x0f type only if in >W95 mode */
+int Is_Supp_Ext_Part( int num_tyoe );
 
 /* sets all partition values to zero */
 void Clear_Partition( Partition *p );

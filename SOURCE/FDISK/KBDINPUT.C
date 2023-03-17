@@ -35,7 +35,6 @@ $set 4
 #include "pdiskio.h"
 #include "userint1.h"
 
-
 /* Get input from keyboard */
 unsigned long Input( int size_of_field, int x_position, int y_position,
                      int type, unsigned long min_range,

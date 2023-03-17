@@ -12,101 +12,72 @@
 #include "compat.h"
 #include "pdiskio.h"
 
+unsigned char sector_buffer[SECT_SIZE];
+int brief_partition_table[8][27];
+char drive_lettering_buffer[8][27];
+Partition_Table part_table[8];
+
+static unsigned char disk_address_packet[16];
+static unsigned char result_buffer[26];
 extern char bootnormal_code[];
 
-extern void Pause( void );
+static int Get_Hard_Drive_Parameters( int physical_drive );
+static int Read_Physical_Sectors_CHS( int drive, long cylinder, long head,
+                                      long sector, int number_of_sectors );
+static int Read_Physical_Sectors_LBA( int drive, long cylinder, long head,
+                                      long sector, int number_of_sectors );
+static int Read_Physical_Sectors_LBA_only( int drive, ulong LBA,
+                                           int number_of_sectors );
+static int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
+                                       long sector, int number_of_sectors );
+static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
+                                       long sector, int number_of_sectors );
+static void Clear_Partition_Table_Area_Of_Sector_Buffer( void );
 
-
-/* Module Prototype Declarations */
-/* ***************************** */
-int Get_Hard_Drive_Parameters( int physical_drive );
-int Read_Physical_Sectors_CHS( int drive, long cylinder, long head,
-                               long sector, int number_of_sectors );
-int Read_Physical_Sectors_LBA( int drive, long cylinder, long head,
-                               long sector, int number_of_sectors );
-int Read_Physical_Sectors_LBA_only( int drive, ulong LBA,
-                                    int number_of_sectors );
-int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
-                                long sector, int number_of_sectors );
-int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
-                                long sector, int number_of_sectors );
-unsigned long Translate_LBA_To_Sector( unsigned long lba,
-                                       unsigned long total_sectors );
-unsigned long Translate_LBA_To_Head( unsigned long lba,
-                                     unsigned long total_heads,
-                                     unsigned long total_sectors );
-void Clear_Partition_Table_Area_Of_Sector_Buffer( void );
-void Check_For_INT13_Extensions( void );
-void Convert_Logical_To_Physical( unsigned long sector,
-                                  unsigned long total_heads,
-                                  unsigned long total_sectors );
 /*void Error_Handler( int error );*/
-void Get_Partition_Information( void );
+static void Get_Partition_Information( void );
 
-int Determine_Drive_Letters( void );
-int Read_Partition_Tables( void );
-int Read_Physical_Sectors( int drive, long cylinder, long head, long sector,
-                           int number_of_sectors );
-int Write_Partition_Tables( void );
-int Write_Physical_Sectors( int drive, long cylinder, long head, long sector,
-                            int number_of_sectors );
+static void StorePartitionInSectorBuffer( char *sector_buffer,
+                                          struct Partition *pPart );
 
-unsigned long Decimal_Number( unsigned long hex1, unsigned long hex2,
-                              unsigned long hex3, unsigned long hex4 );
-
-void StorePartitionInSectorBuffer( char *sector_buffer,
-                                   struct Partition *pPart );
-
-void Check_For_INT13_Extensions( void );
-void Clear_Sector_Buffer( void );
-void Initialize_LBA_Structures( void );
-void Load_Brief_Partition_Table( void );
+static void Load_Brief_Partition_Table( void );
 
 static int Read_Primary_Table( int drive, Partition_Table *pDrive,
                                int *num_ext );
 static int Read_Extended_Table( int drive, Partition_Table *pDrive );
 static void Clear_Partition_Tables( Partition_Table *pDrive );
+static void Clear_Boot_Sector( int drive, unsigned long cylinder,
+                               unsigned long head, unsigned long sector );
+static unsigned long combine_cs( unsigned long cylinder,
+                                 unsigned long sector );
+static void extract_chs( unsigned char *p, unsigned long *cyl,
+                         unsigned long *head, unsigned long *sect );
 
-/* External Prototype Declarations */
-/* ******************************* */
 extern void Clear_Screen( int type );
 /*  extern void Convert_Long_To_Integer(long number);*/
 extern void Pause( void );
 extern void Print_Centered( int y, char *text, int style );
 extern void Position_Cursor( int row, int column );
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  FUNCTIONS
-/////////////////////////////////////////////////////////////////////////////
-*/
+extern void Pause( void );
 
 /* Check for interrupt 0x13 extensions */
 void Check_For_INT13_Extensions( void )
 {
+   Partition_Table *pDrive;
    int carry;
-   int drive_number = 0x80;
+   int drive = 0x80;
 
    unsigned char ah_register = 0;
    unsigned short bx_register = 0;
    unsigned short cx_register = 0;
+   pDrive = part_table;
 
-#ifdef DEBUG
-   if ( debug.lba == TRUE ) {
-      Clear_Screen( NULL );
-      Print_Centered( 0, "void Check_For_INT13_Extensions() debugging screen",
-                      BOLD );
-      printf( "\n\n    drive     int 0x13 ext?     access w/packet\n\n" );
-   }
-#endif
-
-   do {
+   for ( drive = 0x80; drive < 0x88; drive++, pDrive++ ) {
       carry = 0;
-
       asm {
       mov ah,0x41
       mov bx,0x55aa
-      mov dl,BYTE PTR drive_number
+      mov dl,BYTE PTR drive
       int 0x13
 
       mov BYTE PTR ah_register,ah
@@ -115,53 +86,22 @@ void Check_For_INT13_Extensions( void )
       adc WORD PTR carry,0 /* Set carry if CF=1 */
       }
 
-      part_table[( drive_number - 128 )].ext_int_13 = FALSE;
+      pDrive->ext_int_13 = FALSE;
 
       if ( ( !carry ) && ( bx_register == 0xaa55 ) ) {
          flags.use_extended_int_13 = TRUE;
-         part_table[( drive_number - 128 )].ext_int_13 = TRUE;
+         pDrive->ext_int_13 = TRUE;
 
          if ( ( cx_register & 0x0001 ) == 1 ) {
-            part_table[( drive_number - 128 )]
-               .device_access_using_packet_structure = TRUE;
+            pDrive->device_access_using_packet_structure = TRUE;
          }
          else {
-            part_table[( drive_number - 128 )]
-               .device_access_using_packet_structure = FALSE;
+            pDrive->device_access_using_packet_structure = FALSE;
          }
 
-         part_table[( drive_number - 128 )].ext_int_13_version = ah_register;
-
-#ifdef DEBUG
-         if ( debug.lba == TRUE ) {
-            printf( "     0x%2x          yes", drive_number );
-
-            if ( ( cx_register & 0x0001 ) == 1 ) {
-               printf( "                 yes" );
-            }
-            else {
-               printf( "                  no" );
-            }
-
-            printf( "\n" );
-         }
-#endif
+         pDrive->ext_int_13_version = ah_register;
       }
-#ifdef DEBUG
-      else if ( debug.lba == TRUE ) {
-         printf( "     0x%2x           no\n", drive_number );
-      }
-#endif
-
-      drive_number++;
-   } while ( drive_number < 0x88 );
-
-#ifdef DEBUG
-   if ( debug.lba == TRUE ) {
-      printf( "\n\n\n" );
-      Pause();
    }
-#endif
 }
 
 int Is_Ext_Part( int num_type ) { return num_type == 5 || num_type == 0x0f; }
@@ -202,7 +142,7 @@ void Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head,
 }
 
 /* Clear The Partition Table Area Of sector_buffer only. */
-void Clear_Partition_Table_Area_Of_Sector_Buffer( void )
+static void Clear_Partition_Table_Area_Of_Sector_Buffer( void )
 {
    memset( sector_buffer + 0x1be, 0, 4 * 16 );
 }
@@ -211,7 +151,8 @@ void Clear_Partition_Table_Area_Of_Sector_Buffer( void )
 void Clear_Sector_Buffer( void ) { memset( sector_buffer, 0, SECT_SIZE ); }
 
 /* Combine Cylinder and Sector Values */
-unsigned long combine_cs( unsigned long cylinder, unsigned long sector )
+static unsigned long combine_cs( unsigned long cylinder,
+                                 unsigned long sector )
 {
    unsigned long value = 0;
 
@@ -267,30 +208,9 @@ int Determine_Drive_Letters( void )
 
    /* Clear drive_lettering_buffer[8] [27] */
    memset( drive_lettering_buffer, 0, sizeof( drive_lettering_buffer ) );
-#if 0
-   index = 0;
-   do {
-      sub_index = 0;
-      do {
-         drive_lettering_buffer[index][sub_index] = 0;
-
-         sub_index++;
-      } while ( sub_index < 27 );
-
-      index++;
-   } while ( index < 8 );
-#endif
 
    /* Set all active_part_found[] values to 0. */
    memset( active_part_found, 0, sizeof( active_part_found ) );
-
-#if 0 
-   index = 0;
-   do {
-      active_part_found[index] = 0;
-      index++;
-   } while ( index < 8 );
-#endif
 
    /* Begin placement of drive letters */
 
@@ -537,7 +457,7 @@ void extract_chs( unsigned char *p, unsigned long *cyl, unsigned long *head,
 }
 
 /* Get the parameters of the hard disk */
-int Get_Hard_Drive_Parameters( int physical_drive )
+static int Get_Hard_Drive_Parameters( int physical_drive )
 {
    int error_code = 0;
 
@@ -686,7 +606,8 @@ int Get_Hard_Drive_Parameters( int physical_drive )
 }
 
 // return physical start of a logical partition
-unsigned long get_log_drive_start( Partition_Table *pDrive, int partnum )
+static unsigned long get_log_drive_start( Partition_Table *pDrive,
+                                          int partnum )
 {
    if ( partnum == 0 ) {
       return pDrive->log_drive[partnum].rel_sect +
@@ -700,7 +621,7 @@ unsigned long get_log_drive_start( Partition_Table *pDrive, int partnum )
 }
 
 /* Get the volume labels and file system types from the boot sectors */
-void Get_Partition_Information( void )
+static void Get_Partition_Information( void )
 {
    int drivenum;
    int partnum;
@@ -881,7 +802,7 @@ int Delete_EMBR_Chain_Node( Partition_Table *pDrive,
    return 0;
 }
 
-void Normalize_Log_Table( Partition_Table *pDrive )
+static void Normalize_Log_Table( Partition_Table *pDrive )
 {
    int index = 1;
 
@@ -1120,7 +1041,7 @@ static int Read_Extended_Table( int drive, Partition_Table *pDrive )
 }
 
 /* Load the brief_partition_table[8] [27] */
-void Load_Brief_Partition_Table( void )
+static void Load_Brief_Partition_Table( void )
 {
    int drivenum;
    int partnum;
@@ -1211,8 +1132,8 @@ int Read_Physical_Sectors( int drive, long cylinder, long head, long sector,
 }
 
 /* Read physical sector using CHS values */
-int Read_Physical_Sectors_CHS( int drive, long cylinder, long head,
-                               long sector, int number_of_sectors )
+static int Read_Physical_Sectors_CHS( int drive, long cylinder, long head,
+                                      long sector, int number_of_sectors )
 {
    int error_code;
 
@@ -1232,8 +1153,8 @@ int Read_Physical_Sectors_CHS( int drive, long cylinder, long head,
 }
 
 /* Read a physical sector using LBA values */
-int Read_Physical_Sectors_LBA_only( int drive, ulong LBA_address,
-                                    int number_of_sectors )
+static int Read_Physical_Sectors_LBA_only( int drive, ulong LBA_address,
+                                           int number_of_sectors )
 {
    unsigned int error_code = 0;
 
@@ -1269,8 +1190,8 @@ int Read_Physical_Sectors_LBA_only( int drive, ulong LBA_address,
 }
 
 /* Read a physical sector using LBA values */
-int Read_Physical_Sectors_LBA( int drive, long cylinder, long head,
-                               long sector, int number_of_sectors )
+static int Read_Physical_Sectors_LBA( int drive, long cylinder, long head,
+                                      long sector, int number_of_sectors )
 {
    /* Translate CHS values to LBA values. */
    unsigned long LBA_address =
@@ -1436,8 +1357,8 @@ int Write_Physical_Sectors( int drive, long cylinder, long head, long sector,
 }
 
 /* Write physical sectors using CHS format. */
-int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
-                                long sector, int number_of_sectors )
+static int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
+                                       long sector, int number_of_sectors )
 {
    int error_code;
 
@@ -1454,8 +1375,8 @@ int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
 }
 
 /* Write physical sectors using LBA format. */
-int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
-                                long sector, int number_of_sectors )
+static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
+                                       long sector, int number_of_sectors )
 {
    unsigned int error_code = 0;
 
@@ -1498,8 +1419,8 @@ int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
    return ( error_code );
 }
 
-void StorePartitionInSectorBuffer( char *sector_buffer,
-                                   struct Partition *pPart )
+static void StorePartitionInSectorBuffer( char *sector_buffer,
+                                          struct Partition *pPart )
 {
    unsigned long start_cyl = pPart->start_cyl;
    unsigned long start_head = pPart->start_head;

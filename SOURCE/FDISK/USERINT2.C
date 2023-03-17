@@ -19,7 +19,6 @@
 #include "userint1.h"
 #include "userint2.h"
 
-
 int IsRecognizedFatPartition( unsigned partitiontype )
 {
    switch ( partitiontype ) {
