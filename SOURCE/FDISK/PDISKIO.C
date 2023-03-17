@@ -1455,3 +1455,48 @@ static void StorePartitionInSectorBuffer( char *sector_buffer,
    *(_u32 *)( sector_buffer + 0x08 ) = pPart->rel_sect;
    *(_u32 *)( sector_buffer + 0x0c ) = pPart->num_sect;
 }
+
+
+/* convert cylinder count to MB and do overflow checking */
+unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
+                                 unsigned long total_heads,
+                                 unsigned long total_sect )
+{
+   unsigned long mb1 = ( num_cyl * total_heads * total_sect ) / 2048ul;
+   unsigned long mb2 =
+      ( ( num_cyl - 1 ) * total_heads * total_sect ) / 2048ul;
+
+   return ( mb1 > mb2 || num_cyl == 0 ) ? mb1 : mb2;
+}
+
+unsigned long Convert_Sect_To_MB( unsigned long num_sect )
+{
+   return num_sect / 2048ul;
+}
+
+unsigned long Convert_To_Percentage( unsigned long small_num,
+                                     unsigned long large_num )
+{
+   unsigned long percentage;
+
+   /* fix for Borland C not supporting unsigned long long:
+      divide values until 100 * small_value fits in unsigned long */
+   while ( small_num > 42949672ul ) {
+      small_num >>= 1;
+      large_num >>= 1;
+   }
+
+   if ( !large_num ) {
+      return 0;
+   }
+   percentage = 100 * small_num / large_num;
+
+   if ( ( 100 * small_num % large_num ) >= large_num / 2 ) {
+      percentage++;
+   }
+   if ( percentage > 100 ) {
+      percentage = 100;
+   }
+
+   return percentage;
+}

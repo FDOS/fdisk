@@ -1,16 +1,4 @@
 /*
-// Program:  Free FDISK
-// Module:  FDISKIO.C
-// Module Description:  Disk input/output code module for functions specific
-//                      to Free FDISK.
-//                      Functions that access the hard disk and are specific
-//                      to Free FDISK are in this module.
-// Written By:  Brian E. Reifsnyder
-// Version:  1.3.1
-// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
-*/
-
-/*
 CATS message store for fdiskio.c:
 
 $set 3
@@ -20,19 +8,7 @@ $set 3
 
 */
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  DEFINES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
 #define FDISKIO
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  INCLUDES
-/////////////////////////////////////////////////////////////////////////////
-*/
 
 #include <conio.h>
 #ifndef __WATCOMC__
@@ -50,21 +26,12 @@ $set 3
 #include "pcompute.h"
 #include "pdiskio.h"
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  BOOTLOADER POINTERS
-/////////////////////////////////////////////////////////////////////////////
-*/
 
+/* bootloader pointers */
 /*extern char booteasy_code[];*/
 extern char bootnormal_code[];
 extern void cdecl far BootSmart_code();
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  FUNCTIONS
-/////////////////////////////////////////////////////////////////////////////
-*/
 
 /* Automatically partition the selected hard drive */
 int Automatically_Partition_Hard_Drive( void )
@@ -316,6 +283,7 @@ int Create_MBR( void )
 }
 
 /* Create Master Boot Code if it is not present */
+/* currently unused 
 int Create_MBR_If_Not_Present( void )
 {
    int error_code;
@@ -331,6 +299,7 @@ int Create_MBR_If_Not_Present( void )
 
    return 0;
 }
+*/
 
 /* Load External Partition Type Lookup Table */
 void Load_External_Lookup_Table( void )
