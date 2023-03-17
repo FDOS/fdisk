@@ -399,44 +399,12 @@ int Delete_Primary_Partition( int partition_number )
    return 0;
 }
 
-/* Determine the locations of free space in the partition table */
-void Determine_Free_Space( void )
+static void Sort_Primary_Partitions( Partition_Table *pDrive, int drive_order[] )
 {
-   int first_used_partition = UNUSED;
-   int last_used_partition = UNUSED;
-   int index;
-   int sub_index;
-   int swap;
-
-   int drive = flags.drive_number - 0x80;
-
-   Partition_Table *pDrive = &part_table[drive];
-
-   unsigned long space_end = 0;
-   unsigned long space_beg = 0;
-   unsigned long space_part_0_1 = 0;
-   unsigned long space_part_1_2 = 0;
-   unsigned long space_part_2_3 = 0;
-
-   int drive_order[4];
-#ifdef DEBUG
-   unsigned long cylinder_size =
-      ( pDrive->total_head + 1 ) * ( pDrive->total_sect );
-#endif
-
-   /* Reset the physical order to default */
-   index = 0;
-   do {
-      drive_order[index] = index;
-
-      index++;
-   } while ( index < 4 );
+   int index, sub_index, swap;
 
    /* Determine the location and size of the largest free space in the */
    /* primary partition.                                               */
-
-   /* 1.  Sort the primary partitions based upon starting cylinder and their*/
-   /*     contents...or lack of use.                                        */
 
    /* Place all empty partitions at the end of the table. */
    index = 0;
@@ -473,9 +441,158 @@ void Determine_Free_Space( void )
       } while ( sub_index < 3 );
       index++;
    } while ( index < 4 );
+}
+
+static void Determine_Log_Free_Space( Partition_Table *pDrive )
+{
+   int index, last_used_partition;
+
+   /* Determine the location and size of the largest free space in the */
+   /* extended partition, if it exists.                                */
+   if ( pDrive->ptr_ext_part ) {
+      pDrive->ext_free_space = 0;
+      pDrive->log_start_cyl = 0;
+      pDrive->log_end_cyl = 0;
+      pDrive->log_free_loc = 0;
+
+      if ( pDrive->num_of_log_drives > 0 ) {
+         /* If there are logical drives in the extended partition first find  */
+         /* the largest free space between the logical drives...if it exists. */
+         last_used_partition = UNUSED;
+         index = 0;
+
+         /* Check to see if the first possible entry in the extended partition */
+         /* is unused.  If it is unused and there is a logical drive after it  */
+         /* then skip checking for free space between entry 0 and 1.           */
+         if ( pDrive->log_drive[0].num_type == 0 ) {
+            index = 1;
+         }
+
+         do {
+            if ( pDrive->log_drive[index].num_type > 0 ) {
+               last_used_partition = index;
+            }
+
+            if ( ( pDrive->log_drive[index + 1].num_type > 0 ) &&
+                 ( pDrive->log_drive[index + 1].start_cyl >
+                   pDrive->log_drive[index].end_cyl + 1 ) ) {
+               pDrive->ext_free_space =
+                  ( pDrive->log_drive[index + 1].start_cyl -
+                    pDrive->log_drive[index].end_cyl - 1 );
+               pDrive->log_start_cyl = pDrive->log_drive[index].end_cyl + 1;
+               pDrive->log_end_cyl =
+                  pDrive->log_drive[index + 1].start_cyl - 1;
+               pDrive->log_free_loc = index + 1;
+            }
+
+            index++;
+         } while ( index < MAX_LOGICAL_DRIVES - 1 );
+
+         /* Determine if there is any free space before the first logical  */
+         /* drive in the extended partition.                               */
+         if ( pDrive->log_drive[0].num_type != 0 ) {
+            if ( pDrive->log_drive[0].start_cyl >
+                 ( pDrive->ptr_ext_part->start_cyl +
+                   pDrive->ext_free_space ) ) {
+               pDrive->ext_free_space = ( pDrive->log_drive[0].start_cyl -
+                                          pDrive->ptr_ext_part->start_cyl );
+               pDrive->log_start_cyl = pDrive->ptr_ext_part->start_cyl;
+               pDrive->log_end_cyl = pDrive->log_drive[0].start_cyl - 1;
+               pDrive->log_free_loc = 0;
+            }
+         }
+
+         else {
+            if ( pDrive->log_drive[1].start_cyl >
+                 ( pDrive->ptr_ext_part->start_cyl +
+                   pDrive->ext_free_space ) ) {
+               pDrive->ext_free_space = ( pDrive->log_drive[1].start_cyl -
+                                          pDrive->ptr_ext_part->start_cyl );
+               pDrive->log_start_cyl = pDrive->ptr_ext_part->start_cyl;
+               pDrive->log_end_cyl = pDrive->log_drive[1].start_cyl - 1;
+               pDrive->log_free_loc = 0;
+            }
+         }
+
+         /* Determine if there is any free space after the last logical drive  */
+         /* in the extended partition.                                         */
+         if ( ( last_used_partition < MAX_LOGICAL_DRIVES ) &&
+              ( pDrive->log_drive[last_used_partition].end_cyl <
+                pDrive->ptr_ext_part->end_cyl ) ) {
+            if ( pDrive->ptr_ext_part->end_cyl >
+                 ( pDrive->log_drive[last_used_partition].end_cyl +
+                   pDrive->ext_free_space ) ) {
+               pDrive->ext_free_space =
+                  ( pDrive->ptr_ext_part->end_cyl -
+                    pDrive->log_drive[last_used_partition].end_cyl );
+               pDrive->log_start_cyl =
+                  pDrive->log_drive[last_used_partition].end_cyl + 1;
+               pDrive->log_end_cyl = pDrive->ptr_ext_part->end_cyl;
+               pDrive->log_free_loc = last_used_partition + 1;
+               if ( pDrive->ptr_ext_part->end_head != pDrive->total_head ||
+                    pDrive->ptr_ext_part->end_sect != pDrive->total_sect ) {
+                  /* reduce free space by one cylinder if exdended does not end on a
+                  cylinder boundary */
+                  pDrive->log_end_cyl -= 1;
+                  pDrive->ext_free_space -= 1;
+               }
+            }
+         }
+      }
+      else {
+         /* If the extended partition is empty. */
+         pDrive->ext_free_space = ( pDrive->ptr_ext_part->end_cyl ) -
+                                  pDrive->ptr_ext_part->start_cyl + 1;
+         pDrive->log_start_cyl = pDrive->ptr_ext_part->start_cyl;
+         pDrive->log_end_cyl = pDrive->ptr_ext_part->end_cyl;
+
+         if ( pDrive->ptr_ext_part->start_head != 0 ||
+              pDrive->ptr_ext_part->start_sect != 1 ) {
+            /* currently we depend on the extended partition to be aligned to
+               a cylinder boundary. If not move free space to next cylinder */
+            pDrive->log_start_cyl += 1;
+            pDrive->ext_free_space -= 1;
+         }
+         if ( pDrive->ptr_ext_part->end_head != pDrive->total_head ||
+              pDrive->ptr_ext_part->end_sect != pDrive->total_sect ) {
+            /* reduce free space by one cylinder if exdended does not end on a
+            cylinder boundary */
+            pDrive->log_end_cyl -= 1;
+            pDrive->ext_free_space -= 1;
+         }
+      }
+   }   
+}
+
+/* Determine the locations of free space in the partition table */
+void Determine_Free_Space( void )
+{
+   int first_used_partition = UNUSED;
+   int last_used_partition = UNUSED;
+   int index;
+
+   int drive = flags.drive_number - 0x80;
+
+   Partition_Table *pDrive = &part_table[drive];
+
+   unsigned long space_end = 0;
+   unsigned long space_beg = 0;
+   unsigned long space_part_0_1 = 0;
+   unsigned long space_part_1_2 = 0;
+   unsigned long space_part_2_3 = 0;
+
+   int drive_order[4];
+
+   /* Reset the physical order to default */
+   for ( index = 0; index < 4; index++ ) {
+      drive_order[index] = index;      
+   }
+
+   /* 1.  Sort the primary partitions based upon starting cylinder and their*/
+   /*     contents...or lack of use.                                        */
+   Sort_Primary_Partitions( pDrive, drive_order );
 
    /* 2.  Is there any free space before the first partition? */
-
    /* Find the first used partition and the last used partition. */
    index = 0;
    do {
@@ -592,121 +709,7 @@ void Determine_Free_Space( void )
       pDrive->free_end_cyl = pDrive->total_cyl;
    }
 
-   /* Determine the location and size of the largest free space in the */
-   /* extended partition, if it exists.                                */
-   if ( pDrive->ptr_ext_part ) {
-      pDrive->ext_free_space = 0;
-      pDrive->log_start_cyl = 0;
-      pDrive->log_end_cyl = 0;
-      pDrive->log_free_loc = 0;
-
-      if ( pDrive->num_of_log_drives > 0 ) {
-         /* If there are logical drives in the extended partition first find  */
-         /* the largest free space between the logical drives...if it exists. */
-         last_used_partition = UNUSED;
-         index = 0;
-
-         /* Check to see if the first possible entry in the extended partition */
-         /* is unused.  If it is unused and there is a logical drive after it  */
-         /* then skip checking for free space between entry 0 and 1.           */
-         if ( pDrive->log_drive[0].num_type == 0 ) {
-            index = 1;
-         }
-
-         do {
-            if ( pDrive->log_drive[index].num_type > 0 ) {
-               last_used_partition = index;
-            }
-
-            if ( ( pDrive->log_drive[index + 1].num_type > 0 ) &&
-                 ( pDrive->log_drive[index + 1].start_cyl >
-                   pDrive->log_drive[index].end_cyl + 1 ) ) {
-               pDrive->ext_free_space =
-                  ( pDrive->log_drive[index + 1].start_cyl -
-                    pDrive->log_drive[index].end_cyl - 1 );
-               pDrive->log_start_cyl = pDrive->log_drive[index].end_cyl + 1;
-               pDrive->log_end_cyl =
-                  pDrive->log_drive[index + 1].start_cyl - 1;
-               pDrive->log_free_loc = index + 1;
-            }
-
-            index++;
-         } while ( index < 22 );
-
-         /* Determine if there is any free space before the first logical  */
-         /* drive in the extended partition.                               */
-         if ( pDrive->log_drive[0].num_type != 0 ) {
-            if ( pDrive->log_drive[0].start_cyl >
-                 ( pDrive->ptr_ext_part->start_cyl +
-                   pDrive->ext_free_space ) ) {
-               pDrive->ext_free_space = ( pDrive->log_drive[0].start_cyl -
-                                          pDrive->ptr_ext_part->start_cyl );
-               pDrive->log_start_cyl = pDrive->ptr_ext_part->start_cyl;
-               pDrive->log_end_cyl = pDrive->log_drive[0].start_cyl - 1;
-               pDrive->log_free_loc = 0;
-            }
-         }
-
-         else {
-            if ( pDrive->log_drive[1].start_cyl >
-                 ( pDrive->ptr_ext_part->start_cyl +
-                   pDrive->ext_free_space ) ) {
-               pDrive->ext_free_space = ( pDrive->log_drive[1].start_cyl -
-                                          pDrive->ptr_ext_part->start_cyl );
-               pDrive->log_start_cyl = pDrive->ptr_ext_part->start_cyl;
-               pDrive->log_end_cyl = pDrive->log_drive[1].start_cyl - 1;
-               pDrive->log_free_loc = 0;
-            }
-         }
-
-         /* Determine if there is any free space after the last logical drive  */
-         /* in the extended partition.                                         */
-         if ( ( last_used_partition < MAX_LOGICAL_DRIVES ) &&
-              ( pDrive->log_drive[last_used_partition].end_cyl <
-                pDrive->ptr_ext_part->end_cyl ) ) {
-            if ( pDrive->ptr_ext_part->end_cyl >
-                 ( pDrive->log_drive[last_used_partition].end_cyl +
-                   pDrive->ext_free_space ) ) {
-               pDrive->ext_free_space =
-                  ( pDrive->ptr_ext_part->end_cyl -
-                    pDrive->log_drive[last_used_partition].end_cyl );
-               pDrive->log_start_cyl =
-                  pDrive->log_drive[last_used_partition].end_cyl + 1;
-               pDrive->log_end_cyl = pDrive->ptr_ext_part->end_cyl;
-               pDrive->log_free_loc = last_used_partition + 1;
-               if ( pDrive->ptr_ext_part->end_head != pDrive->total_head ||
-                    pDrive->ptr_ext_part->end_sect != pDrive->total_sect ) {
-                  /* reduce free space by one cylinder if exdended does not end on a
-                  cylinder boundary */
-                  pDrive->log_end_cyl -= 1;
-                  pDrive->ext_free_space -= 1;
-               }
-            }
-         }
-      }
-      else {
-         /* If the extended partition is empty. */
-         pDrive->ext_free_space = ( pDrive->ptr_ext_part->end_cyl ) -
-                                  pDrive->ptr_ext_part->start_cyl + 1;
-         pDrive->log_start_cyl = pDrive->ptr_ext_part->start_cyl;
-         pDrive->log_end_cyl = pDrive->ptr_ext_part->end_cyl;
-
-         if ( pDrive->ptr_ext_part->start_head != 0 ||
-              pDrive->ptr_ext_part->start_sect != 1 ) {
-            /* currently we depend on the extended partition to be aligned to
-               a cylinder boundary. If not move free space to next cylinder */
-            pDrive->log_start_cyl += 1;
-            pDrive->ext_free_space -= 1;
-         }
-         if ( pDrive->ptr_ext_part->end_head != pDrive->total_head ||
-              pDrive->ptr_ext_part->end_sect != pDrive->total_sect ) {
-            /* reduce free space by one cylinder if exdended does not end on a
-            cylinder boundary */
-            pDrive->log_end_cyl -= 1;
-            pDrive->ext_free_space -= 1;
-         }
-      }
-   }
+   Determine_Log_Free_Space( pDrive );
 }
 
 /* Convert the standard_partition_type to an LBA partition type */
