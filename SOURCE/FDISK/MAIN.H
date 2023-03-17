@@ -283,10 +283,7 @@ MEXTERN User_Defined_CHS_Settings user_defined_chs_settings[8];
 
 int Get_Environment_Settings( char *environment[] );
 int Get_Options( char *arguments[], int number_of_arguments );
-//MEXTERN int Partition_Type_To_Create(unsigned long size_in_mb);
-unsigned long Decimal_Number( unsigned long hex1, unsigned long hex2,
-                              unsigned long hex3, unsigned long hex4 );
-//MEXTERN void Convert_Long_To_Integer(long number);
+
 void Determine_Color_Video_Support( void );
 void Initialization( char *environment[] );
 void Re_Initialization( void );

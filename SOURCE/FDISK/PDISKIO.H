@@ -49,11 +49,11 @@ typedef struct part_table_structure {
 
    int ext_int_13;
    int ext_int_13_version;
-   int device_access_using_packet_structure;
+   int use_access_packet;
 
    /* Pre-computed hard disk sizes */
-   unsigned long total_disk_size_in_log_sectors;
-   unsigned long total_disk_size_in_MB;
+   unsigned long disk_size_sect;
+   unsigned long disk_size_mb;
 
    int ext_usable; /* true if extended partition is compatible */
    int part_values_changed;
@@ -66,23 +66,25 @@ typedef struct part_table_structure {
 
    int pri_part_created[4];
    /* General pre-computed information. */
-   unsigned long pri_part_largest_free_space;
+   unsigned long pri_free_space;
 
-   unsigned long pp_largest_free_space_start_cyl;
-   unsigned long pp_largest_free_space_start_head;
-   unsigned long pp_largest_free_space_start_sect;
-   unsigned long pp_largest_free_space_end_cyl;
+   /* largest free space for primary partition */
+   unsigned long free_start_cyl;
+   unsigned long free_start_head;
+   unsigned long free_start_sect;
+   unsigned long free_end_cyl;
 
    /* Extended Partition Table */
    struct Partition *ptr_ext_part;
 
-   unsigned long ext_part_size_in_MB;
-   unsigned long ext_part_num_sect;
-   unsigned long ext_part_largest_free_space;
+   unsigned long ext_size_mb;
+   unsigned long ext_num_sect;
+   unsigned long ext_free_space;
 
-   int log_drive_largest_free_space_location;
-   unsigned long log_drive_free_space_start_cyl;
-   unsigned long log_drive_free_space_end_cyl;
+   /* largest space for logical drive */
+   int log_free_loc;
+   unsigned long log_start_cyl;
+   unsigned long log_end_cyl;
 
    int num_of_log_drives;
    int num_of_non_dos_log_drives;
@@ -107,21 +109,15 @@ int Write_Partition_Tables( void );
 int Write_Physical_Sectors( int drive, long cylinder, long head, long sector,
                             int number_of_sectors );
 
-void Check_For_INT13_Extensions( void );
-
-int Num_Ext_Part( Partition_Table *pDrive );
 int Determine_Drive_Letters( void );
+int Num_Ext_Part( Partition_Table *pDrive );
 
-unsigned long Decimal_Number( unsigned long hex1, unsigned long hex2,
-                              unsigned long hex3, unsigned long hex4 );
-
-void Clear_Sector_Buffer( void );
-void Clear_Extended_Partition_Table( Partition_Table *pDrive );
+void Check_For_INT13_Extensions( void );
 void Initialize_LBA_Structures( void );
+
 int IsRecognizedFatPartition( unsigned );
 int Is_Dos_Part( int part_type );
 int Is_Ext_Part( int num_type );
-/* detects 0x0f type only if in >W95 mode */
 int Is_Supp_Ext_Part( int num_tyoe );
 
 /* sets all partition values to zero */
@@ -136,5 +132,8 @@ void lba_to_chs( unsigned long lba_value, Partition_Table *pDrive,
                  unsigned long *sect );
 unsigned long chs_to_lba( Partition_Table *pDrive, unsigned long cylinder,
                           unsigned long head, unsigned long sector );
+
+void Clear_Sector_Buffer( void );
+void Clear_Extended_Partition_Table( Partition_Table *pDrive );
 
 #endif /* PDISKIO_H */

@@ -93,10 +93,10 @@ void Check_For_INT13_Extensions( void )
          pDrive->ext_int_13 = TRUE;
 
          if ( ( cx_register & 0x0001 ) == 1 ) {
-            pDrive->device_access_using_packet_structure = TRUE;
+            pDrive->use_access_packet = TRUE;
          }
          else {
-            pDrive->device_access_using_packet_structure = FALSE;
+            pDrive->use_access_packet = FALSE;
          }
 
          pDrive->ext_int_13_version = ah_register;
@@ -843,10 +843,10 @@ int Read_Partition_Tables( void )
          continue;
       }
 
-      pDrive->total_disk_size_in_log_sectors = ( pDrive->total_cyl + 1 ) *
-                                               ( pDrive->total_head + 1 ) *
-                                               pDrive->total_sect;
-      pDrive->total_disk_size_in_MB =
+      pDrive->disk_size_sect = ( pDrive->total_cyl + 1 ) *
+                               ( pDrive->total_head + 1 ) *
+                               pDrive->total_sect;
+      pDrive->disk_size_mb =
          Convert_Cyl_To_MB( ( pDrive->total_cyl + 1 ), pDrive->total_head + 1,
                             pDrive->total_sect );
 
@@ -956,8 +956,8 @@ static int Read_Primary_Table( int drive, Partition_Table *pDrive,
          ( *num_ext )++;
          if ( !pDrive->ptr_ext_part ) {
             pDrive->ptr_ext_part = p;
-            pDrive->ext_part_num_sect = p->num_sect;
-            pDrive->ext_part_size_in_MB = p->size_in_MB;
+            pDrive->ext_num_sect = p->num_sect;
+            pDrive->ext_size_mb = p->size_in_MB;
          }
       }
 
@@ -1070,11 +1070,11 @@ static void Clear_Partition_Tables( Partition_Table *pDrive )
    pDrive->usable = FALSE;
 
    /* Clear the partition_table_structure structure. */
-   pDrive->pri_part_largest_free_space = 0;
-   pDrive->pp_largest_free_space_start_cyl = 0;
-   pDrive->pp_largest_free_space_start_head = 0;
-   pDrive->pp_largest_free_space_start_sect = 0;
-   pDrive->pp_largest_free_space_end_cyl = 0;
+   pDrive->pri_free_space = 0;
+   pDrive->free_start_cyl = 0;
+   pDrive->free_start_head = 0;
+   pDrive->free_start_sect = 0;
+   pDrive->free_end_cyl = 0;
 
    for ( index = 0; index < 4; index++ ) {
       Clear_Partition( &pDrive->pri_part[index] );
@@ -1090,14 +1090,14 @@ void Clear_Extended_Partition_Table( Partition_Table *pDrive )
 
    pDrive->ext_usable = FALSE;
    pDrive->ptr_ext_part = NULL;
-   pDrive->ext_part_size_in_MB = 0;
-   pDrive->ext_part_num_sect = 0;
-   pDrive->ext_part_largest_free_space = 0;
+   pDrive->ext_size_mb = 0;
+   pDrive->ext_num_sect = 0;
+   pDrive->ext_free_space = 0;
 
-   pDrive->log_drive_free_space_start_cyl = 0;
-   pDrive->log_drive_free_space_end_cyl = 0;
+   pDrive->log_start_cyl = 0;
+   pDrive->log_end_cyl = 0;
 
-   pDrive->log_drive_largest_free_space_location = 0;
+   pDrive->log_free_loc = 0;
    pDrive->num_of_log_drives = 0;
    pDrive->num_of_non_dos_log_drives = 0;
 

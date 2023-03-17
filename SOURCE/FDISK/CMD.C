@@ -164,9 +164,9 @@ void Command_Line_Create_Extended_Partition( void )
    maximum_partition_size_in_MB = Max_Pri_Part_Size_In_MB( EXTENDED );
 
    maximum_possible_percentage = Convert_To_Percentage(
-      maximum_partition_size_in_MB, pDrive->total_disk_size_in_MB );
+      maximum_partition_size_in_MB, pDrive->disk_size_mb );
 
-   //   ,pDrive->ext_part_size_in_MB);
+   //   ,pDrive->ext_size_mb);
 
    if ( arg[0].extra_value == 100 ) {
       /* Set limit on percentage. */
@@ -225,7 +225,7 @@ void Command_Line_Create_Logical_DOS_Drive( void )
    maximum_partition_size_in_MB = Max_Log_Part_Size_In_MB();
 
    maximum_possible_percentage = Convert_To_Percentage(
-      maximum_partition_size_in_MB, pDrive->ext_part_size_in_MB );
+      maximum_partition_size_in_MB, pDrive->ext_size_mb );
 
    if ( arg[0].extra_value == 100 ) {
       /* Set limit on percentage. */
@@ -291,7 +291,7 @@ void Command_Line_Create_Primary_Partition( void )
    maximum_partition_size_in_MB = Max_Pri_Part_Size_In_MB( PRIMARY );
 
    maximum_possible_percentage = Convert_To_Percentage(
-      maximum_partition_size_in_MB, pDrive->total_disk_size_in_MB );
+      maximum_partition_size_in_MB, pDrive->disk_size_mb );
 
    if ( arg[0].extra_value == 100 ) {
       /* Set limit on percentage. */

@@ -102,7 +102,7 @@ int Automatically_Partition_Hard_Drive( void )
 
    /* Create an extended partition, if space allows. */
    Determine_Free_Space();
-   if ( pDrive->pri_part_largest_free_space > 0 ) {
+   if ( pDrive->pri_free_space > 0 ) {
       part_no = Create_Primary_Partition( 5, 999999ul );
 
       if ( part_no == 99 ) {
@@ -119,7 +119,7 @@ int Automatically_Partition_Hard_Drive( void )
          }
          Determine_Free_Space();
 
-      } while ( ( pDrive->ext_part_largest_free_space > 0 ) &&
+      } while ( ( pDrive->ext_free_space > 0 ) &&
                 ( Determine_Drive_Letters() < 'Z' ) );
    }
 

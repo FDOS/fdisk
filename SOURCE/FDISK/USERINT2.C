@@ -252,7 +252,7 @@ int Create_DOS_Partition_Interface( int type )
       printf( " Mbytes " );
 
       maximum_possible_percentage = Convert_To_Percentage(
-         maximum_partition_size_in_MB, pDrive->total_disk_size_in_MB );
+         maximum_partition_size_in_MB, pDrive->disk_size_mb );
 
       Color_Printf( "(%3d%%)", maximum_possible_percentage );
 
@@ -400,7 +400,7 @@ int Create_Logical_Drive_Interface( void )
       }
    }
 
-   if ( pDrive->ext_part_largest_free_space >= 2 ) {
+   if ( pDrive->ext_free_space >= 2 ) {
       do {
          if ( flags.fprmt == TRUE ) {
             flags.fat32 = TRUE;
@@ -439,10 +439,10 @@ int Create_Logical_Drive_Interface( void )
 
          if ( ( flags.version == 4 ) || ( flags.version == 5 ) ||
               ( flags.version == 6 ) ) {
-            Color_Printf( "%7lu", pDrive->ext_part_size_in_MB );
+            Color_Printf( "%7lu", pDrive->ext_size_mb );
          }
          else {
-            Print_UL_B( pDrive->ext_part_size_in_MB );
+            Print_UL_B( pDrive->ext_size_mb );
          }
 
          printf( " Mbytes (1 Mbyte = 1048576 bytes)" );
@@ -460,7 +460,7 @@ int Create_Logical_Drive_Interface( void )
          printf( " Mbytes " );
 
          maximum_possible_percentage = (int)Convert_To_Percentage(
-            maximum_partition_size_in_MB, pDrive->ext_part_size_in_MB );
+            maximum_partition_size_in_MB, pDrive->ext_size_mb );
 
          Color_Printf( "(%3d%%)", maximum_possible_percentage );
 
@@ -504,9 +504,9 @@ int Create_Logical_Drive_Interface( void )
          Create_Logical_Drive( numeric_type, input );
          drive_created = TRUE;
 
-         Determine_Free_Space(); // update pDrive->ext_part_largest_free_space  !!
+         Determine_Free_Space(); // update pDrive->ext_free_space  !!
 
-      } while ( pDrive->ext_part_largest_free_space >= 2 );
+      } while ( pDrive->ext_free_space >= 2 );
    }
 
    Clear_Screen( 0 );
@@ -829,7 +829,7 @@ void Display_All_Drives( void )
       Position_Cursor(
          ( current_column_offset_of_general_drive_information + 10 ),
          current_line );
-      Print_UL( part_table[drive - 1].total_disk_size_in_MB );
+      Print_UL( part_table[drive - 1].disk_size_mb );
 
       /* Get space_used_on_drive_in_MB */
       for ( index = 0; index <= 3; index++ ) {
@@ -897,12 +897,11 @@ void Display_All_Drives( void )
       } while ( drive_letter_index < 27 );
 
       /* Print amount of free space on drive */
-      if ( part_table[drive - 1].total_disk_size_in_MB >
-           space_used_on_drive_in_MB ) {
+      if ( part_table[drive - 1].disk_size_mb > space_used_on_drive_in_MB ) {
          Position_Cursor(
             ( current_column_offset_of_general_drive_information + 18 ),
             current_line_of_general_drive_information );
-         Print_UL( part_table[drive - 1].total_disk_size_in_MB -
+         Print_UL( part_table[drive - 1].disk_size_mb -
                    space_used_on_drive_in_MB );
       }
 
@@ -911,9 +910,8 @@ void Display_All_Drives( void )
          usage = 0;
       }
       else {
-         usage = Convert_To_Percentage(
-            space_used_on_drive_in_MB,
-            part_table[drive - 1].total_disk_size_in_MB );
+         usage = Convert_To_Percentage( space_used_on_drive_in_MB,
+                                        part_table[drive - 1].disk_size_mb );
       }
 
       Position_Cursor(
@@ -939,9 +937,9 @@ void Display_CL_Partition_Table( void )
    printf( "\n\nCurrent fixed disk drive: %1d",
            ( flags.drive_number - 127 ) );
 
-   printf( "   %lu sectors, geometry %lu/%03lu/%02lu",
-           pDrive->total_disk_size_in_log_sectors, pDrive->total_cyl + 1,
-           pDrive->total_head + 1, pDrive->total_sect );
+   printf( "   %lu sectors, geometry %lu/%03lu/%02lu", pDrive->disk_size_sect,
+           pDrive->total_cyl + 1, pDrive->total_head + 1,
+           pDrive->total_sect );
 
    printf( "\n\nPartition   Status   Mbytes   Description      Usage" );
    printf( "    Start CHS       End CHS\n" );
@@ -984,7 +982,7 @@ void Display_CL_Partition_Table( void )
 
          /* Usage */
          usage = Convert_To_Percentage( pDrive->pri_part[index].size_in_MB,
-                                        pDrive->total_disk_size_in_MB );
+                                        pDrive->disk_size_mb );
 
          printf( "   %3lu%%", usage );
 
@@ -1041,9 +1039,8 @@ void Display_CL_Partition_Table( void )
                        [pDrive->log_drive[( index - 4 )].num_type] );
 
             /* Display usage in % */
-            usage =
-               Convert_To_Percentage( pDrive->log_drive[index - 4].num_sect,
-                                      pDrive->ext_part_num_sect );
+            usage = Convert_To_Percentage(
+               pDrive->log_drive[index - 4].num_sect, pDrive->ext_num_sect );
 
             printf( "  %3lu%%", usage );
 
@@ -1129,9 +1126,8 @@ void Display_Extended_Partition_Information_SS( void )
                          [pDrive->log_drive[( index - 4 )].num_type] );
 
             /* Display usage in % */
-            usage =
-               Convert_To_Percentage( pDrive->log_drive[index - 4].num_sect,
-                                      pDrive->ext_part_num_sect );
+            usage = Convert_To_Percentage(
+               pDrive->log_drive[index - 4].num_sect, pDrive->ext_num_sect );
 
             Print_At( column_index + 35, print_index, "%3lu%%", usage );
             print_index++;
@@ -1147,12 +1143,11 @@ void Display_Extended_Partition_Information_SS( void )
 
    if ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
         ( flags.version == W98 ) ) {
-      Print_UL_B( part_table[flags.drive_number - 128].ext_part_size_in_MB );
+      Print_UL_B( part_table[flags.drive_number - 128].ext_size_mb );
    }
    else {
-      Color_Printf(
-         "%7lu",
-         ( part_table[flags.drive_number - 128].ext_part_size_in_MB ) );
+      Color_Printf( "%7lu",
+                    ( part_table[flags.drive_number - 128].ext_size_mb ) );
    }
    printf( " Mbytes (1 Mbyte = 1048576 bytes)" );
 }
@@ -1384,9 +1379,8 @@ void Display_Primary_Partition_Information_SS( void )
                                                          .num_type] );
 
                /* Usage */
-               usage =
-                  Convert_To_Percentage( pDrive->pri_part[index].size_in_MB,
-                                         pDrive->total_disk_size_in_MB );
+               usage = Convert_To_Percentage(
+                  pDrive->pri_part[index].size_in_MB, pDrive->disk_size_mb );
 
                Print_At( 66, ( cursor_offset + 9 ), "%3d%%", usage );
 
@@ -1432,9 +1426,8 @@ void Display_Primary_Partition_Information_SS( void )
                                                         .num_type] );
 
                /* Usage */
-               usage =
-                  Convert_To_Percentage( pDrive->pri_part[index].size_in_MB,
-                                         pDrive->total_disk_size_in_MB );
+               usage = Convert_To_Percentage(
+                  pDrive->pri_part[index].size_in_MB, pDrive->disk_size_mb );
 
                Print_At( 51, ( cursor_offset + 9 ), "%3d%%", usage );
 
@@ -1460,10 +1453,10 @@ void Display_Primary_Partition_Information_SS( void )
 
    if ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
         ( flags.version == W98 ) ) {
-      Print_UL_B( pDrive->total_disk_size_in_MB );
+      Print_UL_B( pDrive->disk_size_mb );
    }
    else {
-      Color_Printf( "%7lu", pDrive->total_disk_size_in_MB );
+      Color_Printf( "%7lu", pDrive->disk_size_mb );
    }
 
    printf( " Mbytes (1 Mbyte = 1048576 bytes)" );
@@ -1573,7 +1566,7 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
       /* Usage */
       usage = Convert_To_Percentage(
          pDrive->log_drive[logical_drive_number].size_in_MB,
-         pDrive->ext_part_size_in_MB );
+         pDrive->ext_size_mb );
 
       Print_At( 51, 9, "%3d%%", usage );
 
@@ -1707,7 +1700,7 @@ void Modify_Primary_Partition_Information( int partition_number )
       /* Usage */
       usage =
          Convert_To_Percentage( pDrive->pri_part[partition_number].size_in_MB,
-                                pDrive->total_disk_size_in_MB );
+                                pDrive->disk_size_mb );
 
       Print_At( 51, 9, "%3d%%", usage );
 

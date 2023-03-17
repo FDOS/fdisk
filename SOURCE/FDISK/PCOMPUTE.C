@@ -99,20 +99,19 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    Partition *ep = pDrive->ptr_ext_part;
    Partition *p, *nep;
 
-   unsigned long start_cyl = pDrive->log_drive_free_space_start_cyl;
+   unsigned long start_cyl = pDrive->log_start_cyl;
    unsigned long end_cyl;
-   unsigned long max_sz_cyl = pDrive->ext_part_largest_free_space;
+   unsigned long max_sz_cyl = pDrive->ext_free_space;
    unsigned long req_sz_cyl = Number_Of_Cylinders( size_in_MB * 2048 );
-   unsigned long max_sz_mb =
-      Convert_Cyl_To_MB( pDrive->ext_part_largest_free_space,
-                         pDrive->total_head + 1, pDrive->total_sect );
+   unsigned long max_sz_mb = Convert_Cyl_To_MB(
+      pDrive->ext_free_space, pDrive->total_head + 1, pDrive->total_sect );
 
    unsigned long ext_start_sect;
    unsigned long start_sect;
    unsigned long end_sect;
    unsigned long part_sz;
 
-   int free_space_loc = pDrive->log_drive_largest_free_space_location;
+   int free_space_loc = pDrive->log_free_loc;
 
    if ( !pDrive->usable || !pDrive->ext_usable ) {
       return 99;
@@ -226,13 +225,12 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
    struct Partition *np;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
-   unsigned long start_cyl = pDrive->pp_largest_free_space_start_cyl;
+   unsigned long start_cyl = pDrive->free_start_cyl;
    unsigned long end_cyl;
-   unsigned long max_sz_cyl = pDrive->pri_part_largest_free_space;
+   unsigned long max_sz_cyl = pDrive->pri_free_space;
    unsigned long req_sz_cyl = Number_Of_Cylinders( size_in_MB * 2048 );
-   unsigned long max_sz_mb =
-      Convert_Cyl_To_MB( pDrive->pri_part_largest_free_space,
-                         pDrive->total_head + 1, pDrive->total_sect );
+   unsigned long max_sz_mb = Convert_Cyl_To_MB(
+      pDrive->pri_free_space, pDrive->total_head + 1, pDrive->total_sect );
 
    unsigned long start_sect;
    unsigned long end_sect;
@@ -333,8 +331,8 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
 
    if ( Is_Ext_Part( num_type ) ) {
       pDrive->ptr_ext_part = &pDrive->pri_part[empty_part_num];
-      pDrive->ext_part_num_sect = part_sz;
-      pDrive->ext_part_size_in_MB = size_in_MB;
+      pDrive->ext_num_sect = part_sz;
+      pDrive->ext_size_mb = size_in_MB;
       pDrive->ext_usable = TRUE;
    }
 
@@ -414,13 +412,13 @@ void Determine_Free_Space( void )
 
    Partition_Table *pDrive = &part_table[drive];
 
-   unsigned long free_space_after_last_used_partition = 0;
-   unsigned long free_space_before_first_used_partition = 0;
-   unsigned long free_space_between_partitions_0_and_1 = 0;
-   unsigned long free_space_between_partitions_1_and_2 = 0;
-   unsigned long free_space_between_partitions_2_and_3 = 0;
+   unsigned long space_end = 0;
+   unsigned long space_beg = 0;
+   unsigned long space_part_0_1 = 0;
+   unsigned long space_part_1_2 = 0;
+   unsigned long space_part_2_3 = 0;
 
-   int pri_part_physical_order[4];
+   int drive_order[4];
 #ifdef DEBUG
    unsigned long cylinder_size =
       ( pDrive->total_head + 1 ) * ( pDrive->total_sect );
@@ -429,7 +427,7 @@ void Determine_Free_Space( void )
    /* Reset the physical order to default */
    index = 0;
    do {
-      pri_part_physical_order[index] = index;
+      drive_order[index] = index;
 
       index++;
    } while ( index < 4 );
@@ -446,12 +444,10 @@ void Determine_Free_Space( void )
 
       sub_index = 0;
       do {
-         if ( pDrive->pri_part[pri_part_physical_order[sub_index]].num_type ==
-              0 ) {
-            swap = pri_part_physical_order[sub_index];
-            pri_part_physical_order[sub_index] =
-               pri_part_physical_order[sub_index + 1];
-            pri_part_physical_order[sub_index + 1] = swap;
+         if ( pDrive->pri_part[drive_order[sub_index]].num_type == 0 ) {
+            swap = drive_order[sub_index];
+            drive_order[sub_index] = drive_order[sub_index + 1];
+            drive_order[sub_index + 1] = swap;
          }
          sub_index++;
       } while ( sub_index < 3 );
@@ -464,18 +460,14 @@ void Determine_Free_Space( void )
    do {
       sub_index = 0;
       do {
-         if ( ( pDrive->pri_part[pri_part_physical_order[sub_index]]
-                   .num_type != 0 ) &&
-              ( pDrive->pri_part[pri_part_physical_order[sub_index + 1]]
-                   .num_type != 0 ) &&
-              ( pDrive->pri_part[pri_part_physical_order[sub_index]]
-                   .start_cyl >
-                pDrive->pri_part[pri_part_physical_order[sub_index + 1]]
-                   .start_cyl ) ) {
-            swap = pri_part_physical_order[sub_index];
-            pri_part_physical_order[sub_index] =
-               pri_part_physical_order[sub_index + 1];
-            pri_part_physical_order[sub_index + 1] = swap;
+         if ( ( pDrive->pri_part[drive_order[sub_index]].num_type != 0 ) &&
+              ( pDrive->pri_part[drive_order[sub_index + 1]].num_type !=
+                0 ) &&
+              ( pDrive->pri_part[drive_order[sub_index]].start_cyl >
+                pDrive->pri_part[drive_order[sub_index + 1]].start_cyl ) ) {
+            swap = drive_order[sub_index];
+            drive_order[sub_index] = drive_order[sub_index + 1];
+            drive_order[sub_index + 1] = swap;
          }
          sub_index++;
       } while ( sub_index < 3 );
@@ -488,12 +480,11 @@ void Determine_Free_Space( void )
    index = 0;
    do {
       if ( ( first_used_partition == UNUSED ) &&
-           ( pDrive->pri_part[pri_part_physical_order[index]].num_type >
-             0 ) ) {
+           ( pDrive->pri_part[drive_order[index]].num_type > 0 ) ) {
          first_used_partition = index;
       }
 
-      if ( pDrive->pri_part[pri_part_physical_order[index]].num_type > 0 ) {
+      if ( pDrive->pri_part[drive_order[index]].num_type > 0 ) {
          last_used_partition = index;
       }
 
@@ -501,131 +492,113 @@ void Determine_Free_Space( void )
    } while ( index < 4 );
 
    if ( first_used_partition != UNUSED ) {
-      if ( pDrive->pri_part[pri_part_physical_order[first_used_partition]]
-              .start_cyl > 0 ) {
-         free_space_before_first_used_partition =
-            ( pDrive->pri_part[pri_part_physical_order[first_used_partition]]
-                 .start_cyl );
+      if ( pDrive->pri_part[drive_order[first_used_partition]].start_cyl >
+           0 ) {
+         space_beg =
+            ( pDrive->pri_part[drive_order[first_used_partition]].start_cyl );
       }
       else {
-         free_space_before_first_used_partition = 0;
+         space_beg = 0;
       }
    }
 
    /* 3.  Is there any free space after the last used partition? */
    if ( first_used_partition != UNUSED ) {
-      if ( pDrive->pri_part[pri_part_physical_order[last_used_partition]]
-              .end_cyl < pDrive->total_cyl ) {
-         free_space_after_last_used_partition =
+      if ( pDrive->pri_part[drive_order[last_used_partition]].end_cyl <
+           pDrive->total_cyl ) {
+         space_end =
             ( pDrive->total_cyl -
-              pDrive->pri_part[pri_part_physical_order[last_used_partition]]
-                 .end_cyl );
+              pDrive->pri_part[drive_order[last_used_partition]].end_cyl );
       }
    }
 
    /* 4.  Is there any free space between partitions?                    */
    /*                                                                    */
    if ( ( first_used_partition != UNUSED ) && ( last_used_partition >= 1 ) ) {
-      if ( ( pDrive->pri_part[pri_part_physical_order[0]].end_cyl + 1 ) <
-           ( pDrive->pri_part[pri_part_physical_order[1]].start_cyl ) ) {
-         free_space_between_partitions_0_and_1 =
-            ( pDrive->pri_part[pri_part_physical_order[1]].start_cyl -
-              pDrive->pri_part[pri_part_physical_order[0]].end_cyl ) -
-            1;
+      if ( ( pDrive->pri_part[drive_order[0]].end_cyl + 1 ) <
+           ( pDrive->pri_part[drive_order[1]].start_cyl ) ) {
+         space_part_0_1 = ( pDrive->pri_part[drive_order[1]].start_cyl -
+                            pDrive->pri_part[drive_order[0]].end_cyl ) -
+                          1;
       }
    }
 
    if ( ( first_used_partition != UNUSED ) && ( last_used_partition >= 2 ) ) {
-      if ( ( pDrive->pri_part[pri_part_physical_order[1]].end_cyl + 1 ) <
-           ( pDrive->pri_part[pri_part_physical_order[2]].start_cyl ) ) {
-         free_space_between_partitions_1_and_2 =
-            ( pDrive->pri_part[pri_part_physical_order[2]].start_cyl -
-              pDrive->pri_part[pri_part_physical_order[1]].end_cyl ) -
-            1;
+      if ( ( pDrive->pri_part[drive_order[1]].end_cyl + 1 ) <
+           ( pDrive->pri_part[drive_order[2]].start_cyl ) ) {
+         space_part_1_2 = ( pDrive->pri_part[drive_order[2]].start_cyl -
+                            pDrive->pri_part[drive_order[1]].end_cyl ) -
+                          1;
       }
    }
 
    if ( ( first_used_partition != UNUSED ) && ( last_used_partition == 3 ) ) {
-      if ( ( pDrive->pri_part[pri_part_physical_order[2]].end_cyl + 1 ) <
-           ( pDrive->pri_part[pri_part_physical_order[3]].start_cyl ) ) {
-         free_space_between_partitions_2_and_3 =
-            ( pDrive->pri_part[pri_part_physical_order[3]].start_cyl -
-              pDrive->pri_part[pri_part_physical_order[2]].end_cyl ) -
-            1;
+      if ( ( pDrive->pri_part[drive_order[2]].end_cyl + 1 ) <
+           ( pDrive->pri_part[drive_order[3]].start_cyl ) ) {
+         space_part_2_3 = ( pDrive->pri_part[drive_order[3]].start_cyl -
+                            pDrive->pri_part[drive_order[2]].end_cyl ) -
+                          1;
       }
    }
 
    /* Locate the largest free space */
    if ( first_used_partition != UNUSED ) {
       /* */
-      pDrive->pp_largest_free_space_start_head = 0;
-      pDrive->pp_largest_free_space_start_sect = 1;
+      pDrive->free_start_head = 0;
+      pDrive->free_start_sect = 1;
 
       /* Default the largest free space to before the first used partition */
-      pDrive->pri_part_largest_free_space =
-         free_space_before_first_used_partition;
-      pDrive->pp_largest_free_space_start_cyl = 0;
-      pDrive->pp_largest_free_space_end_cyl =
-         pDrive->pri_part[pri_part_physical_order[first_used_partition]]
-            .start_cyl -
-         1;
+      pDrive->pri_free_space = space_beg;
+      pDrive->free_start_cyl = 0;
+      pDrive->free_end_cyl =
+         pDrive->pri_part[drive_order[first_used_partition]].start_cyl - 1;
 
       /* If the largest free space is not before the first used partition  */
       /* make the correct adjustments.                                     */
-      if ( free_space_after_last_used_partition >
-           pDrive->pri_part_largest_free_space ) {
-         pDrive->pri_part_largest_free_space =
-            free_space_after_last_used_partition;
-         pDrive->pp_largest_free_space_start_cyl =
-            pDrive->pri_part[pri_part_physical_order[last_used_partition]]
-               .end_cyl +
-            1;
-         pDrive->pp_largest_free_space_end_cyl = pDrive->total_cyl;
+      if ( space_end > pDrive->pri_free_space ) {
+         pDrive->pri_free_space = space_end;
+         pDrive->free_start_cyl =
+            pDrive->pri_part[drive_order[last_used_partition]].end_cyl + 1;
+         pDrive->free_end_cyl = pDrive->total_cyl;
       }
 
-      if ( free_space_between_partitions_0_and_1 >
-           pDrive->pri_part_largest_free_space ) {
-         pDrive->pri_part_largest_free_space =
-            free_space_between_partitions_0_and_1;
-         pDrive->pp_largest_free_space_start_cyl =
-            pDrive->pri_part[pri_part_physical_order[0]].end_cyl + 1;
-         pDrive->pp_largest_free_space_end_cyl =
-            pDrive->pri_part[pri_part_physical_order[1]].start_cyl - 1;
+      if ( space_part_0_1 > pDrive->pri_free_space ) {
+         pDrive->pri_free_space = space_part_0_1;
+         pDrive->free_start_cyl =
+            pDrive->pri_part[drive_order[0]].end_cyl + 1;
+         pDrive->free_end_cyl =
+            pDrive->pri_part[drive_order[1]].start_cyl - 1;
       }
 
-      if ( free_space_between_partitions_1_and_2 >
-           pDrive->pri_part_largest_free_space ) {
-         pDrive->pri_part_largest_free_space =
-            free_space_between_partitions_1_and_2;
-         pDrive->pp_largest_free_space_start_cyl =
-            pDrive->pri_part[pri_part_physical_order[1]].end_cyl + 1;
-         pDrive->pp_largest_free_space_end_cyl =
-            pDrive->pri_part[pri_part_physical_order[2]].start_cyl - 1;
+      if ( space_part_1_2 > pDrive->pri_free_space ) {
+         pDrive->pri_free_space = space_part_1_2;
+         pDrive->free_start_cyl =
+            pDrive->pri_part[drive_order[1]].end_cyl + 1;
+         pDrive->free_end_cyl =
+            pDrive->pri_part[drive_order[2]].start_cyl - 1;
       }
 
-      if ( free_space_between_partitions_2_and_3 >
-           pDrive->pri_part_largest_free_space ) {
-         pDrive->pri_part_largest_free_space =
-            free_space_between_partitions_2_and_3;
-         pDrive->pp_largest_free_space_start_cyl =
-            pDrive->pri_part[pri_part_physical_order[2]].end_cyl + 1;
-         pDrive->pp_largest_free_space_end_cyl =
-            pDrive->pri_part[pri_part_physical_order[3]].start_cyl - 1;
+      if ( space_part_2_3 > pDrive->pri_free_space ) {
+         pDrive->pri_free_space = space_part_2_3;
+         pDrive->free_start_cyl =
+            pDrive->pri_part[drive_order[2]].end_cyl + 1;
+         pDrive->free_end_cyl =
+            pDrive->pri_part[drive_order[3]].start_cyl - 1;
       }
    }
    else {
-      pDrive->pri_part_largest_free_space = pDrive->total_cyl + 1;
-      pDrive->pp_largest_free_space_start_cyl = 0;
-      pDrive->pp_largest_free_space_end_cyl = pDrive->total_cyl;
+      pDrive->pri_free_space = pDrive->total_cyl + 1;
+      pDrive->free_start_cyl = 0;
+      pDrive->free_end_cyl = pDrive->total_cyl;
    }
 
    /* Determine the location and size of the largest free space in the */
    /* extended partition, if it exists.                                */
    if ( pDrive->ptr_ext_part ) {
-      pDrive->ext_part_largest_free_space = 0;
-      pDrive->log_drive_free_space_start_cyl = 0;
-      pDrive->log_drive_free_space_end_cyl = 0;
-      pDrive->log_drive_largest_free_space_location = 0;
+      pDrive->ext_free_space = 0;
+      pDrive->log_start_cyl = 0;
+      pDrive->log_end_cyl = 0;
+      pDrive->log_free_loc = 0;
 
       if ( pDrive->num_of_log_drives > 0 ) {
          /* If there are logical drives in the extended partition first find  */
@@ -648,14 +621,13 @@ void Determine_Free_Space( void )
             if ( ( pDrive->log_drive[index + 1].num_type > 0 ) &&
                  ( pDrive->log_drive[index + 1].start_cyl >
                    pDrive->log_drive[index].end_cyl + 1 ) ) {
-               pDrive->ext_part_largest_free_space =
+               pDrive->ext_free_space =
                   ( pDrive->log_drive[index + 1].start_cyl -
                     pDrive->log_drive[index].end_cyl - 1 );
-               pDrive->log_drive_free_space_start_cyl =
-                  pDrive->log_drive[index].end_cyl + 1;
-               pDrive->log_drive_free_space_end_cyl =
+               pDrive->log_start_cyl = pDrive->log_drive[index].end_cyl + 1;
+               pDrive->log_end_cyl =
                   pDrive->log_drive[index + 1].start_cyl - 1;
-               pDrive->log_drive_largest_free_space_location = index + 1;
+               pDrive->log_free_loc = index + 1;
             }
 
             index++;
@@ -666,30 +638,24 @@ void Determine_Free_Space( void )
          if ( pDrive->log_drive[0].num_type != 0 ) {
             if ( pDrive->log_drive[0].start_cyl >
                  ( pDrive->ptr_ext_part->start_cyl +
-                   pDrive->ext_part_largest_free_space ) ) {
-               pDrive->ext_part_largest_free_space =
-                  ( pDrive->log_drive[0].start_cyl -
-                    pDrive->ptr_ext_part->start_cyl );
-               pDrive->log_drive_free_space_start_cyl =
-                  pDrive->ptr_ext_part->start_cyl;
-               pDrive->log_drive_free_space_end_cyl =
-                  pDrive->log_drive[0].start_cyl - 1;
-               pDrive->log_drive_largest_free_space_location = 0;
+                   pDrive->ext_free_space ) ) {
+               pDrive->ext_free_space = ( pDrive->log_drive[0].start_cyl -
+                                          pDrive->ptr_ext_part->start_cyl );
+               pDrive->log_start_cyl = pDrive->ptr_ext_part->start_cyl;
+               pDrive->log_end_cyl = pDrive->log_drive[0].start_cyl - 1;
+               pDrive->log_free_loc = 0;
             }
          }
 
          else {
             if ( pDrive->log_drive[1].start_cyl >
                  ( pDrive->ptr_ext_part->start_cyl +
-                   pDrive->ext_part_largest_free_space ) ) {
-               pDrive->ext_part_largest_free_space =
-                  ( pDrive->log_drive[1].start_cyl -
-                    pDrive->ptr_ext_part->start_cyl );
-               pDrive->log_drive_free_space_start_cyl =
-                  pDrive->ptr_ext_part->start_cyl;
-               pDrive->log_drive_free_space_end_cyl =
-                  pDrive->log_drive[1].start_cyl - 1;
-               pDrive->log_drive_largest_free_space_location = 0;
+                   pDrive->ext_free_space ) ) {
+               pDrive->ext_free_space = ( pDrive->log_drive[1].start_cyl -
+                                          pDrive->ptr_ext_part->start_cyl );
+               pDrive->log_start_cyl = pDrive->ptr_ext_part->start_cyl;
+               pDrive->log_end_cyl = pDrive->log_drive[1].start_cyl - 1;
+               pDrive->log_free_loc = 0;
             }
          }
 
@@ -700,48 +666,44 @@ void Determine_Free_Space( void )
                 pDrive->ptr_ext_part->end_cyl ) ) {
             if ( pDrive->ptr_ext_part->end_cyl >
                  ( pDrive->log_drive[last_used_partition].end_cyl +
-                   pDrive->ext_part_largest_free_space ) ) {
-               pDrive->ext_part_largest_free_space =
+                   pDrive->ext_free_space ) ) {
+               pDrive->ext_free_space =
                   ( pDrive->ptr_ext_part->end_cyl -
                     pDrive->log_drive[last_used_partition].end_cyl );
-               pDrive->log_drive_free_space_start_cyl =
+               pDrive->log_start_cyl =
                   pDrive->log_drive[last_used_partition].end_cyl + 1;
-               pDrive->log_drive_free_space_end_cyl =
-                  pDrive->ptr_ext_part->end_cyl;
-               pDrive->log_drive_largest_free_space_location =
-                  last_used_partition + 1;
+               pDrive->log_end_cyl = pDrive->ptr_ext_part->end_cyl;
+               pDrive->log_free_loc = last_used_partition + 1;
                if ( pDrive->ptr_ext_part->end_head != pDrive->total_head ||
                     pDrive->ptr_ext_part->end_sect != pDrive->total_sect ) {
                   /* reduce free space by one cylinder if exdended does not end on a
                   cylinder boundary */
-                  pDrive->log_drive_free_space_end_cyl -= 1;
-                  pDrive->ext_part_largest_free_space -= 1;
+                  pDrive->log_end_cyl -= 1;
+                  pDrive->ext_free_space -= 1;
                }
             }
          }
       }
       else {
          /* If the extended partition is empty. */
-         pDrive->ext_part_largest_free_space =
-            ( pDrive->ptr_ext_part->end_cyl ) -
-            pDrive->ptr_ext_part->start_cyl + 1;
-         pDrive->log_drive_free_space_start_cyl =
-            pDrive->ptr_ext_part->start_cyl;
-         pDrive->log_drive_free_space_end_cyl = pDrive->ptr_ext_part->end_cyl;
+         pDrive->ext_free_space = ( pDrive->ptr_ext_part->end_cyl ) -
+                                  pDrive->ptr_ext_part->start_cyl + 1;
+         pDrive->log_start_cyl = pDrive->ptr_ext_part->start_cyl;
+         pDrive->log_end_cyl = pDrive->ptr_ext_part->end_cyl;
 
          if ( pDrive->ptr_ext_part->start_head != 0 ||
               pDrive->ptr_ext_part->start_sect != 1 ) {
             /* currently we depend on the extended partition to be aligned to
                a cylinder boundary. If not move free space to next cylinder */
-            pDrive->log_drive_free_space_start_cyl += 1;
-            pDrive->ext_part_largest_free_space -= 1;
+            pDrive->log_start_cyl += 1;
+            pDrive->ext_free_space -= 1;
          }
          if ( pDrive->ptr_ext_part->end_head != pDrive->total_head ||
               pDrive->ptr_ext_part->end_sect != pDrive->total_sect ) {
             /* reduce free space by one cylinder if exdended does not end on a
             cylinder boundary */
-            pDrive->log_drive_free_space_end_cyl -= 1;
-            pDrive->ext_part_largest_free_space -= 1;
+            pDrive->log_end_cyl -= 1;
+            pDrive->ext_free_space -= 1;
          }
       }
    }
@@ -770,139 +732,133 @@ int LBA_Partition_Type_To_Create( int standard_partition_type )
 
 unsigned long Max_Pri_Free_Space_In_MB( void )
 {
-   unsigned long maximum_partition_size_in_MB;
+   unsigned long max_size_mb;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    Determine_Free_Space();
 
-   maximum_partition_size_in_MB =
-      Convert_Cyl_To_MB( ( pDrive->pri_part_largest_free_space ),
-                         pDrive->total_head + 1, pDrive->total_sect );
+   max_size_mb =
+      Convert_Cyl_To_MB( ( pDrive->pri_free_space ), pDrive->total_head + 1,
+                         pDrive->total_sect );
 
-   return maximum_partition_size_in_MB;
+   return max_size_mb;
 }
 
 unsigned long Max_Log_Free_Space_In_MB( void )
 {
-   unsigned long maximum_partition_size_in_MB;
+   unsigned long max_size_mb;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    Determine_Free_Space();
 
-   maximum_partition_size_in_MB =
-      Convert_Cyl_To_MB( ( pDrive->ext_part_largest_free_space ),
-                         pDrive->total_head + 1, pDrive->total_sect );
+   max_size_mb =
+      Convert_Cyl_To_MB( ( pDrive->ext_free_space ), pDrive->total_head + 1,
+                         pDrive->total_sect );
 
-   return maximum_partition_size_in_MB;
+   return max_size_mb;
 }
 
 /* Get the maximum size of the logical drive, in MB. */
 unsigned long Max_Log_Part_Size_In_MB( void )
 {
-   unsigned long maximum_partition_size_in_MB;
-   unsigned long stored_maximum_partition_size_in_MB;
+   unsigned long max_size_mb;
+   unsigned long stored_max_size_mb;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    Determine_Free_Space();
 
-   maximum_partition_size_in_MB =
-      Convert_Cyl_To_MB( ( pDrive->ext_part_largest_free_space ),
-                         pDrive->total_head + 1, pDrive->total_sect );
+   max_size_mb =
+      Convert_Cyl_To_MB( ( pDrive->ext_free_space ), pDrive->total_head + 1,
+                         pDrive->total_sect );
 
-   stored_maximum_partition_size_in_MB = maximum_partition_size_in_MB;
+   stored_max_size_mb = max_size_mb;
 
-   /* Adjust maximum_partition_size_in_MB depending upon version */
-   if ( ( flags.version == FOUR ) &&
-        ( maximum_partition_size_in_MB > MAXFAT16NORM ) ) {
-      maximum_partition_size_in_MB = MAXFAT16NORM;
+   /* Adjust max_size_mb depending upon version */
+   if ( ( flags.version == FOUR ) && ( max_size_mb > MAXFAT16NORM ) ) {
+      max_size_mb = MAXFAT16NORM;
    }
-   if ( ( flags.version == FIVE ) &&
-        ( maximum_partition_size_in_MB > MAXFAT16NORM ) ) {
-      maximum_partition_size_in_MB = MAXFAT16NORM;
+   if ( ( flags.version == FIVE ) && ( max_size_mb > MAXFAT16NORM ) ) {
+      max_size_mb = MAXFAT16NORM;
    }
-   if ( ( flags.version == SIX ) &&
-        ( maximum_partition_size_in_MB > MAXFAT16NORM ) ) {
-      maximum_partition_size_in_MB = MAXFAT16NORM;
+   if ( ( flags.version == SIX ) && ( max_size_mb > MAXFAT16NORM ) ) {
+      max_size_mb = MAXFAT16NORM;
    }
-   if ( ( flags.version == W95 ) &&
-        ( maximum_partition_size_in_MB > MAXFAT16NORM ) ) {
-      maximum_partition_size_in_MB = MAXFAT16NORM;
+   if ( ( flags.version == W95 ) && ( max_size_mb > MAXFAT16NORM ) ) {
+      max_size_mb = MAXFAT16NORM;
    }
    if ( ( ( flags.version == W95B ) || ( flags.version == W98 ) ) &&
-        ( flags.fat32 == FALSE ) &&
-        ( maximum_partition_size_in_MB > MAXFAT16NORM ) ) {
-      maximum_partition_size_in_MB = MAXFAT16NORM;
+        ( flags.fat32 == FALSE ) && ( max_size_mb > MAXFAT16NORM ) ) {
+      max_size_mb = MAXFAT16NORM;
    }
    if ( ( flags.fat32 == FALSE ) && ( flags.allow_4gb_fat16 == TRUE ) &&
-        ( stored_maximum_partition_size_in_MB > MAXFAT16NORM ) ) {
-      maximum_partition_size_in_MB = stored_maximum_partition_size_in_MB;
+        ( stored_max_size_mb > MAXFAT16NORM ) ) {
+      max_size_mb = stored_max_size_mb;
    }
    if ( ( flags.fat32 == FALSE ) && ( flags.allow_4gb_fat16 == TRUE ) &&
-        ( stored_maximum_partition_size_in_MB >= MAXFAT16LARGE ) ) {
-      maximum_partition_size_in_MB = MAXFAT16LARGE;
+        ( stored_max_size_mb >= MAXFAT16LARGE ) ) {
+      max_size_mb = MAXFAT16LARGE;
    }
 
-   return ( maximum_partition_size_in_MB );
+   return ( max_size_mb );
 }
 
 /* Get the maximum size of the primary partion, in MB.  */
 unsigned long Max_Pri_Part_Size_In_MB( int type )
 {
-   unsigned long maximum_partition_size_in_MB;
-   unsigned long stored_maximum_partition_size_in_MB;
+   unsigned long max_size_mb;
+   unsigned long stored_max_size_mb;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    Determine_Free_Space();
 
-   maximum_partition_size_in_MB =
-      Convert_Cyl_To_MB( ( pDrive->pri_part_largest_free_space ),
-                         pDrive->total_head + 1, pDrive->total_sect );
+   max_size_mb =
+      Convert_Cyl_To_MB( ( pDrive->pri_free_space ), pDrive->total_head + 1,
+                         pDrive->total_sect );
 
-   stored_maximum_partition_size_in_MB = maximum_partition_size_in_MB;
+   stored_max_size_mb = max_size_mb;
 
-   /* Adjust maximum_partition_size_in_MB depending upon version */
+   /* Adjust max_size_mb depending upon version */
    if ( ( type != EXTENDED ) && ( flags.version == FOUR ) &&
-        ( maximum_partition_size_in_MB > MAXFAT16NORM ) ) {
-      maximum_partition_size_in_MB = MAXFAT16NORM;
+        ( max_size_mb > MAXFAT16NORM ) ) {
+      max_size_mb = MAXFAT16NORM;
    }
 
    if ( ( type != EXTENDED ) && ( flags.version == FIVE ) &&
-        ( maximum_partition_size_in_MB > MAXFAT16NORM ) ) {
-      maximum_partition_size_in_MB = MAXFAT16NORM;
+        ( max_size_mb > MAXFAT16NORM ) ) {
+      max_size_mb = MAXFAT16NORM;
    }
 
    if ( ( type != EXTENDED ) && ( flags.version == SIX ) &&
-        ( maximum_partition_size_in_MB > MAXFAT16NORM ) ) {
-      maximum_partition_size_in_MB = MAXFAT16NORM;
+        ( max_size_mb > MAXFAT16NORM ) ) {
+      max_size_mb = MAXFAT16NORM;
    }
 
    if ( ( type != EXTENDED ) && ( flags.version == W95 ) &&
-        ( maximum_partition_size_in_MB > MAXFAT16NORM ) ) {
-      maximum_partition_size_in_MB = MAXFAT16NORM;
+        ( max_size_mb > MAXFAT16NORM ) ) {
+      max_size_mb = MAXFAT16NORM;
    }
 
    if ( ( type != EXTENDED ) &&
         ( ( flags.version == W95B ) || ( flags.version == W98 ) ) &&
-        ( flags.fat32 == FALSE ) &&
-        ( maximum_partition_size_in_MB > MAXFAT16NORM ) ) {
-      maximum_partition_size_in_MB = MAXFAT16NORM;
+        ( flags.fat32 == FALSE ) && ( max_size_mb > MAXFAT16NORM ) ) {
+      max_size_mb = MAXFAT16NORM;
    }
 
    if ( ( type != EXTENDED ) && ( flags.fat32 == FALSE ) &&
         ( flags.allow_4gb_fat16 == TRUE ) &&
-        ( stored_maximum_partition_size_in_MB > MAXFAT16NORM ) ) {
-      maximum_partition_size_in_MB = stored_maximum_partition_size_in_MB;
+        ( stored_max_size_mb > MAXFAT16NORM ) ) {
+      max_size_mb = stored_max_size_mb;
    }
 
    if ( ( type != EXTENDED ) && ( flags.fat32 == FALSE ) &&
         ( flags.allow_4gb_fat16 == TRUE ) &&
-        ( stored_maximum_partition_size_in_MB >= MAXFAT16LARGE ) ) {
-      maximum_partition_size_in_MB = MAXFAT16LARGE;
+        ( stored_max_size_mb >= MAXFAT16LARGE ) ) {
+      max_size_mb = MAXFAT16LARGE;
    }
 
-   return ( maximum_partition_size_in_MB );
+   return ( max_size_mb );
 }
 
 /* Modify Partition Type */

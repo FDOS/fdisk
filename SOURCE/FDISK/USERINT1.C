@@ -286,7 +286,7 @@ void Interactive_User_Interface( void )
          /* Next, make sure that there is a space available of at least   */
          /* two cylinders.                                                */
          Determine_Free_Space();
-         if ( pDrive->pri_part_largest_free_space < 2 ) {
+         if ( pDrive->pri_free_space < 2 ) {
             counter = 4;
          }
 
@@ -674,9 +674,8 @@ int Standard_Menu( int menu )
       Color_Printf( "%d", ( flags.drive_number - 127 ) );
 
       if ( part_table[flags.drive_number - 128].usable ) {
-         Color_Printf(
-            "   %lu",
-            part_table[flags.drive_number - 128].total_disk_size_in_MB );
+         Color_Printf( "   %lu",
+                       part_table[flags.drive_number - 128].disk_size_mb );
          printf( " Mbytes" );
       }
       else {
