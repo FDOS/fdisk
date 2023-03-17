@@ -1,38 +1,19 @@
-/*
-// Program:  Free FDISK
-// Module:  MAIN.H
-// Module Description:  Header File for MAIN.C
-// Written By:  Brian E. Reifsnyder
-// Version:  1.2.1
-// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
-*/
 
-/* Phil Brutsche - November 20, 1998
+#ifdef FD_FREEDOS
+#define FD_NAME "FreeDOS FDISK"
+#endif
 
-   * Created some preprocessor directives to simplify the help screens.
+#define VERSION  "1.3.5"
+#define COPYLEFT "1998 - 2023"
 
-*/
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  DEFINES FOR MAINTENANCE AND CUSTOMIZATION
-/////////////////////////////////////////////////////////////////////////////
-*/
-
-#define PRINAME  "Free FDISK"
-#define ALTNAME  "FreeDOS"
-#define VERSION  "1.3.4"
-#define COPYLEFT "1998 - 2003"
+#ifndef FD_NAME
+#define FD_NAME "Free FDISK"
+#endif
 
 //#define DEBUG
 /* ***** Uncomment the above line to compile */
 /* ***** debugging code and functions into   */
 /* ***** Free FDISK.                         */
-
-//#define BETA_RELEASE
-/* ***** Uncomment the above line to         */
-/* ***** have this program inform the user   */
-/* ***** that it is a beta release.          */
 
 #define DEFAULT_VERSION 8
 /* ***** Set the above definition to the     */
@@ -56,14 +37,14 @@
 /* *****   Win 98          8                 */
 /* *****   FreeDOS:        100               */
 
-//#define SIZE_OF_MBR 445
+//#define SIZE_OF_IPL 445
 /* ***** This is the number of bytes for the */
 /* ***** boot code in the partition table.   */
 /* ***** If the boot code in the partition   */
 /* ***** table changes, this WILL need       */
 /* ***** changed.  (Start the count at 0.)   */
 // sectorsize - 4 tables - '55aa' - signature
-#define SIZE_OF_MBR ( 512 - 4 * 16 - 2 - 6 )
+#define SIZE_OF_IPL ( 512 - 4 * 16 - 2 - 6 )
 
 #define EMULATED_CYLINDERS 15000
 //#define EMULATED_CYLINDERS   784
@@ -206,8 +187,6 @@ MEXTERN char filename[256];
 MEXTERN char path[256];
 MEXTERN char language_filename[15];
 
-MEXTERN char partition_label[16];
-
 MEXTERN int number_of_command_line_options;
 
 /* Buffers */
@@ -246,6 +225,7 @@ typedef struct flags_structure {
 
    char language[12];
 
+   int align_4k;
    int allow_4gb_fat16;
    int allow_abort;
    int del_non_dos_log_drives;
@@ -260,6 +240,7 @@ typedef struct flags_structure {
    int fprmt;
    int fat32;
    int label;
+   int lba_marker; // write LBA marker 1023/254/63 if cylinder >1023
    int monochrome;
    int maximum_drive_number;
    int more_than_one_drive;
@@ -302,10 +283,7 @@ MEXTERN User_Defined_CHS_Settings user_defined_chs_settings[8];
 
 int Get_Environment_Settings( char *environment[] );
 int Get_Options( char *arguments[], int number_of_arguments );
-//MEXTERN int Partition_Type_To_Create(unsigned long size_in_mb);
-unsigned long Decimal_Number( unsigned long hex1, unsigned long hex2,
-                              unsigned long hex3, unsigned long hex4 );
-//MEXTERN void Convert_Long_To_Integer(long number);
+
 void Determine_Color_Video_Support( void );
 void Initialization( char *environment[] );
 void Re_Initialization( void );
@@ -313,16 +291,8 @@ void Reboot_PC( void );
 
 int Print_At( int column, int row, char *, ... );
 int Color_Print_At( int column, int row, char *, ... );
+int Normal_Print_At( int column, int row, char *, ... );
 int BlinkPrintAt( int column, int row, char *format, ... );
-
-ulong GetPercentOfLargeNumber( int percent, ulong number );
-
-typedef struct {
-   char *string;
-   int *flag;
-} OnOffTable;
-
-OnOffTable *FindOnOffTable( char *flagname );
 
 unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
                                  unsigned long total_heads,
@@ -330,5 +300,3 @@ unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
 unsigned long Convert_Sect_To_MB( unsigned long num_sect );
 unsigned long Convert_To_Percentage( unsigned long small_num,
                                      unsigned long large_num );
-unsigned long Convert_Percent_To_MB( unsigned long percent,
-                                     unsigned long total_cyl );

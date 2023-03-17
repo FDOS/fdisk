@@ -1,25 +1,4 @@
-/*
-// Program:  Free FDISK
-// Written By:  Brian E. Reifsnyder
-// Module:  USERINT1.C
-// Module Description:  First User Interface Code Module
-// Version:  1.3.1
-// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
-*/
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  DEFINES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
 #define USERINTM
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  INCLUDES
-/////////////////////////////////////////////////////////////////////////////
-*/
 
 #include <conio.h>
 #include <ctype.h>
@@ -40,41 +19,39 @@
 #include "userint1.h"
 #include "userint2.h"
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  GLOBAL VARIABLES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  FUNCTIONS
-/////////////////////////////////////////////////////////////////////////////
-*/
-
 /* Clear Screen */
 void Clear_Screen( int type ) /* Clear screen code as suggested by     */
 {                             /* Ralf Quint                            */
-   unsigned char color = flags.screen_color;
+   if ( flags.monochrome == TRUE ) {
+      Clear_Screen_With_Attr( type, 0x07 );
+   }
+   else {
+      Clear_Screen_With_Attr( type, flags.screen_color );
+   }
+}
+
+void Clear_Screen_With_Attr( int type, unsigned char attr )
+{
    asm {
     mov ah, 0x0f /* get max column to clear */
     int 0x10
     mov dh, ah
 
-
     mov ah, 0x06 /* scroll up */
     mov al, 0x00 /* 0 rows, clear whole window */
-    mov bh, BYTE PTR color /* set color */
-    xor cx, cx   /* coordinates of upper left corner of screen */
-   /*    mov dh,25    */ /* maximum row */
-    mov dl, 79   /* maximum column */
+    mov bh, BYTE PTR attr /* set color */
+    xor cx, cx      /* coordinates of upper left corner of screen */
+         /*    mov dh,25    */ /* maximum row */
+    mov dl, 79 /* maximum column */
+    push bp /* work arount IBM-XT BIOS bug */
     int 0x10
+    pop bp
    }
 
    if ( type != NOEXTRAS )
    {
       Display_Information();
-      Display_Label();
+      /*Display_Label();*/
    }
 }
 
@@ -130,11 +107,11 @@ void Display_Information( void )
       }
    }
 
-#ifdef BETA_RELEASE
-   Position_Cursor( 2, 1 );
-   Color_Print( "BETA RELEASE" );
-   Position_Cursor( 66, 1 );
-   Color_Print( "BETA RELEASE" );
+#ifndef RELEASE
+   Position_Cursor( 0, flags.extended_options_flag ? 1 : 0 );
+   Color_Print( "NON-RELEASE BUILD" );
+   Position_Cursor( 60, flags.extended_options_flag ? 1 : 0 );
+   Color_Print( __DATE__ " " __TIME__ );
 #endif
 
 #ifdef DEBUG
@@ -151,6 +128,7 @@ void Display_Information( void )
 }
 
 /* Display Label */
+/*
 void Display_Label( void )
 {
    if ( flags.label == TRUE ) {
@@ -158,7 +136,7 @@ void Display_Label( void )
 
       char label[20];
 
-      strcpy( label, PRINAME );
+      strcpy( label, FD_NAME );
 
       do {
          Print_At( 79, ( ( index * 2 ) + 3 ), "%c", label[index] );
@@ -166,7 +144,7 @@ void Display_Label( void )
       } while ( index < 10 );
    }
 }
-
+*/
 /* Exit Screen */
 void Exit_Screen( void )
 {
@@ -186,7 +164,7 @@ void Exit_Screen( void )
          Color_Print_At( 4, 13, "AFTER" );
          printf( " you restart." );
 
-         Input( 0, 0, 0, ESC, 0, 0, ESCE, 0, 0, NULL, NULL );
+         Input( 0, 0, 0, ESC, 0, 0, ESCE, 0, 0, '\0', '\0' );
          Clear_Screen( NOEXTRAS );
       }
       else {
@@ -207,6 +185,24 @@ void Exit_Screen( void )
    }
 }
 
+void Warn_Incompatible_Ext( void )
+{
+   Clear_Screen( NOEXTRAS );
+
+   Color_Print_At( 38, 4, "ERROR" );
+
+   Position_Cursor( 0, 7 );
+   printf(
+      "    A non-compatible extended partition layout was detected on\n"
+      "    this disk. The following actions are disabled:\n\n"
+      "      - creating logical drives\n"
+      "      - deleting logical drives\n\n"
+      "    You may re-create the extended partition to enable editing or\n"
+      "    use another disk utility to partition this disk.\n" );
+
+   Input( 0, 0, 0, ESC, 0, 0, ESCR, 0, 0, '\0', '\0' );
+}
+
 /* Interactive User Interface Control Routine */
 void Interactive_User_Interface( void )
 {
@@ -216,6 +212,16 @@ void Interactive_User_Interface( void )
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    flags.verbose = flags.quiet = 0;
+
+   /* abort if user decides so after beeing informed of FDISK not able
+      to correctly handle disks too large */
+   for ( index = 0; index <= flags.maximum_drive_number - 0x80; ++index ) {
+      if ( part_table[index].size_truncated ) {
+         if ( !Inform_About_Trimmed_Disk() ) {
+            goto ret;
+         }
+      }
+   }
 
    /* Ask the user if FAT32 is desired. */
    if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
@@ -227,6 +233,7 @@ void Interactive_User_Interface( void )
    //                                   DISABLED.
 
    do {
+
       menu = Standard_Menu( menu );
 
       pDrive = &part_table[flags.drive_number - 0x80];
@@ -279,7 +286,7 @@ void Interactive_User_Interface( void )
          /* Next, make sure that there is a space available of at least   */
          /* two cylinders.                                                */
          Determine_Free_Space();
-         if ( pDrive->pri_part_largest_free_space < 2 ) {
+         if ( pDrive->pri_free_space < 2 ) {
             counter = 4;
          }
 
@@ -300,7 +307,7 @@ void Interactive_User_Interface( void )
 
             Color_Print_At( 4, 22, "No space to create a DOS partition." );
 
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
       }
@@ -309,7 +316,7 @@ void Interactive_User_Interface( void )
          Create_DOS_Partition_Interface( PRIMARY );
       }
       if ( menu == CEDP ) {
-         if ( pDrive->ptr_ext_part ) {
+         if ( Num_Ext_Part( pDrive ) > 0 ) {
             Clear_Screen( 0 );
 
             Print_Centered( 4, "Create Extended DOS Partition", BOLD );
@@ -320,7 +327,7 @@ void Interactive_User_Interface( void )
 
             Color_Print_At( 4, 22, "Extended DOS Partition already exists." );
 
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
          }
          else {
             Create_DOS_Partition_Interface( EXTENDED );
@@ -334,7 +341,7 @@ void Interactive_User_Interface( void )
             Color_Print_At(
                4, 23, "an Extended DOS Partition on the current drive." );
             Print_At( 4, 24, "                                        " );
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
          else {
@@ -363,7 +370,7 @@ void Interactive_User_Interface( void )
          if ( counter == 0 ) {
             Color_Print_At( 4, 22, "No Primary DOS Partition to delete." );
             Print_At( 4, 24, "                                        " );
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
          /* */
@@ -376,7 +383,7 @@ void Interactive_User_Interface( void )
          if ( pDrive->ptr_ext_part == NULL ) {
             Color_Print_At( 4, 22, "No Extended DOS Partition to delete." );
             Print_At( 4, 24, "                                        " );
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
          else {
@@ -389,7 +396,7 @@ void Interactive_User_Interface( void )
               ( pDrive->ptr_ext_part == NULL ) ) {
             Color_Print_At( 4, 22, "No Logical DOS Drive(s) to delete." );
             Print_At( 4, 24, "                                        " );
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
          else {
@@ -414,7 +421,7 @@ void Interactive_User_Interface( void )
          if ( counter == 0 ) {
             Color_Print_At( 4, 22, "No Non-DOS Partition to delete." );
             Print_At( 4, 24, "                                        " );
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
          else {
@@ -430,9 +437,9 @@ void Interactive_User_Interface( void )
       }
 
       if ( menu == BMBR ) {
-         Create_BootEasy_MBR();
+         /*         Create_BootEasy_MBR();
          Color_Print_At( 4, 22, "BootEasy MBR has been created." );
-         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );*/
       }
 
       if ( menu == AMBR ) {
@@ -452,26 +459,27 @@ void Interactive_User_Interface( void )
          if ( !file_pointer ) {
             Color_Print_At(
                4, 22,
-               "\nUnable to find the \"boot.mbr\" file...MBR has not been created.\n" );
+               "\nUnable to find the \"boot.mbr\" file...MBR has not been loaded.\n" );
          }
          else {
-            Create_Alternate_MBR();
+            Load_MBR( 0 );
             Color_Print_At( 4, 22,
                             "MBR has been written using \"boot.mbr\"" );
+            Read_Partition_Tables();
          }
-         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
 
       if ( menu == SMBR ) {
          Save_MBR();
          Color_Print_At( 4, 22, "MBR has been saved to \"boot.mbr\"" );
-         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
 
       if ( menu == RMBR ) {
-         Remove_MBR();
-         Color_Print_At( 4, 22, "MBR has been removed from the hard disk." );
-         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+         Remove_IPL();
+         Color_Print_At( 4, 22, "Boot code has been removed from MBR." );
+         Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
 
       if ( menu != EXIT ) {
@@ -489,7 +497,10 @@ void Interactive_User_Interface( void )
       Exit_Screen();
    }
 
-   Clear_Screen( NOEXTRAS );
+ret:
+   /* clear screen with "normal" black background and position cursor at the
+      top left */
+   Clear_Screen_With_Attr( NOEXTRAS, TEXT_ATTR_NORMAL );
    Position_Cursor( 0, 0 );
 }
 
@@ -536,11 +547,11 @@ void Print_Centered( int y, char *text, int style )
    }
 }
 
-/* Print 6 Digit Unsigned Long Values */
-void Print_UL( unsigned long number ) { printf( "%6lu", number ); }
+/* Print 7 Digit Unsigned Long Values */
+void Print_UL( unsigned long number ) { printf( "%7lu", number ); }
 
-/* Print 6 Digit Unsigned Long Values in bold print */
-void Print_UL_B( unsigned long number ) { Color_Printf( "%6lu", number ); }
+/* Print 7 Digit Unsigned Long Values in bold print */
+void Print_UL_B( unsigned long number ) { Color_Printf( "%7lu", number ); }
 
 /* Standard Menu Routine */
 /* Displays the menus laid out in a standard format and returns the */
@@ -552,9 +563,10 @@ int Standard_Menu( int menu )
 
    int input;
 
+   int minimum_option;
    int maximum_number_of_options = 0;
 
-   char copyleft[60] = "";
+   char copyleft[80] = "";
    char program_name[60] = "";
    char program_description[60] = "";
    char version[30] = "";
@@ -567,26 +579,20 @@ int Standard_Menu( int menu )
    char option_4[60] = "";
    char option_5[60] = "Change current fixed disk drive";
 
-   char optional_char_1[1] = { '\0' };
-   char optional_char_2[1] = { '\0' };
+   char optional_char_1 = '\0';
+   char optional_char_2 = '\0';
 
    for ( ;; ) {
       Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+      minimum_option = 1;
 
-      /* Load Menu Text */
-
-      if ( flags.use_freedos_label == FALSE ) {
-         strcpy( program_name, PRINAME );
-         strcat( program_name, "     Version " );
-         strcat( program_name, VERSION );
-      }
-      else {
-         strcpy( program_name, ALTNAME );
-      }
+      strcpy( program_name, FD_NAME );
+      strcat( program_name, " V" );
+      strcat( program_name, VERSION );
 
       strcpy( program_description, "Fixed Disk Setup Program" );
-      strcpy( copyleft, "GNU GPL Copyright Brian E. Reifsnyder " );
-      strcat( copyleft, COPYLEFT );
+      strcpy( copyleft, "GNU GPL (c) " COPYLEFT " by Brian E. Reifsnyder"
+                        " and The FreeDOS Community" );
 
       if ( menu == MM ) {
          maximum_number_of_options = 4;
@@ -631,10 +637,10 @@ int Standard_Menu( int menu )
       if ( menu == MBR ) {
          maximum_number_of_options = 4;
          strcpy( title, "MBR Maintenance" );
-         strcpy( option_1, "Create BootEasy MBR" );
-         strcpy( option_2, "Create MBR using the saved file" );
-         strcpy( option_3, "Save the MBR to a file" );
-         strcpy( option_4, "Remove the MBR from the disk" );
+         strcpy( option_1, "Create BootEasy MBR (disabled)" );
+         strcpy( option_2, "Load MBR (partitions and code) from saved file" );
+         strcpy( option_3, "Save the MBR (partitions and code) to a file" );
+         strcpy( option_4, "Remove boot code from the MBR" );
       }
 
       /* Display Program Name and Copyright Information */
@@ -667,6 +673,16 @@ int Standard_Menu( int menu )
       Print_At( 4, 6, "Current fixed disk drive: " );
       Color_Printf( "%d", ( flags.drive_number - 127 ) );
 
+      if ( part_table[flags.drive_number - 128].usable ) {
+         Color_Printf( "   %lu",
+                       part_table[flags.drive_number - 128].disk_size_mb );
+         printf( " Mbytes" );
+      }
+      else {
+         Color_Print( " is unusable!" );
+         minimum_option = 5;
+      }
+
       if ( menu == DP ) {
          /* Ensure that primary partitions are available to delete. */
          counter = 0;
@@ -682,7 +698,7 @@ int Standard_Menu( int menu )
          if ( counter == 0 ) {
             Color_Print_At( 4, 22, "No partitions to delete." );
             Print_At( 4, 24, "                                        " );
-            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, NULL, NULL );
+            Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
             return ( menu );
          }
@@ -691,20 +707,21 @@ int Standard_Menu( int menu )
       /* Display Menu */
       Print_At( 4, 8, "Choose one of the following:" );
 
-      Color_Print_At( 4, 10, "1.  " );
-      printf( "%s", option_1 );
-
-      if ( maximum_number_of_options > 1 ) {
+      if ( minimum_option <= 1 ) {
+         Color_Print_At( 4, 10, "1.  " );
+         printf( "%s", option_1 );
+      }
+      if ( maximum_number_of_options > 1 && minimum_option <= 2 ) {
          Color_Print_At( 4, 11, "2.  " );
          printf( "%s", option_2 );
       }
 
-      if ( maximum_number_of_options > 2 ) {
+      if ( maximum_number_of_options > 2 && minimum_option <= 3 ) {
          Color_Print_At( 4, 12, "3.  " );
          printf( "%s", option_3 );
       }
 
-      if ( maximum_number_of_options > 3 ) {
+      if ( maximum_number_of_options > 3 && minimum_option <= 4 ) {
          Color_Print_At( 4, 13, "4.  " );
          printf( "%s", option_4 );
       }
@@ -715,24 +732,25 @@ int Standard_Menu( int menu )
          printf( "%s", option_5 );
       }
 
-      if ( ( menu == MM ) && ( flags.extended_options_flag == TRUE ) ) {
+      if ( menu == MM && flags.extended_options_flag == TRUE &&
+           minimum_option == 1 ) {
          Color_Print_At( 50, 15, "M.  " );
          printf( "MBR maintenance" );
 
-         optional_char_1[0] = 'M';
+         optional_char_1 = 'M';
       }
       else {
-         optional_char_1[0] = '\0';
+         optional_char_1 = '\0';
       }
 
-      if ( ( menu == MM ) && ( flags.allow_abort == TRUE ) ) {
+      if ( menu == MM && flags.allow_abort == TRUE && minimum_option == 1 ) {
          Color_Print_At( 50, 16, "A.  " );
          printf( "Abort changes and exit" );
 
-         optional_char_2[0] = 'A';
+         optional_char_2 = 'A';
       }
       else {
-         optional_char_2[0] = '\0';
+         optional_char_2 = '\0';
       }
 
       /* Display Special Messages */
@@ -757,12 +775,13 @@ int Standard_Menu( int menu )
       Print_At( 4, 17, "Enter choice: " );
 
       if ( menu == MM ) {
-         input = (int)Input( 1, 19, 17, NUM, 1, maximum_number_of_options,
-                             ESCE, 1, 0, optional_char_1, optional_char_2 );
+         input = (int)Input( 1, 19, 17, NUM, minimum_option,
+                             maximum_number_of_options, ESCE, 1, 0,
+                             optional_char_1, optional_char_2 );
       }
       else {
          input = (int)Input( 1, 19, 17, NUM, 1, maximum_number_of_options,
-                             ESCR, -1, 0, NULL, NULL );
+                             ESCR, -1, 0, '\0', '\0' );
       }
 
       /* Process the input */

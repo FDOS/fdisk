@@ -1,13 +1,4 @@
 /*
-// Program:  Free FDISK
-// Written By:  Brian E. Reifsnyder
-// Module:  KBDINPUT.C
-// Module Description:  Keyboard Interface Routine
-// Version:  1.3.1
-// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
-*/
-
-/*
 CATS message store for kbdinput.c:
 
 $set 4
@@ -27,19 +18,7 @@ $set 4
 
 */
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  DEFINES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
 #define KBDINPUT
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  INCLUDES
-/////////////////////////////////////////////////////////////////////////////
-*/
 
 #include <conio.h>
 #include <ctype.h>
@@ -56,24 +35,13 @@ $set 4
 #include "pdiskio.h"
 #include "userint1.h"
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  GLOBAL VARIABLES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  FUNCTIONS
-/////////////////////////////////////////////////////////////////////////////
-*/
-
 /* Get input from keyboard */
 unsigned long Input( int size_of_field, int x_position, int y_position,
-                     int type, int min_range, long max_range,
-                     int return_message, long default_value,
-                     long maximum_possible_percentage,
-                     char optional_char_1[1], char optional_char_2[1] )
+                     int type, unsigned long min_range,
+                     unsigned long max_range, int return_message,
+                     long default_value,
+                     unsigned long maximum_possible_percentage,
+                     char optional_char_1, char optional_char_2 )
 {
    /*
   size_of_field:                 number of characters for the user to enter,
@@ -117,8 +85,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                                  Set this to -1 if it is not used.
   maximum_possible_percentage                   If type is NUMP, this is the
                                                 maximum percentage possible.
-  optional_char_1[1] and
-  optional_char_2[1]             2 optional character fields for use with
+  optional_char_1   and
+  optional_char_2                2 optional character fields for use with
                                  the NUM type when size_of_field==1
                                  Also is used as two option number fields
                                  (converted to char value) when type==CHAR
@@ -147,10 +115,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
 
    /* Clear line buffer */
    index = 0;
-   do {
-      line_buffer[index] = 0;
-      index++;
-   } while ( index < 10 );
+   memset( line_buffer, 0, sizeof( line_buffer ) );
 
    /* Place appropriate text on the screen prior to obtaining input */
    if ( type != ESC ) {
@@ -193,9 +158,9 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
    if ( ( default_value >= 0 ) && ( type == NUM ) &&
         ( size_of_field == 1 ) ) {
       Position_Cursor( x_position + 1, y_position );
-      printf( "%d", default_value );
+      printf( "%ld", default_value );
       line_buffer_index = 0;
-      line_buffer[0] = default_value + 48;
+      line_buffer[0] = default_value + '0';
    }
 
    /* Set the default value for NUMP type, if applicable */
@@ -257,10 +222,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
          line_buffer_index = 0;
 
          index = 0;
-         do {
-            line_buffer[index] = 0;
-            index++;
-         } while ( index < 10 );
+         memset( line_buffer, 0, sizeof( line_buffer ) );
 
          default_value_preentered = FALSE;
       }
@@ -365,7 +327,13 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
             } while ( index >= 0 );
 
             if ( percent_entered == TRUE ) {
-               data = ( data * data_max_range ) / maximum_possible_percentage;
+               if ( maximum_possible_percentage ) {
+                  data =
+                     ( data * data_max_range ) / maximum_possible_percentage;
+               }
+               else {
+                  data = 0;
+               }
             }
 
             /* Make sure that data is <= max_range */
@@ -427,10 +395,10 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       }
 
       if ( ( type == CHARNUM ) &&
-           ( ( input == optional_char_1[0] ) ||
-             ( ( input - 32 ) == optional_char_1[0] ) ||
-             ( input == optional_char_2[0] ) ||
-             ( ( input - 32 ) == optional_char_2[0] ) ) ) {
+           ( ( input == optional_char_1 ) ||
+             ( ( input - 32 ) == optional_char_1 ) ||
+             ( input == optional_char_2 ) ||
+             ( ( input - 32 ) == optional_char_2 ) ) ) {
          if ( input >= 97 ) {
             input = input - 32;
          }
@@ -454,9 +422,9 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       }
 
       /* Process a legitimate entry if type==NUMCHAR. */
-      if ( ( type == NUMCHAR ) && ( optional_char_1[0] != NULL ) &&
-           ( optional_char_2[0] != NULL ) ) {
-         char_max_range = atoi( optional_char_2 );
+      if ( ( type == NUMCHAR ) && ( optional_char_1 != NULL ) &&
+           ( optional_char_2 != NULL ) ) {
+         char_max_range = optional_char_2 - '0';
 
          if ( ( input >= '1' ) && ( input <= ( char_max_range + 48 ) ) ) {
             line_buffer_index = 1;
@@ -475,10 +443,10 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       }
 
       /* Process optional character fields. */
-      if ( ( type == NUM ) && ( ( optional_char_1[0] != NULL ) ||
-                                ( optional_char_2[0] != NULL ) ) ) {
-         if ( ( input == optional_char_1[0] ) ||
-              ( ( input - 32 ) == optional_char_1[0] ) ) {
+      if ( ( type == NUM ) &&
+           ( ( optional_char_1 != '\0' ) || ( optional_char_2 != '\0' ) ) ) {
+         if ( ( input == optional_char_1 ) ||
+              ( ( input - 32 ) == optional_char_1 ) ) {
             if ( input >= 97 ) {
                input = input - 32;
             }
@@ -492,8 +460,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
             Color_Printf( "%c", line_buffer[0] );
          }
 
-         if ( ( input == optional_char_2[0] ) ||
-              ( ( input - 32 ) == optional_char_2[0] ) ) {
+         if ( ( input == optional_char_2 ) ||
+              ( ( input - 32 ) == optional_char_2 ) ) {
             if ( input >= 97 ) {
                input = input - 32;
             }
@@ -508,9 +476,9 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
          }
       }
 
-      if ( ( type == CHAR ) && ( optional_char_1[0] != NULL ) &&
-           ( optional_char_2[0] != NULL ) ) {
-         char_max_range = atoi( optional_char_2 );
+      if ( ( type == CHAR ) && ( optional_char_1 != NULL ) &&
+           ( optional_char_2 != NULL ) ) {
+         char_max_range = optional_char_2 - '0';
 
          if ( ( input >= '1' ) && ( input <= ( char_max_range + 48 ) ) ) {
             line_buffer_index = 1;
@@ -523,9 +491,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       }
 
       if ( ( ( type == YN ) || ( type == NUMYN ) ) &&
-           ( optional_char_1[0] != NULL ) &&
-           ( optional_char_2[0] != NULL ) ) {
-         char_max_range = atoi( optional_char_2 );
+           ( optional_char_1 != NULL ) && ( optional_char_2 != NULL ) ) {
+         char_max_range = optional_char_2 - '0';
 
          if ( ( input >= '1' ) && ( input <= ( char_max_range + 48 ) ) ) {
             line_buffer_index = 1;
@@ -637,7 +604,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                  ( input > 9 ) ) {
                proper_input_given = FALSE;
 
-               Color_Print_At( 4, 23, "Invalid entry, please enter %d-%d.",
+               Color_Print_At( 4, 23, "Invalid entry, please enter %lu-%lu.",
                                min_range, max_range );
                invalid_input = TRUE;
             }
@@ -649,7 +616,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
 
                Color_Print_At( 4, 23, "%d is not a choice, please enter ",
                                input );
-               Color_Printf( "%d-%d.", min_range, max_range );
+               Color_Printf( "%lu-%lu.", min_range, max_range );
                invalid_input = TRUE;
             }
 
@@ -744,7 +711,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                    ( input > 9 ) ) ) {
                proper_input_given = FALSE;
 
-               Color_Print_At( 4, 23, "Invalid entry, please enter %d-%d.",
+               Color_Print_At( 4, 23, "Invalid entry, please enter %lu-%lu.",
                                min_range, max_range );
                invalid_input = TRUE;
             }
@@ -756,7 +723,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
 
                Color_Print_At( 4, 23, "%d is not a choice, please enter ",
                                input );
-               Color_Printf( "%d-%d.", min_range, max_range );
+               Color_Printf( "%lu-%lu.", min_range, max_range );
                invalid_input = TRUE;
             }
 

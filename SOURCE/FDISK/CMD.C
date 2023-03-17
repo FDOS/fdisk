@@ -119,16 +119,19 @@ void Command_Line_Clear_Flag( void )
       } while ( index <= 64 );
 
       printf( "\n" );
-      printf( catgets( cat, 2, 3, "All flags have been cleared" ) );
+      printf( catgets( cat, 2, 3, "All flags have been cleared." ) );
       printf( "\n" );
    }
    else {
-      Clear_Flag( (int)arg[0].value );
+      if ( Clear_Flag( (int)arg[0].value ) != 0 ) {
+         printf( "\nError clearing flag.\n" );
+         exit( 9 );
+      }
 
       printf( "\n" );
       printf( catgets( cat, 2, 4, "Flag" ) );
       printf( " %d ", arg[0].value );
-      printf( catgets( cat, 2, 5, "has been cleared" ) );
+      printf( catgets( cat, 2, 5, "has been cleared." ) );
       printf( "\n" );
    }
 
@@ -138,18 +141,21 @@ void Command_Line_Clear_Flag( void )
 /* /EXT command line options */
 void Command_Line_Create_Extended_Partition( void )
 {
-   int maximum_possible_percentage;
-
-   long maximum_partition_size_in_MB;
+   unsigned long maximum_possible_percentage;
+   unsigned long maximum_partition_size_in_MB;
+   int error_code = 0;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    if ( arg[0].value == 0 ) {
       printf( "\n" );
-      printf( catgets( cat, 2, 6, "Invalid partition size specifed" ) );
+      printf( catgets( cat, 2, 6, "Invalid partition size specifed." ) );
       printf( "\n" );
-      printf( catgets( cat, 2, 2, "Program Terminated" ) );
-      printf( "\n" );
+      exit( 9 );
+   }
+
+   if ( pDrive->ptr_ext_part ) {
+      printf( "\nExtended partition already exists.\n" );
       exit( 9 );
    }
 
@@ -157,10 +163,10 @@ void Command_Line_Create_Extended_Partition( void )
 
    maximum_partition_size_in_MB = Max_Pri_Part_Size_In_MB( EXTENDED );
 
-   maximum_possible_percentage = (int)Convert_To_Percentage(
-      maximum_partition_size_in_MB, pDrive->total_disk_size_in_MB );
+   maximum_possible_percentage = Convert_To_Percentage(
+      maximum_partition_size_in_MB, pDrive->disk_size_mb );
 
-   //   ,pDrive->ext_part_size_in_MB);
+   //   ,pDrive->ext_size_mb);
 
    if ( arg[0].extra_value == 100 ) {
       /* Set limit on percentage. */
@@ -172,16 +178,21 @@ void Command_Line_Create_Extended_Partition( void )
       }
 
       /* Determine partition size. */
-      arg[0].value = ( arg[0].value * maximum_partition_size_in_MB ) /
-                     maximum_possible_percentage;
-
-      /*
-    arg[0].value = Convert_Percent_To_MB(arg[0].value
-     ,(pDrive->total_cyl+1) );
-*/
+      if ( maximum_possible_percentage > 0 ) {
+         arg[0].value = ( arg[0].value * maximum_partition_size_in_MB ) /
+                        maximum_possible_percentage;
+      }
+      else {
+         arg[0].value = 0;
+      }
    }
 
-   Create_Primary_Partition( 5, arg[0].value );
+   error_code = Create_Primary_Partition( 5, arg[0].value );
+
+   if ( error_code == 99 ) {
+      printf( "\nError creating extended partition.\n" );
+      exit( 9 );
+   }
 
    Shift_Command_Line_Options( 1 );
 }
@@ -189,20 +200,23 @@ void Command_Line_Create_Extended_Partition( void )
 /* /LOG and /LOGO command line options */
 void Command_Line_Create_Logical_DOS_Drive( void )
 {
-   int maximum_possible_percentage;
+   unsigned long maximum_possible_percentage;
+   unsigned long maximum_partition_size_in_MB;
    int option_count = 1;
-
-   //  long ext_part_size;
-   long maximum_partition_size_in_MB;
+   int error_code;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    if ( arg[0].value == 0 ) {
       printf( "\n" );
-      printf( catgets( cat, 2, 6, "Invalid partition size specifed" ) );
+      printf( catgets( cat, 2, 6, "Invalid partition size specifed." ) );
       printf( "\n" );
-      printf( catgets( cat, 2, 2, "Program Terminated" ) );
-      printf( "\n" );
+
+      exit( 9 );
+   }
+
+   if ( !pDrive->ext_usable ) {
+      printf( "\nNo usable extended partition found.\n" );
       exit( 9 );
    }
 
@@ -210,8 +224,8 @@ void Command_Line_Create_Logical_DOS_Drive( void )
 
    maximum_partition_size_in_MB = Max_Log_Part_Size_In_MB();
 
-   maximum_possible_percentage = (int)Convert_To_Percentage(
-      maximum_partition_size_in_MB, pDrive->ext_part_size_in_MB );
+   maximum_possible_percentage = Convert_To_Percentage(
+      maximum_partition_size_in_MB, pDrive->ext_size_mb );
 
    if ( arg[0].extra_value == 100 ) {
       /* Set limit on percentage. */
@@ -223,25 +237,31 @@ void Command_Line_Create_Logical_DOS_Drive( void )
       }
 
       /* Determine partition size. */
-      arg[0].value = ( arg[0].value * maximum_partition_size_in_MB ) /
-                     maximum_possible_percentage;
-
-      /* Compute the partition size as a percentage. */
-
-      //    arg[0].value = Convert_Percent_To_MB(arg[0].value,ext_part_size);
+      if ( maximum_possible_percentage > 0 ) {
+         arg[0].value = ( arg[0].value * maximum_partition_size_in_MB ) /
+                        maximum_possible_percentage;
+      }
+      else {
+         arg[0].value = 0;
+      }
    }
 
    if ( 0 != strcmp( arg[1].choice, "SPEC" ) ) {
       /* If no special partition type is defined. */
 
-      Create_Logical_Drive( Partition_Type_To_Create( arg[0].value, 0 ),
-                            arg[0].value );
+      error_code = Create_Logical_Drive(
+         Partition_Type_To_Create( arg[0].value, 0 ), arg[0].value );
    }
    else {
       /* If a special partition type is defined. */
       option_count = 2;
 
-      Create_Logical_Drive( (int)arg[1].value, arg[0].value );
+      error_code = Create_Logical_Drive( (int)arg[1].value, arg[0].value );
+   }
+
+   if ( error_code == 99 ) {
+      printf( "\nError creating logical drive.\n" );
+      exit( 9 );
    }
 
    Shift_Command_Line_Options( option_count );
@@ -250,19 +270,19 @@ void Command_Line_Create_Logical_DOS_Drive( void )
 /* /PRI and /PRIO command line options */
 void Command_Line_Create_Primary_Partition( void )
 {
-   int maximum_possible_percentage;
+   unsigned long maximum_possible_percentage;
+   unsigned long maximum_partition_size_in_MB;
    int option_count = 1;
-
-   long maximum_partition_size_in_MB;
+   int part_no = 0;
+   int part_type = 0;
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    if ( arg[0].value == 0 ) {
       printf( "\n" );
-      printf( catgets( cat, 2, 6, "Invalid partition size specifed" ) );
+      printf( catgets( cat, 2, 6, "Invalid partition size specifed." ) );
       printf( "\n" );
-      printf( catgets( cat, 2, 2, "Program Terminated" ) );
-      printf( "\n" );
+
       exit( 9 );
    }
 
@@ -270,8 +290,8 @@ void Command_Line_Create_Primary_Partition( void )
 
    maximum_partition_size_in_MB = Max_Pri_Part_Size_In_MB( PRIMARY );
 
-   maximum_possible_percentage = (int)Convert_To_Percentage(
-      maximum_partition_size_in_MB, pDrive->total_disk_size_in_MB );
+   maximum_possible_percentage = Convert_To_Percentage(
+      maximum_partition_size_in_MB, pDrive->disk_size_mb );
 
    if ( arg[0].extra_value == 100 ) {
       /* Set limit on percentage. */
@@ -283,22 +303,30 @@ void Command_Line_Create_Primary_Partition( void )
       }
 
       /* Determine partition size. */
-      arg[0].value = ( arg[0].value * maximum_partition_size_in_MB ) /
-                     maximum_possible_percentage;
+      if ( maximum_possible_percentage > 0 ) {
+         arg[0].value = ( arg[0].value * maximum_partition_size_in_MB ) /
+                        maximum_possible_percentage;
+      }
+      else {
+         arg[0].value = 0;
+      }
    }
 
    if ( 0 != strcmp( arg[1].choice, "SPEC" ) ) {
-      /* If no special partition type is defined. */
-
-      Set_Active_Partition_If_None_Is_Active( Create_Primary_Partition(
-         Partition_Type_To_Create( arg[0].value, 0 ), arg[0].value ) );
+      part_type = Partition_Type_To_Create( arg[0].value, 0 );
    }
    else {
       /* If a special partition type is defined. */
       option_count = 2;
-
-      Create_Primary_Partition( (int)arg[1].value, arg[0].value );
+      part_type = (int)arg[1].value;
    }
+
+   part_no = Create_Primary_Partition( part_type, arg[0].value );
+   if ( part_no == 99 ) {
+      printf( "\nError creating primary partition.\n" );
+      exit( 9 );
+   }
+   Set_Active_Partition_If_None_Is_Active( part_no );
 
    Shift_Command_Line_Options( option_count );
 }
@@ -307,18 +335,19 @@ void Command_Line_Create_Primary_Partition( void )
 void Command_Line_Delete( void )
 {
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+   int error_code = 0;
 
    /* Delete the primary partition */
    if ( 0 == strcmp( arg[1].choice, "PRI" ) ) {
       if ( arg[1].value != 0 ) /* specified what to delete */
       {
          if ( arg[1].value < 1 || arg[1].value > 4 ) {
-            printf( "primary partition # (%ld) must be 1..4\n",
+            printf( "primary partition # (%ld) must be 1..4.\n",
                     (long)arg[1].value );
             exit( 9 );
          }
 
-         Delete_Primary_Partition( (int)( arg[1].value - 1 ) );
+         error_code = Delete_Primary_Partition( (int)( arg[1].value - 1 ) );
       }
       else { /* no number given, delete 'the' partition */
          int index, found, count;
@@ -331,75 +360,68 @@ void Command_Line_Delete( void )
             }
          }
          if ( count == 0 ) {
-            printf( "no partition to delete found\n" ); /* but continue */
+            printf( "No partition to delete found.\n" ); /* but continue */
          }
          else if ( count > 1 ) {
             printf(
-               "%d primary partitions found, you must specify number to delete\n",
+               "%d primary partitions found, you must specify number to delete.\n",
                count );
             exit( 9 );
          }
          else {
-            Delete_Primary_Partition( found );
+            error_code = Delete_Primary_Partition( found );
          }
+      }
+      if ( error_code == 99 ) {
+         printf( "\nError deleting primary partition.\n" );
+         exit( 9 );
       }
    } /* end PRI */
 
    /* Delete the extended partition */
-   if ( 0 == strcmp( arg[1].choice, "EXT" ) ) {
-      int index = 3;
+   else if ( 0 == strcmp( arg[1].choice, "EXT" ) ) {
+      error_code = Delete_Extended_Partition();
 
-      do {
-         if ( ( ( flags.version == FOUR ) || ( flags.version == FIVE ) ||
-                ( flags.version == SIX ) ) &&
-              ( pDrive->pri_part[index].num_type == 5 ) ) {
-            Delete_Primary_Partition( index );
-            break;
-         }
-         if ( ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
-                ( flags.version == W98 ) ) &&
-              ( ( pDrive->pri_part[index].num_type == 5 ) ||
-                ( pDrive->pri_part[index].num_type == 15 ) ) ) {
-            Delete_Primary_Partition( index );
-            break;
-         }
-
-         index--;
-      } while ( index >= 0 );
-
-      if ( index < 0 ) {
-         printf(
-            "\nExtended DOS Partition not found...no partition deleted.\n" );
+      if ( error_code == 99 ) {
+         printf( "\nError deleting extended partition.\n" );
          exit( 9 );
       }
    }
 
    /* Delete a Logical DOS Drive */
-   if ( 0 == strcmp( arg[1].choice, "LOG" ) ) {
+   else if ( 0 == strcmp( arg[1].choice, "LOG" ) ) {
       if ( ( arg[1].value >= 1 ) && ( arg[1].value <= 23 ) ) {
-         Delete_Logical_Drive( (int)( arg[1].value - 1 ) );
+         error_code = Delete_Logical_Drive( (int)( arg[1].value - 1 ) );
       }
       else {
-         printf(
-            "\nLogical drive number  (%d) is out of range...Operation Terminated\n",
-            arg[1].value );
+         printf( "\nLogical drive number %d is out of range.\n",
+                 arg[1].value );
          exit( 9 );
       }
    }
 
    /* Delete the partition by the number of the partition */
-   if ( 0 == strcmp( arg[1].choice, "NUM" ) ) {
+   else if ( 0 == strcmp( arg[1].choice, "NUM" ) ) {
       if ( ( arg[1].value >= 1 ) && ( arg[1].value <= 4 ) ) {
-         Delete_Primary_Partition( (int)( arg[1].value - 1 ) );
+         error_code = Delete_Primary_Partition( (int)( arg[1].value - 1 ) );
       }
       else if ( ( arg[1].value >= 5 ) && ( arg[1].value <= 28 ) ) {
-         Delete_Logical_Drive( (int)( arg[1].value - 5 ) );
+         error_code = Delete_Logical_Drive( (int)( arg[1].value - 5 ) );
       }
       else {
-         printf(
-            "\nPartition number is out of range...Operation Terminated\n" );
+         printf( "\nPartition number is out of range.\n" );
          exit( 9 );
       }
+   }
+
+   else {
+      printf( "\nInvalid delete argument.\n" );
+      exit( 9 );
+   }
+
+   if ( error_code != 0 ) {
+      printf( "\nError deleting logical drive.\n" );
+      exit( 9 );
    }
 
    Shift_Command_Line_Options( 2 );
@@ -411,9 +433,10 @@ void Command_Line_Info( void )
    int option_count = 1;
 
    if ( 0 == strcmp( arg[1].choice, "TECH" ) ) {
+      /* for backwards compatibility. full info is always shown */
       option_count = 2;
 
-      flags.extended_options_flag = TRUE;
+      /*flags.extended_options_flag = TRUE;*/
    }
 
    Display_CL_Partition_Table();
@@ -424,20 +447,17 @@ void Command_Line_Info( void )
 /* /MODIFY command line option */
 void Command_Line_Modify( void )
 {
-   /*
-  if((arg[0].value<1) || (arg[0].value>4))
-    {
-    printf("\nPrimary partition number is out of range...Operation Terminated.\n");
-    exit(9);
-    }
-*/
+
    if ( ( arg[0].extra_value == 0 ) || ( arg[0].extra_value > 255 ) ) {
-      printf(
-         "\nNew partition type is out of range...Operation Terminated.\n" );
+      printf( "\nNew partition type is out of range.\n" );
       exit( 9 );
    }
 
-   Modify_Partition_Type( (int)( arg[0].value - 1 ), arg[0].extra_value );
+   if ( Modify_Partition_Type( (int)( arg[0].value - 1 ),
+                               arg[0].extra_value ) != 0 ) {
+      printf( "\nError modifying partition type.\n" );
+      exit( 9 );
+   }
 
    Shift_Command_Line_Options( 1 );
 }
@@ -446,19 +466,20 @@ void Command_Line_Modify( void )
 void Command_Line_Move( void )
 {
    if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
-      printf(
-         "\nSource partition number is out of range...Operation Terminated.\n" );
+      printf( "\nSource partition number is out of range.\n" );
       exit( 9 );
    }
 
    if ( ( arg[0].extra_value < 1 ) || ( arg[0].extra_value > 4 ) ) {
-      printf(
-         "\nDestination partition number is out of range...Operation Terminated.\n" );
+      printf( "\nDestination partition number is out of range.\n" );
       exit( 9 );
    }
 
-   Primary_Partition_Slot_Transfer( MOVE, (int)arg[0].value,
-                                    arg[0].extra_value );
+   if ( Primary_Partition_Slot_Transfer( MOVE, (int)arg[0].value,
+                                         arg[0].extra_value ) != 0 ) {
+      printf( "\nError moving partition slot.\n" );
+      exit( 9 );
+   }
 
    Shift_Command_Line_Options( 1 );
 }
@@ -467,8 +488,7 @@ void Command_Line_Move( void )
 void Command_Line_Set_Flag( void )
 {
    if ( ( arg[0].value < 1 ) || ( arg[0].value > 64 ) ) {
-      printf( "\nInvalid flag number...Operation Terminated.\n" );
-
+      printf( "\nInvalid flag number.\n" );
       exit( 9 );
    }
 
@@ -477,12 +497,14 @@ void Command_Line_Set_Flag( void )
    }
 
    if ( ( arg[0].extra_value < 1 ) || ( arg[0].extra_value > 64 ) ) {
-      printf( "\nFlag value is out of range...Operation Terminated.\n" );
-
+      printf( "\nFlag value is out of range.\n" );
       exit( 9 );
    }
 
-   Set_Flag( (int)arg[0].value, arg[0].extra_value );
+   if ( Set_Flag( (int)arg[0].value, arg[0].extra_value ) != 0 ) {
+      printf( "\nError setting flag.\n" );
+      exit( 9 );
+   }
 
    printf( "\nFlag %d has been set to ", arg[0].value );
    printf( "%d.\n", arg[0].extra_value );
@@ -494,7 +516,7 @@ void Command_Line_Set_Flag( void )
 void Command_Line_Status( void )
 {
    flags.monochrome = TRUE;
-   textcolor( 7 );
+   textattr( 7 );
    Clear_Screen( 0 );
    Print_Centered( 1, "Fixed Disk Drive Status", 0 );
    Display_All_Drives();
@@ -506,19 +528,20 @@ void Command_Line_Status( void )
 void Command_Line_Swap( void )
 {
    if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
-      printf(
-         "\nSource partition number is out of range...Operation Terminated.\n" );
+      printf( "\nSource partition number is out of range.\n" );
       exit( 9 );
    }
 
    if ( ( arg[0].extra_value < 1 ) || ( arg[0].extra_value > 4 ) ) {
-      printf(
-         "\nDestination partition number is out of range...Operation Terminated.\n" );
+      printf( "\nDestination partition number is out of range.\n" );
       exit( 9 );
    }
 
-   Primary_Partition_Slot_Transfer( SWAP, (int)arg[0].value,
-                                    arg[0].extra_value );
+   if ( Primary_Partition_Slot_Transfer( SWAP, (int)arg[0].value,
+                                         arg[0].extra_value ) != 0 ) {
+      printf( "\nError swapping partitions.\n" );
+      exit( 9 );
+   }
 
    Shift_Command_Line_Options( 1 );
 }
@@ -565,9 +588,9 @@ void Command_Line_X( void )
    int index;
 
    /* Ask the user if FAT32 is desired. */
-   if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
+   /*if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
       Ask_User_About_FAT32_Support();
-   }
+   }*/
 
    flags.use_extended_int_13 = FALSE;
    index = 0;
@@ -576,8 +599,16 @@ void Command_Line_X( void )
       index++;
    } while ( index < 8 );
 
-   Read_Partition_Tables();
-   Interactive_User_Interface();
+   if ( Read_Partition_Tables() != 0 ) {
+      Color_Print( "\n    Error reading partition tables.\n" );
+      exit( 1 );
+   }
+   /*if ( flags.maximum_drive_number == 0 ) {
+      Color_Print( "\n    No fixed disks present.\n" );
+      exit( 6 );
+   }
+
+   Interactive_User_Interface();*/
 }
 
 /* Get the command line options */
@@ -650,27 +681,36 @@ int Get_Options( char *argv[], int argc )
 
       argptr++;
 
-      arg[number_of_options].value = atol( argptr );
+      if ( isdigit( *argptr ) ) {
+         arg[number_of_options].value = atol( argptr );
 
-      while ( isdigit( *argptr ) ) { /* skip number */
+         while ( isdigit( *argptr ) ) { /* skip number */
+            argptr++;
+         }
+
+         if ( *argptr == 0 ) { /* done */
+            continue;
+         }
+
+         if ( *argptr != ',' ) {
+            printf( "<%s> ',' expected; terminated\n", argptr );
+            exit( 9 );
+         }
+
          argptr++;
+
+         arg[number_of_options].extra_value = (int)atol( argptr );
+
+         while ( isdigit( *argptr ) ) { /* skip number */
+            argptr++;
+         }
       }
-
-      if ( *argptr == 0 ) { /* done */
-         continue;
-      }
-
-      if ( *argptr != ',' ) {
-         printf( "<%s> ',' expected; terminated\n", argptr );
-         exit( 9 );
-      }
-
-      argptr++;
-
-      arg[number_of_options].extra_value = (int)atol( argptr );
-
-      while ( isdigit( *argptr ) ) { /* skip number */
-         argptr++;
+      else {
+         if ( !stricmp( argptr, "MAX" ) ) {
+            arg[number_of_options].value = 100;
+            arg[number_of_options].extra_value = 100;
+            argptr += 3;
+         }
       }
 
       if ( *argptr != 0 ) /* done */
@@ -683,7 +723,7 @@ int Get_Options( char *argv[], int argc )
    /* check to make sure the drive is a legitimate number */
    if ( ( flags.drive_number < 0x80 ) ||
         ( flags.drive_number > flags.maximum_drive_number ) ) {
-      printf( "\nInvalid drive designation...Operation Terminated.\n" );
+      printf( "\nInvalid drive designation.\n" );
       exit( 5 );
    }
 

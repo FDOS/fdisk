@@ -1,89 +1,43 @@
-/*
-// Program:  Free FDISK
-// Module:  PDISKIO.H
-// Module Description:  PDISKIO.C Header File
-// Written By:  Brian E. Reifsnyder
-// Module Version:  3.0
-// Copyright:  1998-2001 under the terms of the GNU GPL, Version 2
-*/
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  DEFINES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
 #ifndef PDISKIO_H
 #define PDISKIO_H
 
-#ifdef PDISKIO
-#define PEXTERN
-#else
-#define PEXTERN extern
-#endif
+#define MAX_LOGICAL_DRIVES 23
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  SPECIAL
-/////////////////////////////////////////////////////////////////////////////
-*/
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  GLOBAL VARIABLES
-/////////////////////////////////////////////////////////////////////////////
-*/
+#define SECT_SIZE 512
 
 /* Buffers */
-PEXTERN unsigned char sector_buffer[512];
-//PEXTERN unsigned char far huge_sector_buffer[(512*32)];
+extern unsigned char sector_buffer[SECT_SIZE];
 
 /* Brief partition type table buffer for computing drive letters. */
-PEXTERN int brief_partition_table[8][27];
+extern int brief_partition_table[8][27];
 
 /* Buffer containing drive letters. */
-PEXTERN char drive_lettering_buffer[8][27];
+extern char drive_lettering_buffer[8][27];
 
-/* Integers converted from long numbers */
-/*PEXTERN int integer1;
-PEXTERN int integer2;
-*/
-
-/* LBA Specific Global Variables */
-PEXTERN unsigned char disk_address_packet[16];
-PEXTERN unsigned char result_buffer[26];
-
-PEXTERN unsigned long translated_cylinder;
-PEXTERN unsigned long translated_head;
-PEXTERN unsigned long translated_sector;
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-// GLOBAL STRUCTURES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
-struct Partition {
+#define REL_END_SECT( p ) ( ( p ).rel_sect + ( p ).num_sect - 1 )
+typedef struct Partition {
    int active_status;
 
    int num_type;
    char vol_label[13];
 
-   long start_cyl;
-   long start_head;
-   long start_sect;
-   long end_cyl;
-   long end_head;
-   long end_sect;
+   unsigned long start_cyl;
+   unsigned long start_head;
+   unsigned long start_sect;
+   unsigned long end_cyl;  /* inclusive ! */
+   unsigned long end_head; /* inclusive ! */
+   unsigned long end_sect; /* inclusive ! */
 
    unsigned long rel_sect;
    unsigned long num_sect;
 
-   long size_in_MB;
-};
+   unsigned long size_in_MB;
+} Partition;
 
 /* Partition Table Structure...Created 5/6/1999 */
 typedef struct part_table_structure {
+
+   int usable; /* true if drive is found and primary partition coud be read */
 
    /* Hard disk Geometry */
    /* total_cyl and total_head are actually not the total but the highest
@@ -95,14 +49,14 @@ typedef struct part_table_structure {
 
    int ext_int_13;
    int ext_int_13_version;
-   int device_access_using_packet_structure;
+   int use_access_packet;
 
    /* Pre-computed hard disk sizes */
-   long total_disk_size_in_log_sectors;
-   unsigned long total_disk_size_in_MB;
+   unsigned long disk_size_sect;
+   unsigned long disk_size_mb;
 
+   int ext_usable; /* true if extended partition is compatible */
    int part_values_changed;
-   int pri_part_exists;
 
    /* Primary Partition Table */
 
@@ -112,66 +66,74 @@ typedef struct part_table_structure {
 
    int pri_part_created[4];
    /* General pre-computed information. */
-   unsigned long pri_part_largest_free_space;
+   unsigned long pri_free_space;
 
-   long pp_largest_free_space_start_cyl;
-   long pp_largest_free_space_start_head;
-   long pp_largest_free_space_start_sect;
-
-   long pp_largest_free_space_end_cyl;
+   /* largest free space for primary partition */
+   unsigned long free_start_cyl;
+   unsigned long free_start_head;
+   unsigned long free_start_sect;
+   unsigned long free_end_cyl;
 
    /* Extended Partition Table */
    struct Partition *ptr_ext_part;
 
-   long ext_part_size_in_MB;
-   unsigned long ext_part_num_sect;
-   long ext_part_largest_free_space;
+   unsigned long ext_size_mb;
+   unsigned long ext_num_sect;
+   unsigned long ext_free_space;
 
-   int log_drive_largest_free_space_location;
-   long log_drive_free_space_start_cyl;
-   long log_drive_free_space_end_cyl;
+   /* largest space for logical drive */
+   int log_free_loc;
+   unsigned long log_start_cyl;
+   unsigned long log_end_cyl;
 
    int num_of_log_drives;
    int num_of_non_dos_log_drives;
 
-   struct Partition log_drive[23];
+   struct Partition log_drive[MAX_LOGICAL_DRIVES];
 
-   int log_drive_created[23];
+   int log_drive_created[MAX_LOGICAL_DRIVES];
 
-   int next_ext_exists[23];
+   int next_ext_exists[MAX_LOGICAL_DRIVES];
 
-   struct Partition next_ext[23];
+   struct Partition next_ext[MAX_LOGICAL_DRIVES];
+
+   int size_truncated; /* true if disk size > 32-bit unsigned long */
 } Partition_Table;
 
-PEXTERN Partition_Table part_table[8];
+extern Partition_Table part_table[8];
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  PROTOTYPES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
-int Determine_Drive_Letters( void );
-/*PEXTERN int Read_Logical_Sectors(unsigned char drive_letter[2]
- , unsigned long logical_sector_number, int number_of_sectors); */
 int Read_Partition_Tables( void );
 int Read_Physical_Sectors( int drive, long cylinder, long head, long sector,
-                           int number_of_sectors );
-int Write_Logical_Sectors( unsigned char drive_letter[2],
-                           unsigned long logical_sector_number,
                            int number_of_sectors );
 int Write_Partition_Tables( void );
 int Write_Physical_Sectors( int drive, long cylinder, long head, long sector,
                             int number_of_sectors );
 
-unsigned long Decimal_Number( unsigned long hex1, unsigned long hex2,
-                              unsigned long hex3, unsigned long hex4 );
+int Determine_Drive_Letters( void );
+int Num_Ext_Part( Partition_Table *pDrive );
 
 void Check_For_INT13_Extensions( void );
-void Clear_Sector_Buffer( void );
 void Initialize_LBA_Structures( void );
-void Load_Brief_Partition_Table( void );
 
 int IsRecognizedFatPartition( unsigned );
+int Is_Dos_Part( int part_type );
+int Is_Ext_Part( int num_type );
+int Is_Supp_Ext_Part( int num_tyoe );
+
+/* sets all partition values to zero */
+void Clear_Partition( Partition *p );
+void Copy_Partition( Partition *dst, Partition *src );
+int Delete_EMBR_Chain_Node( Partition_Table *pDrive,
+                            int logical_drive_number );
+
+/* LBA<->CHS conversion functions */
+void lba_to_chs( unsigned long lba_value, Partition_Table *pDrive,
+                 unsigned long *cyl, unsigned long *head,
+                 unsigned long *sect );
+unsigned long chs_to_lba( Partition_Table *pDrive, unsigned long cylinder,
+                          unsigned long head, unsigned long sector );
+
+void Clear_Sector_Buffer( void );
+void Clear_Extended_Partition_Table( Partition_Table *pDrive );
 
 #endif /* PDISKIO_H */

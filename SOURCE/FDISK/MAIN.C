@@ -1,10 +1,8 @@
 /*
 // Program:  Free FDISK
 // Written By:  Brian E. Reifsnyder
-// Module:  MAIN.C
-// Module Description:  Main Free FDISK Code Module and Misc. Functions
-// Version:  1.3.1
-// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
+// Version:  1.3.5
+// Copyright:  1998-2023 under the terms of the GNU GPL, Version 2
 */
 
 /*
@@ -16,19 +14,7 @@ $set 1
 
 */
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  DEFINES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
 #define MAIN
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  INCLUDES
-/////////////////////////////////////////////////////////////////////////////
-*/
 
 #include <conio.h>
 #include <ctype.h>
@@ -48,88 +34,48 @@ $set 1
 #include "userint1.h"
 #include "userint2.h"
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  GLOBAL VARIABLES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
-//extern char **environ;
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  GLOBAL VARIABLES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
-/* Ending Mapping Variables */
-long computed_ending_cylinder;
-unsigned long computed_partition_size;
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  FUNCTIONS
-/////////////////////////////////////////////////////////////////////////////
-*/
-
+/* convert cylinder count to MB and do overflow checking */
 unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
                                  unsigned long total_heads,
                                  unsigned long total_sect )
 {
-   /* seems to round at 0.5 MB ( sect_per_meg / 2 ) */
-   unsigned long sect_per_meg = 1048576ul / 512;
-   return (
-      ( ( ( num_cyl * total_heads ) * total_sect ) + ( sect_per_meg / 2 ) ) /
-      sect_per_meg );
+   unsigned long mb1 = ( num_cyl * total_heads * total_sect ) / 2048ul;
+   unsigned long mb2 =
+      ( ( num_cyl - 1 ) * total_heads * total_sect ) / 2048ul;
+
+   return ( mb1 > mb2 || num_cyl == 0 ) ? mb1 : mb2;
 }
 
 unsigned long Convert_Sect_To_MB( unsigned long num_sect )
 {
-   unsigned long sect_per_meg = 1048576ul / 512;
-
-   return ( ( num_sect + ( sect_per_meg / 2 ) ) / sect_per_meg );
+   return num_sect / 2048ul;
 }
 
 unsigned long Convert_To_Percentage( unsigned long small_num,
                                      unsigned long large_num )
 {
-   unsigned long percentage = ( 100 * small_num ) / large_num;
+   unsigned long percentage;
 
-   if ( ( ( 100 * small_num ) % large_num ) >= ( large_num / 2 ) ) {
+   /* fix for Borland C not supporting unsigned long long:
+      divide values until 100 * small_value fits in unsigned long */
+   while ( small_num > 42949672ul ) {
+      small_num >>= 1;
+      large_num >>= 1;
+   }
+
+   if ( !large_num ) {
+      return 0;
+   }
+   percentage = 100 * small_num / large_num;
+
+   if ( ( 100 * small_num % large_num ) >= large_num / 2 ) {
       percentage++;
    }
    if ( percentage > 100 ) {
       percentage = 100;
    }
 
-   return ( percentage );
-}
-
-unsigned long Convert_Percent_To_MB( unsigned long percent,
-                                     unsigned long total_cyl )
-{
-   unsigned long num_cyl;
-   Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
-
-   /* first convert percent to cylinders */
-   num_cyl = ( percent * total_cyl ) / 100;
-   if ( ( ( percent * total_cyl ) % 100 ) != 0 ) {
-      num_cyl++;
-   }
-
-   /* return the result of converting cyl to mb */
-   return ( Convert_Cyl_To_MB( num_cyl, pDrive->total_head + 1,
-                               pDrive->total_sect ) );
-}
-
-ulong GetPercentOfLargeNumber( int percent, ulong number )
-{
-   if ( number > 0x7ffffffl / 100 ) {
-      return number / 100 * percent;
-   }
-   else {
-      return number * percent / 100;
-   }
+   return percentage;
 }
 
 /* Determine if the video display will support boldfacing text */
@@ -151,12 +97,12 @@ void Determine_Color_Video_Support( void )
    if ( videomode == 7 ) /* monochrome mode */
    {
       flags.monochrome = TRUE;
-      textcolor( 7 );
+      textattr( 7 );
    }
    else /* assume color mode */
    {
       flags.monochrome = FALSE;
-      textcolor( 15 );
+      textattr( 15 );
    }
 }
 
@@ -185,6 +131,26 @@ int Color_Print_At( int column, int row, char *format, ... )
    va_end( arglist );
 
    return Color_Print( buffer );
+}
+
+int Normal_Print_At( int column, int row, char *format, ... )
+{
+   char buffer[256];
+   va_list arglist;
+   int res, attr;
+
+   attr = gettextattr();
+   textcolor( 7 );
+   Position_Cursor( column, row );
+
+   va_start( arglist, format );
+   vsprintf( buffer, format, arglist );
+   va_end( arglist );
+
+   res = Color_Print( buffer );
+   textattr( attr );
+
+   return res;
 }
 
 int BlinkPrintAt( int column, int row, char *format, ... )
@@ -300,6 +266,16 @@ int Get_Environment_Settings( char *environment[] )
 
       /* Process the command found in the line buffer */
 
+      /* Align partitions to 4K */
+      if ( 0 == strcmp( command_buffer, "FFD_ALIGN_4K" ) ) {
+         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
+            flags.align_4k = TRUE;
+         }
+         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
+            flags.align_4k = FALSE;
+         }
+      }
+
       /* Check for the ALLOW_4GB_FAT16 statement */
       if ( 0 == strcmp( command_buffer, "FFD_ALLOW_4GB_FAT16" ) ) {
          if ( 0 == strcmp( setting_buffer, "ON" ) ) {
@@ -380,6 +356,16 @@ int Get_Environment_Settings( char *environment[] )
          }
          if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
             flags.label = FALSE;
+         }
+      }
+
+      /* Check for the LBA_MARKER statement */
+      if ( 0 == strcmp( command_buffer, "FFD_LBA_MARKER" ) ) {
+         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
+            flags.lba_marker = TRUE;
+         }
+         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
+            flags.lba_marker = FALSE;
          }
       }
 
@@ -505,26 +491,26 @@ void Initialization( char *environment[] )
          index++;
       } while ( index <= 255 );
 
-      strcpy( partition_lookup_table_buffer_short[1], "FAT12   " );
-      strcpy( partition_lookup_table_buffer_short[4], "FAT16   " );
+      strcpy( partition_lookup_table_buffer_short[1], "FAT12" );
+      strcpy( partition_lookup_table_buffer_short[4], "FAT16" );
       strcpy( partition_lookup_table_buffer_short[5], "Extended" );
-      strcpy( partition_lookup_table_buffer_short[6], "FAT16   " );
-      strcpy( partition_lookup_table_buffer_short[7], "NTFS    " );
-      strcpy( partition_lookup_table_buffer_short[11], "FAT32ext" );
-      strcpy( partition_lookup_table_buffer_short[12], "FAT32ext" );
+      strcpy( partition_lookup_table_buffer_short[6], "FAT16" );
+      strcpy( partition_lookup_table_buffer_short[7], "NTFS" );
+      strcpy( partition_lookup_table_buffer_short[11], "FAT32" );
+      strcpy( partition_lookup_table_buffer_short[12], "FAT32LBA" );
       /* */
-      strcpy( partition_lookup_table_buffer_short[14], "FAT16ext" );
-      strcpy( partition_lookup_table_buffer_short[15], "Extended" );
+      strcpy( partition_lookup_table_buffer_short[14], "FAT16LBA" );
+      strcpy( partition_lookup_table_buffer_short[15], "Ext. LBA" );
 
-      strcpy( partition_lookup_table_buffer_long[1], "FAT12          " );
-      strcpy( partition_lookup_table_buffer_long[4], "FAT16          " );
-      strcpy( partition_lookup_table_buffer_long[5], "Extended       " );
-      strcpy( partition_lookup_table_buffer_long[6], "FAT16          " );
-      strcpy( partition_lookup_table_buffer_long[7], "NTFS           " );
-      strcpy( partition_lookup_table_buffer_long[11], "FAT32 ext Int13" );
-      strcpy( partition_lookup_table_buffer_long[12], "FAT32 ext Int13" );
-      strcpy( partition_lookup_table_buffer_long[14], "FAT16 ext Int13" );
-      strcpy( partition_lookup_table_buffer_long[15], "Extended ext   " );
+      strcpy( partition_lookup_table_buffer_long[1], "FAT12" );
+      strcpy( partition_lookup_table_buffer_long[4], "FAT16" );
+      strcpy( partition_lookup_table_buffer_long[5], "Extended" );
+      strcpy( partition_lookup_table_buffer_long[6], "FAT16" );
+      strcpy( partition_lookup_table_buffer_long[7], "NTFS" );
+      strcpy( partition_lookup_table_buffer_long[11], "FAT32" );
+      strcpy( partition_lookup_table_buffer_long[12], "FAT32 LBA Int13" );
+      strcpy( partition_lookup_table_buffer_long[14], "FAT16 LBA Int13" );
+      strcpy( partition_lookup_table_buffer_long[15], "Extended LBA" );
    }
 
    Determine_Color_Video_Support();
@@ -542,7 +528,7 @@ void Initialization( char *environment[] )
    /* Set the colors. monochrome mode, if it is desired. */
    textattr( flags.screen_color );
    if ( flags.monochrome == TRUE ) {
-      textcolor( 7 );
+      textattr( 7 );
    }
    else {
       textcolor( 15 );
@@ -564,15 +550,14 @@ void Initialization( char *environment[] )
       Initialize_LBA_Structures();
    }
 
-   Read_Partition_Tables();
+   if ( Read_Partition_Tables() != 0 ) {
+      Color_Print( "\n    Error reading partition tables.\n" );
+      exit( 1 );
+   }
 
-   if ( ( flags.flag_sector >
-          part_table[( flags.drive_number - 128 )].total_sect ) &&
-        ( flags.flag_sector != 0 ) ) {
-      printf(
-         "The \"FLAG_SECTOR\" value in the \"fdisk.ini\" file is out of range...\n" );
-      printf( "Operation Terminated.\n" );
-      exit( 3 );
+   if ( flags.maximum_drive_number == 0 ) {
+      Color_Print( "\n    No fixed disks present.\n" );
+      exit( 6 );
    }
 }
 
@@ -587,6 +572,8 @@ void Reboot_PC( void )
 }
 
 /* Re-Initialize LBA related functions. */
+/* UNUSED */
+#if 0
 void Re_Initialization( void )
 {
    /* Check for interrupt 0x13 extensions (If the proper version is set.) */
@@ -607,6 +594,7 @@ void Re_Initialization( void )
 
    Read_Partition_Tables();
 }
+#endif
 
 /*
 	if the C: drive has not been formatted, and fdisk
@@ -618,16 +606,24 @@ void Re_Initialization( void )
 
 extern void cdecl far int24_handler( void );
 
-void ( interrupt far *old_int24 )( void );
+void( interrupt far *old_int24 )( void );
 
 void restore_int24( void ) { setvect( 0x24, old_int24 ); }
 
-void int24_init( void )
+static void int24_init( void )
 {
 
    old_int24 = getvect( 0x24 );
-   setvect( 0x24, (void (interrupt far *)()) int24_handler );
+   setvect( 0x24, (void( interrupt far * )())int24_handler );
    atexit( restore_int24 );
+}
+
+static void Ensure_Drive_Number( void )
+{
+   if ( flags.using_default_drive_number == TRUE ) {
+      printf( "\nNo drive number has been entered.\n" );
+      exit( 9 );
+   }
 }
 
 /*
@@ -640,6 +636,7 @@ void main( int argc, char *argv[] )
    int command_ok;
    int index;
    int location;
+   int fat32_temp;
 
    extern void cdecl far smart_mbr( void );
 
@@ -735,7 +732,6 @@ void main( int argc, char *argv[] )
       exit( 0 );
    }
    else {
-      flags.use_iui = FALSE;
       do {
 #ifdef DEBUG
          if ( debug.command_line_arguments == TRUE ) {
@@ -755,305 +751,336 @@ void main( int argc, char *argv[] )
 
          command_ok = FALSE;
 
-         switch ( arg[0].choice[0] ) {
-         case 'A': {
-            if ( 0 == strcmp( arg[0].choice, "ACTIVATE" ) ) {
-               if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
-                  printf(
-                     "\nPartition number is out of range (1-4)...Operation Terminated.\n" );
-                  exit( 9 );
-               }
-
-               Set_Active_Partition( (int)( arg[0].value - 1 ) );
-               command_ok = TRUE;
-
-               Shift_Command_Line_Options( 1 );
+         if ( 0 == strcmp( arg[0].choice, "ACTIVATE" ) ||
+              0 == strcmp( arg[0].choice, "ACT" ) ) {
+            flags.use_iui = FALSE;
+            if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
+               printf( "\nPartition number is out of range (1-4).\n" );
+               exit( 9 );
             }
 
-            if ( 0 == strcmp( arg[0].choice, "ACTOK" ) ) {
+            if ( !Set_Active_Partition( (int)( arg[0].value - 1 ) ) ) {
+               printf( "\nCan not activate partition.\n" );
+               exit( 9 );
+            }
+            command_ok = TRUE;
+            Shift_Command_Line_Options( 1 );
+         }
+
+         if ( 0 == strcmp( arg[0].choice, "ACTOK" ) ) {
+            /*
                if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
                   Ask_User_About_FAT32_Support();
                }
+               */
+         }
 
-               Interactive_User_Interface();
-               exit( 0 );
+         if ( 0 == strcmp( arg[0].choice, "AUTO" ) ) {
+            flags.use_iui = FALSE;
+            if ( Automatically_Partition_Hard_Drive() ) {
+               printf( "\nError auto-partitioning hard drive.\n" );
+               exit( 9 );
             }
+            command_ok = TRUE;
+            Shift_Command_Line_Options( 1 );
+         }
 
-            if ( 0 == strcmp( arg[0].choice, "AMBR" ) ) {
-               Create_Alternate_MBR();
-               command_ok = TRUE;
+         if ( 0 == strcmp( arg[0].choice, "CLEARMBR" ) ||
+              0 == strcmp( arg[0].choice, "CLEARALL" ) ) {
+            flags.use_iui = FALSE;
+            Ensure_Drive_Number();
 
-               Shift_Command_Line_Options( 1 );
+            if ( Clear_Entire_Sector_Zero() != 0 ) {
+               printf( "\nError clearing MBR sector.\n" );
+               exit( 8 );
             }
+            command_ok = TRUE;
+            Read_Partition_Tables();
+            Shift_Command_Line_Options( 1 );
+         }
 
-            if ( 0 == strcmp( arg[0].choice, "AUTO" ) ) {
-               Automatically_Partition_Hard_Drive();
-               command_ok = TRUE;
+         if ( 0 == strcmp( arg[0].choice, "CLEARFLAG" ) ) {
+            flags.use_iui = FALSE;
+            Command_Line_Clear_Flag();
+            command_ok = TRUE;
+         }
 
-               Shift_Command_Line_Options( 1 );
+         if ( 0 == strcmp( arg[0].choice, "CLEARIPL" ) ) {
+            flags.use_iui = FALSE;
+            Ensure_Drive_Number();
+
+            if ( Remove_IPL() != 0 ) {
+               printf( " \nError removing IPL.\n" );
+               exit( 8 );
             }
-         } break;
+            command_ok = TRUE;
 
-         case 'C': {
-            if ( 0 == strcmp( arg[0].choice, "CLEAR" ) ) {
-               if ( flags.using_default_drive_number == TRUE ) {
-                  printf(
-                     "\nNo drive number has been entered...Operation Terminated.\n" );
-                  exit( 9 );
-               }
+            Shift_Command_Line_Options( 1 );
+         }
 
-               Clear_Partition_Table();
-               command_ok = TRUE;
-
-               Re_Initialization();
-               Shift_Command_Line_Options( 1 );
+         if ( 0 == strcmp( arg[0].choice, "CMBR" ) ) {
+            flags.use_iui = FALSE;
+            if ( Create_MBR() != 0 ) {
+               printf( "\nError writing IPL.\n" );
+               exit( 8 );
             }
+            command_ok = TRUE;
+            Shift_Command_Line_Options( 1 );
+         }
 
-            if ( 0 == strcmp( arg[0].choice, "CLEARALL" ) ) {
-               if ( flags.using_default_drive_number == TRUE ) {
-                  printf(
-                     "\nNo drive number has been entered...Operation Terminated.\n" );
-                  exit( 9 );
-               }
-
-               Clear_Entire_Sector_Zero();
-               command_ok = TRUE;
-
-               Re_Initialization();
-               Shift_Command_Line_Options( 1 );
+         if ( 0 == strcmp( arg[0].choice, "DEACTIVATE" ) ||
+              0 == strcmp( arg[0].choice, "DEACT" ) ) {
+            flags.use_iui = FALSE;
+            if ( Deactivate_Active_Partition() != 0 ||
+                 Write_Partition_Tables() != 0 ) {
+               printf( "\nError deactivating partition.\n" );
+               exit( 9 );
             }
+            command_ok = TRUE;
+            Shift_Command_Line_Options( 1 );
+         }
 
-            if ( 0 == strcmp( arg[0].choice, "CLEARFLAG" ) ) {
-               Command_Line_Clear_Flag();
-               command_ok = TRUE;
+         if ( 0 == strcmp( arg[0].choice, "DELETE" ) ||
+              0 == strcmp( arg[0].choice, "DEL" ) ) {
+            flags.use_iui = FALSE;
+            Ensure_Drive_Number();
+
+            Command_Line_Delete();
+            command_ok = TRUE;
+         }
+
+         if ( 0 == strcmp( arg[0].choice, "DELETEALL" ) ||
+              0 == strcmp( arg[0].choice, "DELALL" ) ||
+              0 == strcmp( arg[0].choice, "CLEAR" ) ) {
+            flags.use_iui = FALSE;
+            Ensure_Drive_Number();
+
+            if ( Clear_Partition_Table() != 0 ) {
+               printf( "\nError clearing partition table.\n" );
+               exit( 9 );
             }
+            command_ok = TRUE;
+            Read_Partition_Tables();
+            Shift_Command_Line_Options( 1 );
+         }
 
-            if ( 0 == strcmp( arg[0].choice, "CMBR" ) ) {
-               Create_MBR();
-               command_ok = TRUE;
+         if ( 0 == strcmp( arg[0].choice, "DUMP" ) ) {
+            flags.use_iui = FALSE;
+            Dump_Partition_Information();
+            command_ok = TRUE;
 
-               Shift_Command_Line_Options( 1 );
+            Shift_Command_Line_Options( 1 );
+         }
+
+         if ( 0 == strcmp( arg[0].choice, "EXT" ) ) {
+            flags.use_iui = FALSE;
+            Command_Line_Create_Extended_Partition();
+            command_ok = TRUE;
+         }
+
+         if ( 0 == strcmp( arg[0].choice, "FPRMT" ) ) {
+            if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
+               flags.fprmt = TRUE;
             }
-         } break;
+         }
 
-         case 'D': {
-            if ( 0 == strcmp( arg[0].choice, "DEACTIVATE" ) ) {
-               Clear_Active_Partition();
-               Write_Partition_Tables();
-               command_ok = TRUE;
+         if ( 0 == strcmp( arg[0].choice, "INFO" ) ) {
+            flags.use_iui = FALSE;
+            Command_Line_Info();
+            command_ok = TRUE;
+         }
 
-               Shift_Command_Line_Options( 1 );
+         if ( 0 == strcmp( arg[0].choice, "IPL" ) ) {
+            flags.use_iui = FALSE;
+            Ensure_Drive_Number();
+
+            if ( Create_MBR() != 0 ) {
+               printf( "\nError writing IPL.\n" );
+               exit( 8 );
             }
+            command_ok = TRUE;
+            Shift_Command_Line_Options( 1 );
+         }
 
-            if ( 0 == strcmp( arg[0].choice, "DELETE" ) ) {
-               Command_Line_Delete();
-               command_ok = TRUE;
+         if ( 0 == strcmp( arg[0].choice, "LOADIPL" ) ) {
+            flags.use_iui = FALSE;
+            Ensure_Drive_Number();
+
+            if ( Load_MBR( 1 ) != 0 ) {
+               printf( "\nError installing IPL from file.\n" );
+               exit( 8 );
             }
+            command_ok = TRUE;
+            Shift_Command_Line_Options( 1 );
+         }
 
-            if ( 0 == strcmp( arg[0].choice, "DUMP" ) ) {
-               Dump_Partition_Information();
-               command_ok = TRUE;
+         if ( 0 == strcmp( arg[0].choice, "LOADMBR" ) ) {
+            flags.use_iui = FALSE;
+            Ensure_Drive_Number();
 
-               Shift_Command_Line_Options( 1 );
+            if ( Load_MBR( 0 ) != 0 ) {
+               printf( "\nError installing MBR from file.\n" );
+               exit( 8 );
             }
-         } break;
+            command_ok = TRUE;
+            Shift_Command_Line_Options( 1 );
+         }
 
-         case 'E': {
-            if ( 0 == strcmp( arg[0].choice, "EXT" ) ) {
-               Command_Line_Create_Extended_Partition();
-               command_ok = TRUE;
+         if ( 0 == strcmp( arg[0].choice, "LOG" ) ) {
+            flags.use_iui = FALSE;
+            Command_Line_Create_Logical_DOS_Drive();
+            command_ok = TRUE;
+         }
+
+         if ( 0 == strcmp( arg[0].choice, "LOGO" ) ) {
+            flags.use_iui = FALSE;
+            fat32_temp = flags.fat32;
+            flags.fat32 = FALSE;
+            Command_Line_Create_Logical_DOS_Drive();
+            flags.fat32 = fat32_temp;
+            command_ok = TRUE;
+         }
+
+         if ( 0 == strcmp( arg[0].choice, "MBR" ) ) {
+            flags.use_iui = FALSE;
+            if ( Create_MBR() != 0 ) {
+               printf( "\nError writing MBR.\n" );
+               exit( 8 );
             }
-         } break;
+            command_ok = TRUE;
 
-         case 'F': {
-            if ( 0 == strcmp( arg[0].choice, "FPRMT" ) ) {
-               if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
-                  flags.fprmt = TRUE;
-               }
-               Interactive_User_Interface();
-               exit( 0 );
+            Shift_Command_Line_Options( 1 );
+         }
+
+         if ( 0 == strcmp( arg[0].choice, "MODIFY" ) ) {
+            flags.use_iui = FALSE;
+            Command_Line_Modify();
+            command_ok = TRUE;
+         }
+
+         if ( 0 == strcmp( arg[0].choice, "MONO" ) ) {
+            flags.monochrome = TRUE;
+            textattr( 7 );
+            command_ok = TRUE;
+
+            Shift_Command_Line_Options( 1 );
+         }
+
+         if ( 0 == strcmp( arg[0].choice, "MOVE" ) ) {
+            flags.use_iui = FALSE;
+            Command_Line_Move();
+            command_ok = TRUE;
+         }
+
+         if ( 0 == strcmp( arg[0].choice, "PRI" ) ) {
+            flags.use_iui = FALSE;
+            Command_Line_Create_Primary_Partition();
+            command_ok = TRUE;
+         }
+
+         if ( 0 == strcmp( arg[0].choice, "PRIO" ) ) {
+            flags.use_iui = FALSE;
+            fat32_temp = flags.fat32;
+            flags.fat32 = FALSE;
+            Command_Line_Create_Primary_Partition();
+            flags.fat32 = fat32_temp;
+            command_ok = TRUE;
+         }
+
+         if ( 0 == strcmp( arg[0].choice, "Q" ) ) {
+            flags.reboot = FALSE;
+
+            if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
+               Ask_User_About_FAT32_Support();
             }
-         } break;
+         }
 
-         case 'I': {
-            if ( 0 == strcmp( arg[0].choice, "INFO" ) ) {
-               Command_Line_Info();
-               command_ok = TRUE;
+         if ( 0 == strcmp( arg[0].choice, "REBOOT" ) ) {
+            flags.use_iui = FALSE;
+            if ( Write_Partition_Tables() != 0 ) {
+               printf( " \nError writing partition tables.\n" );
+               exit( 8 );
             }
-            /*
-    Add in the future.....
-	  if(0==strcmp(arg[0].choice,"IUI"))
-	    {
-	    flags.return_from_iui=TRUE;
-	    Interactive_User_Interface();
-	    flags.return_from_iui=FALSE;
-	    command_ok=TRUE;
+            Reboot_PC();
+         }
 
-	    Shift_Command_Line_Options(1);
-	    }
-*/
-         } break;
+         if ( 0 == strcmp( arg[0].choice, "SETFLAG" ) ) {
+            flags.use_iui = FALSE;
+            Command_Line_Set_Flag();
+            command_ok = TRUE;
+         }
 
-         case 'L': {
-            if ( 0 == strcmp( arg[0].choice, "LOG" ) ) {
-               Command_Line_Create_Logical_DOS_Drive();
-               command_ok = TRUE;
+         if ( 0 == strcmp( arg[0].choice, "SAVEMBR" ) ) {
+            flags.use_iui = FALSE;
+            Ensure_Drive_Number();
+
+            if ( Save_MBR() != 0 ) {
+               printf( "\nError saving MBR.\n" );
+               exit( 8 );
             }
+            command_ok = TRUE;
 
-            if ( 0 == strcmp( arg[0].choice, "LOGO" ) ) {
-               flags.fat32 = FALSE;
-               Command_Line_Create_Logical_DOS_Drive();
-               flags.fat32 = TRUE;
-               command_ok = TRUE;
+            Shift_Command_Line_Options( 1 );
+         }
+
+         if ( 0 == strcmp( arg[0].choice, "SMARTIPL" ) ) {
+            flags.use_iui = FALSE;
+            Ensure_Drive_Number();
+
+            if ( Create_BootSmart_IPL() != 0 ) {
+               printf( "\nError writing Smart IPL.\n" );
+               exit( 8 );
             }
-         } break;
+            command_ok = TRUE;
 
-         case 'M': {
-            if ( 0 == strcmp( arg[0].choice, "MBR" ) ) {
-               Create_MBR();
-               command_ok = TRUE;
+            Shift_Command_Line_Options( 1 );
+         }
 
-               Shift_Command_Line_Options( 1 );
-            }
+         if ( 0 == strcmp( arg[0].choice, "STATUS" ) ) {
+            flags.use_iui = FALSE;
+            Command_Line_Status();
+            command_ok = TRUE;
+         }
 
-            if ( 0 == strcmp( arg[0].choice, "MODIFY" ) ) {
-               Command_Line_Modify();
-               command_ok = TRUE;
-            }
+         if ( 0 == strcmp( arg[0].choice, "SWAP" ) ) {
+            flags.use_iui = FALSE;
+            Command_Line_Swap();
+            command_ok = TRUE;
+         }
 
-            if ( 0 == strcmp( arg[0].choice, "MONO" ) ) {
-               flags.monochrome = TRUE;
-               textcolor( 7 );
-               flags.use_iui = TRUE;
-               command_ok = TRUE;
+         if ( 0 == strcmp( arg[0].choice, "TESTFLAG" ) ) {
+            flags.use_iui = FALSE;
+            Command_Line_Test_Flag();
+            command_ok = TRUE;
+         }
 
-               Shift_Command_Line_Options( 1 );
-            }
+         if ( 0 == strcmp( arg[0].choice, "UI" ) ) {
+            flags.use_iui = TRUE;
+            command_ok = TRUE;
 
-            if ( 0 == strcmp( arg[0].choice, "MOVE" ) ) {
-               Command_Line_Move();
-               command_ok = TRUE;
-            }
-         } break;
+            Shift_Command_Line_Options( 1 );
+         }
 
-         case 'P': {
-            if ( 0 == strcmp( arg[0].choice, "PRI" ) ) {
-               Command_Line_Create_Primary_Partition();
-               command_ok = TRUE;
-            }
+         if ( 0 == strcmp( arg[0].choice, "X" ) ) {
+            Command_Line_X();
+            Shift_Command_Line_Options( 1 );
+            command_ok = TRUE;
+            /*exit( 0 );*/
+         }
 
-            if ( 0 == strcmp( arg[0].choice, "PRIO" ) ) {
-               flags.fat32 = FALSE;
-               Command_Line_Create_Primary_Partition();
-               flags.fat32 = TRUE;
-               command_ok = TRUE;
-            }
-         } break;
+         if ( 0 == strcmp( arg[0].choice, "XO" ) ) {
+            flags.extended_options_flag = TRUE;
+            flags.allow_abort = TRUE;
+            flags.del_non_dos_log_drives = TRUE;
+            flags.set_any_pri_part_active = TRUE;
+            command_ok = TRUE;
 
-         case 'Q': {
-            if ( 0 == strcmp( arg[0].choice, "Q" ) ) {
-               flags.reboot = FALSE;
+            Shift_Command_Line_Options( 1 );
+         }
 
-               if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
-                  Ask_User_About_FAT32_Support();
-               }
-
-               Interactive_User_Interface();
-               exit( 0 );
-            }
-         } break;
-
-         case 'R': {
-            if ( 0 == strcmp( arg[0].choice, "REBOOT" ) ) {
-               Write_Partition_Tables(); /* If no changes have been  */
-                                         /* made, then this function */
-               Reboot_PC();              /* will simply return       */
-            }                            /* without writing anything.*/
-
-            if ( 0 == strcmp( arg[0].choice, "RMBR" ) ) {
-               Remove_MBR();
-               command_ok = TRUE;
-
-               Shift_Command_Line_Options( 1 );
-            }
-         } break;
-
-         case 'S': {
-            /*
-	  if(0==strcmp(arg[0].choice,"SAVE"))
-	    {
-	    Write_Partition_Tables();
-	    command_ok=TRUE;
-
-	    Shift_Command_Line_Options(1);
-	    }
-*/
-
-            if ( 0 == strcmp( arg[0].choice, "SETFLAG" ) ) {
-               Command_Line_Set_Flag();
-               command_ok = TRUE;
-            }
-
-            if ( 0 == strcmp( arg[0].choice, "SMBR" ) ) {
-               Save_MBR();
-               command_ok = TRUE;
-
-               Shift_Command_Line_Options( 1 );
-            }
-
-            if ( 0 == strcmp( arg[0].choice, "SMARTMBR" ) ) {
-               extern void Create_BootSmart_MBR( void );
-               Create_BootSmart_MBR();
-               command_ok = TRUE;
-
-               Shift_Command_Line_Options( 1 );
-            }
-
-            if ( 0 == strcmp( arg[0].choice, "SMBR" ) ) {
-               Save_MBR();
-               command_ok = TRUE;
-
-               Shift_Command_Line_Options( 1 );
-            }
-
-            if ( 0 == strcmp( arg[0].choice, "STATUS" ) ) {
-               Command_Line_Status();
-               command_ok = TRUE;
-            }
-
-            if ( 0 == strcmp( arg[0].choice, "SWAP" ) ) {
-               Command_Line_Swap();
-               command_ok = TRUE;
-            }
-         } break;
-
-         case 'T': {
-            if ( 0 == strcmp( arg[0].choice, "TESTFLAG" ) ) {
-               Command_Line_Test_Flag();
-               command_ok = TRUE;
-            }
-         } break;
-
-         case 'X': {
-            if ( 0 == strcmp( arg[0].choice, "X" ) ) {
-               Command_Line_X();
-               exit( 0 );
-            }
-
-            if ( 0 == strcmp( arg[0].choice, "XO" ) ) {
-               flags.extended_options_flag = TRUE;
-               flags.allow_abort = TRUE;
-               flags.del_non_dos_log_drives = TRUE;
-               flags.set_any_pri_part_active = TRUE;
-               flags.use_iui = TRUE;
-               command_ok = TRUE;
-
-               Shift_Command_Line_Options( 1 );
-            }
-         } break;
-
-         case '?': {
-            if ( 0 == strcmp( arg[1].choice, "NOPAUSE" ) ) {
+         if ( arg[0].choice[0] == '?' ) {
+            flags.use_iui = FALSE;
+            if ( strcmp( arg[1].choice, "NOPAUSE" ) ) {
                flags.do_not_pause_help_information = TRUE;
                Shift_Command_Line_Options( 1 );
             }
@@ -1061,16 +1088,10 @@ void main( int argc, char *argv[] )
             command_ok = TRUE;
 
             Shift_Command_Line_Options( 1 );
-         } break;
-
-         default: {
-            printf( "\nSyntax Error...Operation Terminated.\n" );
-            exit( 1 );
          }
-         }
-
          if ( command_ok == FALSE ) {
-            printf( "\nSyntax Error...Operation Terminated.\n" );
+            printf(
+               "\nInvalid command or syntax error. Invoke FDISK /? for help.\n" );
             exit( 1 );
          }
 
