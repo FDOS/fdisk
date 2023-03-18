@@ -13,9 +13,9 @@
 #include "pdiskio.h"
 
 unsigned char sector_buffer[SECT_SIZE];
-int brief_partition_table[8][27];
-char drive_lettering_buffer[8][27];
-Partition_Table part_table[8];
+int brief_partition_table[MAX_DISKS][27];
+char drive_lettering_buffer[MAX_DISKS][27];
+Partition_Table part_table[MAX_DISKS];
 
 static unsigned char disk_address_packet[16];
 static unsigned char result_buffer[26];
@@ -202,7 +202,7 @@ int Determine_Drive_Letters( void )
    int non_dos_partition_counter;
    int sub_index = 0;
 
-   int active_part_found[8];
+   int active_part_found[MAX_DISKS];
 
    Load_Brief_Partition_Table();
 
@@ -216,7 +216,7 @@ int Determine_Drive_Letters( void )
 
    /* First, look for and assign drive letters to all active */
    /* primary partitions. */
-   for ( index = 0; index < 8; index++ ) {
+   for ( index = 0; index < MAX_DISKS; index++ ) {
       Partition_Table *pDrive = &part_table[index];
       if ( !pDrive->usable ) {
          continue;
@@ -239,7 +239,7 @@ int Determine_Drive_Letters( void )
 
    /* Next, assign one drive letter for one existing primary partition   */
    /* if an active partition does not exist on that hard disk.           */
-   for ( index = 0; index < 8; index++ ) {
+   for ( index = 0; index < MAX_DISKS; index++ ) {
       Partition_Table *pDrive = &part_table[index];
       if ( !pDrive->usable ) {
          continue;
@@ -261,7 +261,7 @@ int Determine_Drive_Letters( void )
    }
 
    /* Next assign drive letters to applicable extended partitions... */
-   for ( index = 0; index < 8; index++ ) {
+   for ( index = 0; index < MAX_DISKS; index++ ) {
       Partition_Table *pDrive = &part_table[index];
       if ( !pDrive->usable ) {
          continue;
@@ -280,7 +280,7 @@ int Determine_Drive_Letters( void )
    }
 
    /* Return to the primary partitions... */
-   for ( index = 0; index < 8; index++ ) {
+   for ( index = 0; index < MAX_DISKS; index++ ) {
       Partition_Table *pDrive = &part_table[index];
       if ( !pDrive->usable ) {
          continue;
@@ -301,7 +301,7 @@ int Determine_Drive_Letters( void )
    }
 
    /* Find the Non-DOS Logical Drives in the Extended Partition Table */
-   for ( index = 0; index < 8; index++ ) {
+   for ( index = 0; index < MAX_DISKS; index++ ) {
       Partition_Table *pDrive = &part_table[index];
       if ( !pDrive->usable ) {
          continue;
@@ -630,7 +630,7 @@ static void Get_Partition_Information( void )
 
    /* First get the information from the primary partitions. */
 
-   for ( drivenum = 0; drivenum < 8; drivenum++ ) {
+   for ( drivenum = 0; drivenum < MAX_DISKS; drivenum++ ) {
       Partition_Table *pDrive = &part_table[drivenum];
 
       for ( partnum = 0; partnum < 4; partnum++ ) {
@@ -827,7 +827,7 @@ int Read_Partition_Tables( void )
    flags.maximum_drive_number = 0;
    flags.more_than_one_drive = FALSE;
 
-   for ( drive = 0; drive < 8; drive++ ) {
+   for ( drive = 0; drive < MAX_DISKS; drive++ ) {
       pDrive = &part_table[drive];
       num_ext = 0;
 
@@ -939,7 +939,7 @@ static int Read_Primary_Table( int drive, Partition_Table *pDrive,
    }
 
    if ( *(unsigned short *)( sector_buffer + 510 ) != 0xAA55 ) {
-      /* do we have a partition table? */
+      /* no partition table at all */
       return 0;
    }
 
@@ -1046,7 +1046,7 @@ static void Load_Brief_Partition_Table( void )
    int drivenum;
    int partnum;
 
-   for ( drivenum = 0; drivenum < 8; drivenum++ ) {
+   for ( drivenum = 0; drivenum < MAX_DISKS; drivenum++ ) {
       Partition_Table *pDrive = &part_table[drivenum];
 
       /* Load the primary partitions into brief_partition_table[8] [27] */

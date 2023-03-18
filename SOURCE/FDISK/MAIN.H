@@ -161,6 +161,8 @@ typedef unsigned char _u8;
 #define MEXTERN extern
 #endif
 
+#include "pdiskio.h"
+
 /*
 /////////////////////////////////////////////////////////////////////////////
 // CATS
@@ -259,7 +261,7 @@ typedef struct user_defined_chs_settings_structure {
 
 MEXTERN Arg_Structure arg[20];
 MEXTERN Flags flags;
-MEXTERN User_Defined_CHS_Settings user_defined_chs_settings[8];
+MEXTERN User_Defined_CHS_Settings user_defined_chs_settings[MAX_DISKS];
 
 int Get_Options( char *arguments[], int number_of_arguments );
 

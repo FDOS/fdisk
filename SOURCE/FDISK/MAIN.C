@@ -437,7 +437,7 @@ static void Initialization( char *environment[] )
       user_defined_chs_settings[index].total_sectors = 0;
 
       index++;
-   } while ( index < 8 );
+   } while ( index < MAX_DISKS );
 
    Load_External_Lookup_Table();
 

@@ -1,6 +1,7 @@
 #ifndef PDISKIO_H
 #define PDISKIO_H
 
+#define MAX_DISKS 8
 #define MAX_LOGICAL_DRIVES 23
 
 #define SECT_SIZE 512
