@@ -2,7 +2,7 @@ Free FDISK Change Log
 =====================
 
 
-Version 1.3.5 (unreleased)
+Version 1.3.5 (2023-03-19)
 --------------------------
 Bugfixes:
  - CRITICAL: Fix FDISK loading wrong CHS head and sector values from MBR if
