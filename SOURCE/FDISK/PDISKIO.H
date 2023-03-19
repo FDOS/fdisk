@@ -1,6 +1,7 @@
 #ifndef PDISKIO_H
 #define PDISKIO_H
 
+#define MAX_DISKS 8
 #define MAX_LOGICAL_DRIVES 23
 
 #define SECT_SIZE 512
@@ -135,5 +136,12 @@ unsigned long chs_to_lba( Partition_Table *pDrive, unsigned long cylinder,
 
 void Clear_Sector_Buffer( void );
 void Clear_Extended_Partition_Table( Partition_Table *pDrive );
+
+unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
+                                 unsigned long total_heads,
+                                 unsigned long total_sect );
+unsigned long Convert_Sect_To_MB( unsigned long num_sect );
+unsigned long Convert_To_Percentage( unsigned long small_num,
+                                     unsigned long large_num );
 
 #endif /* PDISKIO_H */

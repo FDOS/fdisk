@@ -1,28 +1,7 @@
-/*
-// Program:  Free FDISK
-// Written By:  Brian E. Reifsnyder
-// Module:  PCOMPUTE.C
-// Module Description:  Partition Computation and Modification Functions
-// Version:  1.3.1
-// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
-*/
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  DEFINES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
 #define PCOMPUTE
 
 #define MAXFAT16NORM  2047
 #define MAXFAT16LARGE 4095
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  INCLUDES
-/////////////////////////////////////////////////////////////////////////////
-*/
 
 #include <dos.h>
 #include <stdio.h>
@@ -36,25 +15,9 @@
 #include "pdiskio.h"
 #include "userint1.h"
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  GLOBAL VARIABLES
-/////////////////////////////////////////////////////////////////////////////
-*/
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  PROTOTYPES
-/////////////////////////////////////////////////////////////////////////////
-*/
+static unsigned long Number_Of_Cylinders( unsigned long size );
 
-unsigned long Number_Of_Cylinders( unsigned long size );
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  FUNCTIONS
-/////////////////////////////////////////////////////////////////////////////
-*/
 
 /* Clear the Active Partition */
 int Deactivate_Active_Partition( void )
@@ -887,7 +850,7 @@ int Modify_Partition_Type( int partition_number, int type_number )
 }
 
 /* Calculate number of cylinders */
-unsigned long Number_Of_Cylinders( unsigned long size )
+static unsigned long Number_Of_Cylinders( unsigned long size )
 {
    /* unsigned long size has to be in sectors @ 512 bytes/sector */
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];

@@ -1,15 +1,4 @@
 /*
-// Program:  Free FDISK
-// Module:  CMD.C
-// Module Description:  Command Line Switch Code Module
-//                      All functions that process command line entry are
-//                      here.
-// Written By:  Brian E. Reifsnyder
-// Version:  1.3.0
-// Copyright:  1998-2008 under the terms of the GNU GPL, Version 2
-*/
-
-/*
 CATS message store for cmd.c:
 
 $set 2
@@ -597,7 +586,7 @@ void Command_Line_X( void )
    do {
       part_table[index].ext_int_13 = FALSE;
       index++;
-   } while ( index < 8 );
+   } while ( index < MAX_DISKS );
 
    if ( Read_Partition_Tables() != 0 ) {
       Color_Print( "\n    Error reading partition tables.\n" );

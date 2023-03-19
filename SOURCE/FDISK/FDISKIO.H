@@ -1,22 +1,7 @@
-/*
-// Program:  Free FDISK
-// Module:  FDISKIO.H
-// Module Description:  Header File for FDISKIO.C
-// Written By:  Brian E. Reifsnyder
-// Version:  1.2.1
-// Copyright:  1998-2001 under the terms of the GNU GPL, Version 2
-*/
-
 #ifndef FDISKIO_H
 #define FDISKIO_H
 
 #include "compat.h"
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  PROTOTYPES
-/////////////////////////////////////////////////////////////////////////////
-*/
 
 int Test_Flag( int flag_number );
 
@@ -29,7 +14,7 @@ int Load_MBR( int ipl_only );
 /*void Create_BootEasy_MBR( void );*/
 int Create_BootSmart_IPL( void );
 int Create_MBR( void );
-int Create_MBR_If_Not_Present( void );
+/*int Create_MBR_If_Not_Present( void );*/
 void Load_External_Lookup_Table( void );
 void Process_Fdiskini_File( void );
 int Remove_IPL( void );

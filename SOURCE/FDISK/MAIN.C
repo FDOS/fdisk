@@ -34,52 +34,14 @@ $set 1
 #include "userint1.h"
 #include "userint2.h"
 
-/* convert cylinder count to MB and do overflow checking */
-unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
-                                 unsigned long total_heads,
-                                 unsigned long total_sect )
-{
-   unsigned long mb1 = ( num_cyl * total_heads * total_sect ) / 2048ul;
-   unsigned long mb2 =
-      ( ( num_cyl - 1 ) * total_heads * total_sect ) / 2048ul;
+static int Get_Environment_Settings( char *environment[] );
+static void Determine_Color_Video_Support( void );
+static void Initialization( char *environment[] );
+/*void Re_Initialization( void );*/
 
-   return ( mb1 > mb2 || num_cyl == 0 ) ? mb1 : mb2;
-}
-
-unsigned long Convert_Sect_To_MB( unsigned long num_sect )
-{
-   return num_sect / 2048ul;
-}
-
-unsigned long Convert_To_Percentage( unsigned long small_num,
-                                     unsigned long large_num )
-{
-   unsigned long percentage;
-
-   /* fix for Borland C not supporting unsigned long long:
-      divide values until 100 * small_value fits in unsigned long */
-   while ( small_num > 42949672ul ) {
-      small_num >>= 1;
-      large_num >>= 1;
-   }
-
-   if ( !large_num ) {
-      return 0;
-   }
-   percentage = 100 * small_num / large_num;
-
-   if ( ( 100 * small_num % large_num ) >= large_num / 2 ) {
-      percentage++;
-   }
-   if ( percentage > 100 ) {
-      percentage = 100;
-   }
-
-   return percentage;
-}
 
 /* Determine if the video display will support boldfacing text */
-void Determine_Color_Video_Support( void )
+static void Determine_Color_Video_Support( void )
 {
    /* Changed to code suggested by Ralf Quint. */
 
@@ -178,7 +140,7 @@ int BlinkPrintAt( int column, int row, char *format, ... )
 }
 
 /* Get Environment Settings */
-int Get_Environment_Settings( char *environment[] )
+static int Get_Environment_Settings( char *environment[] )
 {
    char command_buffer[255];
    char setting_buffer[255];
@@ -447,7 +409,7 @@ int Get_Environment_Settings( char *environment[] )
 }
 
 /* Initialize flags, variables, load fdisk.ini, load part.ini, etc. */
-void Initialization( char *environment[] )
+static void Initialization( char *environment[] )
 {
    int index;
 
@@ -475,7 +437,7 @@ void Initialization( char *environment[] )
       user_defined_chs_settings[index].total_sectors = 0;
 
       index++;
-   } while ( index < 8 );
+   } while ( index < MAX_DISKS );
 
    Load_External_Lookup_Table();
 
@@ -608,7 +570,7 @@ extern void cdecl far int24_handler( void );
 
 void( interrupt far *old_int24 )( void );
 
-void restore_int24( void ) { setvect( 0x24, old_int24 ); }
+static void restore_int24( void ) { setvect( 0x24, old_int24 ); }
 
 static void int24_init( void )
 {
@@ -710,13 +672,6 @@ void main( int argc, char *argv[] )
 
    Initialization( environ );
 
-#ifdef DEBUG
-   if ( debug.path == TRUE ) {
-      printf( "\nThe PATH to \"%s\" is:  ", filename );
-      printf( "\"%s\"\n\n", path );
-      Pause();
-   }
-#endif
 
    /* New Parsing Routine */
    /* The command line format is:                                            */
@@ -733,22 +688,6 @@ void main( int argc, char *argv[] )
    }
    else {
       do {
-#ifdef DEBUG
-         if ( debug.command_line_arguments == TRUE ) {
-            int command_line_index = 0;
-
-            printf( "\n" );
-            do {
-               printf( "/%s:", arg[command_line_index].choice );
-               printf( "%d,", arg[command_line_index].value );
-               printf( "%d ", arg[command_line_index].extra_value );
-               command_line_index++;
-            } while ( command_line_index < number_of_command_line_options );
-
-            Pause();
-         }
-#endif
-
          command_ok = FALSE;
 
          if ( 0 == strcmp( arg[0].choice, "ACTIVATE" ) ||
@@ -1096,12 +1035,6 @@ void main( int argc, char *argv[] )
          }
 
       } while ( number_of_command_line_options > 0 );
-
-#ifdef DEBUG
-      if ( debug.write == FALSE ) {
-         Pause();
-      }
-#endif
 
       if ( flags.use_iui == TRUE ) {
          Interactive_User_Interface();

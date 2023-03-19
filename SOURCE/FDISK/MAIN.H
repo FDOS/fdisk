@@ -10,11 +10,6 @@
 #define FD_NAME "Free FDISK"
 #endif
 
-//#define DEBUG
-/* ***** Uncomment the above line to compile */
-/* ***** debugging code and functions into   */
-/* ***** Free FDISK.                         */
-
 #define DEFAULT_VERSION 8
 /* ***** Set the above definition to the     */
 /* ***** version to be emulated if the       */
@@ -166,6 +161,8 @@ typedef unsigned char _u8;
 #define MEXTERN extern
 #endif
 
+#include "pdiskio.h"
+
 /*
 /////////////////////////////////////////////////////////////////////////////
 // CATS
@@ -205,20 +202,6 @@ typedef struct arg_structure {
    unsigned long value;
    unsigned int extra_value;
 } Arg_Structure;
-
-/* Debugging Structure...Created 5/27/1999 */
-typedef struct debugging_table_structure {
-   int all;
-   int command_line_arguments;
-   int create_partition;
-   int determine_free_space;
-   int emulate_disk;
-   int input_routine;
-   int lba;
-   int path;
-   int read_sector;
-   int write;
-} Debugging_Table;
 
 /* Flags Structure...Created 5/27/1999 */
 typedef struct flags_structure {
@@ -277,16 +260,11 @@ typedef struct user_defined_chs_settings_structure {
 } User_Defined_CHS_Settings;
 
 MEXTERN Arg_Structure arg[20];
-MEXTERN Debugging_Table debug;
 MEXTERN Flags flags;
-MEXTERN User_Defined_CHS_Settings user_defined_chs_settings[8];
+MEXTERN User_Defined_CHS_Settings user_defined_chs_settings[MAX_DISKS];
 
-int Get_Environment_Settings( char *environment[] );
 int Get_Options( char *arguments[], int number_of_arguments );
 
-void Determine_Color_Video_Support( void );
-void Initialization( char *environment[] );
-void Re_Initialization( void );
 void Reboot_PC( void );
 
 int Print_At( int column, int row, char *, ... );
@@ -294,9 +272,3 @@ int Color_Print_At( int column, int row, char *, ... );
 int Normal_Print_At( int column, int row, char *, ... );
 int BlinkPrintAt( int column, int row, char *format, ... );
 
-unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,
-                                 unsigned long total_heads,
-                                 unsigned long total_sect );
-unsigned long Convert_Sect_To_MB( unsigned long num_sect );
-unsigned long Convert_To_Percentage( unsigned long small_num,
-                                     unsigned long large_num );
