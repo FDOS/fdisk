@@ -120,6 +120,7 @@ int IsRecognizedFatPartition( unsigned );
 int Is_Dos_Part( int part_type );
 int Is_Ext_Part( int num_type );
 int Is_Supp_Ext_Part( int num_tyoe );
+int Is_Pri_Tbl_Empty( void );
 
 /* sets all partition values to zero */
 void Clear_Partition( Partition *p );

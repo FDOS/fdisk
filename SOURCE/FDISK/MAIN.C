@@ -823,6 +823,15 @@ void main( int argc, char *argv[] )
             }
          }
 
+         if ( 0 == strcmp( arg[0].choice, "IFEMPTY" ) ) {
+            /* only execute th following commands if part tbl is empty */
+            if ( !Is_Pri_Tbl_Empty() ) {
+               exit( 0 );
+            }
+            Shift_Command_Line_Options( 1 );
+            command_ok = TRUE;
+         }
+
          if ( 0 == strcmp( arg[0].choice, "INFO" ) ) {
             flags.use_iui = FALSE;
             Command_Line_Info();

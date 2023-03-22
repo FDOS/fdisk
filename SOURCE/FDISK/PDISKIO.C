@@ -120,6 +120,20 @@ int Is_Supp_Ext_Part( int num_type )
               flags.version == W98 ) );
 }
 
+int Is_Pri_Tbl_Empty( void )
+{
+   int index;
+   Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+
+   for ( index = 0; index < 4; index++ ) {
+      if ( pDrive->pri_part[index].num_type != 0 ) {
+         return 0;
+      }
+   }
+
+   return 1;
+}
+
 /* Clear the Boot Sector of a partition */
 void Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head,
                         unsigned long sector )
