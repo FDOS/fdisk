@@ -24,20 +24,6 @@ $set 2
 20 no partition deleted
 */
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  DEFINES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
-#define CMD
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  INCLUDES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
 #include <conio.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -53,34 +39,6 @@ $set 2
 #include "userint1.h"
 #include "userint2.h"
 
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  PROTOTYPES
-/////////////////////////////////////////////////////////////////////////////
-*/
-
-int Get_Options( char *arguments[], int number_of_arguments );
-
-void Command_Line_Clear_Flag( void );
-void Command_Line_Create_Extended_Partition( void );
-void Command_Line_Create_Logical_DOS_Drive( void );
-void Command_Line_Create_Primary_Partition( void );
-void Command_Line_Delete( void );
-void Command_Line_Info( void );
-void Command_Line_Modify( void );
-void Command_Line_Move( void );
-void Command_Line_Set_Flag( void );
-void Command_Line_Status( void );
-void Command_Line_Swap( void );
-void Command_Line_Test_Flag( void );
-void Command_Line_X( void );
-void Shift_Command_Line_Options( int number_of_places );
-
-/*
-/////////////////////////////////////////////////////////////////////////////
-//  FUNCTIONS
-/////////////////////////////////////////////////////////////////////////////
-*/
 
 /* /CLEARFLAG command line option */
 void Command_Line_Clear_Flag( void )
@@ -154,8 +112,6 @@ void Command_Line_Create_Extended_Partition( void )
 
    maximum_possible_percentage = Convert_To_Percentage(
       maximum_partition_size_in_MB, pDrive->disk_size_mb );
-
-   //   ,pDrive->ext_size_mb);
 
    if ( arg[0].extra_value == 100 ) {
       /* Set limit on percentage. */
