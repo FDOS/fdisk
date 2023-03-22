@@ -594,7 +594,7 @@ int Get_Options( char *argv[], int argc )
           
          }
          else if ( flags.drive_number != ( argptr[0] - '0' ) + 127 ) {
-            printf( "more than one drive specified; terminated\n", argptr );
+            printf( "more than one drive specified; terminated\n" );
             exit( 9 );       
          }
          number_of_options--;
