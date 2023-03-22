@@ -824,7 +824,7 @@ void main( int argc, char *argv[] )
          }
 
          if ( 0 == strcmp( arg[0].choice, "IFEMPTY" ) ) {
-            /* only execute th following commands if part tbl is empty */
+            /* only execute the following commands if part tbl is empty */
             if ( !Is_Pri_Tbl_Empty() ) {
                exit( 0 );
             }
