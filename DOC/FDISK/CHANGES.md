@@ -2,6 +2,18 @@ Free FDISK Change Log
 =====================
 
 
+Version 1.3.6 (unreleased)
+--------------------------
+Bugfixes:
+ - CRITICAL: Prevent user from specifying multiple disks via command line
+     leading to commands operating on the wrong disk.
+ - LOW: Work around AT BIOS bug. It is LOW because it actually does not get
+     triggered by the current version.
+
+Other changes:
+ - Implement /IFEMPTY command for use by the FreeDOS installers.
+
+
 Version 1.3.5 (2023-03-19)
 --------------------------
 Bugfixes:
