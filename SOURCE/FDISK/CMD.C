@@ -606,7 +606,6 @@ int Get_Options( char *argv[], int argc )
    char *argptr;
    int i;
    int number_of_options = 0;
-
    flags.drive_number = 0x80;
 
    argc--, argv++; /* absorb program name */
@@ -633,8 +632,15 @@ int Get_Options( char *argv[], int argc )
             exit( 9 );
          }
 
-         flags.drive_number = ( argptr[0] - '0' ) + 127;
-         flags.using_default_drive_number = FALSE;
+         if ( flags.using_default_drive_number ) {
+            flags.drive_number = ( argptr[0] - '0' ) + 127;
+            flags.using_default_drive_number = FALSE;
+          
+         }
+         else if ( flags.drive_number != ( argptr[0] - '0' ) + 127 ) {
+            printf( "more than one drive specified; terminated\n", argptr );
+            exit( 9 );       
+         }
          number_of_options--;
          continue;
       }

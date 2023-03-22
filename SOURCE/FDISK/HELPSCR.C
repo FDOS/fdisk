@@ -44,28 +44,28 @@ void Display_Help_Screen( void )
 
    printf( "%-20s                   %40s\n", name, version );
    printf(
-      "Syntax: FDISK [argument]...\n"
+      "Syntax: FDISK [<drive#>] [commands]...\n"
       "  no argument       Runs in interactive mode\n"
-      "  /INFO [<drive#>]  Displays partition information of <drive#>\n"
+      "  /INFO             Displays partition information of <drive#>\n"
       "  /REBOOT           Reboots the Computer\n"
       "\n"
       "Commands to create and delete partitions:\n"
       "    <size> is a number for megabytes or MAX for maximum size\n"
       "           or <number>,100 for <number> to be in percent\n"
       "    <type#> is a numeric partition type or FAT-12/16/32 if /SPEC not given\n\n"
-      "  /PRI:<size> [/SPEC:<type#>] [drive#]     Creates a primary partition\n"
-      "  /EXT:<size> [drive#]                     Creates an extended DOS partition\n"
-      "  /LOG:<size> [/SPEC:<type#>] [drive#]     Creates a logical drive\n"
+      "  /PRI:<size> [/SPEC:<type#>]              Creates a primary partition\n"
+      "  /EXT:<size>                              Creates an extended DOS partition\n"
+      "  /LOG:<size> [/SPEC:<type#>]              Creates a logical drive\n"
       "  /PRIO,/EXTO,/LOGO                        same as above, but avoids FAT32\n"
-      "  /AUTO [drive#]                           Automatically partitions the disk\n"
+      "  /AUTO                                    Automatically partitions the disk\n"
       "\n"
       "  /DELETE {/PRI[:#] | /EXT | /LOG:<part#>  Deletes a partition\n"
-      "           | /NUM:<part#>} [drive#]        ...logical drives start at /NUM=5\n"
-      "  /DELETEALL [drive#]                      Deletes all partitions from <drive#>\n"
+      "           | /NUM:<part#>}                 ...logical drives start at /NUM=5\n"
+      "  /DELETEALL                               Deletes all partitions from <drive#>\n"
       "\n"
       "Setting active partitions:\n"
-      "  /ACTIVATE:<partition#> [drive#]          Sets <partition#> active\n"
-      "  /DEACTIVATE [drive#]                     Deactivates all partitions\n" );
+      "  /ACTIVATE:<partition#>                   Sets <partition#> active\n"
+      "  /DEACTIVATE                              Deactivates all partitions\n" );
    if ( flags.do_not_pause_help_information == FALSE ) {
       //printf("\n\n");
       Pause();
@@ -76,27 +76,27 @@ void Display_Help_Screen( void )
 
    printf(
       "MBR (Master Boot Record) management:\n"
-      "  /CLEARMBR [drive#]       Deletes all partitions and boot code\n"
-      "  /LOADMBR  [drive#]       Loads part. table and code from \"boot.mbr\" into MBR\n"
-      "  /SAVEMBR  [drive#]       Saves partition table and code into file \"boot.mbr\"\n"
+      "  /CLEARMBR                Deletes all partitions and boot code\n"
+      "  /LOADMBR                 Loads part. table and code from \"boot.mbr\" into MBR\n"
+      "  /SAVEMBR                 Saves partition table and code into file \"boot.mbr\"\n"
       "\n"
       "MBR code modifications leaving partitions intact:\n"
-      "  /IPL      [drive#]       Installs the standard boot code into MBR <drive#>\n"
+      "  /IPL                     Installs the standard boot code into MBR <drive#>\n"
       "                           ...same as /MBR and /CMBR for compatibility\n"
-      "  /SMARTIPL [drive#]       Installs DriveSmart IPL into MBR <drive#>\n"
+      "  /SMARTIPL                Installs DriveSmart IPL into MBR <drive#>\n"
       /*      "  /CLEARIPL [drive#]       Zeros 440 code bytes of MBR\n"*/
-      "  /LOADIPL  [drive#]       Writes 440 code bytes from \"boot.mbr\" into MBR\n"
+      "  /LOADIPL                 Writes 440 code bytes from \"boot.mbr\" into MBR\n"
       "\n"
       "Advanced partition table modification:\n"
-      "  /MODIFY:<part#>,<type#> [drive#]           Changes partition type to <type#>\n"
+      "  /MODIFY:<part#>,<type#>                    Changes partition type to <type#>\n"
       "                                             ...logical drives start at \"5\"\n"
-      "  /MOVE:<srcpart#>,<destpart#> [drive#]      Moves primary partitions\n"
-      "  /SWAP:<1stpart#>,<2ndpart#>  [drive#]      Swaps primary partitions\n"
+      "  /MOVE:<srcpart#>,<destpart#>               Moves primary partitions\n"
+      "  /SWAP:<1stpart#>,<2ndpart#>                Swaps primary partitions\n"
       "\n"
       "For handling flags on a hard disk:\n"
-      "  /CLEARFLAG[{:<flag#>} | /ALL}] [drive#]    Resets <flag#> or all on <drive#>\n"
-      "  /SETFLAG:<flag#>[,<value>] [drive#]        Sets <flag#> to 1 or <value>\n"
-      "  /TESTFLAG:<flag#>[,<value>] [drive#]       Tests <flag#> for 1 or <value>\n" );
+      "  /CLEARFLAG[{:<flag#>} | /ALL}]             Resets <flag#> or all on <drive#>\n"
+      "  /SETFLAG:<flag#>[,<value>]                 Sets <flag#> to 1 or <value>\n"
+      "  /TESTFLAG:<flag#>[,<value>]                Tests <flag#> for 1 or <value>\n" );
    if ( flags.do_not_pause_help_information == FALSE ) {
       printf( "\n" );
       Pause();
