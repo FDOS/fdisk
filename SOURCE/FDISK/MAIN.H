@@ -3,7 +3,7 @@
 #define FD_NAME "FreeDOS FDISK"
 #endif
 
-#define VERSION  "1.3.5"
+#define VERSION  "1.3.6"
 #define COPYLEFT "1998 - 2023"
 
 #ifndef FD_NAME
