@@ -99,7 +99,9 @@ get_pos:
    mov bh, byte ptr _textattr
    xor cx, cx
    mov dx, 184Fh
+   push bp
    int 10h
+   pop bp
    mov dx, 1800h
 
 move_cursor:
