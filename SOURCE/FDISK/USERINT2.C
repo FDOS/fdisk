@@ -1068,6 +1068,7 @@ void Display_CL_Partition_Table( void )
          "\nLargest continious free space in extended partition = %lu MBytes\n",
          Max_Log_Free_Space_In_MB() );
    }
+   printf("\n");
 }
 
 /* Display Extended Partition Information Sub Screen */
