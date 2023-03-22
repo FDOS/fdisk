@@ -3,7 +3,6 @@
 #define MAXFAT16NORM  2047
 #define MAXFAT16LARGE 4095
 
-#include <dos.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

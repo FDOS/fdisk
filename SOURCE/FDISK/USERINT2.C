@@ -934,15 +934,20 @@ void Display_CL_Partition_Table( void )
 
    Determine_Drive_Letters();
 
-   printf( "\n\nCurrent fixed disk drive: %1d",
+   printf( "\nCurrent fixed disk drive: %1d",
            ( flags.drive_number - 127 ) );
 
    printf( "   %lu sectors, geometry %lu/%03lu/%02lu", pDrive->disk_size_sect,
            pDrive->total_cyl + 1, pDrive->total_head + 1,
            pDrive->total_sect );
 
-   printf( "\n\nPartition   Status   Mbytes   Description      Usage" );
-   printf( "    Start CHS       End CHS\n" );
+   if ( !Is_Pri_Tbl_Empty() ) {
+      printf( "\n\nPartition   Status   Mbytes   Description      Usage" );
+      printf( "    Start CHS       End CHS\n" );
+   }
+   else {
+      printf("\n\nNo partitions defined.\n");
+   }
 
    index = 0;
    do {
@@ -1472,7 +1477,7 @@ void Dump_Partition_Information( void )
       flags.drive_number = index + 128;
       Display_CL_Partition_Table();
       index++;
-   } while ( index <= 7 );
+   } while ( index + 128 <= flags.maximum_drive_number );
 }
 
 /* List the Partition Types */
