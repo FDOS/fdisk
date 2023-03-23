@@ -34,7 +34,8 @@ objs += pcompute.obj userint1.obj userint2.obj kitten.obj compat.obj
 objs += int24.obj bootnorm.obj smartmbr.obj
 
 
-all : fdisk.exe test.exe
+all : fdisk.exe
+dist : ..\..\fdisk.zip
 
 .C.OBJ : .AUTODEPEND
 	$(CC) $(CFLAGS) $*.C
@@ -45,6 +46,7 @@ all : fdisk.exe test.exe
 fdisk.exe : $(objs) fdisk.lnk
 	$(LD) $(LDFLAGS) @fdisk
 	-$(PACKER) $(PACKERFLAGS) $^@
+	-copy /y fdisk.exe ..\..\bin\fdisk.exe
 
 fdisk.lnk : $(objs)
 	@echo NAME $^& >$^@
@@ -56,9 +58,14 @@ fdisk.lnk : $(objs)
 !endif
 	@for %i in ($(objs)) do @echo FILE %i >>$^@
 
+..\..\fdisk.zip : fdisk.exe
+	cd ..\..
+  zip -r fdisk.zip appinfo bin doc help source\fdisk\*.[ch] &
+  source\fdisk\*.asm source\fdisk\makefile.* license readme.md
+  cd source\fdisk  
+
 test.exe : test.c compat.c
   $(CL) $(CLFLAGS) test.c compat.c
-
 
 # clean up:
 

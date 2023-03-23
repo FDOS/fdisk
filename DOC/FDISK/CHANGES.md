@@ -2,7 +2,7 @@ Free FDISK Change Log
 =====================
 
 
-Version 1.3.6 (unreleased)
+Version 1.3.6 (2023-03-23)
 --------------------------
 Bugfixes:
  - CRITICAL: Prevent user from specifying multiple disks via command line
