@@ -849,7 +849,8 @@ void main( int argc, char *argv[] )
             Shift_Command_Line_Options( 1 );
          }
 
-         if ( 0 == strcmp( arg[0].choice, "LOADIPL" ) ) {
+         if ( 0 == strcmp( arg[0].choice, "LOADIPL" ) || 
+              0 == strcmp( arg[0].choice, "AIPL" ) ) {
             flags.use_iui = FALSE;
             Ensure_Drive_Number();
 
