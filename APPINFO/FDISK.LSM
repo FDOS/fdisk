@@ -1,7 +1,7 @@
 Begin3
 Title:          Fdisk
-Version:        1.3.6
-Entered-date:   2023-03-13
+Version:        1.3.7
+Entered-date:   2023-??-??
 Description:    Fixed disk partition tool
 Summary:        Fixed disk partition tool to create, delete and view hard disk
                 partitions.

@@ -2,6 +2,13 @@ Free FDISK Change Log
 =====================
 
 
+Version 1.3.7 (2023-??-??)
+--------------------------
+Changes:
+ - Reintroduce /AMBR as alias for /LOADIPL, becaus I saw it in some external
+   documentation.
+
+
 Version 1.3.6 (2023-03-23)
 --------------------------
 Bugfixes:

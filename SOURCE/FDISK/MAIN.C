@@ -850,7 +850,7 @@ void main( int argc, char *argv[] )
          }
 
          if ( 0 == strcmp( arg[0].choice, "LOADIPL" ) || 
-              0 == strcmp( arg[0].choice, "AIPL" ) ) {
+              0 == strcmp( arg[0].choice, "AMBR" ) ) {
             flags.use_iui = FALSE;
             Ensure_Drive_Number();
 
