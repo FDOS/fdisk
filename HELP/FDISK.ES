@@ -1,3 +1,3 @@
 FDISK
 
-FDISK es una herramienta b sica para gestionar particiones en discos duros.
+FDISK es una herramienta basica para gestionar particiones en discos duros.
