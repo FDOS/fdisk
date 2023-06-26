@@ -67,5 +67,4 @@ This program comes as-is and without warranty of any kind.  The author of
 this software assumes no responsibility pertaining to the use or mis-use of
 this software.  By using this software, the operator is understood to be
 agreeing to the terms of the above.
-# Free FDISK Command Line Syntax
 ```
