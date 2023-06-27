@@ -283,7 +283,7 @@ int Create_MBR( void )
 }
 
 /* Create Master Boot Code if it is not present */
-/* currently unused 
+/* currently unused
 int Create_MBR_If_Not_Present( void )
 {
    int error_code;
@@ -382,6 +382,7 @@ void Load_External_Lookup_Table( void )
             printf(
                "\nPartition type out of range in line %d of \"fdiskpt.ini\".\n",
                line_counter );
+            fclose(file);
             exit( 9 );
          }
 
