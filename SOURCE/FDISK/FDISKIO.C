@@ -387,20 +387,16 @@ void Load_External_Lookup_Table( void )
       }
 
       /* Load the short description buffer (8) */
-      offset = 4;
-      do {
-         /* */
+      for (offset = 4; offset <= 11; offset++) {
          partition_lookup_table_buffer_short[index][( offset - 4 )] =
             line_buffer[offset];
-         offset++;
-      } while ( offset <= 11 );
+      }
+
       /* Load the long description buffer (15) */
-      offset = 13;
-      do {
+      for (offset = 13; offset <= 27; offset++) {
          partition_lookup_table_buffer_long[index][( offset - 13 )] =
             line_buffer[offset];
-         offset++;
-      } while ( offset <= 27 );
+      }
 
       index++;
    }
