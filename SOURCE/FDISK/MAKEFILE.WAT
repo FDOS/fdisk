@@ -4,7 +4,7 @@
 #   for version 1.3.4 and Open Watcom 1.9.
 
 CC       = wcc
-CFLAGS   = -q -0 -bt=dos -w4
+CFLAGS   = -q -0 -bt=dos -w4 -we
 AS       = nasm
 ASFLAGS  = -t -f obj
 LD       = wlink

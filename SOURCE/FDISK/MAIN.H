@@ -267,8 +267,8 @@ int Get_Options( char *arguments[], int number_of_arguments );
 
 void Reboot_PC( void );
 
-int Print_At( int column, int row, char *, ... );
-int Color_Print_At( int column, int row, char *, ... );
-int Normal_Print_At( int column, int row, char *, ... );
-int BlinkPrintAt( int column, int row, char *format, ... );
+int Print_At( int column, int row, const char *, ... );
+int Color_Print_At( int column, int row, const char *, ... );
+int Normal_Print_At( int column, int row, const char *, ... );
+int BlinkPrintAt( int column, int row, const char *format, ... );
 
