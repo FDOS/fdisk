@@ -35,6 +35,8 @@ $set 4
 #include "pdiskio.h"
 #include "userint1.h"
 
+#include "svarlang\svarlang.h"
+
 /* Get input from keyboard */
 unsigned long Input( int size_of_field, int x_position, int y_position,
                      int type, unsigned long min_range,
@@ -113,6 +115,23 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
    unsigned long data_max_range = max_range;
    unsigned long data;
 
+   char YESchar = 'Y'; /* char that represents "yes" */
+   char yeschar = 'y';
+   char NOchar = 'N';  /* char that represents "no" */
+   char nochar = 'n';
+
+   /* load localized version of "Y/N" if needed */
+   if (type == YN) {
+     const char *YN_str = svarlang_str(250, 0);
+     const char *yn_str = svarlang_str(250, 1);
+     if ((YN_str[0] > 32) && (YN_str[1] > 32) && (yn_str[0] > 32) && (yn_str[1] > 32)) {
+       YESchar = YN_str[0];
+       NOchar = YN_str[1];
+       yeschar = yn_str[0];
+       nochar = yn_str[1];
+     }
+   }
+
    /* Clear line buffer */
    index = 0;
    memset( line_buffer, 0, sizeof( line_buffer ) );
@@ -187,16 +206,16 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       Position_Cursor( x_position + 1, y_position );
 
       if ( default_value == 1 ) {
-         printf( "Y" );
+         printf( "%c", YESchar );
          line_buffer_index = 0;
-         line_buffer[0] = 'Y';
+         line_buffer[0] = YESchar;
          data = TRUE;
       }
 
       if ( default_value == 0 ) {
-         printf( "N" );
+         printf( "%c", NOchar );
          line_buffer_index = 0;
-         line_buffer[0] = 'N';
+         line_buffer[0] = NOchar;
          data = FALSE;
       }
    }
@@ -413,10 +432,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       }
 
       /* Process a legitimate entry if type==NUMYN. */
-      if ( ( type == NUMYN ) && ( ( input == 'Y' ) || ( input == 'N' ) ||
-                                  ( input == 'y' ) || ( input == 'n' ) ) ) {
+      if ((type == NUMYN) && ((input == YESchar) || (input == yeschar) || (input == NOchar) || (input == nochar))) {
          type = YN;
-
          line_buffer[0] = ' ';
          line_buffer_index = 1;
       }
@@ -540,32 +557,18 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       }
 
       if ( type == YN ) {
-         switch ( input ) {
-         case 'Y':
-            line_buffer[0] = 'Y';
-            data = TRUE;
-            break;
-         case 'y':
-            line_buffer[0] = 'Y';
-            data = TRUE;
-            break;
-         case 'N':
-            line_buffer[0] = 'N';
-            data = FALSE;
-            break;
-         case 'n':
-            line_buffer[0] = 'N';
-            data = FALSE;
-            break;
-         default:
-            proper_input_given = FALSE;
-            line_buffer[0] = ' ';
-            data = 99;
-
-            Color_Print_At(
-               4, 23,
-               catgets( cat, 4, 7, "Invalid entry, please enter Y-N." ) );
-         }
+        if ((input == YESchar) || (input == yeschar)) {
+          line_buffer[0] = YESchar;
+          data = TRUE;
+        } else if ((input == NOchar) || (input == nochar)) {
+          line_buffer[0] = NOchar;
+          data = FALSE;
+        } else {
+          proper_input_given = FALSE;
+          line_buffer[0] = ' ';
+          data = 99;
+          Color_Print_At(4, 23, svarlang_str(250, 2) );
+        }
 
          Position_Cursor( ( x_position + 1 ), y_position );
          Color_Printf( "%c", line_buffer[0] );
