@@ -318,21 +318,14 @@ void Load_External_Lookup_Table( void )
    char line_buffer[256];
 
    /* Clear the buffers */
-   do {
-      sub_index = 0;
-      do {
+   for (index = 0; index < 256; index++) {
+      for (sub_index = 0; sub_index < 9; sub_index++) {
          partition_lookup_table_buffer_short[index][sub_index] = 0;
-         sub_index++;
-      } while ( sub_index < 9 );
-
-      sub_index = 0;
-      do {
+      }
+      for (sub_index = 0; sub_index < 16; sub_index++) {
          partition_lookup_table_buffer_long[index][sub_index] = 0;
-         sub_index++;
-      } while ( sub_index < 16 );
-
-      index++;
-   } while ( index < 256 );
+      }
+   }
    index = 0;
 
    strcpy( home_path, path );
@@ -485,15 +478,12 @@ void Process_Fdiskini_File( void )
               ( 0 != strncmp( line_buffer, "999", 3 ) ) &&
               ( line_buffer[0] != 0x0a ) &&
               ( end_of_file_marker_encountered == FALSE ) ) {
-            /* Clear the command_buffer and setting_buffer */
-            index = 0;
 
-            do {
+            /* Clear the command_buffer and setting_buffer */
+            for (index = 0; index < 20; index++) {
                command_buffer[index] = 0x00;
                setting_buffer[index] = 0x00;
-
-               index++;
-            } while ( index < 20 );
+            }
 
             /* Extract the command and setting from the line_buffer */
 
