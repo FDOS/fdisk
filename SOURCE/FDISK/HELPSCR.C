@@ -21,6 +21,8 @@
 #include "pdiskio.h"
 #include "userint1.h"
 
+#include "helpscr.h"
+
 #include "svarlang/svarlang.h"
 
 /*
