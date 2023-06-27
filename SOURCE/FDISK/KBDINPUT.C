@@ -1,20 +1,4 @@
 /*
-CATS message store for kbdinput.c:
-
-$set 4
-1 Press
-2 to
-3 return to FDISK options
-4 exit FDISK
-5 continue
-6 Requested partition size exceeds the maximum available space
-7 Invalid entry, please enter Y-N.
-8 Invalid entry.
-
-
-  // example commands:
-	printf("\n%s...",catgets(cat,1,1,"Syntax Error"));
-	printf("%s.\n",catgets(cat,1,2,"Operation Terminated"));
 
 */
 
@@ -157,22 +141,22 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
    if ( ( return_message == ESCR ) || ( return_message == ESCE ) ||
         ( return_message == ESCC ) ) {
       Print_At( 4, 24, "                                                 " );
-      Print_At( 4, 24, catgets( cat, 4, 1, "Press" ) );
+      Print_At(4, 24, "Press");
       Color_Print( " Esc " );
-      printf( catgets( cat, 4, 2, "to" ) );
+      printf("to");
       printf( " " );
    }
 
    if ( return_message == ESCR ) {
-      printf( catgets( cat, 4, 3, "return to FDISK options" ) );
+      printf("return to FDISK options");
    }
 
    if ( return_message == ESCE ) {
-      printf( catgets( cat, 4, 4, "exit FDISK" ) );
+      printf("exit FDISK");
    }
 
    if ( return_message == ESCC ) {
-      printf( catgets( cat, 4, 5, "continue" ) );
+      printf("continue");
    }
 
    /* Set the default value for NUM type, if applicable */
@@ -317,9 +301,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
 
                Color_Print_At(
                   4, 22,
-                  catgets(
-                     cat, 4, 6,
-                     "Requested partition size exceeds the maximum available space" ) );
+                     "Requested partition size exceeds the maximum available space");
 
                /* Set input=0xff to avoid processing this time around */
                input = '\xff';
@@ -364,9 +346,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
 
                Color_Print_At(
                   4, 22,
-                  catgets(
-                     cat, 4, 6,
-                     "Requested partition size exceeds the maximum available space" ) );
+                     "Requested partition size exceeds the maximum available space");
 
                /* Set input=0xff to avoid processing this time around */
                input = '\xff';
@@ -630,8 +610,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                  ( size_of_field > 1 ) ) {
                proper_input_given = FALSE;
 
-               Color_Print_At( 4, 23,
-                               catgets( cat, 4, 8, "Invalid entry." ) );
+               Color_Print_At( 4, 23, "Invalid entry.");
                invalid_input = TRUE;
             }
 
@@ -739,8 +718,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                    ( size_of_field > 1 ) ) ) {
                proper_input_given = FALSE;
 
-               Color_Print_At( 4, 23,
-                               catgets( cat, 4, 8, "Invalid entry." ) );
+               Color_Print_At( 4, 23, "Invalid entry.");
                invalid_input = TRUE;
             }
 

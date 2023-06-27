@@ -47,9 +47,9 @@ void Command_Line_Clear_Flag( void )
 
    if ( ( 0 == strcmp( arg[1].choice, "ALL" ) ) && ( arg[0].value != 0 ) ) {
       printf( "\n" );
-      printf( catgets( cat, 2, 1, "Syntax Error" ) );
+      printf("Syntax Error");
       printf( "\n" );
-      printf( catgets( cat, 2, 2, "Program Terminated" ) );
+      printf("Program Terminated");
       printf( "\n" );
       exit( 1 );
    }
@@ -66,7 +66,7 @@ void Command_Line_Clear_Flag( void )
       } while ( index <= 64 );
 
       printf( "\n" );
-      printf( catgets( cat, 2, 3, "All flags have been cleared." ) );
+      printf("All flags have been cleared.");
       printf( "\n" );
    }
    else {
@@ -76,9 +76,9 @@ void Command_Line_Clear_Flag( void )
       }
 
       printf( "\n" );
-      printf( catgets( cat, 2, 4, "Flag" ) );
+      printf("Flag");
       printf( " %d ", arg[0].value );
-      printf( catgets( cat, 2, 5, "has been cleared." ) );
+      printf("has been cleared.");
       printf( "\n" );
    }
 
@@ -96,7 +96,7 @@ void Command_Line_Create_Extended_Partition( void )
 
    if ( arg[0].value == 0 ) {
       printf( "\n" );
-      printf( catgets( cat, 2, 6, "Invalid partition size specifed." ) );
+      printf("Invalid partition size specifed.");
       printf( "\n" );
       exit( 9 );
    }
@@ -154,7 +154,7 @@ void Command_Line_Create_Logical_DOS_Drive( void )
 
    if ( arg[0].value == 0 ) {
       printf( "\n" );
-      printf( catgets( cat, 2, 6, "Invalid partition size specifed." ) );
+      printf("Invalid partition size specifed.");
       printf( "\n" );
 
       exit( 9 );
@@ -225,7 +225,7 @@ void Command_Line_Create_Primary_Partition( void )
 
    if ( arg[0].value == 0 ) {
       printf( "\n" );
-      printf( catgets( cat, 2, 6, "Invalid partition size specifed." ) );
+      printf("Invalid partition size specifed.");
       printf( "\n" );
 
       exit( 9 );
@@ -591,11 +591,11 @@ int Get_Options( char *argv[], int argc )
          if ( flags.using_default_drive_number ) {
             flags.drive_number = ( argptr[0] - '0' ) + 127;
             flags.using_default_drive_number = FALSE;
-          
+
          }
          else if ( flags.drive_number != ( argptr[0] - '0' ) + 127 ) {
             printf( "more than one drive specified; terminated\n" );
-            exit( 9 );       
+            exit( 9 );
          }
          number_of_options--;
          continue;
