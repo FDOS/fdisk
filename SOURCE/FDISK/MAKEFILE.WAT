@@ -60,7 +60,7 @@ fdisk.lnk : $(objs)
 
 ..\..\fdisk.zip : fdisk.exe
 	cd ..\..
-  zip -r fdisk.zip appinfo bin doc help source\fdisk\*.[ch] &
+  zip -9rkDX fdisk.zip appinfo bin doc help source\fdisk\*.[ch] &
   source\fdisk\*.asm source\fdisk\makefile.* license readme.md
   cd source\fdisk
 
