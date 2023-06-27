@@ -351,6 +351,9 @@ void Load_External_Lookup_Table( void )
       if ( 0 == strncmp( line_buffer, "end", 3 ) ||
            0 == strncmp( line_buffer, "END", 3 ) ||
            0 == strncmp( line_buffer, "999", 3 ) ) {
+         /* proper end of file marker: only now I am sure that the file has
+          * been loaded successfully */
+         flags.partition_type_lookup_table = EXTERNAL;
          break;
       }
 
@@ -403,7 +406,6 @@ void Load_External_Lookup_Table( void )
    }
 
    fclose( file );
-   flags.partition_type_lookup_table = EXTERNAL;
 }
 
 /* Read and process the fdisk.ini file */
