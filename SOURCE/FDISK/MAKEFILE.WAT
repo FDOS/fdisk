@@ -29,9 +29,9 @@ CFLAGS += -DRELEASE=$(RELEASE)
 CFLAGS += -DFD_FREEDOS=$(FREEDOS)
 !endif
 
-objs  = main.obj cmd.obj fdiskio.obj helpscr.obj kbdinput.obj pdiskio.obj
-objs += pcompute.obj userint1.obj userint2.obj kitten.obj compat.obj
-objs += int24.obj bootnorm.obj smartmbr.obj
+objs  = main.obj cmd.obj deflang.obj fdiskio.obj helpscr.obj kbdinput.obj
+objs += pdiskio.obj pcompute.obj userint1.obj userint2.obj kitten.obj
+objs += compat.obj int24.obj bootnorm.obj smartmbr.obj
 
 
 all : fdisk.exe
@@ -46,7 +46,10 @@ dist : ..\..\fdisk.zip
 fdisk.exe : $(objs) fdisk.lnk
 	$(LD) $(LDFLAGS) @fdisk
 	-del ..\..\bin\fdisk.exe
-	-copy fdisk.exe ..\..\bin\fdisk.exe
+	-copy fdisk.exe ..\..\bin\
+	-del ..\..\nls\fdisk.lng
+	-mkdir ..\..\nls
+	-copy fdisk.lng ..\..\nls\
 	-$(PACKER) $(PACKERFLAGS) ..\..\bin\fdisk.exe
 
 fdisk.lnk : $(objs)
@@ -58,10 +61,11 @@ fdisk.lnk : $(objs)
 	@echo DEBUG ALL >>$^@
 !endif
 	@for %i in ($(objs)) do @echo FILE %i >>$^@
+	@echo LIB SVARLANG\SVARLNGS.LIB >>$^@
 
 ..\..\fdisk.zip : fdisk.exe
 	cd ..\..
-  zip -9rkDX fdisk.zip appinfo bin doc help source\fdisk\*.[ch] &
+  zip -9rkDX fdisk.zip appinfo bin doc help nls source\fdisk\*.[ch] &
   source\fdisk\*.asm source\fdisk\makefile.* license readme.md
   cd source\fdisk
 

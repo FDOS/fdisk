@@ -1,0 +1,87 @@
+
+
+              SVARLANG.LIB - THE SVARDOS TRANSLATION C LIBRARY
+
+                   Copyright (C) 2021-2023 Mateusz Viste
+
+
+
+SvarLANG is a library and toolset for enabling SvarDOS applications to easily
+support multiple languages. It is part of the SvarDOS project.
+
+
+### PREPARING TRANSLATION FILES ###
+
+The translation files must be CATS-style text files in the usual format:
+
+1.1:Hello, World!
+1.2:Help screen
+2.0:Type /? for more options
+
+The files must be named as EN.TXT, DE.TXT, FR.TXT, etc. Then, they must be
+"compiled" into SvarLANG's binary format using the TLUMACZ tool:
+
+tlumacz en fr pl (...)
+
+The first language provided in the command line is the reference language and
+is used both as the default (embedded in the application) language, as well as
+to substitute messages missing in other languages.
+
+TLUMACZ computes two files:
+
+ * OUT.LNG   - the binary file that contains all translations
+ * DEFLANG.C - the default translations that will be embedded into the program
+
+Then, DEFLANG.C must be compiled and linked to your program along with
+SVARLNGx.LIB. From there you will be able to use SvarLANG calls, typically:
+
+  svarlang_load("myprogram", "pl", "."); /* load .\myprogram.lng */
+  puts(svarlang_str(2, 0));              /* display the string with id 2.0 */
+
+Read svarlang.h for more information about available functions.
+
+
+### ESCAPED CHARACTERS ###
+
+Translation strings may contain some escaped characters. At this time only the
+following escaped characters are supported: \r \n \t and \\
+
+
+### DIRTY STRINGS ###
+
+In the CATS-style source translation, lines may be prefixed with a '?' sign:
+
+?1.1:Hello, World!
+
+Such string is used by tlumacz like any other, but it is also reported on the
+command-line with a warning about the line being "dirty" (that is, requiring
+to be reviewed by a translator).
+
+
+### ENVIRONMENT ###
+
+The program translation file should be named "PROGNAME.LNG", where PROGNAME
+is the program's name. This file should be placed in a well-known location,
+typically the program's own directory. An exception are SvarDOS "CORE" programs
+that store their translation files in a directory pointed out by %NLSPATH%.
+
+The %LANG% environment variable usually defines what language should be loaded,
+albeit the program can just as well provide its own controls for language
+selection and pass this information to svarlang_load() accordingly.
+
+
+### WHY IS IT BETTER THAN CATS? ###
+
+The CATS library is heavier and slower, as it embeds a text-file parser.
+Translations also take more disk space since each file is in a separate file
+leading to cluster waste. Finally, CATS requires default strings to be part of
+the application's source code, while SvarLANG keeps all strings in TXT files
+and embedds the default one inside the application in an automated way at
+compile time.
+
+There is also a licensing issue: CATS/Kitten libraries are published under the
+terms of a viral license. SvarLANG, on the other hand, is published under a
+truly free, liberal license (MIT).
+
+
+======================================================================= EOF ===
