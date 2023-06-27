@@ -354,8 +354,8 @@ void Load_External_Lookup_Table( void )
          break;
       }
 
-      if ( 0 == strncmp( line_buffer, ";", 1 ) ||
-           line_buffer[0] == 0x0a ) {
+      /* skip comments and empty lines */
+      if ((line_buffer[0] == ';') || (line_buffer[0] == 0x0a)) {
          continue;
       }
 
