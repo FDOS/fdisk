@@ -1,0 +1,8 @@
+#
+# FDISK IN GERMAN
+#
+
+# ### HILFE DISPLAYUNG #######################################################
+
+0.0:Der Satzbau: FDISK [<Antrieb#>] [Befehl]...
+0.1:  kein Streit       läuft im Interaktionsmodus

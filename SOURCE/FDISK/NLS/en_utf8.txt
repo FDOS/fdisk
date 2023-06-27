@@ -1,3 +1,9 @@
+#
+# FDISK IN ENGLISH
+#
+
+# ### HELP SCREEN ############################################################
+
 0.0:Syntax: FDISK [<drive#>] [commands]...
 0.1:  no argument       Runs in interactive mode
 0.2:  /INFO             Displays partition information of <drive#>

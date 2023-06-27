@@ -1,0 +1,11 @@
+#
+# FDISK IN POLISH
+#
+
+# ### POMOC ##################################################################
+
+0.0:Składnia: FDISK [<dysk#> [polecenia]...
+0.1:  brak argumentów   Uruchamia tryb interaktywny
+0.2:  /INFO             Wyświetla informacje dot. partycji na <dysk#>
+0.3:  /REBOOT           Uruchamia ponownie komputer
+0.4:\t
