@@ -33,6 +33,8 @@ $set 1
 #include "userint1.h"
 #include "userint2.h"
 
+#include "svarlang\svarlang.h"
+
 static int Get_Environment_Settings( char *environment[] );
 static void Determine_Color_Video_Support( void );
 static void Initialization( char *environment[] );
@@ -559,10 +561,10 @@ void Re_Initialization( void )
 
 /*
 	if the C: drive has not been formatted, and fdisk
-	is (re)started, it will generate a couple of 
+	is (re)started, it will generate a couple of
 	   retry/abort/fail
 	messages because it searches FDISK.INI.
-	this is annoying and must be stopped	   
+	this is annoying and must be stopped
 */
 
 extern void cdecl far int24_handler( void );
@@ -606,6 +608,9 @@ void main( int argc, char *argv[] )
 #ifdef __WATCOMC__
    setbuf( stdout, NULL );
 #endif
+
+   /* initialize the SvarLANG library (loads translation strings) */
+   svarlang_autoload("FDISK");
 
    if ( memicmp( argv[1], "SMART", 5 ) == 0 ) {
       smart_mbr();
@@ -849,7 +854,7 @@ void main( int argc, char *argv[] )
             Shift_Command_Line_Options( 1 );
          }
 
-         if ( 0 == strcmp( arg[0].choice, "LOADIPL" ) || 
+         if ( 0 == strcmp( arg[0].choice, "LOADIPL" ) ||
               0 == strcmp( arg[0].choice, "AMBR" ) ) {
             flags.use_iui = FALSE;
             Ensure_Drive_Number();

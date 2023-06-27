@@ -1,0 +1,10 @@
+
+20220314
+- added support for flaggin strings as being "dirty", eg: ?1.1:Hello, World
+
+20220309
+- static lib buffer is sized to fit the largest lang block +5% of margin
+  (was: twice the size of the reference language)
+
+20220226
+- replaced fopen() and friends by direct DOS calls (smaller memory footprint)

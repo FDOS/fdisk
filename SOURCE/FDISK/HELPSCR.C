@@ -21,6 +21,8 @@
 #include "pdiskio.h"
 #include "userint1.h"
 
+#include "svarlang/svarlang.h"
+
 /*
 /////////////////////////////////////////////////////////////////////////////
 //  FUNCTIONS
@@ -32,6 +34,9 @@ void Display_Help_Screen( void )
 {
    char version[40];
    char name[20];
+   unsigned char i;
+   unsigned char linestopause;
+   unsigned char screenh = 25; /* TODO autodetect the number of video rows */
 
    if ( !isatty( fileno( stdout ) ) ) {
       flags.do_not_pause_help_information = TRUE;
@@ -43,89 +48,23 @@ void Display_Help_Screen( void )
    strcat( version, VERSION );
 
    printf( "%-20s                   %40s\n", name, version );
-   printf(
-      "Syntax: FDISK [<drive#>] [commands]...\n"
-      "  no argument       Runs in interactive mode\n"
-      "  /INFO             Displays partition information of <drive#>\n"
-      "  /REBOOT           Reboots the Computer\n"
-      "\n"
-      "Commands to create and delete partitions:\n"
-      "    <size> is a number for megabytes or MAX for maximum size\n"
-      "           or <number>,100 for <number> to be in percent\n"
-      "    <type#> is a numeric partition type or FAT-12/16/32 if /SPEC not given\n\n"
-      "  /PRI:<size> [/SPEC:<type#>]              Creates a primary partition\n"
-      "  /EXT:<size>                              Creates an extended DOS partition\n"
-      "  /LOG:<size> [/SPEC:<type#>]              Creates a logical drive\n"
-      "  /PRIO,/EXTO,/LOGO                        same as above, but avoids FAT32\n"
-      "  /AUTO                                    Automatically partitions the disk\n"
-      "\n"
-      "  /DELETE {/PRI[:#] | /EXT | /LOG:<part#>  Deletes a partition\n"
-      "           | /NUM:<part#>}                 ...logical drives start at /NUM=5\n"
-      "  /DELETEALL                               Deletes all partitions from <drive#>\n"
-      "\n"
-      "Setting active partitions:\n"
-      "  /ACTIVATE:<partition#>                   Sets <partition#> active\n"
-      "  /DEACTIVATE                              Deactivates all partitions\n" );
-   if ( flags.do_not_pause_help_information == FALSE ) {
-      //printf("\n\n");
-      Pause();
-   }
-   else {
-      printf( "\n" );
-   }
 
-   printf(
-      "MBR (Master Boot Record) management:\n"
-      "  /CLEARMBR                Deletes all partitions and boot code\n"
-      "  /LOADMBR                 Loads part. table and code from \"boot.mbr\" into MBR\n"
-      "  /SAVEMBR                 Saves partition table and code into file \"boot.mbr\"\n"
-      "\n"
-      "MBR code modifications leaving partitions intact:\n"
-      "  /IPL                     Installs the standard boot code into MBR <drive#>\n"
-      "                           ...same as /MBR and /CMBR for compatibility\n"
-      "  /SMARTIPL                Installs DriveSmart IPL into MBR <drive#>\n"
-      /*      "  /CLEARIPL [drive#]       Zeros 440 code bytes of MBR\n"*/
-      "  /LOADIPL                 Writes 440 code bytes from \"boot.mbr\" into MBR\n"
-      "\n"
-      "Advanced partition table modification:\n"
-      "  /MODIFY:<part#>,<type#>                    Changes partition type to <type#>\n"
-      "                                             ...logical drives start at \"5\"\n"
-      "  /MOVE:<srcpart#>,<destpart#>               Moves primary partitions\n"
-      "  /SWAP:<1stpart#>,<2ndpart#>                Swaps primary partitions\n"
-      "\n"
-      "For handling flags on a hard disk:\n"
-      "  /CLEARFLAG[{:<flag#>} | /ALL}]             Resets <flag#> or all on <drive#>\n"
-      "  /SETFLAG:<flag#>[,<value>]                 Sets <flag#> to 1 or <value>\n"
-      "  /TESTFLAG:<flag#>[,<value>]                Tests <flag#> for 1 or <value>\n" );
-   if ( flags.do_not_pause_help_information == FALSE ) {
-      printf( "\n" );
-      Pause();
-   }
+   /* dump the entire help on screen */
+   linestopause = screenh - 1;    /* number of lines before screen is full */
+   for (i = 0; i < 250; i++) {
+     const char *s = svarlang_strid(i);
+     if (*s == 0) continue;
+     if (i == 200) {   /* special case: COPYLEFT needs to be inserted */
+       printf(s, COPYLEFT);
+       puts("");
+     } else {
+       puts(s);
+     }
 
-   printf(
-      "\nFor obtaining information about the hard disk(s):\n"
-      "  /STATUS       Displays the current partition layout.\n"
-      "  /DUMP         Dumps partition information from all hard disks(for debugging)\n"
-      "\n"
-      "Interactive user interface switches:\n"
-      "  /UI           Always starts UI if given as last argument.\n"
-      "  /MONO         Forces the user interface to run in monochrome mode.\n"
-      "  /FPRMT        Prompts for FAT32/FAT16 in interactive mode.\n"
-      "  /XO           Enables extended options.\n"
-      "\n"
-      "Compatibility options:\n"
-      "  /X            Disables ext. INT 13 and LBA for the following commands\n" );
-   if ( flags.do_not_pause_help_information == FALSE ) {
-      printf( "\n" );
+     /* is it time for a pause? */
+     if ((flags.do_not_pause_help_information == FALSE) && (--linestopause <= 2)) {
+       linestopause = screenh;
+       Pause();
+     }
    }
-   printf(
-      "\nThis program is Copyright %s by Brian E. Reifsnyder and\n"
-      "The FreeDOS Community under the terms of the GNU General Public License,\n",
-      COPYLEFT );
-   printf( "version 2.\n" );
-   printf(
-      "\nThis program comes as-is and without warranty of any kind.  The author of\n"
-      "this software assumes no responsibility pertaining to the use or mis-use of\n"
-      "this software.  By using this software, the operator is understood to be\n"
-      "agreeing to the terms of the above.\n" );
 }

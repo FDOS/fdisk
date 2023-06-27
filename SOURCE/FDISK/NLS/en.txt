@@ -1,0 +1,79 @@
+0.0:Syntax: FDISK [<drive#>] [commands]...
+0.1:  no argument       Runs in interactive mode
+0.2:  /INFO             Displays partition information of <drive#>
+0.3:  /REBOOT           Reboots the Computer
+0.4:\t
+
+0.10:Commands to create and delete partitions:
+0.11:    <size> is a number for megabytes or MAX for maximum size
+0.12:           or <number>,100 for <number> to be in percent
+0.13:    <type#> is a numeric partition type or FAT-12/16/32 if /SPEC not given
+0.14:\t
+
+0.20:  /PRI:<size> [/SPEC:<type#>]              Creates a primary partition
+0.21:  /EXT:<size>                              Creates an extended DOS partition
+0.22:  /LOG:<size> [/SPEC:<type#>]              Creates a logical drive
+0.23:  /PRIO,/EXTO,/LOGO                        same as above, but avoids FAT32
+0.24:  /AUTO                                    Automatically partitions the disk
+0.25:\t
+0.26:  /DELETE {/PRI[:#] | /EXT | /LOG:<part#>  Deletes a partition
+0.27:           | /NUM:<part#>}                 ...logical drives start at /NUM=5
+0.28:\t
+0.29:  /DELETEALL                               Deletes all partitions from <drive#>
+0.30:\t
+
+0.31:Setting active partitions:
+0.32:  /ACTIVATE:<partition#>                   Sets <partition#> active
+0.33:  /DEACTIVATE                              Deactivates all partitions
+0.34:\t
+
+0.40:MBR (Master Boot Record) management:
+0.41:  /CLEARMBR                Deletes all partitions and boot code
+0.42:  /LOADMBR                 Loads part. table and code from "boot.mbr" into MBR
+0.43:  /SAVEMBR                 Saves partition table and code into file "boot.mbr"
+0.44:\t
+
+0.50:MBR code modifications leaving partitions intact:
+0.51:  /IPL                     Installs the standard boot code into MBR <drive#>
+0.52:                           ...same as /MBR and /CMBR for compatibility
+0.53:  /SMARTIPL                Installs DriveSmart IPL into MBR <drive#>
+0.54:  /LOADIPL                 Writes 440 code bytes from \"boot.mbr\" into MBR
+0.55:\t
+
+0.60:Advanced partition table modification:
+0.61:  /MODIFY:<part#>,<type#>                    Changes partition type to <type#>
+0.62:                                             ...logical drives start at "5"
+0.63:  /MOVE:<srcpart#>,<destpart#>               Moves primary partitions
+0.64:  /SWAP:<1stpart#>,<2ndpart#>                Swaps primary partitions
+0.65:\t
+
+0.70:For handling flags on a hard disk:
+0.71:  /CLEARFLAG[{:<flag#>} | /ALL}]             Resets <flag#> or all on <drive#>
+0.72:  /SETFLAG:<flag#>[,<value>]                 Sets <flag#> to 1 or <value>
+0.73:  /TESTFLAG:<flag#>[,<value>]                Tests <flag#> for 1 or <value>
+0.74:\t
+
+0.80:For obtaining information about the hard disk(s):
+0.81:  /STATUS       Displays the current partition layout.
+0.82:  /DUMP         Dumps partition information from all hard disks(for debugging)
+0.83:\t
+
+0.90:Interactive user interface switches:
+0.91:  /UI           Always starts UI if given as last argument.
+0.92:  /MONO         Forces the user interface to run in monochrome mode.
+0.93:  /FPRMT        Prompts for FAT32/FAT16 in interactive mode.
+0.94:  /XO           Enables extended options.
+0.95:\t
+
+0.100:Compatibility options:
+0.101:  /X            Disables ext. INT 13 and LBA for the following commands
+0.102:\t
+
+0.200:This program is Copyright %s by Brian E. Reifsnyder and
+0.201:The FreeDOS Community under the terms of the GNU General Public License,
+0.202:version 2.
+0.203:\t
+0.204:This program comes as-is and without warranty of any kind.  The author of
+0.205:this software assumes no responsibility pertaining to the use or mis-use of
+0.206:this software.  By using this software, the operator is understood to be
+0.207:agreeing to the terms of the above.
