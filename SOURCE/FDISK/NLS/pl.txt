@@ -1,5 +1,0 @@
-0.0:Skladnia: FDISK [<dysk#> [polecenia]...
-0.1:  brak argumentow   Uruchamia tryb interaktywny
-0.2:  /INFO             Wyswietla informacje dot. partycji na <dysk#>
-0.3:  /REBOOT           Uruchamia ponownie komputer
-0.4:\t
