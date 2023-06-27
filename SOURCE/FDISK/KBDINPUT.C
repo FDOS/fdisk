@@ -35,11 +35,13 @@ $set 4
 #include "pdiskio.h"
 #include "userint1.h"
 
+#include "kbdinput.h"
+
 #include "svarlang\svarlang.h"
 
 /* Get input from keyboard */
 unsigned long Input( int size_of_field, int x_position, int y_position,
-                     int type, unsigned long min_range,
+                     enum kbdinput_type type, unsigned long min_range,
                      unsigned long max_range, int return_message,
                      long default_value,
                      unsigned long maximum_possible_percentage,
