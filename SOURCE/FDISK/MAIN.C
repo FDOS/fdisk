@@ -69,7 +69,7 @@ static void Determine_Color_Video_Support( void )
    }
 }
 
-int Print_At( int column, int row, char *format, ... )
+int Print_At( int column, int row, const char *format, ... )
 {
    va_list arglist;
    int result;
@@ -82,7 +82,7 @@ int Print_At( int column, int row, char *format, ... )
    return result;
 }
 
-int Color_Print_At( int column, int row, char *format, ... )
+int Color_Print_At( int column, int row, const char *format, ... )
 {
    char buffer[256];
    va_list arglist;
@@ -96,7 +96,7 @@ int Color_Print_At( int column, int row, char *format, ... )
    return Color_Print( buffer );
 }
 
-int Normal_Print_At( int column, int row, char *format, ... )
+int Normal_Print_At( int column, int row, const char *format, ... )
 {
    char buffer[256];
    va_list arglist;
@@ -116,7 +116,7 @@ int Normal_Print_At( int column, int row, char *format, ... )
    return res;
 }
 
-int BlinkPrintAt( int column, int row, char *format, ... )
+int BlinkPrintAt( int column, int row, const char *format, ... )
 {
    char buffer[256];
    va_list arglist;
