@@ -452,6 +452,7 @@ void Interactive_User_Interface( void )
          /* PATH in the environment for the boot.mbr file.                  */
          file_pointer = fopen( home_path, "rb" );
 
+         /* if .\boot.mbr not found, then look for it in %PATH% */
          if ( !file_pointer ) {
             file_pointer = fopen( searchpath( "boot.mbr" ), "rb" );
          }
@@ -462,6 +463,7 @@ void Interactive_User_Interface( void )
                "\nUnable to find the \"boot.mbr\" file...MBR has not been loaded.\n" );
          }
          else {
+            fclose(file_pointer);
             Load_MBR( 0 );
             Color_Print_At( 4, 22,
                             "MBR has been written using \"boot.mbr\"" );

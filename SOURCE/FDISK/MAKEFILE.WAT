@@ -1,7 +1,7 @@
 # This makefile is for Free FDISK and Open Watcom.
 #
 # Created by Bernd Boeckmann
-#   for verison 1.3.4 and Open Watcom 1.9.
+#   for version 1.3.4 and Open Watcom 1.9.
 
 CC       = wcc
 CFLAGS   = -q -0 -bt=dos -w4
@@ -45,8 +45,8 @@ dist : ..\..\fdisk.zip
 
 fdisk.exe : $(objs) fdisk.lnk
 	$(LD) $(LDFLAGS) @fdisk
-	-$(PACKER) $(PACKERFLAGS) $^@
 	-copy /y fdisk.exe ..\..\bin\fdisk.exe
+	-$(PACKER) $(PACKERFLAGS) ..\..\bin\fdisk.exe
 
 fdisk.lnk : $(objs)
 	@echo NAME $^& >$^@
@@ -62,7 +62,7 @@ fdisk.lnk : $(objs)
 	cd ..\..
   zip -r fdisk.zip appinfo bin doc help source\fdisk\*.[ch] &
   source\fdisk\*.asm source\fdisk\makefile.* license readme.md
-  cd source\fdisk  
+  cd source\fdisk
 
 test.exe : test.c compat.c
   $(CL) $(CLFLAGS) test.c compat.c
