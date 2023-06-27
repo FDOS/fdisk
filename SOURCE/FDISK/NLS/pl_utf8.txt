@@ -9,3 +9,28 @@
 0.2:  /INFO             Wyświetla informacje dot. partycji na <dysk#>
 0.3:  /REBOOT           Uruchamia ponownie komputer
 0.4:\t
+
+
+##############################################################################
+# FAT32 SUPPORT SCREEN                                                       #
+##############################################################################
+
+1.0:FDISK potrafi wykorzystać wsparcie dla dużych dysków, umożliwiając
+1.1:tworzenie partycji większych niż 2048 MB przy pomocy systemu plików FAT32
+1.2:Jeśli włączysz wsparcie dla dużych dysków, wszelkie partycje lub wolumeny
+1.3:logiczne większe niż 512 MB zostaną utworzone jako FAT32.
+1.4:WAŻNE:  Włączenie wsparcia dla dużych dysków może spowodować, że niektóre
+1.5:systemy operacyjne nie będą w stanie odczytać partycji lub logicznych
+1.6:wolumenów o rozmiarze powyżej 512 MB.
+1.7:Czy chcesz włączyć wsparcie dla dużych dysków (FAT32)? (T/N)
+
+
+##############################################################################
+# GLOBAL STRINGS                                                             #
+##############################################################################
+
+# Yes-No letters, as used to answer "Yes/No" questions (upper- and lower-case)
+250.0:TN
+250.1:tn
+
+250.2:Nieprawidłowa odpowiedź, wprowadź T lub N

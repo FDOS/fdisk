@@ -2,7 +2,10 @@
 # FDISK IN ENGLISH
 #
 
-# ### HELP SCREEN ############################################################
+
+##############################################################################
+# HELP SCREEN                                                                #
+##############################################################################
 
 0.0:Syntax: FDISK [<drive#>] [commands]...
 0.1:  no argument       Runs in interactive mode
@@ -83,3 +86,28 @@
 0.205:this software assumes no responsibility pertaining to the use or mis-use of
 0.206:this software.  By using this software, the operator is understood to be
 0.207:agreeing to the terms of the above.
+
+
+##############################################################################
+# FAT32 SUPPORT SCREEN                                                       #
+##############################################################################
+
+1.0:FDISK is capable of using large disk support to allow you to
+1.1:create partitions that are greater than 2,048 MB by using FAT32
+1.2:partitions.  If you enable large disk support, any partitions or
+1.3:logical drives greater than 512 MB will be created using FAT32.
+1.4:IMPORTANT:  If you enable large disk support, some operating systems
+1.5:will be unable to access the partitions and logical drives that are
+1.6:over 512 MB in size.
+1.7:Do you want to use large disk (FAT32) support (Y/N)....?
+
+
+##############################################################################
+# GLOBAL STRINGS                                                             #
+##############################################################################
+
+# Yes-No letters, as used to answer "Yes/No" questions (upper- and lower-case)
+250.0:YN
+250.1:yn
+
+250.2:Invalid entry, please enter Y-N

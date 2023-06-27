@@ -19,6 +19,8 @@
 #include "userint1.h"
 #include "userint2.h"
 
+#include "svarlang\svarlang.h"
+
 int IsRecognizedFatPartition( unsigned partitiontype )
 {
    switch ( partitiontype ) {
@@ -58,30 +60,18 @@ void Ask_User_About_FAT32_Support( void )
 
    Clear_Screen( 0 );
 
-   Print_At( 4, 5,
-             FD_NAME
-             " is capable of using large disk support to allow you to" );
-   Print_At(
-      4, 6,
-      "create partitions that are greater than 2,048 MB by using FAT32" );
-   Print_At(
-      4, 7,
-      "partitions.  If you enable large disk support, any partitions or" );
-   Print_At(
-      4, 8,
-      "logical drives greater than 512 MB will be created using FAT32." );
-   Print_At(
-      4, 10,
-      "IMPORTANT:  If you enable large disk support, some operating systems" );
-   Print_At(
-      4, 11,
-      "will be unable to access the partitions and logical drives that are" );
-   Print_At( 4, 12, "over 512 MB in size." );
+   Print_At( 4,  5, svarlang_str(1, 0));
+   Print_At( 4,  6, svarlang_str(1, 1));
+   Print_At( 4,  7, svarlang_str(1, 2));
+   Print_At( 4,  8, svarlang_str(1, 3));
+   Print_At( 4, 10, svarlang_str(1, 4));
+   Print_At( 4, 11, svarlang_str(1, 5));
+   Print_At( 4, 12, svarlang_str(1, 6));
 
-   Print_At( 4, 17,
-             "Do you want to use large disk (FAT32) support (Y/N)....?" );
+   /* "do you want to use large disk (FAT32) support (Y/N)...?" */
+   Print_At( 4, 17, svarlang_str(1, 7));
 
-   flags.fat32 = (int)Input( 1, 62, 17, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
+   flags.fat32 = (int)Input( 1, strlen(svarlang_str(1, 7)) + 5, 17, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
 }
 
 int Inform_About_Trimmed_Disk( void )
