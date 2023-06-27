@@ -36,6 +36,7 @@ objs += compat.obj int24.obj bootnorm.obj smartmbr.obj
 
 all : fdisk.exe
 dist : ..\..\fdisk.zip
+dist-svardos: ..\..\fdisk.svp
 
 .C.OBJ : .AUTODEPEND
 	$(CC) $(CFLAGS) $*.C
@@ -68,6 +69,17 @@ fdisk.lnk : $(objs)
   zip -9rkDX fdisk.zip appinfo bin doc help nls source\fdisk\*.[ch] &
   source\fdisk\*.asm source\fdisk\makefile.* license readme.md
   cd source\fdisk
+
+..\..\fdisk.svp : fdisk.exe
+	cd ..\..
+	rename appinfo appinfo.tmp
+	mkdir appinfo
+	copy appinfo.tmp\fdisk.lsm appinfo\
+	zip -9rkDX fdisk.svp appinfo bin doc nls
+	del appinfo\fdisk.lsm
+	rmdir appinfo
+	rename appinfo.tmp appinfo
+	cd source\fdisk
 
 test.exe : test.c compat.c
   $(CL) $(CLFLAGS) test.c compat.c
