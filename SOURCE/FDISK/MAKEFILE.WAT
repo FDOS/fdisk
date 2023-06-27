@@ -45,7 +45,8 @@ dist : ..\..\fdisk.zip
 
 fdisk.exe : $(objs) fdisk.lnk
 	$(LD) $(LDFLAGS) @fdisk
-	-copy /y fdisk.exe ..\..\bin\fdisk.exe
+	-del ..\..\bin\fdisk.exe
+	-copy fdisk.exe ..\..\bin\fdisk.exe
 	-$(PACKER) $(PACKERFLAGS) ..\..\bin\fdisk.exe
 
 fdisk.lnk : $(objs)
