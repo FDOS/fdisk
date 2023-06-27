@@ -283,7 +283,7 @@ int Create_MBR( void )
 }
 
 /* Create Master Boot Code if it is not present */
-/* currently unused 
+/* currently unused
 int Create_MBR_If_Not_Present( void )
 {
    int error_code;
@@ -318,21 +318,14 @@ void Load_External_Lookup_Table( void )
    char line_buffer[256];
 
    /* Clear the buffers */
-   do {
-      sub_index = 0;
-      do {
+   for (index = 0; index < 256; index++) {
+      for (sub_index = 0; sub_index < 9; sub_index++) {
          partition_lookup_table_buffer_short[index][sub_index] = 0;
-         sub_index++;
-      } while ( sub_index < 9 );
-
-      sub_index = 0;
-      do {
+      }
+      for (sub_index = 0; sub_index < 16; sub_index++) {
          partition_lookup_table_buffer_long[index][sub_index] = 0;
-         sub_index++;
-      } while ( sub_index < 16 );
-
-      index++;
-   } while ( index < 256 );
+      }
+   }
    index = 0;
 
    strcpy( home_path, path );
@@ -346,67 +339,69 @@ void Load_External_Lookup_Table( void )
       file = fopen( searchpath( "fdiskpt.ini" ), "rt" );
    }
 
+   /* if no fdiskpt.ini file could be found then fall back on internal tables
+    * and quit */
    flags.partition_type_lookup_table = INTERNAL;
-   if ( file ) {
-      while ( fgets( line_buffer, 255, file ) != NULL ) {
-         line_counter++;
+   if (!file) return;
 
-         if ( 0 == strncmp( line_buffer, "end", 3 ) ||
-              0 == strncmp( line_buffer, "END", 3 ) ||
-              0 == strncmp( line_buffer, "999", 3 ) ) {
-            break;
-         }
+   /* fdiskpt.ini found: load it up now */
+   while ( fgets( line_buffer, 255, file ) != NULL ) {
+      line_counter++;
 
-         if ( 0 == strncmp( line_buffer, ";", 1 ) ||
-              line_buffer[0] == 0x0a ) {
-            continue;
-         }
-
-         /* Determine what partition type this line is referring to. */
-         character_number[3] = 0;
-
-         if ( line_buffer[0] == '0' ) {
-            character_number[0] = line_buffer[1];
-            character_number[1] = line_buffer[2];
-            character_number[2] = 0;
-         }
-         else {
-            character_number[0] = line_buffer[0];
-            character_number[1] = line_buffer[1];
-            character_number[2] = line_buffer[2];
-         }
-
-         index = atoi( character_number );
-
-         if ( ( index < 0 ) || ( index > 255 ) ) {
-            printf(
-               "\nPartition type out of range in line %d of \"fdiskpt.ini\".\n",
-               line_counter );
-            exit( 9 );
-         }
-
-         /* Load the short description buffer (8) */
-         offset = 4;
-         do {
-            /* */
-            partition_lookup_table_buffer_short[index][( offset - 4 )] =
-               line_buffer[offset];
-            offset++;
-         } while ( offset <= 11 );
-         /* Load the long description buffer (15) */
-         offset = 13;
-         do {
-            partition_lookup_table_buffer_long[index][( offset - 13 )] =
-               line_buffer[offset];
-            offset++;
-         } while ( offset <= 27 );
-
-         index++;
+      if ( 0 == strncmp( line_buffer, "end", 3 ) ||
+           0 == strncmp( line_buffer, "END", 3 ) ||
+           0 == strncmp( line_buffer, "999", 3 ) ) {
+         /* proper end of file marker: only now I am sure that the file has
+          * been loaded successfully */
+         flags.partition_type_lookup_table = EXTERNAL;
+         break;
       }
 
-      fclose( file );
-      flags.partition_type_lookup_table = EXTERNAL;
+      /* skip comments and empty lines */
+      if ((line_buffer[0] == ';') || (line_buffer[0] == 0x0a)) {
+         continue;
+      }
+
+      /* Determine what partition type this line is referring to. */
+      character_number[3] = 0;
+
+      if ( line_buffer[0] == '0' ) {
+         character_number[0] = line_buffer[1];
+         character_number[1] = line_buffer[2];
+         character_number[2] = 0;
+      }
+      else {
+         character_number[0] = line_buffer[0];
+         character_number[1] = line_buffer[1];
+         character_number[2] = line_buffer[2];
+      }
+
+      index = atoi( character_number );
+
+      if ( ( index < 0 ) || ( index > 255 ) ) {
+         printf(
+            "\nPartition type out of range in line %d of \"fdiskpt.ini\".\n",
+            line_counter );
+         fclose(file);
+         exit( 9 );
+      }
+
+      /* Load the short description buffer (8) */
+      for (offset = 4; offset <= 11; offset++) {
+         partition_lookup_table_buffer_short[index][( offset - 4 )] =
+            line_buffer[offset];
+      }
+
+      /* Load the long description buffer (15) */
+      for (offset = 13; offset <= 27; offset++) {
+         partition_lookup_table_buffer_long[index][( offset - 13 )] =
+            line_buffer[offset];
+      }
+
+      index++;
    }
+
+   fclose( file );
 }
 
 /* Read and process the fdisk.ini file */
@@ -484,15 +479,12 @@ void Process_Fdiskini_File( void )
               ( 0 != strncmp( line_buffer, "999", 3 ) ) &&
               ( line_buffer[0] != 0x0a ) &&
               ( end_of_file_marker_encountered == FALSE ) ) {
-            /* Clear the command_buffer and setting_buffer */
-            index = 0;
 
-            do {
+            /* Clear the command_buffer and setting_buffer */
+            for (index = 0; index < 20; index++) {
                command_buffer[index] = 0x00;
                setting_buffer[index] = 0x00;
-
-               index++;
-            } while ( index < 20 );
+            }
 
             /* Extract the command and setting from the line_buffer */
 
