@@ -2,8 +2,11 @@
 *.bat text eol=crlf
 *.BAT text eol=crlf
 *.c text eol=crlf
+*.C text eol=crlf
 *.com -text
 *.COM -text
+*.exe -text
+*.EXE -text
 *.h text eol=crlf
 *.prj -text
 *.PRJ -text
@@ -12,4 +15,3 @@
 *.sh text eol=lf
 *.HTM text
 *.htm text
-
