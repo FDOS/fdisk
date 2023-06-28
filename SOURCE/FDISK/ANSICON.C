@@ -260,6 +260,11 @@ void con_set_bold( int flag )
 	}
 }
 
+int con_get_bold( void )
+{
+	return (con_textattr & 0x08) != 0;
+}
+
 void con_set_textcolor( int color )
 {
 	con_textattr = ( con_textattr & 0xf8 ) | ( color & 7 );

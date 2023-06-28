@@ -139,6 +139,8 @@ TODO??    8            Concealed On            (ISO 6429 standard)
 #define ESC_ATTR_OFF     "\33[0m"
 #define ESC_BOLD_ON      "\33[1m"
 #define ESC_BOLD_OFF     "\33[22m"
+#define ESC_BLINK_ON
+#define ESC_BLINK_OFF
 #define ESC_CLRSCR       "\33[2J"
 #define ESC_CLREOL       "\33[K"
 
@@ -193,6 +195,7 @@ void con_reset_attr( void );
 void con_set_textcolor( int color );
 void con_set_backcolor( int color );
 void con_set_bold( int flag );
+int con_get_bold( void );
 
 #ifdef __cplusplus
 }

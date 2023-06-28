@@ -41,110 +41,12 @@ $set 1
 #include "svarlang\svarlang.h"
 
 static int Get_Environment_Settings( char *environment[] );
-static void Determine_Color_Video_Support( void );
 static void Initialization( char *environment[] );
 /*void Re_Initialization( void );*/
 
 
-/* Determine if the video display will support boldfacing text */
-static void Determine_Color_Video_Support( void )
-{
-   /* Changed to code suggested by Ralf Quint. */
-
-   unsigned char videomode = 0;
-   unsigned char maxcolumn = 0;
-
-   asm {
-
-    mov ah,0x0f
-    int 0x10
-    mov videomode,al
-    mov maxcolumn,ah
-   }
-
-   if ( videomode == 7 ) /* monochrome mode */
-   {
-      flags.monochrome = TRUE;
-      textattr( 7 );
-   }
-   else /* assume color mode */
-   {
-      flags.monochrome = FALSE;
-      textattr( 15 );
-   }
-}
-
-int Print_At( int column, int row, const char *format, ... )
-{
-   va_list arglist;
-   int result;
-   con_set_cursor_xy( column + 1, row + 1 );
-
-   va_start( arglist, format );
-   result = vprintf( format, arglist );
-   va_end( arglist );
-
-   return result;
-}
-
-int Color_Print_At( int column, int row, const char *format, ... )
-{
-   char buffer[256];
-   va_list arglist;
-
-   Position_Cursor( column, row );
-
-   va_start( arglist, format );
-   vsprintf( buffer, format, arglist );
-   va_end( arglist );
-
-   return Color_Print( buffer );
-}
-
 #ifndef FDISKLITE
-int Normal_Print_At( int column, int row, const char *format, ... )
-{
-   char buffer[256];
-   va_list arglist;
-   int res, attr;
 
-   attr = gettextattr();
-   textcolor( 7 );
-   Position_Cursor( column, row );
-
-   va_start( arglist, format );
-   vsprintf( buffer, format, arglist );
-   va_end( arglist );
-
-   res = Color_Print( buffer );
-   textattr( attr );
-
-   return res;
-}
-
-int BlinkPrintAt( int column, int row, const char *format, ... )
-{
-   char buffer[256];
-   va_list arglist;
-   int len;
-
-   Position_Cursor( column, row );
-
-   va_start( arglist, format );
-   vsprintf( buffer, format, arglist );
-   va_end( arglist );
-
-   if ( flags.monochrome != TRUE ) {
-      textcolor( WHITE | BLINK );
-   }
-   len = Color_Print( buffer );
-
-   if ( flags.monochrome != TRUE ) {
-      textcolor( WHITE );
-   }
-
-   return len;
-}
 #endif
 
 /* Get Environment Settings */
@@ -483,7 +385,6 @@ static void Initialization( char *environment[] )
       strcpy( partition_lookup_table_buffer_long[15], "Extended LBA" );
    }
 
-   Determine_Color_Video_Support();
    Process_Fdiskini_File();
 
    Get_Environment_Settings( &*environment );
@@ -496,12 +397,8 @@ static void Initialization( char *environment[] )
    }
 
    /* Set the colors. monochrome mode, if it is desired. */
-   textattr( flags.screen_color );
    if ( flags.monochrome == TRUE ) {
-      textattr( 7 );
-   }
-   else {
-      textcolor( 15 );
+      /* TODO: reimplement if ansicon supports monochrome */
    }
 
    /* Check for interrupt 0x13 extensions (If the proper version is set.) */
@@ -926,7 +823,7 @@ void main( int argc, char *argv[] )
 
          if ( 0 == strcmp( arg[0].choice, "MONO" ) ) {
             flags.monochrome = TRUE;
-            textattr( 7 );
+            
             command_ok = TRUE;
 
             Shift_Command_Line_Options( 1 );

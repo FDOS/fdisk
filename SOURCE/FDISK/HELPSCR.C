@@ -51,7 +51,7 @@ void Display_Help_Screen( void )
    strcpy( version, " V" );
    strcat( version, VERSION );
 
-   printf( "%-20s                   %40s\n", name, version );
+   con_printf( "%-20s                   %40s\n", name, version );
 
    /* dump the entire help on screen */
    linestopause = screenh - 1;    /* number of lines before screen is full */

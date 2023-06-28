@@ -37,6 +37,8 @@ $set 2
 #include "pcompute.h"
 #include "pdiskio.h"
 #include "userint0.h"
+#include "ansicon.h"
+#include "printf.h"
 
 #ifndef FDISKLITE
 #include "userint1.h"
@@ -49,11 +51,7 @@ void Command_Line_Clear_Flag( void )
    int option_count = 1;
 
    if ( ( 0 == strcmp( arg[1].choice, "ALL" ) ) && ( arg[0].value != 0 ) ) {
-      printf( "\n" );
-      printf("Syntax Error");
-      printf( "\n" );
-      printf("Program Terminated");
-      printf( "\n" );
+      con_puts( "\nSyntax Error\n\nProgram Terminated\n" );
       exit( 1 );
    }
 
@@ -68,21 +66,17 @@ void Command_Line_Clear_Flag( void )
          index++;
       } while ( index <= 64 );
 
-      printf( "\n" );
-      printf("All flags have been cleared.");
-      printf( "\n" );
+      con_puts("\nAll flags have been cleared.\n");
    }
    else {
       if ( Clear_Flag( (int)arg[0].value ) != 0 ) {
-         printf( "\nError clearing flag.\n" );
+         con_puts( "\nError clearing flag.\n" );
          exit( 9 );
       }
 
-      printf( "\n" );
-      printf("Flag");
-      printf( " %d ", arg[0].value );
-      printf("has been cleared.");
-      printf( "\n" );
+      con_puts("\nFlag");
+      con_printf( " %d ", arg[0].value );
+      con_puts("has been cleared.\n" );
    }
 
    Shift_Command_Line_Options( option_count );
@@ -98,14 +92,12 @@ void Command_Line_Create_Extended_Partition( void )
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    if ( arg[0].value == 0 ) {
-      printf( "\n" );
-      printf("Invalid partition size specifed.");
-      printf( "\n" );
+      con_puts( "\nInvalid partition size specifed.\n" );
       exit( 9 );
    }
 
    if ( pDrive->ptr_ext_part ) {
-      printf( "\nExtended partition already exists.\n" );
+      con_puts( "\nExtended partition already exists.\n" );
       exit( 9 );
    }
 
@@ -138,7 +130,7 @@ void Command_Line_Create_Extended_Partition( void )
    error_code = Create_Primary_Partition( 5, arg[0].value );
 
    if ( error_code == 99 ) {
-      printf( "\nError creating extended partition.\n" );
+      con_puts( "\nError creating extended partition.\n" );
       exit( 9 );
    }
 
@@ -156,15 +148,13 @@ void Command_Line_Create_Logical_DOS_Drive( void )
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    if ( arg[0].value == 0 ) {
-      printf( "\n" );
-      printf("Invalid partition size specifed.");
-      printf( "\n" );
+      con_puts( "\nInvalid partition size specifed.\n" );
 
       exit( 9 );
    }
 
    if ( !pDrive->ext_usable ) {
-      printf( "\nNo usable extended partition found.\n" );
+      con_puts( "\nNo usable extended partition found.\n" );
       exit( 9 );
    }
 
@@ -208,7 +198,7 @@ void Command_Line_Create_Logical_DOS_Drive( void )
    }
 
    if ( error_code == 99 ) {
-      printf( "\nError creating logical drive.\n" );
+      con_puts( "\nError creating logical drive.\n" );
       exit( 9 );
    }
 
@@ -227,10 +217,7 @@ void Command_Line_Create_Primary_Partition( void )
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    if ( arg[0].value == 0 ) {
-      printf( "\n" );
-      printf("Invalid partition size specifed.");
-      printf( "\n" );
-
+      con_puts( "\nInvalid partition size specifed.\n" );
       exit( 9 );
    }
 
@@ -271,7 +258,7 @@ void Command_Line_Create_Primary_Partition( void )
 
    part_no = Create_Primary_Partition( part_type, arg[0].value );
    if ( part_no == 99 ) {
-      printf( "\nError creating primary partition.\n" );
+      con_puts( "\nError creating primary partition.\n" );
       exit( 9 );
    }
    Set_Active_Partition_If_None_Is_Active( part_no );
@@ -290,7 +277,7 @@ void Command_Line_Delete( void )
       if ( arg[1].value != 0 ) /* specified what to delete */
       {
          if ( arg[1].value < 1 || arg[1].value > 4 ) {
-            printf( "primary partition # (%ld) must be 1..4.\n",
+            con_printf( "primary partition # (%ld) must be 1..4.\n",
                     (long)arg[1].value );
             exit( 9 );
          }
@@ -308,10 +295,10 @@ void Command_Line_Delete( void )
             }
          }
          if ( count == 0 ) {
-            printf( "No partition to delete found.\n" ); /* but continue */
+            con_puts( "No partition to delete found.\n" ); /* but continue */
          }
          else if ( count > 1 ) {
-            printf(
+            con_printf(
                "%d primary partitions found, you must specify number to delete.\n",
                count );
             exit( 9 );
@@ -321,7 +308,7 @@ void Command_Line_Delete( void )
          }
       }
       if ( error_code == 99 ) {
-         printf( "\nError deleting primary partition.\n" );
+         con_printf( "\nError deleting primary partition.\n" );
          exit( 9 );
       }
    } /* end PRI */
@@ -331,7 +318,7 @@ void Command_Line_Delete( void )
       error_code = Delete_Extended_Partition();
 
       if ( error_code == 99 ) {
-         printf( "\nError deleting extended partition.\n" );
+         con_puts( "\nError deleting extended partition.\n" );
          exit( 9 );
       }
    }
@@ -342,7 +329,7 @@ void Command_Line_Delete( void )
          error_code = Delete_Logical_Drive( (int)( arg[1].value - 1 ) );
       }
       else {
-         printf( "\nLogical drive number %d is out of range.\n",
+         con_printf( "\nLogical drive number %d is out of range.\n",
                  arg[1].value );
          exit( 9 );
       }
@@ -357,18 +344,18 @@ void Command_Line_Delete( void )
          error_code = Delete_Logical_Drive( (int)( arg[1].value - 5 ) );
       }
       else {
-         printf( "\nPartition number is out of range.\n" );
+         con_puts( "\nPartition number is out of range.\n" );
          exit( 9 );
       }
    }
 
    else {
-      printf( "\nInvalid delete argument.\n" );
+      con_puts( "\nInvalid delete argument.\n" );
       exit( 9 );
    }
 
    if ( error_code != 0 ) {
-      printf( "\nError deleting logical drive.\n" );
+      con_puts( "\nError deleting logical drive.\n" );
       exit( 9 );
    }
 
@@ -397,13 +384,13 @@ void Command_Line_Modify( void )
 {
 
    if ( ( arg[0].extra_value == 0 ) || ( arg[0].extra_value > 255 ) ) {
-      printf( "\nNew partition type is out of range.\n" );
+      con_puts( "\nNew partition type is out of range.\n" );
       exit( 9 );
    }
 
    if ( Modify_Partition_Type( (int)( arg[0].value - 1 ),
                                arg[0].extra_value ) != 0 ) {
-      printf( "\nError modifying partition type.\n" );
+      con_puts( "\nError modifying partition type.\n" );
       exit( 9 );
    }
 
@@ -414,18 +401,18 @@ void Command_Line_Modify( void )
 void Command_Line_Move( void )
 {
    if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
-      printf( "\nSource partition number is out of range.\n" );
+      con_puts( "\nSource partition number is out of range.\n" );
       exit( 9 );
    }
 
    if ( ( arg[0].extra_value < 1 ) || ( arg[0].extra_value > 4 ) ) {
-      printf( "\nDestination partition number is out of range.\n" );
+      con_puts( "\nDestination partition number is out of range.\n" );
       exit( 9 );
    }
 
    if ( Primary_Partition_Slot_Transfer( MOVE, (int)arg[0].value,
                                          arg[0].extra_value ) != 0 ) {
-      printf( "\nError moving partition slot.\n" );
+      con_puts( "\nError moving partition slot.\n" );
       exit( 9 );
    }
 
@@ -436,7 +423,7 @@ void Command_Line_Move( void )
 void Command_Line_Set_Flag( void )
 {
    if ( ( arg[0].value < 1 ) || ( arg[0].value > 64 ) ) {
-      printf( "\nInvalid flag number.\n" );
+      con_puts( "\nInvalid flag number.\n" );
       exit( 9 );
    }
 
@@ -445,17 +432,17 @@ void Command_Line_Set_Flag( void )
    }
 
    if ( ( arg[0].extra_value < 1 ) || ( arg[0].extra_value > 64 ) ) {
-      printf( "\nFlag value is out of range.\n" );
+      con_puts( "\nFlag value is out of range.\n" );
       exit( 9 );
    }
 
    if ( Set_Flag( (int)arg[0].value, arg[0].extra_value ) != 0 ) {
-      printf( "\nError setting flag.\n" );
+      con_puts( "\nError setting flag.\n" );
       exit( 9 );
    }
 
-   printf( "\nFlag %d has been set to ", arg[0].value );
-   printf( "%d.\n", arg[0].extra_value );
+   con_printf( "\nFlag %d has been set to ", arg[0].value );
+   con_printf( "%d.\n", arg[0].extra_value );
 
    Shift_Command_Line_Options( 1 );
 }
@@ -464,8 +451,7 @@ void Command_Line_Set_Flag( void )
 void Command_Line_Status( void )
 {
    flags.monochrome = TRUE;
-   textattr( 7 );
-   Clear_Screen( 0 );
+   con_clrscr();
    Print_Centered( 1, "Fixed Disk Drive Status", 0 );
    Display_All_Drives();
 
@@ -476,18 +462,18 @@ void Command_Line_Status( void )
 void Command_Line_Swap( void )
 {
    if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
-      printf( "\nSource partition number is out of range.\n" );
+      con_puts( "\nSource partition number is out of range.\n" );
       exit( 9 );
    }
 
    if ( ( arg[0].extra_value < 1 ) || ( arg[0].extra_value > 4 ) ) {
-      printf( "\nDestination partition number is out of range.\n" );
+      con_puts( "\nDestination partition number is out of range.\n" );
       exit( 9 );
    }
 
    if ( Primary_Partition_Slot_Transfer( SWAP, (int)arg[0].value,
                                          arg[0].extra_value ) != 0 ) {
-      printf( "\nError swapping partitions.\n" );
+      con_puts( "\nError swapping partitions.\n" );
       exit( 9 );
    }
 
@@ -506,14 +492,14 @@ void Command_Line_Test_Flag( void )
       /* The error level returned will be 20 for false and 21 for true.    */
 
       if ( flag == arg[0].extra_value ) {
-         printf( "\nFlag %d is set to ", arg[0].value );
-         printf( "%d.\n", arg[0].extra_value );
+         con_printf( "\nFlag %d is set to ", arg[0].value );
+         con_printf( "%d.\n", arg[0].extra_value );
 
          exit( 21 );
       }
       else {
-         printf( "\nFlag %d is not set to ", arg[0].value );
-         printf( "%d.\n", arg[0].extra_value );
+         con_printf( "\nFlag %d is not set to ", arg[0].value );
+         con_printf( "%d.\n", arg[0].extra_value );
 
          exit( 20 );
       }
@@ -523,8 +509,8 @@ void Command_Line_Test_Flag( void )
       /* the flag is set to.  The error level returned will be the value  */
       /* of the flag + 30.                                                */
 
-      printf( "\nFlag %d is set to ", arg[0].value );
-      printf( "%d.\n", flag );
+      con_printf( "\nFlag %d is set to ", arg[0].value );
+      con_printf( "%d.\n", flag );
 
       exit( ( 30 + flag ) );
    }
@@ -548,7 +534,7 @@ void Command_Line_X( void )
    } while ( index < MAX_DISKS );
 
    if ( Read_Partition_Tables() != 0 ) {
-      Color_Print( "\n    Error reading partition tables.\n" );
+      con_puts( ESC_BOLD_ON "\n    Error reading partition tables.\n" ESC_BOLD_OFF );
       exit( 1 );
    }
    /*if ( flags.maximum_drive_number == 0 ) {
@@ -587,7 +573,7 @@ int Get_Options( char *argv[], int argc )
 
       if ( 1 == strlen( argptr ) ) {
          if ( !isdigit( *argptr ) ) {
-            printf( "<%s> should be a digit; terminated\n", argptr );
+            con_printf( "<%s> should be a digit; terminated\n", argptr );
             exit( 9 );
          }
 
@@ -597,7 +583,7 @@ int Get_Options( char *argv[], int argc )
 
          }
          else if ( flags.drive_number != ( argptr[0] - '0' ) + 127 ) {
-            printf( "more than one drive specified; terminated\n" );
+            con_puts( "more than one drive specified; terminated\n" );
             exit( 9 );
          }
          number_of_options--;
@@ -605,7 +591,7 @@ int Get_Options( char *argv[], int argc )
       }
 
       if ( *argptr != '-' && *argptr != '/' ) {
-         printf( "<%s> should start with '-' or '/'; terminated\n", argptr );
+         con_printf( "<%s> should start with '-' or '/'; terminated\n", argptr );
          exit( 9 );
       }
 
@@ -629,7 +615,7 @@ int Get_Options( char *argv[], int argc )
       }
 
       if ( *argptr != ':' ) {
-         printf( "<%s> ':' expected; terminated\n", argptr );
+         con_printf( "<%s> ':' expected; terminated\n", argptr );
          exit( 9 );
       }
 
@@ -647,7 +633,7 @@ int Get_Options( char *argv[], int argc )
          }
 
          if ( *argptr != ',' ) {
-            printf( "<%s> ',' expected; terminated\n", argptr );
+            con_printf( "<%s> ',' expected; terminated\n", argptr );
             exit( 9 );
          }
 
@@ -669,7 +655,7 @@ int Get_Options( char *argv[], int argc )
 
       if ( *argptr != 0 ) /* done */
       {
-         printf( "<%s> expected end of string; terminated\n", argptr );
+         con_printf( "<%s> expected end of string; terminated\n", argptr );
          exit( 9 );
       }
    }
@@ -677,7 +663,7 @@ int Get_Options( char *argv[], int argc )
    /* check to make sure the drive is a legitimate number */
    if ( ( flags.drive_number < 0x80 ) ||
         ( flags.drive_number > flags.maximum_drive_number ) ) {
-      printf( "\nInvalid drive designation.\n" );
+      con_puts( "\nInvalid drive designation.\n" );
       exit( 5 );
    }
 

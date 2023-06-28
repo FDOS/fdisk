@@ -20,7 +20,7 @@
 #include "userint1.h"
 #include "userint2.h"
 #include "ansicon.h"
-
+#include "printf.h"
 #include "svarlang\svarlang.h"
 
 
@@ -215,7 +215,7 @@ int Create_DOS_Partition_Interface( int type )
          Color_Printf( "%7lu", maximum_partition_size_in_MB );
       }
 
-      printf( " Mbytes " );
+      con_puts( " Mbytes " );
 
       maximum_possible_percentage = Convert_To_Percentage(
          maximum_partition_size_in_MB, pDrive->disk_size_mb );
@@ -411,7 +411,7 @@ int Create_Logical_Drive_Interface( void )
             Print_UL_B( pDrive->ext_size_mb );
          }
 
-         printf( " Mbytes (1 Mbyte = 1048576 bytes)" );
+         con_puts( " Mbytes (1 Mbyte = 1048576 bytes)" );
 
          Print_At( 4, 18, "Maximum space available for partition is " );
 
@@ -423,7 +423,7 @@ int Create_Logical_Drive_Interface( void )
             Print_UL_B( maximum_partition_size_in_MB );
          }
 
-         printf( " Mbytes " );
+         con_puts( " Mbytes " );
 
          maximum_possible_percentage = (int)Convert_To_Percentage(
             maximum_partition_size_in_MB, pDrive->ext_size_mb );
@@ -504,7 +504,7 @@ void Delete_Extended_DOS_Partition_Interface( void )
 
    BlinkPrintAt( 4, 18, "WARNING!" );
 
-   printf( " Data in the deleted Extended DOS Partition(s) will be lost." );
+   con_puts( " Data in the deleted Extended DOS Partition(s) will be lost." );
    Print_At( 4, 19, "Do you wish to continue (Y/N).................? " );
 
    flags.esc = FALSE;
@@ -548,7 +548,7 @@ int Delete_Logical_Drive_Interface( void )
    Display_Extended_Partition_Information_SS();
 
    BlinkPrintAt( 4, 19, "WARNING!" );
-   printf( " Data in a deleted Logical DOS Drive will be lost." );
+   con_puts( " Data in a deleted Logical DOS Drive will be lost." );
 
    Print_At(
       4, 20,
@@ -650,7 +650,7 @@ void Delete_N_DOS_Partition_Interface( void )
 
    BlinkPrintAt( 4, 18, "WARNING!" );
 
-   printf( " Data in the deleted Non-DOS Partition will be lost." );
+   con_puts( " Data in the deleted Non-DOS Partition will be lost." );
    Print_At( 4, 19, "What Non-DOS Partition do you want to delete..? " );
 
    flags.esc = FALSE;
@@ -695,7 +695,7 @@ void Delete_Primary_DOS_Partition_Interface( void )
 
    BlinkPrintAt( 4, 19, "WARNING!" );
 
-   printf( " Data in the deleted Primary DOS Partition will be lost." );
+   con_puts( " Data in the deleted Primary DOS Partition will be lost." );
    Print_At( 4, 20, "What primary partition do you want to delete..? " );
 
    flags.esc = FALSE;
@@ -831,7 +831,7 @@ void Display_Extended_Partition_Information_SS( void )
       Color_Printf( "%7lu",
                     ( part_table[flags.drive_number - 128].ext_size_mb ) );
    }
-   printf( " Mbytes (1 Mbyte = 1048576 bytes)" );
+   con_puts( " Mbytes (1 Mbyte = 1048576 bytes)" );
 }
 
 /* Display Or Modify Logical Drive Information in the extended partition */
@@ -1141,7 +1141,7 @@ void Display_Primary_Partition_Information_SS( void )
       Color_Printf( "%7lu", pDrive->disk_size_mb );
    }
 
-   printf( " Mbytes (1 Mbyte = 1048576 bytes)" );
+   con_puts( " Mbytes (1 Mbyte = 1048576 bytes)" );
 }
 
 /* List the Partition Types */
@@ -1165,14 +1165,14 @@ void List_Partition_Types( void )
       }
 
       Color_Print_At( column, row, "%3d ", index );
-      printf( "%s", partition_lookup_table_buffer_long[index] );
+      con_printf( "%s", partition_lookup_table_buffer_long[index] );
 
       if ( ( index == 63 ) || ( index == 127 ) || ( index == 191 ) ||
            ( index == 255 ) ) {
 
          Print_At( 0, 23, "Press " );
          Color_Print( "Any Key" );
-         printf( " to continue" );
+         con_puts( " to continue" );
 
          asm {
        mov ah,7
@@ -1250,14 +1250,14 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
       Print_At( 4, 12, "Choose one of the following:" );
 
       Color_Print_At( 4, 14, "1." );
-      printf( "  Change partition type" );
+      con_puts( "  Change partition type" );
       Color_Print_At( 4, 15, "2." );
-      printf( "  List partition types" );
+      con_puts( "  List partition types" );
       Color_Print_At( 44, 14, "3." );
-      printf( "  Hide/Unhide partition" );
+      con_puts( "  Hide/Unhide partition" );
       /*
     Color_Print_At(44,15,"4.");
-    printf("  Reserved for future use.");
+    con_puts("  Reserved for future use.");
 */
       Print_At( 4, 17, "Enter choice: " );
 
@@ -1382,13 +1382,13 @@ void Modify_Primary_Partition_Information( int partition_number )
       Print_At( 4, 12, "Choose one of the following:" );
 
       Color_Print_At( 4, 14, "1." );
-      printf( "  Change partition type" );
+      con_puts( "  Change partition type" );
       Color_Print_At( 4, 15, "2." );
-      printf( "  List partition types" );
+      con_puts( "  List partition types" );
       Color_Print_At( 44, 14, "3." );
-      printf( "  Hide/Unhide partition" );
+      con_puts( "  Hide/Unhide partition" );
       Color_Print_At( 44, 15, "4." );
-      printf( "  Remove active status" );
+      con_puts( "  Remove active status" );
 
       Print_At( 4, 17, "Enter choice: " );
 

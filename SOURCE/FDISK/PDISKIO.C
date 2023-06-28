@@ -11,6 +11,8 @@
 
 #include "compat.h"
 #include "pdiskio.h"
+#include "ansicon.h"
+#include "printf.h"
 
 unsigned char sector_buffer[SECT_SIZE];
 int brief_partition_table[MAX_DISKS][27];
@@ -349,80 +351,7 @@ int Determine_Drive_Letters( void )
    return ( current_letter - 1 );
 }
 
-/* Error Handler */
-/*
-void Error_Handler( int error )
-{
-   if ( error == 0x11 ) {
-      return; //  Read error corrected by ECC
-   }
 
-   printf( "\n\nError Reading Hard Disk:\n" );
-   printf( "  " );
-
-   switch ( error ) {
-   case 0x01:
-      printf( "Function number or drive not permitted.\n" );
-      break;
-
-   case 0x02:
-      printf( "Address not found.\n" );
-      break;
-
-   case 0x04:
-      printf( "Addressed sector not found.\n" );
-      break;
-
-   case 0x05:
-      printf( "Error on sector reset.\n" );
-      break;
-
-   case 0x07:
-      printf( "Error during controler initialization.\n" );
-      break;
-
-   case 0x09:
-      printf( "DMA transmission error.  Segment border exceeded.\n" );
-      break;
-
-   case 0x0a:
-      printf( "Defective sector.\n" );
-      break;
-
-   case 0x10:
-      printf( "Read error.\n" );
-      break;
-
-   case 0x11:
-      printf( "Read error corrected by ECC.\n" );
-      break;
-
-   case 0x20:
-      printf( "Controller defect.\n" );
-      break;
-
-   case 0x40:
-      printf( "Search operation failed.\n" );
-      break;
-
-   case 0x80:
-      printf( "Time out, unit not responding.\n" );
-      break;
-
-   case 0xaa:
-      printf( "Unit not ready.\n" );
-      break;
-
-   case 0xcc:
-      printf( "Write error.\n" );
-      break;
-   }
-
-   printf( "\nProgram Terminated.\n\n" );
-
-   exit( error );
-}
-*/
 void Clear_Partition( Partition *p )
 {
    memset( p, 0, sizeof( Partition ) );
@@ -673,7 +602,7 @@ static void Get_Partition_Information( void )
             }
 
             if ( flags.verbose ) {
-               printf( "primary %d sect %lu label %11.11s\n", partnum,
+               con_printf( "primary %d sect %lu label %11.11s\n", partnum,
                        pDrive->pri_part[partnum].rel_sect,
                        sector_buffer + label_offset );
             }
@@ -716,7 +645,7 @@ static void Get_Partition_Information( void )
             }
 
             if ( flags.verbose ) {
-               printf( "logical %u sect %lu label %11.11s\n", partnum,
+               con_printf( "logical %u sect %lu label %11.11s\n", partnum,
                        lba_sect, sector_buffer + label_offset );
             }
 
@@ -1159,7 +1088,7 @@ static int Read_Physical_Sectors_CHS( int drive, long cylinder, long head,
                              number_of_sectors, sector_buffer );
    }
    else {
-      printf( "sector != 1\n" );
+      con_puts( "sector != 1\n" );
       exit( 1 );
    }
 
@@ -1183,7 +1112,7 @@ static int Read_Physical_Sectors_LBA_only( int drive, ulong LBA_address,
       *(void far **)( disk_address_packet + 4 ) = sector_buffer;
    }
    else {
-      printf( "sector != 1\n" );
+      con_puts( "sector != 1\n" );
       exit( 1 );
    }
 
@@ -1303,7 +1232,7 @@ int Write_Partition_Tables( void )
             if ( pDrive->log_drive_created[index] == TRUE ) {
                if ( pDrive->log_drive[index].start_cyl !=
                     extended_cylinder ) {
-                  printf(
+                  con_printf(
                      "pDrive->log_drive[index].start_cyl (%lu) != extended_cylinder (%lu)",
                      pDrive->log_drive[index].start_cyl, extended_cylinder );
                   Pause();
@@ -1381,7 +1310,7 @@ static int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
                              number_of_sectors, sector_buffer );
    }
    else {
-      printf( "sector != 1\n" );
+      con_puts( "sector != 1\n" );
       exit( 1 );
    }
 
@@ -1412,7 +1341,7 @@ static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
       *(void far **)( disk_address_packet + 4 ) = sector_buffer;
    }
    else {
-      printf( "sector != 1\n" );
+      con_puts( "sector != 1\n" );
       exit( 1 );
    }
 

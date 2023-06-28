@@ -25,6 +25,8 @@ $set 3
 #include "main.h"
 #include "pcompute.h"
 #include "pdiskio.h"
+#include "ansicon.h"
+#include "printf.h"
 
 
 /* bootloader pointers */
@@ -51,7 +53,7 @@ int Automatically_Partition_Hard_Drive( void )
              0 ) &&
            ( brief_partition_table[( flags.drive_number - 128 )][index] !=
              18 ) ) {
-         printf( "\nThe hard drive has already been partitioned.\n" );
+         con_puts( "\nThe hard drive has already been partitioned.\n" );
          return 99;
       }
 
@@ -175,7 +177,7 @@ int Load_MBR( ipl_only )
    }
 
    if ( !file_pointer ) {
-      printf( "\nThe \"boot.mbr\" file has not been found.\n" );
+      con_puts( "\nThe \"boot.mbr\" file has not been found.\n" );
       return 8;
    }
 
@@ -249,7 +251,7 @@ int Create_BootSmart_IPL( void )
 {
    int error_code;
 
-   printf( "Creating Drive Smart MBR for disk %d\n",
+   con_printf( "Creating Drive Smart MBR for disk %d\n",
            flags.drive_number - 0x7F );
 
    error_code = Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
@@ -379,7 +381,7 @@ void Load_External_Lookup_Table( void )
       index = atoi( character_number );
 
       if ( ( index < 0 ) || ( index > 255 ) ) {
-         printf(
+         con_printf(
             "\nPartition type out of range in line %d of \"fdiskpt.ini\".\n",
             line_counter );
          fclose(file);
@@ -510,7 +512,7 @@ void Process_Fdiskini_File( void )
                }
 
                if ( ( index == 254 ) || ( line_buffer[index] == 0x0a ) ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
 
@@ -541,7 +543,7 @@ void Process_Fdiskini_File( void )
                }
 
                if ( index == 254 ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
 
@@ -569,7 +571,7 @@ void Process_Fdiskini_File( void )
                   flags.align_4k = FALSE;
                }
                if ( flags.align_4k == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -584,7 +586,7 @@ void Process_Fdiskini_File( void )
                   flags.allow_4gb_fat16 = FALSE;
                }
                if ( flags.allow_4gb_fat16 == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -599,7 +601,7 @@ void Process_Fdiskini_File( void )
                   flags.allow_abort = FALSE;
                }
                if ( flags.allow_abort == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -614,7 +616,7 @@ void Process_Fdiskini_File( void )
                   flags.use_ambr = FALSE;
                }
                if ( flags.use_ambr == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -629,7 +631,7 @@ void Process_Fdiskini_File( void )
                   flags.check_for_extra_cylinder = FALSE;
                }
                if ( flags.check_for_extra_cylinder == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -644,7 +646,7 @@ void Process_Fdiskini_File( void )
                }
 
                if ( flags.screen_color == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -660,7 +662,7 @@ void Process_Fdiskini_File( void )
                   debug.all = FALSE;
                }
                if ( debug.all == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -675,7 +677,7 @@ void Process_Fdiskini_File( void )
                   debug.command_line_arguments = FALSE;
                }
                if ( debug.command_line_arguments == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -690,7 +692,7 @@ void Process_Fdiskini_File( void )
                   debug.create_partition = FALSE;
                }
                if ( debug.create_partition == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -705,7 +707,7 @@ void Process_Fdiskini_File( void )
                   debug.determine_free_space = FALSE;
                }
                if ( debug.determine_free_space == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -720,7 +722,7 @@ void Process_Fdiskini_File( void )
                   debug.input_routine = FALSE;
                }
                if ( debug.input_routine == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -735,7 +737,7 @@ void Process_Fdiskini_File( void )
                   debug.lba = FALSE;
                }
                if ( debug.lba == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -750,7 +752,7 @@ void Process_Fdiskini_File( void )
                   debug.path = FALSE;
                }
                if ( debug.path == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -765,7 +767,7 @@ void Process_Fdiskini_File( void )
                   debug.read_sector = FALSE;
                }
                if ( debug.read_sector == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -781,7 +783,7 @@ void Process_Fdiskini_File( void )
                   flags.del_non_dos_log_drives = FALSE;
                }
                if ( flags.del_non_dos_log_drives == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -861,7 +863,7 @@ void Process_Fdiskini_File( void )
                   debug.emulate_disk = 8;
                }
                if ( debug.emulate_disk == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -881,7 +883,7 @@ void Process_Fdiskini_File( void )
                   flags.flag_sector = part_table[0].total_sect;
                }
                if ( flags.flag_sector == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -896,7 +898,7 @@ void Process_Fdiskini_File( void )
                   flags.label = FALSE;
                }
                if ( flags.label == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -911,7 +913,7 @@ void Process_Fdiskini_File( void )
                   flags.lba_marker = FALSE;
                }
                if ( flags.lba_marker == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -927,7 +929,7 @@ void Process_Fdiskini_File( void )
                }
 
                if ( flags.monochrome == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -943,7 +945,7 @@ void Process_Fdiskini_File( void )
                }
 
                if ( flags.reboot == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -959,7 +961,7 @@ void Process_Fdiskini_File( void )
                }
 
                if ( flags.set_any_pri_part_active == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -990,7 +992,7 @@ void Process_Fdiskini_File( void )
                   flags.version = FREEDOS_VERSION;
                }
                if ( flags.version == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -1005,7 +1007,7 @@ void Process_Fdiskini_File( void )
                   flags.extended_options_flag = FALSE;
                }
                if ( flags.extended_options_flag == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -1021,7 +1023,7 @@ void Process_Fdiskini_File( void )
                   debug.write = FALSE;
                }
                if ( debug.write == UNCHANGED ) {
-                  printf( error_str, line_counter );
+                  con_printf( error_str, line_counter );
                   exit( 3 );
                }
                command_ok = TRUE;
@@ -1029,7 +1031,7 @@ void Process_Fdiskini_File( void )
 #endif
 
             if ( command_ok == FALSE ) {
-               printf( error_str, line_counter );
+               con_printf( error_str, line_counter );
                exit( 3 );
             }
          }
@@ -1230,12 +1232,12 @@ int Test_Flag( int flag_number )
    if ( flags.flag_sector != 0 ) {
       if ( Read_Physical_Sectors( ( flags.drive_number ), 0, 0,
                                   ( flags.flag_sector ), 1 ) != 0 ) {
-         printf( "\nError reading sector.\n" );
+         con_puts( "\nError reading sector.\n" );
          exit( 8 );
       }
    }
    else {
-      printf( "\nSector flagging functions have been disabled.\n" );
+      con_puts( "\nSector flagging functions have been disabled.\n" );
       exit( 9 );
    }
    return ( sector_buffer[( 446 + flag_number - 1 )] );

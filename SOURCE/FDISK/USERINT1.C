@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include "compat.h"
 #include "fdiskio.h"
@@ -19,26 +20,96 @@
 #include "userint0.h"
 #include "userint1.h"
 #include "userint2.h"
+#include "ansicon.h"
+#include "printf.h"
 
-
-/* Display Label */
-/* unused
-void Display_Label( void )
+void Clear_Screen( int type ) 
 {
-   if ( flags.label == TRUE ) {
-      int index = 0;
-
-      char label[20];
-
-      strcpy( label, FD_NAME );
-
-      do {
-         Print_At( 79, ( ( index * 2 ) + 3 ), "%c", label[index] );
-         index++;
-      } while ( index < 10 );
+   con_clrscr();
+   if ( type != NOEXTRAS ) {
+      Display_Information();
    }
 }
-*/
+
+void Color_Print( char *text )
+{
+   int was_bold = con_get_bold();
+   con_set_bold(1);
+   con_puts(text);
+   con_set_bold(was_bold);
+}
+
+void Color_Printf( const char *format, ... )
+{
+   va_list arglist;
+
+   int was_bold = con_get_bold();
+   con_set_bold(1);
+
+   va_start( arglist, format );
+   con_vprintf( format, arglist );
+   va_end( arglist );
+
+   con_set_bold(was_bold);
+}
+
+
+void Print_At( int column, int row, const char *format, ... )
+{
+   va_list arglist;
+   con_set_cursor_xy( column + 1, row + 1 );
+
+   va_start( arglist, format );
+   con_vprintf( format, arglist );
+   va_end( arglist );
+}
+
+void Color_Print_At( int column, int row, const char *format, ... )
+{
+   va_list arglist;
+   int was_bold;
+
+   was_bold = con_get_bold();
+   con_set_bold( 1 );
+
+   con_set_cursor_xy( column + 1, row + 1 );
+   va_start( arglist, format );
+   con_vprintf( format, arglist );
+   va_end( arglist );
+
+   con_set_bold( was_bold );
+}
+
+void Normal_Print_At( int column, int row, const char *format, ... )
+{
+   va_list arglist;
+
+   con_set_bold( 0 );
+   con_set_cursor_xy( column + 1, row + 1 );
+
+   con_set_cursor_xy( column + 1, row + 1 );
+   va_start( arglist, format );
+   con_vprintf( format, arglist );
+   va_end( arglist );
+}
+
+void BlinkPrintAt( int column, int row, const char *format, ... )
+{
+   va_list arglist;
+
+   Position_Cursor( column, row );
+
+   va_start( arglist, format );
+   con_printf( format, arglist );
+   va_end( arglist );
+}
+
+/* Position cursor on the screen */
+void Position_Cursor( int column, int row )
+{
+   con_set_cursor_xy( column + 1, row + 1 );
+}
+
 /* Exit Screen */
 void Exit_Screen( void )
 {
@@ -51,12 +122,12 @@ void Exit_Screen( void )
       if ( flags.reboot == FALSE ) {
          Print_At( 4, 11, "You " );
          Color_Print( "MUST" );
-         printf( " restart your system for your changes to take effect." );
+         con_puts( " restart your system for your changes to take effect." );
          Print_At(
             4, 12,
             "Any drives you have created or changed must be formatted" );
          Color_Print_At( 4, 13, "AFTER" );
-         printf( " you restart." );
+         con_puts( " you restart." );
 
          Input( 0, 0, 0, ESC, 0, 0, ESCE, 0, 0, '\0', '\0' );
          Clear_Screen( NOEXTRAS );
@@ -86,7 +157,7 @@ void Warn_Incompatible_Ext( void )
    Color_Print_At( 38, 4, "ERROR" );
 
    Position_Cursor( 0, 7 );
-   printf(
+   con_puts(
       "    A non-compatible extended partition layout was detected on\n"
       "    this disk. The following actions are disabled:\n\n"
       "      - creating logical drives\n"
@@ -396,7 +467,7 @@ void Interactive_User_Interface( void )
 ret:
    /* clear screen with "normal" black background and position cursor at the
       top left */
-   Clear_Screen_With_Attr( NOEXTRAS, TEXT_ATTR_NORMAL );
+   Clear_Screen( NOEXTRAS );
    Position_Cursor( 0, 0 );
 }
 
@@ -508,7 +579,7 @@ int Standard_Menu( int menu )
             strcpy( version, "Version:  " );
             strcat( version, VERSION );
             Position_Cursor( ( 76 - strlen( version ) ), 24 );
-            printf( "%s", version );
+            con_printf( "%s", version );
          }
       }
 
@@ -524,7 +595,7 @@ int Standard_Menu( int menu )
       if ( part_table[flags.drive_number - 128].usable ) {
          Color_Printf( "   %lu",
                        part_table[flags.drive_number - 128].disk_size_mb );
-         printf( " Mbytes" );
+         con_puts( " Mbytes" );
       }
       else {
          Color_Print( " is unusable!" );
@@ -557,33 +628,33 @@ int Standard_Menu( int menu )
 
       if ( minimum_option <= 1 ) {
          Color_Print_At( 4, 10, "1.  " );
-         printf( "%s", option_1 );
+         con_printf( "%s", option_1 );
       }
       if ( maximum_number_of_options > 1 && minimum_option <= 2 ) {
          Color_Print_At( 4, 11, "2.  " );
-         printf( "%s", option_2 );
+         con_printf( "%s", option_2 );
       }
 
       if ( maximum_number_of_options > 2 && minimum_option <= 3 ) {
          Color_Print_At( 4, 12, "3.  " );
-         printf( "%s", option_3 );
+         con_printf( "%s", option_3 );
       }
 
       if ( maximum_number_of_options > 3 && minimum_option <= 4 ) {
          Color_Print_At( 4, 13, "4.  " );
-         printf( "%s", option_4 );
+         con_printf( "%s", option_4 );
       }
 
       if ( ( menu == MM ) && ( flags.more_than_one_drive == TRUE ) ) {
          maximum_number_of_options = 5;
          Color_Print_At( 4, 14, "5.  " );
-         printf( "%s", option_5 );
+         con_printf( "%s", option_5 );
       }
 
       if ( menu == MM && flags.extended_options_flag == TRUE &&
            minimum_option == 1 ) {
          Color_Print_At( 50, 15, "M.  " );
-         printf( "MBR maintenance" );
+         con_puts( "MBR maintenance" );
 
          optional_char_1 = 'M';
       }
@@ -593,7 +664,7 @@ int Standard_Menu( int menu )
 
       if ( menu == MM && flags.allow_abort == TRUE && minimum_option == 1 ) {
          Color_Print_At( 50, 16, "A.  " );
-         printf( "Abort changes and exit" );
+         con_puts( "Abort changes and exit" );
 
          optional_char_2 = 'A';
       }
@@ -614,7 +685,7 @@ int Standard_Menu( int menu )
            ( pDrive->pri_part[2].active_status == 0 ) &&
            ( pDrive->pri_part[3].active_status == 0 ) ) {
          Color_Print_At( 4, 21, "WARNING! " );
-         printf(
+         con_puts(
             "No partitions are set active - disk 1 is not startable unless" );
          Print_At( 4, 22, "a partition is set active" );
       }

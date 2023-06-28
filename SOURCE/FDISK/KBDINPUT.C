@@ -18,8 +18,12 @@
 #include "main.h"
 #include "pdiskio.h"
 #include "userint0.h"
+#include "userint1.h"
 
 #include "kbdinput.h"
+
+#include "ansicon.h"
+#include "printf.h"
 
 #include "svarlang\svarlang.h"
 
@@ -143,27 +147,27 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       Print_At( 4, 24, "                                                 " );
       Print_At(4, 24, "Press");
       Color_Print( " Esc " );
-      printf("to");
-      printf( " " );
+      con_puts("to");
+      con_puts( " " );
    }
 
    if ( return_message == ESCR ) {
-      printf("return to FDISK options");
+      con_puts("return to FDISK options");
    }
 
    if ( return_message == ESCE ) {
-      printf("exit FDISK");
+      con_puts("exit FDISK");
    }
 
    if ( return_message == ESCC ) {
-      printf("continue");
+      con_puts("continue");
    }
 
    /* Set the default value for NUM type, if applicable */
    if ( ( default_value >= 0 ) && ( type == NUM ) &&
         ( size_of_field == 1 ) ) {
       Position_Cursor( x_position + 1, y_position );
-      printf( "%ld", default_value );
+      Color_Printf( "%ld", default_value );
       line_buffer_index = 0;
       line_buffer[0] = default_value + '0';
    }
@@ -192,14 +196,14 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       Position_Cursor( x_position + 1, y_position );
 
       if ( default_value == 1 ) {
-         printf( "%c", YESchar );
+         Color_Printf( "%c", YESchar );
          line_buffer_index = 0;
          line_buffer[0] = YESchar;
          data = TRUE;
       }
 
       if ( default_value == 0 ) {
-         printf( "%c", NOchar );
+         Color_Printf( "%c", NOchar );
          line_buffer_index = 0;
          line_buffer[0] = NOchar;
          data = FALSE;
@@ -360,7 +364,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
          if ( ( debug.input_routine == TRUE ) && ( type == 99 ) ) {
             Clear_Screen( NULL );
 
-            printf( "Input entered by user:  %d", data );
+            con_printf( "Input entered by user:  %d", data );
             Pause();
          }
 #endif
@@ -649,7 +653,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
          index = 0;
          do {
             Position_Cursor( ( x_position + 1 + index ), y_position );
-            printf( " " );
+            Color_Print( " " );
 
             index++;
          } while ( index < size_of_field );
@@ -768,7 +772,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
          index = 0;
          do {
             Position_Cursor( ( x_position + 1 + index ), y_position );
-            printf( " " );
+            con_puts( " " );
 
             index++;
          } while ( index < size_of_field );
