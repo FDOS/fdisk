@@ -30,7 +30,7 @@ CFLAGS += -DFD_FREEDOS=$(FREEDOS)
 !endif
 
 objs  = main.obj cmd.obj deflang.obj fdiskio.obj helpscr.obj
-objs += pdiskio.obj pcompute.obj ansicon.obj userint0.obj
+objs += pdiskio.obj pcompute.obj ansicon.obj printf.obj userint0.obj
 objs += compat.obj int24.obj bootnorm.obj smartmbr.obj
 
 !ifdef LITE

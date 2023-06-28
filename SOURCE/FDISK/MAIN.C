@@ -78,7 +78,7 @@ int Print_At( int column, int row, const char *format, ... )
 {
    va_list arglist;
    int result;
-   con_set_cursor_xy( column - 1, row - 1 );
+   con_set_cursor_xy( column + 1, row + 1 );
 
    va_start( arglist, format );
    result = vprintf( format, arglist );
