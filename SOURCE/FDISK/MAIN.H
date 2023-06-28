@@ -141,20 +141,6 @@ typedef unsigned char _u8;
 
 #define EXIT 0x0f /* Code to Exit from Program     */
 
-/* Definitions for the input routine */
-#define YN      0
-#define NUM     1
-#define NUMP    2
-#define ESC     3
-#define ESCR    4
-#define ESCE    5
-#define ESCC    6
-#define CHAR    7
-#define NONE    8
-#define CHARNUM 9
-#define NUMCHAR 10
-#define NUMYN   11
-
 #ifdef MAIN
 #define MEXTERN
 #else
@@ -165,24 +151,12 @@ typedef unsigned char _u8;
 
 /*
 /////////////////////////////////////////////////////////////////////////////
-// CATS
-/////////////////////////////////////////////////////////////////////////////
-*/
-
-#include "kitten.h"
-
-MEXTERN nl_catd cat;
-MEXTERN char *s;
-
-/*
-/////////////////////////////////////////////////////////////////////////////
 //  GLOBAL VARIABLES
 /////////////////////////////////////////////////////////////////////////////
 */
 
 MEXTERN char filename[256];
 MEXTERN char path[256];
-MEXTERN char language_filename[15];
 
 MEXTERN int number_of_command_line_options;
 

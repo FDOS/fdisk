@@ -4,7 +4,7 @@
 #   for version 1.3.4 and Open Watcom 1.9.
 
 CC       = wcc
-CFLAGS   = -q -0 -bt=dos -w4 -we
+CFLAGS   = -q -0 -bt=dos -wx -we
 AS       = nasm
 ASFLAGS  = -t -f obj
 LD       = wlink
@@ -30,7 +30,7 @@ CFLAGS += -DFD_FREEDOS=$(FREEDOS)
 !endif
 
 objs  = main.obj cmd.obj deflang.obj fdiskio.obj helpscr.obj kbdinput.obj
-objs += pdiskio.obj pcompute.obj userint1.obj userint2.obj kitten.obj
+objs += pdiskio.obj pcompute.obj userint1.obj userint2.obj
 objs += compat.obj int24.obj bootnorm.obj smartmbr.obj
 
 
