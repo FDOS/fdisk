@@ -9,6 +9,8 @@
 SvarLANG is a library and toolset for enabling SvarDOS applications to easily
 support multiple languages. It is part of the SvarDOS project.
 
+Homepage: http://svardos.org/svarlang/
+
 
 ### PREPARING TRANSLATION FILES ###
 
@@ -19,7 +21,7 @@ The translation files must be CATS-style text files in the usual format:
 2.0:Type /? for more options
 
 The files must be named as EN.TXT, DE.TXT, FR.TXT, etc. Then, they must be
-"compiled" into SvarLANG's binary format using the TLUMACZ tool:
+converted into SvarLANG's binary format using the TLUMACZ tool:
 
 tlumacz en fr pl (...)
 
@@ -44,7 +46,7 @@ Read svarlang.h for more information about available functions.
 ### ESCAPED CHARACTERS ###
 
 Translation strings may contain some escaped characters. At this time only the
-following escaped characters are supported: \r \n \t and \\
+following escaped characters are supported: \e \r \n \t and \\
 
 
 ### DIRTY STRINGS ###
@@ -73,15 +75,15 @@ selection and pass this information to svarlang_load() accordingly.
 ### WHY IS IT BETTER THAN CATS? ###
 
 The CATS library is heavier and slower, as it embeds a text-file parser.
-Translations also take more disk space since each file is in a separate file
-leading to cluster waste. Finally, CATS requires default strings to be part of
-the application's source code, while SvarLANG keeps all strings in TXT files
-and embedds the default one inside the application in an automated way at
-compile time.
+Translations also take more disk space since each language is stored in a
+separate file, leading to cluster waste. Finally, CATS requires default strings
+to be part of the application's source code, while SvarLANG keeps all strings
+in TXT files and embedds the default one inside the application in an automated
+way at compile time.
 
 There is also a licensing issue: CATS/Kitten libraries are published under the
-terms of a viral license. SvarLANG, on the other hand, is published under a
-truly free, liberal license (MIT).
+terms of a viral, corrosive license. SvarLANG, on the other hand, is published
+under a truly free, liberal license (MIT).
 
 
 ======================================================================= EOF ===
