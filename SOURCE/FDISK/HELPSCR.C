@@ -19,7 +19,7 @@
 
 #include "main.h"
 #include "pdiskio.h"
-#include "userint1.h"
+#include "userint0.h"
 
 #include "helpscr.h"
 #include "ansicon.h"
@@ -57,6 +57,9 @@ void Display_Help_Screen( void )
    linestopause = screenh - 1;    /* number of lines before screen is full */
    for (i = 0; i < 250; i++) {
      const char *s = svarlang_strid(i);
+#ifdef FDISKLITE
+     if (i == 1) continue; /* skip msg "no arg = launch interactive mode" */
+#endif
      if (*s == 0) continue;
      if (i == 200) {   /* special case: COPYLEFT needs to be inserted */
        con_printf(s, COPYLEFT);

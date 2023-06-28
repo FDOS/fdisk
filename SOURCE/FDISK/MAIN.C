@@ -30,8 +30,12 @@ $set 1
 #include "main.h"
 #include "pcompute.h"
 #include "pdiskio.h"
+#include "userint0.h"
+
+#ifndef FDISKLITE
 #include "userint1.h"
 #include "userint2.h"
+#endif
 #include "ansicon.h"
 
 #include "svarlang\svarlang.h"
@@ -97,6 +101,7 @@ int Color_Print_At( int column, int row, const char *format, ... )
    return Color_Print( buffer );
 }
 
+#ifndef FDISKLITE
 int Normal_Print_At( int column, int row, const char *format, ... )
 {
    char buffer[256];
@@ -140,6 +145,7 @@ int BlinkPrintAt( int column, int row, const char *format, ... )
 
    return len;
 }
+#endif
 
 /* Get Environment Settings */
 static int Get_Environment_Settings( char *environment[] )
@@ -690,11 +696,14 @@ void main( int argc, char *argv[] )
 
    /* If "FDISK" is typed without any options */
    number_of_command_line_options = Get_Options( &*argv, argc );
+#ifndef FDISKLITE
    if ( number_of_command_line_options == 0 ) {
       Interactive_User_Interface();
       exit( 0 );
    }
-   else {
+   else
+#endif
+   {
       do {
          command_ok = FALSE;
 
@@ -944,6 +953,7 @@ void main( int argc, char *argv[] )
             command_ok = TRUE;
          }
 
+#ifndef FDISKLITE
          if ( 0 == strcmp( arg[0].choice, "Q" ) ) {
             flags.reboot = FALSE;
 
@@ -951,6 +961,7 @@ void main( int argc, char *argv[] )
                Ask_User_About_FAT32_Support();
             }
          }
+#endif
 
          if ( 0 == strcmp( arg[0].choice, "REBOOT" ) ) {
             flags.use_iui = FALSE;
@@ -1011,12 +1022,14 @@ void main( int argc, char *argv[] )
             command_ok = TRUE;
          }
 
+#ifndef FDISKLITE
          if ( 0 == strcmp( arg[0].choice, "UI" ) ) {
             flags.use_iui = TRUE;
             command_ok = TRUE;
 
             Shift_Command_Line_Options( 1 );
          }
+#endif
 
          if ( 0 == strcmp( arg[0].choice, "X" ) ) {
             Command_Line_X();
@@ -1054,10 +1067,11 @@ void main( int argc, char *argv[] )
 
       } while ( number_of_command_line_options > 0 );
 
+#ifndef FDISKLITE
       if ( flags.use_iui == TRUE ) {
          Interactive_User_Interface();
       }
-
+#endif
       Write_Partition_Tables();
       exit( 0 );
    }

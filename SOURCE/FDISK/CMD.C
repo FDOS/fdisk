@@ -36,9 +36,12 @@ $set 2
 #include "main.h"
 #include "pcompute.h"
 #include "pdiskio.h"
+#include "userint0.h"
+
+#ifndef FDISKLITE
 #include "userint1.h"
 #include "userint2.h"
-
+#endif
 
 /* /CLEARFLAG command line option */
 void Command_Line_Clear_Flag( void )

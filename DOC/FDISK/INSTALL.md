@@ -58,3 +58,8 @@ To build a FreeDOS FDISK branded release:
 ```
 wmake -f makefile.wat RELEASE=1 FREEDOS=1
 ```
+
+To build a LITE release (without UI):
+```
+wmake -f makefile.wat RELEASE=1 LITE=1
+```

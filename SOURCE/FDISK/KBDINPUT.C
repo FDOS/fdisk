@@ -17,7 +17,7 @@
 #include "compat.h"
 #include "main.h"
 #include "pdiskio.h"
-#include "userint1.h"
+#include "userint0.h"
 
 #include "kbdinput.h"
 

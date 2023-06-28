@@ -29,9 +29,15 @@ CFLAGS += -DRELEASE=$(RELEASE)
 CFLAGS += -DFD_FREEDOS=$(FREEDOS)
 !endif
 
-objs  = main.obj cmd.obj deflang.obj fdiskio.obj helpscr.obj kbdinput.obj
-objs += pdiskio.obj pcompute.obj userint1.obj userint2.obj ansicon.obj
-objs += printf.obj compat.obj int24.obj bootnorm.obj smartmbr.obj
+objs  = main.obj cmd.obj deflang.obj fdiskio.obj helpscr.obj
+objs += pdiskio.obj pcompute.obj ansicon.obj userint0.obj
+objs += compat.obj int24.obj bootnorm.obj smartmbr.obj
+
+!ifdef LITE
+CFLAGS += -DFDISKLITE=1
+!else
+objs += kbdinput.obj userint1.obj userint2.obj
+!endif
 
 
 all : fdisk.exe
