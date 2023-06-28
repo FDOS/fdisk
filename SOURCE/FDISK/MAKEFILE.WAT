@@ -30,8 +30,8 @@ CFLAGS += -DFD_FREEDOS=$(FREEDOS)
 !endif
 
 objs  = main.obj cmd.obj deflang.obj fdiskio.obj helpscr.obj kbdinput.obj
-objs += pdiskio.obj pcompute.obj userint1.obj userint2.obj
-objs += compat.obj int24.obj bootnorm.obj smartmbr.obj
+objs += pdiskio.obj pcompute.obj userint1.obj userint2.obj ansicon.obj
+objs += printf.obj compat.obj int24.obj bootnorm.obj smartmbr.obj
 
 
 all : fdisk.exe
