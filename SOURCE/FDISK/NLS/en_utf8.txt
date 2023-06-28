@@ -96,8 +96,8 @@
 # Yes-No letters, as used to answer "Yes/No" questions (upper- and lower-case)
 250.0:YN
 250.1:yn
-
 250.2:Invalid entry, please enter Y-N
+250.3:Press any key to continue
 
 ##############################################################################
 # ERROR MESSAGES                                                             #
