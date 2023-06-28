@@ -74,7 +74,7 @@ int Print_At( int column, int row, const char *format, ... )
 {
    va_list arglist;
    int result;
-   Position_Cursor( column, row );
+   con_set_cursor_xy( column - 1, row - 1 );
 
    va_start( arglist, format );
    result = vprintf( format, arglist );
@@ -515,12 +515,12 @@ static void Initialization( char *environment[] )
    }
 
    if ( Read_Partition_Tables() != 0 ) {
-      Color_Print( "\n    Error reading partition tables.\n" );
+      con_puts( svarlang_str(255, 0) );
       exit( 1 );
    }
 
    if ( flags.maximum_drive_number == 0 ) {
-      Color_Print( "\n    No fixed disks present.\n" );
+      con_puts( svarlang_str(255, 1) );
       exit( 6 );
    }
 }
@@ -585,7 +585,7 @@ static void int24_init( void )
 static void Ensure_Drive_Number( void )
 {
    if ( flags.using_default_drive_number == TRUE ) {
-      printf( "\nNo drive number has been entered.\n" );
+      con_puts( svarlang_str( 255, 2) );
       exit( 9 );
    }
 }
@@ -612,7 +612,7 @@ void main( int argc, char *argv[] )
 
    /* initialize console io with interpretation of esc seq enabled */
    con_init( 1 );
-   
+
    /* initialize the SvarLANG library (loads translation strings) */
    svarlang_autoload("FDISK");
 
@@ -702,12 +702,12 @@ void main( int argc, char *argv[] )
               0 == strcmp( arg[0].choice, "ACT" ) ) {
             flags.use_iui = FALSE;
             if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
-               printf( "\nPartition number is out of range (1-4).\n" );
+               con_puts( svarlang_str(255, 3) );
                exit( 9 );
             }
 
             if ( !Set_Active_Partition( (int)( arg[0].value - 1 ) ) ) {
-               printf( "\nCan not activate partition.\n" );
+               con_puts( svarlang_str(255, 4) );
                exit( 9 );
             }
             command_ok = TRUE;
@@ -725,7 +725,7 @@ void main( int argc, char *argv[] )
          if ( 0 == strcmp( arg[0].choice, "AUTO" ) ) {
             flags.use_iui = FALSE;
             if ( Automatically_Partition_Hard_Drive() ) {
-               printf( "\nError auto-partitioning hard drive.\n" );
+               con_puts( svarlang_str(255, 5) );
                exit( 9 );
             }
             command_ok = TRUE;
@@ -738,7 +738,7 @@ void main( int argc, char *argv[] )
             Ensure_Drive_Number();
 
             if ( Clear_Entire_Sector_Zero() != 0 ) {
-               printf( "\nError clearing MBR sector.\n" );
+               con_puts( svarlang_str(255,6) );
                exit( 8 );
             }
             command_ok = TRUE;
@@ -757,7 +757,7 @@ void main( int argc, char *argv[] )
             Ensure_Drive_Number();
 
             if ( Remove_IPL() != 0 ) {
-               printf( " \nError removing IPL.\n" );
+               con_puts( svarlang_str(255, 7) );
                exit( 8 );
             }
             command_ok = TRUE;
@@ -768,7 +768,7 @@ void main( int argc, char *argv[] )
          if ( 0 == strcmp( arg[0].choice, "CMBR" ) ) {
             flags.use_iui = FALSE;
             if ( Create_MBR() != 0 ) {
-               printf( "\nError writing IPL.\n" );
+               con_puts( svarlang_str(255, 11) );
                exit( 8 );
             }
             command_ok = TRUE;
@@ -780,7 +780,7 @@ void main( int argc, char *argv[] )
             flags.use_iui = FALSE;
             if ( Deactivate_Active_Partition() != 0 ||
                  Write_Partition_Tables() != 0 ) {
-               printf( "\nError deactivating partition.\n" );
+               con_puts( svarlang_str(255, 9) );
                exit( 9 );
             }
             command_ok = TRUE;
@@ -803,7 +803,7 @@ void main( int argc, char *argv[] )
             Ensure_Drive_Number();
 
             if ( Clear_Partition_Table() != 0 ) {
-               printf( "\nError clearing partition table.\n" );
+               con_puts( svarlang_str(255, 10) );
                exit( 9 );
             }
             command_ok = TRUE;
@@ -851,7 +851,7 @@ void main( int argc, char *argv[] )
             Ensure_Drive_Number();
 
             if ( Create_MBR() != 0 ) {
-               printf( "\nError writing IPL.\n" );
+               con_puts( svarlang_str(255, 11) );
                exit( 8 );
             }
             command_ok = TRUE;
@@ -864,7 +864,7 @@ void main( int argc, char *argv[] )
             Ensure_Drive_Number();
 
             if ( Load_MBR( 1 ) != 0 ) {
-               printf( "\nError installing IPL from file.\n" );
+               con_puts( svarlang_str(255, 12) );
                exit( 8 );
             }
             command_ok = TRUE;
@@ -876,7 +876,7 @@ void main( int argc, char *argv[] )
             Ensure_Drive_Number();
 
             if ( Load_MBR( 0 ) != 0 ) {
-               printf( "\nError installing MBR from file.\n" );
+               con_puts( svarlang_str(255,13) );
                exit( 8 );
             }
             command_ok = TRUE;
@@ -901,7 +901,7 @@ void main( int argc, char *argv[] )
          if ( 0 == strcmp( arg[0].choice, "MBR" ) ) {
             flags.use_iui = FALSE;
             if ( Create_MBR() != 0 ) {
-               printf( "\nError writing MBR.\n" );
+               con_puts( svarlang_str(255, 14) );
                exit( 8 );
             }
             command_ok = TRUE;
@@ -955,7 +955,7 @@ void main( int argc, char *argv[] )
          if ( 0 == strcmp( arg[0].choice, "REBOOT" ) ) {
             flags.use_iui = FALSE;
             if ( Write_Partition_Tables() != 0 ) {
-               printf( " \nError writing partition tables.\n" );
+               con_puts( svarlang_str(255, 15) );
                exit( 8 );
             }
             Reboot_PC();
@@ -972,7 +972,7 @@ void main( int argc, char *argv[] )
             Ensure_Drive_Number();
 
             if ( Save_MBR() != 0 ) {
-               printf( "\nError saving MBR.\n" );
+               con_puts( svarlang_str(255, 16) );
                exit( 8 );
             }
             command_ok = TRUE;
@@ -985,7 +985,7 @@ void main( int argc, char *argv[] )
             Ensure_Drive_Number();
 
             if ( Create_BootSmart_IPL() != 0 ) {
-               printf( "\nError writing Smart IPL.\n" );
+               con_puts( svarlang_str(255, 17) );
                exit( 8 );
             }
             command_ok = TRUE;
@@ -1047,8 +1047,7 @@ void main( int argc, char *argv[] )
             Shift_Command_Line_Options( 1 );
          }
          if ( command_ok == FALSE ) {
-            printf(
-               "\nInvalid command or syntax error. Invoke FDISK /? for help.\n" );
+            con_puts(svarlang_str(255, 18) );
             exit( 1 );
          }
 

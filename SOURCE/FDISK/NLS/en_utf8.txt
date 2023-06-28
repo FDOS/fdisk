@@ -102,3 +102,25 @@
 250.1:yn
 
 250.2:Invalid entry, please enter Y-N
+
+##############################################################################
+# ERROR MESSAGES                                                             #
+##############################################################################
+255.0:\n    \e[1mError reading partition tables.\e[22m\n
+255.1:\n    \e1[mNo fixed disks present.\e[22m\n
+255.2:\nNo drive number has been entered.\n
+255.3:\nPartition number is out of range (1-4).\n
+255.4:\nCan not activate partition.\n
+255.5:\nError auto-partitioning hard drive.\n
+255.6:\nError clearing MBR sector.\n
+255.7:\nError removing IPL.\n
+255.9:\nError deactivating partition.\n
+255.10:\nError clearing partition table.\n
+255.11:\nError writing IPL.\n
+255.12:\nError installing IPL from file.\n
+255.13:\nError installing MBR from file.\n
+255.14:\nError writing MBR.\n
+255.15:\nError writing partition tables.\n
+255.16:\nError saving MBR.\n
+255.17:\nError writing Smart IPL.\n
+255.18:\nInvalid command or syntax error. Invoke FDISK /? for help.\n

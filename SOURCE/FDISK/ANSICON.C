@@ -437,6 +437,11 @@ void con_puts( const char *s )
 	}
 }
 
+void con_puts_at( int x, int y, const char *s )
+{
+	con_set_cursor_xy( x, y );
+}
+
 void con_putc( char c )
 {
 	if ( flag_interpret_esc ) {

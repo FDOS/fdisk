@@ -1,7 +1,7 @@
 #ifndef ANSICONS_H
 #define ANSICONS_H
 
-/* This file is part of the ansicons project and is published under the terms
+/* This file is part of the ANSICON project and is published under the terms
  * of the MIT license.
  *
  * Copyright (C) 2023 Bernd Boeckmann
@@ -160,10 +160,11 @@ void con_init( int interpret_esc );
 unsigned con_get_width( void );
 unsigned con_get_height( void );
 
-/* Display output routines. The *ansi* functions interpret ANSI escape
- * sequences. */
+/* Display output routines. The functions interpret ANSI escape sequences
+ * if enabled via con_init(). */
 void con_putc( char c ); 
 void con_puts( const char *s );
+void con_puts_at( int x, int y, const char *s );
 void con_nl( void );
 void con_cr( void );   
 
