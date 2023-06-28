@@ -46,13 +46,16 @@ int IsRecognizedFatPartition( unsigned partitiontype )
 /* Pause Routine */
 void Pause( void )
 {
-   con_printf( "\nPress any key to continue" );
+   con_nl();
+   con_print(svarlang_str(250,3));
 
+   /* wait for keypress */
    asm {
-    mov ah,7
+    mov ah, 7  /* direct character input, without echo */
     int 0x21
    }
-   con_printf( "\r                          \r" );
+   con_cr();
+   con_clreol();
 }
 
 
@@ -158,13 +161,13 @@ void Print_Centered( int y, char *text, int style )
 
 
 /* Print 7 Digit Unsigned Long Values */
-void Print_UL( unsigned long number ) { 
+void Print_UL( unsigned long number ) {
    con_printf( "%7lu", number );
 }
 
 
 /* Print 7 Digit Unsigned Long Values in bold print */
-void Print_UL_B( unsigned long number ) { 
+void Print_UL_B( unsigned long number ) {
    con_printf( "\33[1m%7lu\33[22m", number );
 }
 
