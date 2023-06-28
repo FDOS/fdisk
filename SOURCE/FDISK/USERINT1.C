@@ -16,116 +16,10 @@
 #include "main.h"
 #include "pcompute.h"
 #include "pdiskio.h"
+#include "userint0.h"
 #include "userint1.h"
 #include "userint2.h"
 
-/* Clear Screen */
-void Clear_Screen( int type ) /* Clear screen code as suggested by     */
-{                             /* Ralf Quint                            */
-   if ( flags.monochrome == TRUE ) {
-      Clear_Screen_With_Attr( type, 0x07 );
-   }
-   else {
-      Clear_Screen_With_Attr( type, flags.screen_color );
-   }
-}
-
-void Clear_Screen_With_Attr( int type, unsigned char attr )
-{
-   asm {
-    mov ah, 0x0f /* get max column to clear */
-    int 0x10
-    mov dh, ah
-
-    mov ah, 0x06 /* scroll up */
-    mov al, 0x00 /* 0 rows, clear whole window */
-    mov bh, BYTE PTR attr /* set color */
-    xor cx, cx      /* coordinates of upper left corner of screen */
-         /*    mov dh,25    */ /* maximum row */
-    mov dl, 79 /* maximum column */
-    push bp /* work arount IBM-XT BIOS bug */
-    int 0x10
-    pop bp
-   }
-
-   if ( type != NOEXTRAS )
-   {
-      Display_Information();
-      /*Display_Label();*/
-   }
-}
-
-/* Display Information */
-void Display_Information( void )
-{
-   if ( flags.extended_options_flag == TRUE ) {
-      Position_Cursor( 0, 0 );
-      if ( flags.version == FOUR ) {
-         Color_Print( "4" );
-      }
-      if ( flags.version == FIVE ) {
-         Color_Print( "5" );
-      }
-      if ( flags.version == SIX ) {
-         Color_Print( "6" );
-      }
-      if ( flags.version == W95 ) {
-         Color_Print( "W95" );
-      }
-      if ( flags.version == W95B ) {
-         Color_Print( "W95B" );
-      }
-      if ( flags.version == W98 ) {
-         Color_Print( "W98" );
-      }
-
-      if ( flags.partition_type_lookup_table == INTERNAL ) {
-         Color_Print_At( 5, 0, "INT" );
-      }
-      else {
-         Color_Print_At( 5, 0, "EXT" );
-      }
-
-      if ( flags.use_extended_int_13 == TRUE ) {
-         Color_Print_At( 9, 0, "LBA" );
-      }
-
-      if ( flags.fat32 == TRUE ) {
-         Color_Print_At( 13, 0, "FAT32" );
-      }
-
-      if ( flags.use_ambr == TRUE ) {
-         Color_Print_At( 72, 0, "AMBR" );
-      }
-
-      if ( flags.partitions_have_changed == TRUE ) {
-         Color_Print_At( 77, 0, "C" );
-      }
-
-      if ( flags.extended_options_flag == TRUE ) {
-         Color_Print_At( 79, 0, "X" );
-      }
-   }
-
-#ifndef RELEASE
-   Position_Cursor( 0, flags.extended_options_flag ? 1 : 0 );
-   Color_Print( "NON-RELEASE BUILD" );
-   Position_Cursor( 60, flags.extended_options_flag ? 1 : 0 );
-   Color_Print( __DATE__ " " __TIME__ );
-#endif
-
-#ifdef DEBUG
-   Color_Print_At( 60, 0, "DEBUG" );
-
-   if ( debug.emulate_disk > 0 ) {
-      Color_Print_At( 66, 0, "E%1d", debug.emulate_disk );
-   }
-
-   if ( debug.write == FALSE ) {
-      Color_Print_At( 69, 0, "RO" );
-   }
-#endif
-}
 
 /* Display Label */
 /* unused
@@ -506,54 +400,6 @@ ret:
    Position_Cursor( 0, 0 );
 }
 
-/* Pause Routine */
-void Pause( void )
-{
-   printf( "\nPress any key to continue" );
-
-   asm {
-    mov ah,7
-    int 0x21
-   }
-   printf( "\r                          \r" );
-}
-
-/* Position cursor on the screen */
-void Position_Cursor( int column, int row )
-{
-   asm {
-      /* Get video page number */
-    mov ah,0x0f
-    int 0x10
-
-      /* Position Cursor */
-    mov ah,0x02
-    mov dh,byte ptr row
-    mov dl,byte ptr column
-    int 0x10
-   }
-}
-
-/* Print Centered Text */
-void Print_Centered( int y, char *text, int style )
-{
-   int x = 40 - strlen( text ) / 2;
-
-   Position_Cursor( x, y );
-
-   if ( style == BOLD ) {
-      Color_Print( text );
-   }
-   else {
-      printf( text );
-   }
-}
-
-/* Print 7 Digit Unsigned Long Values */
-void Print_UL( unsigned long number ) { printf( "%7lu", number ); }
-
-/* Print 7 Digit Unsigned Long Values in bold print */
-void Print_UL_B( unsigned long number ) { Color_Printf( "%7lu", number ); }
 
 /* Standard Menu Routine */
 /* Displays the menus laid out in a standard format and returns the */

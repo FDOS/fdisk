@@ -1,14 +1,20 @@
 
+#ifdef FDISKLITE
+#define FD_NAME "FDISK LITE"
+#else
+
 #ifdef FD_FREEDOS
 #define FD_NAME "FreeDOS FDISK"
 #endif
 
-#define VERSION  "1.3.7"
-#define COPYLEFT "1998 - 2023"
-
 #ifndef FD_NAME
 #define FD_NAME "Free FDISK"
 #endif
+
+#endif /* FDISKLITE */
+
+#define VERSION  "1.3.7"
+#define COPYLEFT "1998 - 2023"
 
 #define DEFAULT_VERSION 8
 /* ***** Set the above definition to the     */
