@@ -51,6 +51,7 @@ static int con_is_device;
 void con_init( int interpret_esc )
 {
 	union REGPACK r; 
+	int x, y;
 
 	flag_interpret_esc = interpret_esc;
 
@@ -65,6 +66,11 @@ void con_init( int interpret_esc )
 	intr( 0x21, &r );
 
 	con_is_device = (r.w.dx & 0x80) != 0;
+
+	con_get_cursor_xy( &x, &y );
+	if ( y > con_height ) y = con_height;
+	if ( x > con_width ) x = con_width;
+	con_set_cursor_xy( x, y );
 }
 
 unsigned con_get_width( void )
@@ -175,7 +181,7 @@ static void _con_putc_plain( char c )
 			r.h.bh = 0;
 			r.w.cx = 1;
 			intr( 0x10, &r );
-		con_advance_cursor();
+			con_advance_cursor();
 		}
 		else {
 			/* handle control characters */
@@ -451,6 +457,7 @@ void con_puts( const char *s )
 void con_print_at( int x, int y, const char *s )
 {
 	con_set_cursor_xy( x, y );
+	con_print( s );	
 }
 
 void con_putc( char c )
