@@ -32,6 +32,7 @@ $set 1
 #include "pdiskio.h"
 #include "userint1.h"
 #include "userint2.h"
+#include "ansicon.h"
 
 #include "svarlang\svarlang.h"
 
@@ -609,6 +610,9 @@ void main( int argc, char *argv[] )
    setbuf( stdout, NULL );
 #endif
 
+   /* initialize console io with interpretation of esc seq enabled */
+   con_init( 1 );
+   
    /* initialize the SvarLANG library (loads translation strings) */
    svarlang_autoload("FDISK");
 

@@ -18,6 +18,7 @@
 #include "pdiskio.h"
 #include "userint1.h"
 #include "userint2.h"
+#include "ansicon.h"
 
 #include "svarlang\svarlang.h"
 
@@ -58,18 +59,18 @@ void Ask_User_About_FAT32_Support( void )
    }
    already_asked = 1;
 
-   Clear_Screen( 0 );
+   con_clrscr();
 
-   Print_At( 4,  5, svarlang_str(1, 0));
-   Print_At( 4,  6, svarlang_str(1, 1));
-   Print_At( 4,  7, svarlang_str(1, 2));
-   Print_At( 4,  8, svarlang_str(1, 3));
-   Print_At( 4, 10, svarlang_str(1, 4));
-   Print_At( 4, 11, svarlang_str(1, 5));
-   Print_At( 4, 12, svarlang_str(1, 6));
+   con_puts( svarlang_str(1, 0) );
+   con_puts( svarlang_str(1, 1) );
+   con_puts( svarlang_str(1, 2) );
+   con_puts( svarlang_str(1, 3) );
+   con_puts( svarlang_str(1, 4) );
+   con_puts( svarlang_str(1, 5) );
+   con_puts( svarlang_str(1, 6) );
 
    /* "do you want to use large disk (FAT32) support (Y/N)...?" */
-   Print_At( 4, 17, svarlang_str(1, 7));
+   con_puts( svarlang_str(1, 7) );
 
    flags.fat32 = (int)Input( 1, strlen(svarlang_str(1, 7)) + 5, 17, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
 }

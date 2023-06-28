@@ -22,6 +22,8 @@
 #include "userint1.h"
 
 #include "helpscr.h"
+#include "ansicon.h"
+#include "printf.h"
 
 #include "svarlang/svarlang.h"
 
@@ -57,10 +59,9 @@ void Display_Help_Screen( void )
      const char *s = svarlang_strid(i);
      if (*s == 0) continue;
      if (i == 200) {   /* special case: COPYLEFT needs to be inserted */
-       printf(s, COPYLEFT);
-       puts("");
+       con_printf(s, COPYLEFT);
      } else {
-       puts(s);
+       con_puts(s);
      }
 
      /* is it time for a pause? */
