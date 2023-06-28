@@ -7,6 +7,8 @@
 *.COM -text
 *.exe -text
 *.EXE -text
+*.lib -text
+*.LIB -text
 *.h text eol=crlf
 *.prj -text
 *.PRJ -text
