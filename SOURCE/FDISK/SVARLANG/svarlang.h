@@ -1,7 +1,7 @@
 /* This file is part of the svarlang project and is published under the terms
  * of the MIT license.
  *
- * Copyright (C) 2021-2022 Mateusz Viste
+ * Copyright (C) 2021-2023 Mateusz Viste
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -25,6 +25,13 @@
 #ifndef SVARLANG_H
 #define SVARLANG_H
 
+/* library version */
+#define SVARLANGVER "20230628"
+
+/* returns a pointer to a string with the SvarLANG's library version,
+ * independently of the SVARLANGVER string above. */
+const char *svarlang_getver(void);
+
 /* loads translations for program progname, language lang, in paths.
  *
  * only the two first letters of the lang strings are meaningful and they are
@@ -42,9 +49,11 @@
  * done yet. */
 int svarlang_load(const char *progname, const char *lang, const char *paths);
 
+
 /* same as svarlang_load(), but relies on getenv() to pull LANG and NLSPATH.
  * this call should be used only by "CORE" SvarDOS programs. */
 int svarlang_autoload(const char *progname);
+
 
 /* Returns a pointer to the string "id". Does not require svalang_load() to be
  * executed, but then it will only return the reference language strings.
@@ -53,8 +62,10 @@ int svarlang_autoload(const char *progname);
  * It NEVER returns NULL, if id not found then an empty string is returned */
 const char *svarlang_strid(unsigned short id);
 
+
 /* a convenience definition to fetch strings by their CATS-style pairs instead
  * of the 16-bit id. */
 #define svarlang_str(x, y) svarlang_strid((x << 8) | y)
+
 
 #endif
