@@ -53,6 +53,10 @@ void Pause( void )
    asm {
     mov ah, 7  /* direct character input, without echo */
     int 0x21
+    test al, al /* AL=0 means "extended key" */
+    jnz amgood
+    int 0x21   /* extended keypress -> call input again to get the scancode */
+    amgood:
    }
    con_cr();
    con_clreol();
