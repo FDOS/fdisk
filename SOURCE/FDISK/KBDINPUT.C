@@ -147,20 +147,20 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       Print_At( 4, 24, "                                                 " );
       Print_At(4, 24, "Press");
       Color_Print( " Esc " );
-      con_puts("to");
-      con_puts( " " );
+      con_print("to");
+      con_print( " " );
    }
 
    if ( return_message == ESCR ) {
-      con_puts("return to FDISK options");
+      con_print("return to FDISK options");
    }
 
    if ( return_message == ESCE ) {
-      con_puts("exit FDISK");
+      con_print("exit FDISK");
    }
 
    if ( return_message == ESCC ) {
-      con_puts("continue");
+      con_print("continue");
    }
 
    /* Set the default value for NUM type, if applicable */
@@ -772,7 +772,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
          index = 0;
          do {
             Position_Cursor( ( x_position + 1 + index ), y_position );
-            con_puts( " " );
+            con_print( " " );
 
             index++;
          } while ( index < size_of_field );

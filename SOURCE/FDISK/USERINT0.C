@@ -62,69 +62,69 @@ void Display_Information( void )
    if ( flags.extended_options_flag == TRUE ) {
       con_set_cursor_xy( 1, 1 );
       if ( flags.version == FOUR ) {
-         con_puts( "4" );
+         con_print( "4" );
       }
       if ( flags.version == FIVE ) {
-         con_puts( "5" );
+         con_print( "5" );
       }
       if ( flags.version == SIX ) {
-         con_puts( "6" );
+         con_print( "6" );
       }
       if ( flags.version == W95 ) {
-         con_puts( "W95" );
+         con_print( "W95" );
       }
       if ( flags.version == W95B ) {
-         con_puts( "W95B" );
+         con_print( "W95B" );
       }
       if ( flags.version == W98 ) {
-         con_puts( "W98" );
+         con_print( "W98" );
       }
 
       if ( flags.partition_type_lookup_table == INTERNAL ) {
          con_set_cursor_xy( 6, 1 );
-         con_puts( "INT" );
+         con_print( "INT" );
       }
       else {
          con_set_cursor_xy( 6, 1 );
-         con_puts( "EXT" );
+         con_print( "EXT" );
       }
 
       if ( flags.use_extended_int_13 == TRUE ) {
          con_set_cursor_xy( 10, 1 );
-         con_puts( "LBA" );
+         con_print( "LBA" );
       }
 
       if ( flags.fat32 == TRUE ) {
          con_set_cursor_xy( 14, 1 );
-         con_puts( "FAT32" );
+         con_print( "FAT32" );
       }
 
       if ( flags.use_ambr == TRUE ) {
          con_set_cursor_xy( 73, 1 );
-         con_puts( "AMBR" );
+         con_print( "AMBR" );
       }
 
       if ( flags.partitions_have_changed == TRUE ) {
          con_set_cursor_xy( 78, 1 );
-         con_puts( "C" );
+         con_print( "C" );
       }
 
       if ( flags.extended_options_flag == TRUE ) {
          con_set_cursor_xy( 80, 1 );
-         con_puts( "X" );
+         con_print( "X" );
       }
    }
 
 #ifndef RELEASE
    con_set_cursor_xy( 1, flags.extended_options_flag ? 2 : 1 );
-   con_puts( "NON-RELEASE BUILD" );
+   con_print( "NON-RELEASE BUILD" );
    con_set_cursor_xy( 61, flags.extended_options_flag ? 2 : 1 );
-   con_puts( __DATE__ " " __TIME__ );
+   con_print( __DATE__ " " __TIME__ );
 #endif
 
 #ifdef DEBUG
    con_set_cursor_xy( 61, 1 );
-   con_puts( "DEBUG" );
+   con_print( "DEBUG" );
 
    if ( debug.emulate_disk > 0 ) {
       con_set_cursor_xy( 67, 1 );
@@ -133,7 +133,7 @@ void Display_Information( void )
 
    if ( debug.write == FALSE ) {
       con_set_cursor_xy(70, 1);
-      con_puts( "RO" );
+      con_print( "RO" );
    }
 #endif
 }
@@ -151,7 +151,7 @@ void Print_Centered( int y, char *text, int style )
       con_set_bold( 1 );
    }
    else {
-      con_puts( text );
+      con_print( text );
    }
    con_set_bold(was_bold);
 }
@@ -217,7 +217,7 @@ void Display_CL_Partition_Table( void )
                drive_lettering_buffer[( flags.drive_number - 128 )][index] );
          }
          else {
-            con_puts( "   " );
+            con_print( "   " );
          }
 
          /* Partition Number */
@@ -228,14 +228,14 @@ void Display_CL_Partition_Table( void )
 
          /* Status */
          if ( pDrive->pri_part[index].active_status > 0 ) {
-            con_puts( "      A" );
+            con_print( "      A" );
          }
          else {
-            con_puts( "       " );
+            con_print( "       " );
          }
 
          /* Mbytes */
-         con_puts( "    " );
+         con_print( "    " );
          Print_UL( pDrive->pri_part[index].size_in_MB );
 
          /* Description */
@@ -293,7 +293,7 @@ void Display_CL_Partition_Table( void )
             }
 
             /* Display size in MB */
-            con_puts( "  " );
+            con_print( "  " );
             Print_UL( pDrive->log_drive[( index - 4 )].size_in_MB );
 
             /* Display file system type */
@@ -348,7 +348,7 @@ void Display_All_Drives( void )
    Determine_Drive_Letters();
 
    con_set_cursor_xy( 3, 3 );
-   con_puts( "Disk   Drv   Mbytes    Free  Usage" );
+   con_print( "Disk   Drv   Mbytes    Free  Usage" );
 
    for ( drive = 1; drive <= flags.maximum_drive_number - 127; drive++ ) {
       if ( current_line > 18 ) {
@@ -356,7 +356,7 @@ void Display_All_Drives( void )
          current_column_offset = 45;
 
          con_set_cursor_xy( 44, 3 );
-         con_puts( "Disk   Drv   Mbytes    Free  Usage" );
+         con_print( "Disk   Drv   Mbytes    Free  Usage" );
       }
 
       /* Print physical drive information */
@@ -412,7 +412,7 @@ void Display_All_Drives( void )
                current_column_offset = 45;
 
                con_set_cursor_xy( 44, 3 );
-               con_puts( "Disk   Drv   Mbytes   Free   Usage" );
+               con_print( "Disk   Drv   Mbytes   Free   Usage" );
             }
 
             /* Print drive letter of logical drive */
@@ -476,5 +476,5 @@ void Display_All_Drives( void )
    }
 
    con_set_cursor_xy( 5, 21 );
-   con_puts( "(1 Mbyte = 1048576 bytes)" );
+   con_print( "(1 Mbyte = 1048576 bytes)" );
 }

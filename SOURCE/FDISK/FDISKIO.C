@@ -53,7 +53,7 @@ int Automatically_Partition_Hard_Drive( void )
              0 ) &&
            ( brief_partition_table[( flags.drive_number - 128 )][index] !=
              18 ) ) {
-         con_puts( "\nThe hard drive has already been partitioned.\n" );
+         con_print( "\nThe hard drive has already been partitioned.\n" );
          return 99;
       }
 
@@ -177,7 +177,7 @@ int Load_MBR( ipl_only )
    }
 
    if ( !file_pointer ) {
-      con_puts( "\nThe \"boot.mbr\" file has not been found.\n" );
+      con_print( "\nThe \"boot.mbr\" file has not been found.\n" );
       return 8;
    }
 
@@ -1232,12 +1232,12 @@ int Test_Flag( int flag_number )
    if ( flags.flag_sector != 0 ) {
       if ( Read_Physical_Sectors( ( flags.drive_number ), 0, 0,
                                   ( flags.flag_sector ), 1 ) != 0 ) {
-         con_puts( "\nError reading sector.\n" );
+         con_print( "\nError reading sector.\n" );
          exit( 8 );
       }
    }
    else {
-      con_puts( "\nSector flagging functions have been disabled.\n" );
+      con_print( "\nSector flagging functions have been disabled.\n" );
       exit( 9 );
    }
    return ( sector_buffer[( 446 + flag_number - 1 )] );

@@ -1,4 +1,4 @@
-/* This file is part of the ansicons project and is published under the terms
+/* This file is part of the ANSICON project and is published under the terms
  * of the MIT license.
  *
  * Copyright (C) 2023 Bernd Boeckmann
@@ -202,7 +202,7 @@ void con_putc_dos( char c )
 
 }
 
-void con_puts_dos( const char *s )
+void con_print_dos( const char *s )
 {
 
 }
@@ -427,7 +427,7 @@ static void _con_putc_ansi( char c )
 }
 
 
-void con_puts( const char *s )
+void con_print( const char *s )
 {
 	if ( flag_interpret_esc ) {
 		while ( *s ) {
@@ -442,7 +442,13 @@ void con_puts( const char *s )
 	}
 }
 
-void con_puts_at( int x, int y, const char *s )
+void con_puts( const char *s )
+{
+	con_print( s );
+	con_nl();
+}
+
+void con_print_at( int x, int y, const char *s )
 {
 	con_set_cursor_xy( x, y );
 }

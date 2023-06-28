@@ -35,7 +35,7 @@ void Color_Print( char *text )
 {
    int was_bold = con_get_bold();
    con_set_bold(1);
-   con_puts(text);
+   con_print(text);
    con_set_bold(was_bold);
 }
 
@@ -122,12 +122,12 @@ void Exit_Screen( void )
       if ( flags.reboot == FALSE ) {
          Print_At( 4, 11, "You " );
          Color_Print( "MUST" );
-         con_puts( " restart your system for your changes to take effect." );
+         con_print( " restart your system for your changes to take effect." );
          Print_At(
             4, 12,
             "Any drives you have created or changed must be formatted" );
          Color_Print_At( 4, 13, "AFTER" );
-         con_puts( " you restart." );
+         con_print( " you restart." );
 
          Input( 0, 0, 0, ESC, 0, 0, ESCE, 0, 0, '\0', '\0' );
          Clear_Screen( NOEXTRAS );
@@ -157,7 +157,7 @@ void Warn_Incompatible_Ext( void )
    Color_Print_At( 38, 4, "ERROR" );
 
    Position_Cursor( 0, 7 );
-   con_puts(
+   con_print(
       "    A non-compatible extended partition layout was detected on\n"
       "    this disk. The following actions are disabled:\n\n"
       "      - creating logical drives\n"
@@ -595,7 +595,7 @@ int Standard_Menu( int menu )
       if ( part_table[flags.drive_number - 128].usable ) {
          Color_Printf( "   %lu",
                        part_table[flags.drive_number - 128].disk_size_mb );
-         con_puts( " Mbytes" );
+         con_print( " Mbytes" );
       }
       else {
          Color_Print( " is unusable!" );
@@ -654,7 +654,7 @@ int Standard_Menu( int menu )
       if ( menu == MM && flags.extended_options_flag == TRUE &&
            minimum_option == 1 ) {
          Color_Print_At( 50, 15, "M.  " );
-         con_puts( "MBR maintenance" );
+         con_print( "MBR maintenance" );
 
          optional_char_1 = 'M';
       }
@@ -664,7 +664,7 @@ int Standard_Menu( int menu )
 
       if ( menu == MM && flags.allow_abort == TRUE && minimum_option == 1 ) {
          Color_Print_At( 50, 16, "A.  " );
-         con_puts( "Abort changes and exit" );
+         con_print( "Abort changes and exit" );
 
          optional_char_2 = 'A';
       }
@@ -685,7 +685,7 @@ int Standard_Menu( int menu )
            ( pDrive->pri_part[2].active_status == 0 ) &&
            ( pDrive->pri_part[3].active_status == 0 ) ) {
          Color_Print_At( 4, 21, "WARNING! " );
-         con_puts(
+         con_print(
             "No partitions are set active - disk 1 is not startable unless" );
          Print_At( 4, 22, "a partition is set active" );
       }

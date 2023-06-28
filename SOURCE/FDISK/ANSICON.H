@@ -165,8 +165,9 @@ unsigned con_get_height( void );
 /* Display output routines. The functions interpret ANSI escape sequences
  * if enabled via con_init(). */
 void con_putc( char c ); 
-void con_puts( const char *s );
-void con_puts_at( int x, int y, const char *s );
+void con_print( const char *s );
+void con_print_at( int x, int y, const char *s );
+void con_puts( const char *s );  /* like con_print with trailing new-line */
 void con_nl( void );
 void con_cr( void );   
 

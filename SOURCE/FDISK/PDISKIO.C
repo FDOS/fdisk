@@ -1088,7 +1088,7 @@ static int Read_Physical_Sectors_CHS( int drive, long cylinder, long head,
                              number_of_sectors, sector_buffer );
    }
    else {
-      con_puts( "sector != 1\n" );
+      con_print( "sector != 1\n" );
       exit( 1 );
    }
 
@@ -1112,7 +1112,7 @@ static int Read_Physical_Sectors_LBA_only( int drive, ulong LBA_address,
       *(void far **)( disk_address_packet + 4 ) = sector_buffer;
    }
    else {
-      con_puts( "sector != 1\n" );
+      con_print( "sector != 1\n" );
       exit( 1 );
    }
 
@@ -1310,7 +1310,7 @@ static int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
                              number_of_sectors, sector_buffer );
    }
    else {
-      con_puts( "sector != 1\n" );
+      con_print( "sector != 1\n" );
       exit( 1 );
    }
 
@@ -1341,7 +1341,7 @@ static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
       *(void far **)( disk_address_packet + 4 ) = sector_buffer;
    }
    else {
-      con_puts( "sector != 1\n" );
+      con_print( "sector != 1\n" );
       exit( 1 );
    }
 
