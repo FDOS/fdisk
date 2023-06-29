@@ -189,7 +189,12 @@ void con_scroll( int n );
 void con_set_cursor_xy( int x, int y );
 void con_get_cursor_xy( int *x, int *y );
 void con_set_cursor_rel( int dx, int dy );
-void con_advance_cursor( void );
+/* Enables / disables hardware cursor synchronisation. Can be disabled to
+ * enhance performance while printing to screen. May be nested. */
+void con_disable_cursor_sync( void );
+void con_enable_cursor_sync( void );
+/* use to re-sync ANSICON cursor position when changed by other io routines */
+void con_sync_from_hw_cursor( void );
 
 /* Text attribute function */
 void con_reset_attr( void );

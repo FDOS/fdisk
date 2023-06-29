@@ -543,9 +543,13 @@ int con_printf(const char* format, ...)
   va_list va;
   char buffer[1];
   int ret;
+
+  con_disable_cursor_sync();
   va_start(va, format);
   ret = _vsnprintf(_out_char, buffer, (size_t)-1, format, va);
   va_end(va);
+  con_enable_cursor_sync();
+  
   return ret;
 }
 
@@ -581,7 +585,13 @@ int con_vprintf(const char* format, va_list va)
 
 int con_vsnprintf(char* buffer, size_t count, const char* format, va_list va)
 {
-  return _vsnprintf(_out_buffer, buffer, count, format, va);
+  int res;
+
+  con_disable_cursor_sync();
+  res = _vsnprintf(_out_buffer, buffer, count, format, va);
+  con_enable_cursor_sync();
+
+  return res;
 }
 
 

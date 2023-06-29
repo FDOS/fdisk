@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include <i86.h>
 #include "ansicon.h"
@@ -36,41 +37,71 @@
 
 int con_error;
 
-static unsigned char con_textattr;
 static unsigned con_width;
 static unsigned con_height;
+static unsigned con_size;
 
-int flag_interpret_esc;
+static int con_curx;
+static int con_cury;
+
+static unsigned char con_textattr;
+
+static char flag_interpret_esc;
 
 /* escape sequence arguments */
 static int arg_count;
 static int arg[CON_MAX_ARG];
 
-static int con_is_device;
+static char con_is_device;
+static char con_is_monochrome;
+static char cursor_sync_disabled;
+
+static unsigned short far *vid_mem;
+
+static void con_get_hw_cursor( int *x, int *y );
+static void con_set_hw_cursor( int x, int y );
+static void con_advance_cursor( void );
+
+static int detect_ega( void )
+{
+	union REGPACK r; 
+	r.h.ah = 0x12;
+	r.h.bl = 0x10;
+	intr( 0x10, &r );
+	return r.h.bl != 0x10;	
+}
 
 void con_init( int interpret_esc )
 {
 	union REGPACK r; 
-	int x, y;
 
 	flag_interpret_esc = interpret_esc;
 
-	/* TODO: proper screen size, color/mono detection... */
-	con_width = 80;
-	con_height = 25;
-	con_textattr = 7;
+	/* detect video mode */
+	r.h.ah = 0xf;
+	intr( 0x10, &r );
+	con_is_monochrome = ( r.h.al == 7 );
+	vid_mem = ( con_is_monochrome ) ? MK_FP(0xb000, 0) : MK_FP(0xb800, 0);
+
+	/* screen size ? */
+	con_width = r.h.ah;
+	if ( detect_ega() ) {
+		con_height = (*(unsigned char far *) MK_FP(0x40, 0x84)) + 1;
+	}
+	else {
+		con_height = 25;
+	}
+	con_size = con_width * con_height;
 
 	/* are we writing to screen or file? */
 	r.w.ax = 0x4400;
 	r.w.bx = 1;	/* stdout handle */
 	intr( 0x21, &r );
-
 	con_is_device = (r.w.dx & 0x80) != 0;
 
-	con_get_cursor_xy( &x, &y );
-	if ( y > con_height ) y = con_height;
-	if ( x > con_width ) x = con_width;
-	con_set_cursor_xy( x, y );
+	con_reset_attr();
+	con_get_hw_cursor( &con_curx, &con_cury );
+	cursor_sync_disabled = 0;
 }
 
 unsigned con_get_width( void )
@@ -83,20 +114,38 @@ unsigned con_get_height( void )
 	return con_height;
 }
 
+/* function to disable cursor sync without affecting the flag */
+void con_disable_cursor_sync( void )
+{
+	cursor_sync_disabled++;
+}
+
+/* function to enable cursor sync, may be overridden by the setting
+ * in flag_sync_cursor */
+void con_enable_cursor_sync( void )
+{
+	if ( cursor_sync_disabled ) {
+		cursor_sync_disabled--;
+	}
+
+	if ( !cursor_sync_disabled ) {
+		con_set_hw_cursor( con_curx, con_cury );
+	}
+}
+
 void con_set_cursor_xy( int x, int y )
 {
-	union REGPACK r; 
-
 	if ( x < 1 ) x = 1;
 	if ( y < 1 ) y = 1;
 	if ( x > con_width ) x = con_width;
 	if ( y > con_height ) y = con_height;
 
-	r.w.ax = 0x0200;
-	r.w.bx = 0;
-	r.h.dl = x - 1;
-	r.h.dh = y - 1;
-	intr( 0x10, &r );
+	con_curx = x;
+	con_cury = y;
+
+	if ( !cursor_sync_disabled ) {
+		con_set_hw_cursor( con_curx, con_cury );
+	}
 }
 
 void con_set_cursor_rel( int dx, int dy )
@@ -112,6 +161,12 @@ void con_set_cursor_rel( int dx, int dy )
 
 void con_get_cursor_xy( int *x, int *y )
 {
+	*x = con_curx;
+	*y = con_cury;
+}
+
+static void con_get_hw_cursor( int *x, int *y )
+{
 	union REGPACK r; 
 
 	r.x.ax = 0x0300;
@@ -122,7 +177,25 @@ void con_get_cursor_xy( int *x, int *y )
 	*y = r.h.dh + 1;
 }
 
-void con_advance_cursor( void )
+static void con_set_hw_cursor( int x, int y )
+{
+	union REGPACK r; 
+
+	if ( !con_is_device ) return;
+	
+	r.w.ax = 0x0200;
+	r.w.bx = 0;
+	r.h.dl = x - 1;
+	r.h.dh = y - 1;
+	intr( 0x10, &r );
+}
+
+void con_sync_from_hw_cursor( void )
+{
+	con_get_hw_cursor( &con_curx, &con_cury );
+}
+
+static void con_advance_cursor( void )
 {
 	int x, y;
 
@@ -171,16 +244,17 @@ void con_cr( void ) {
 static void _con_putc_plain( char c )
 {
 	union REGPACK r; 
+	unsigned v;
+	int x, y;
 
 	if ( con_is_device ) {
 		if ( c >= 0x20 ) {
 			/* handle printable characters */
-			r.h.ah = 9;
-			r.h.al = c;
-			r.h.bl = con_textattr;
-			r.h.bh = 0;
-			r.w.cx = 1;
-			intr( 0x10, &r );
+			v = ( con_textattr << 8 ) | c;
+			con_get_cursor_xy( &x, &y );
+
+			vid_mem[(y-1) * con_width + (x-1)] = v;
+
 			con_advance_cursor();
 		}
 		else {
@@ -203,52 +277,56 @@ static void _con_putc_plain( char c )
 	}
 }
 
-void con_putc_dos( char c )
-{
 
-}
-
-void con_print_dos( const char *s )
-{
-
-}
-
-/* !!! FIXME: prevend destruction of BP register by early AT BIOS */
 void con_scroll( int n )
 {
-	union REGPACK r;
+	int distance;
+	int last, i;
+	unsigned v;
 
-	if ( n >= 0 ) {
-		r.h.ah = 6;
-		r.h.al = n;
+	if ( !con_is_device || n == 0 ) return;
+
+	if ( n > 0 ) {
+		/* scroll up */
+		if ( n > con_height ) n = con_height;
+		last = (con_height - n) * con_width;
+		distance = n * con_width;
+		v = ( con_textattr << 8 ) | ' ';
+
+		_fmemmove(vid_mem, vid_mem + distance, last << 1);
+		for ( i = last; i < con_size; i++ ) {
+			vid_mem[i] = v;
+		}
 	}
-	else {
-		r.h.ah = 7;
-		r.h.al = -n;
-	}
-	r.w.cx = 0;
-	r.w.dx = 0x184f;
-	r.h.bh = con_textattr;
-	intr( 0x10, &r );	
 }
 
 void con_clrscr( void )
 {
-	con_scroll( 0 );
+	int i;
+	unsigned v;
+
+	if ( !con_is_device ) return;
+
+	v = ( con_textattr << 8 ) | ' ';
+
+	for ( i = 0; i < con_size; i++ ) {
+		vid_mem[i] = v;
+	}
+
 	con_set_cursor_xy( 1, 1 );
 }
 
 void con_clreol( void )
 {
-	union REGPACK r;
-	int x, y;
+	unsigned v;
+	int x;
 
-	con_get_cursor_xy( &x, &y );
-	r.w.ax = 0x0920;
-	r.w.cx = con_width - x + 1;
-	r.h.bh = 0;	
-	r.h.bl = con_textattr;
-	intr( 0x10, &r );
+	if ( !con_is_device ) return;
+
+	v = ( con_textattr << 8 ) | ' ';
+	for (x = con_curx; x <= con_width; x++ ) {
+		vid_mem[(con_cury-1) * con_width + (x-1)] = v;
+	}
 }
 
 void con_reset_attr( void )
@@ -435,6 +513,7 @@ static void _con_putc_ansi( char c )
 
 void con_print( const char *s )
 {
+	con_disable_cursor_sync();
 	if ( flag_interpret_esc ) {
 		while ( *s ) {
 			_con_putc_ansi( *s++ );
@@ -446,18 +525,23 @@ void con_print( const char *s )
 			_con_putc_plain( *s++ );
 		}
 	}
+	con_enable_cursor_sync();
 }
 
 void con_puts( const char *s )
 {
+	con_disable_cursor_sync();
 	con_print( s );
 	con_nl();
+	con_enable_cursor_sync();
 }
 
 void con_print_at( int x, int y, const char *s )
 {
+	con_disable_cursor_sync();
 	con_set_cursor_xy( x, y );
 	con_print( s );	
+	con_enable_cursor_sync();
 }
 
 void con_putc( char c )
@@ -468,5 +552,4 @@ void con_putc( char c )
 	else {
 		_con_putc_plain( c );
 	}
-
 }
