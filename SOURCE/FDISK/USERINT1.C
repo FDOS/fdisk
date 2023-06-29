@@ -23,6 +23,9 @@
 #include "ansicon.h"
 #include "printf.h"
 
+#include "svarlang/svarlang.h"
+
+
 void Clear_Screen( int type )
 {
    con_clrscr();
@@ -120,21 +123,15 @@ void Exit_Screen( void )
       Clear_Screen( NOEXTRAS );
 
       if ( flags.reboot == FALSE ) {
-         Print_At( 4, 11, "You " );
-         Color_Print( "MUST" );
-         con_print( " restart your system for your changes to take effect." );
-         Print_At(
-            4, 12,
-            "Any drives you have created or changed must be formatted" );
-         Color_Print_At( 4, 13, "AFTER" );
-         con_print( " you restart." );
+         Print_At(4, 11, svarlang_str(2,0)); /* You must restart your system */
+         Print_At(4, 12, svarlang_str(2,1)); /* Any drives created must be formatted AFTER restart */
 
          Input( 0, 0, 0, ESC, 0, 0, ESCE, 0, 0, '\0', '\0' );
          Clear_Screen( NOEXTRAS );
       }
       else {
-         Color_Print_At( 4, 13, "System will now restart" );
-         Print_At( 4, 15, "Press any key when ready . . ." );
+         Color_Print_At(4, 13, svarlang_str(2,2)); /* System will now restart */
+         Print_At(4, 15, svarlang_str(2,3)); /* Press key when ready... */
 
          /* Wait for a keypress. */
          get_keypress();
@@ -151,7 +148,7 @@ void Warn_Incompatible_Ext( void )
 {
    Clear_Screen( NOEXTRAS );
 
-   Color_Print_At( 38, 4, "ERROR" );
+   Color_Print_At( 38, 4, svarlang_str(250, 4)); /* ERROR */
 
    Position_Cursor( 0, 7 );
    con_print(

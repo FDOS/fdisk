@@ -34,7 +34,7 @@
 0.41:  /CLEARMBR                Deletes all partitions and boot code
 0.42:  /LOADMBR                 Loads part. table and code from "boot.mbr" into MBR
 0.43:  /SAVEMBR                 Saves partition table and code into file "boot.mbr"
-0.44:\t 
+0.44:\t
 0.50:MBR code modifications leaving partitions intact:
 0.51:  /IPL                     Installs the standard boot code into MBR <drive#>
 0.52:                           ...same as /MBR and /CMBR for compatibility
@@ -90,6 +90,20 @@
 
 
 ##############################################################################
+# EXIT SCREEN                                                                #
+##############################################################################
+
+# TODO: the "MUST" word below should be printed in high luminosity
+2.0:You MUST restart your system for your changes to take effect.
+
+# TODO: same for the word "AFTER" below
+2.1:Any drives you have created or changed must be formatted AFTER you restart.
+
+2.2:System will now restart
+2.3:Press any key when ready . . .
+
+
+##############################################################################
 # GLOBAL STRINGS                                                             #
 ##############################################################################
 
@@ -98,6 +112,8 @@
 250.1:yn
 250.2:Invalid entry, please enter Y-N
 250.3:Press any key to continue
+250.4:ERROR
+
 
 ##############################################################################
 # ERROR MESSAGES                                                             #
