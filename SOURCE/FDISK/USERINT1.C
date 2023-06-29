@@ -484,13 +484,13 @@ int Standard_Menu( int menu )
    char program_description[60] = "";
    char version[30] = "";
 
-   char title[60] = "";
+   const char *title;
 
-   char option_1[60] = "";
-   char option_2[60] = "";
-   char option_3[60] = "";
-   char option_4[60] = "";
-   char option_5[60] = "Change current fixed disk drive";
+   const char *option_1 = "";
+   const char *option_2 = "";
+   const char *option_3 = "";
+   const char *option_4 = "";
+   const char *option_5 = "Change current fixed disk drive";
 
    char optional_char_1 = '\0';
    char optional_char_2 = '\0';
@@ -509,39 +509,34 @@ int Standard_Menu( int menu )
 
       if ( menu == MM ) {
          maximum_number_of_options = 4;
-         strcpy( title, "FDISK Options" );
-         strcpy( option_1, "Create DOS partition or Logical DOS Drive" );
-         strcpy( option_2, "Set Active partition" );
-         strcpy( option_3, "Delete partition or Logical DOS Drive" );
+         title = "FDISK Options";
+         option_1 = "Create DOS partition or Logical DOS Drive";
+         option_2 = "Set Active partition";
+         option_3 = "Delete partition or Logical DOS Drive";
 
          if ( flags.extended_options_flag == FALSE ) {
-            strcpy( option_4, "Display partition information" );
-         }
-         else {
-            strcpy( option_4, "Display/Modify partition information" );
+            option_4 = "Display partition information";
+         } else {
+            option_4 = "Display/Modify partition information";
          }
       }
 
       if ( menu == CP ) {
          maximum_number_of_options = 3;
-         strcpy( title, "Create DOS Partition or Logical DOS Drive" );
-         strcpy( option_1, "Create Primary DOS Partition" );
-         strcpy( option_2, "Create Extended DOS Partition" );
-         strcpy(
-            option_3,
-            "Create Logical DOS Drive(s) in the Extended DOS Partition" );
-         strcpy( option_4, "" );
+         title = "Create DOS Partition or Logical DOS Drive";
+         option_1 = "Create Primary DOS Partition";
+         option_2 = "Create Extended DOS Partition";
+         option_3 = "Create Logical DOS Drive(s) in the Extended DOS Partition";
+         option_4 = "";
       }
 
       if ( menu == DP ) {
          maximum_number_of_options = 4;
-         strcpy( title, "Delete DOS Partition or Logical DOS Drive" );
-         strcpy( option_1, "Delete Primary DOS Partition" );
-         strcpy( option_2, "Delete Extended DOS Partition" );
-         strcpy(
-            option_3,
-            "Delete Logical DOS Drive(s) in the Extended DOS Partition" );
-         strcpy( option_4, "Delete Non-DOS Partition" );
+         title = "Delete DOS Partition or Logical DOS Drive";
+         option_1 = "Delete Primary DOS Partition";
+         option_2 = "Delete Extended DOS Partition";
+         option_3 = "Delete Logical DOS Drive(s) in the Extended DOS Partition";
+         option_4 = "Delete Non-DOS Partition";
          if ( flags.version == FOUR ) {
             maximum_number_of_options = 3;
          }
@@ -549,15 +544,15 @@ int Standard_Menu( int menu )
 
       if ( menu == MBR ) {
          maximum_number_of_options = 4;
-         strcpy( title, "MBR Maintenance" );
-         strcpy( option_1, "Create BootEasy MBR (disabled)" );
-         strcpy( option_2, "Load MBR (partitions and code) from saved file" );
-         strcpy( option_3, "Save the MBR (partitions and code) to a file" );
-         strcpy( option_4, "Remove boot code from the MBR" );
+         title = "MBR Maintenance";
+         option_1 = "Create BootEasy MBR (disabled)";
+         option_2 = "Load MBR (partitions and code) from saved file";
+         option_3 = "Save the MBR (partitions and code) to a file";
+         option_4 = "Remove boot code from the MBR";
       }
 
       /* Display Program Name and Copyright Information */
-      Clear_Screen( 0 );
+      Clear_Screen(0);
 
       if ( ( flags.extended_options_flag == TRUE ) && ( menu == MM ) ) {
          /* */
@@ -580,7 +575,7 @@ int Standard_Menu( int menu )
       flags.display_name_description_copyright = FALSE;
 
       /* Display Menu Title(s) */
-      Print_Centered( 4, title, BOLD );
+      Print_Centered(4, title, BOLD);
 
       /* Display Current Drive Number */
       Print_At( 4, 6, "Current fixed disk drive: " );
