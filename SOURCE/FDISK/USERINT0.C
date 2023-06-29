@@ -157,9 +157,7 @@ void Print_Centered( int y, char *text, int style )
    if ( style == BOLD ) {
       con_set_bold( 1 );
    }
-   else {
-      con_print( text );
-   }
+   con_print( text );
    con_set_bold(was_bold);
 }
 
