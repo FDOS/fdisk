@@ -23,7 +23,7 @@
 #include "ansicon.h"
 #include "printf.h"
 
-void Clear_Screen( int type ) 
+void Clear_Screen( int type )
 {
    con_clrscr();
    if ( type != NOEXTRAS ) {
@@ -137,10 +137,7 @@ void Exit_Screen( void )
          Print_At( 4, 15, "Press any key when ready . . ." );
 
          /* Wait for a keypress. */
-         asm {
-        mov ah,7
-        int 0x21
-         }
+         get_keypress();
 
          Reboot_PC();
       }
