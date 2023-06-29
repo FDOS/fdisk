@@ -114,14 +114,13 @@ unsigned con_get_height( void )
 	return con_height;
 }
 
-/* function to disable cursor sync without affecting the flag */
+/* function to disable hardware cursor sync  */
 void con_disable_cursor_sync( void )
 {
 	cursor_sync_disabled++;
 }
 
-/* function to enable cursor sync, may be overridden by the setting
- * in flag_sync_cursor */
+/* function to enable cursor sync */
 void con_enable_cursor_sync( void )
 {
 	if ( cursor_sync_disabled ) {

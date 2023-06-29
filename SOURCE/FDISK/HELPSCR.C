@@ -40,7 +40,7 @@ void Display_Help_Screen( void )
    char name[20];
    unsigned char i;
    unsigned char linestopause;
-   unsigned char screenh = 25; /* TODO autodetect the number of video rows */
+   unsigned char screenh = con_get_height();
 
    if ( !isatty( fileno( stdout ) ) ) {
       flags.do_not_pause_help_information = TRUE;
@@ -54,7 +54,7 @@ void Display_Help_Screen( void )
    con_printf( "%-20s                   %40s\n", name, version );
 
    /* dump the entire help on screen */
-   linestopause = screenh - 1;    /* number of lines before screen is full */
+   linestopause = screenh - 2;    /* number of lines before screen is full */
    for (i = 0; i < 250; i++) {
      const char *s = svarlang_strid(i);
 #ifdef FDISKLITE
@@ -70,7 +70,7 @@ void Display_Help_Screen( void )
 
      /* is it time for a pause? */
      if ((flags.do_not_pause_help_information == FALSE) && (--linestopause <= 2)) {
-       linestopause = screenh;
+       linestopause = screenh - 1;
        Pause();
      }
    }

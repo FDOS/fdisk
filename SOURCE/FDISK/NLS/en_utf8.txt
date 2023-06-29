@@ -7,28 +7,28 @@
 # HELP SCREEN                                                                #
 ##############################################################################
 
-0.0:\e[1mSyntax: FDISK [<drive#>] [commands]...\e[22m
+0.0:Syntax: FDISK [<drive#>] [commands]...
 0.1:  no argument       Runs in interactive mode
-0.2:  \e[1m/INFO\e[22m             Displays partition information of <drive#>
-0.3:  \e[1m/REBOOT\e[22m           Reboots the Computer
+0.2:  /INFO             Displays partition information of <drive#>
+0.3:  /REBOOT           Reboots the Computer
 0.4:\t
 0.10:Commands to create and delete partitions:
 0.11:    <size> is a number for megabytes or MAX for maximum size
 0.12:           or <number>,100 for <number> to be in percent
 0.13:    <type#> is a numeric partition type or FAT-12/16/32 if /SPEC not given
 0.14:\t
-0.20:  \e[1m/PRI:<size> [/SPEC:<type#>]\e[22m              Creates a primary partition
-0.21:  \e[1m/EXT:<size>\e[22m                              Creates an extended DOS partition
-0.22:  \e[1m/LOG:<size> [/SPEC:<type#>]\e[22m              Creates a logical drive
-0.23:  \e[1m/PRIO,/EXTO,/LOGO\e[22m                        same as above, but avoids FAT32
-0.24:  \e[1m/AUTO\e[22m                                    Automatically partitions the disk
-0.26:  \e[1m/DELETE {/PRI[:#] | /EXT | /LOG:<part#>\e[22m  Deletes a partition
-0.27:  \e[1m         | /NUM:<part#>}\e[22m                 ...logical drives start at /NUM=5
-0.29:  \e[1m/DELETEALL\e[22m                               Deletes all partitions from <drive#>
+0.20:  /PRI:<size> [/SPEC:<type#>]              Creates a primary partition
+0.21:  /EXT:<size>                              Creates an extended DOS partition
+0.22:  /LOG:<size> [/SPEC:<type#>]              Creates a logical drive
+0.23:  /PRIO,/EXTO,/LOGO                        same as above, but avoids FAT32
+0.24:  /AUTO                                    Automatically partitions the disk
+0.26:  /DELETE {/PRI[:#] | /EXT | /LOG:<part#>  Deletes a partition
+0.27:           | /NUM:<part#>}                 ...logical drives start at /NUM=5
+0.29:  /DELETEALL                               Deletes all partitions from <drive#>
 0.30:\t
 0.31:Setting active partitions:
-0.32:  \e[1m/ACTIVATE:<partition#>\e[22m                   Sets <partition#> active
-0.33:  \e[1m/DEACTIVATE\e[22m                              Deactivates all partitions
+0.32:  /ACTIVATE:<partition#>                   Sets <partition#> active
+0.33:  /DEACTIVATE                              Deactivates all partitions
 0.34:\t
 0.40:MBR (Master Boot Record) management:
 0.41:  /CLEARMBR                Deletes all partitions and boot code
@@ -102,8 +102,8 @@
 ##############################################################################
 # ERROR MESSAGES                                                             #
 ##############################################################################
-255.0:\n    \e[1mError reading partition tables.\e[22m
-255.1:\n    \e1[mNo fixed disks present.\e[22m
+255.0:\n    Error reading partition tables.
+255.1:\n    No fixed disks present.
 255.2:\nNo drive number has been entered.
 255.3:\nPartition number is out of range (1-4).
 255.4:\nCan not activate partition.
