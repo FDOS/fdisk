@@ -88,7 +88,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                                  as with NUM type above.
   */
 
-   char input;
+   int input; /* int here because extended keys are stored as 9 bit values */
    char line_buffer[18];
 
    unsigned long multiplier;
@@ -216,11 +216,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       }
 
       /* Obtain keypress from keyboard */
-      asm {
-      mov ah,7
-      int 0x21
-      mov BYTE PTR input,al
-      }
+      input = get_keypress();
 
       /* Zero the default value if type==NUMP, the enter, esc, or backspace key */
       /* has not been pressed, and the default value is pre-entered. */

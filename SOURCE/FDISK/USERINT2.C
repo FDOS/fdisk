@@ -1174,10 +1174,7 @@ void List_Partition_Types( void )
          Color_Print( "Any Key" );
          con_print( " to continue" );
 
-         asm {
-       mov ah,7
-       int 0x21
-         }
+         get_keypress();
       }
 
       row++;
