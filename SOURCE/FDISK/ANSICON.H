@@ -183,14 +183,13 @@ void con_clreol( void );
  *     n = 0 : clear screen WITHOUT returning cursor to home pos */
 void con_scroll( int n );
 
-/* Cursor functions. Upper left corner is (1,1).
- * con_advance_cursor moves cursor by one position. Scrolls if vertically
- * running out of screen  */
+/* Cursor functions. Upper left corner is (1,1). */
 void con_set_cursor_xy( int x, int y );
 void con_get_cursor_xy( int *x, int *y );
 void con_set_cursor_rel( int dx, int dy );
 /* Enables / disables hardware cursor synchronisation. Can be disabled to
- * enhance performance while printing to screen. May be nested. */
+ * enhance performance while printing to screen. May be nested. 
+ * con_print* functions implicitly disable it temporarily */
 void con_disable_cursor_sync( void );
 void con_enable_cursor_sync( void );
 /* use to re-sync ANSICON cursor position when changed by other io routines */

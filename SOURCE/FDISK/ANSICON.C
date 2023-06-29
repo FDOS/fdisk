@@ -150,10 +150,9 @@ void con_set_cursor_xy( int x, int y )
 void con_set_cursor_rel( int dx, int dy )
 {
 	int x, y;
-	con_get_cursor_xy( &x, &y );
 
-	x += dx;
-	y += dy;
+	x = con_curx + dx;
+	y = con_cury + dy;
 	
 	con_set_cursor_xy( x, y );	
 }
@@ -198,7 +197,8 @@ static void con_advance_cursor( void )
 {
 	int x, y;
 
-	con_get_cursor_xy( &x, &y );
+	x = con_curx;
+	y = con_cury;
 
 	if ( x < con_width ) {
 		x += 1;
@@ -220,9 +220,8 @@ void con_nl( void )
 {
 	int x, y;
 
-	con_get_cursor_xy( &x, &y );
 	x = 1;
-	y += 1;
+	y = con_cury + 1;
 
 	if ( y > con_height ) {
 		con_scroll( 1 );
@@ -233,26 +232,19 @@ void con_nl( void )
 }
 
 void con_cr( void ) {
-	int x, y;
-
-	con_get_cursor_xy( &x, &y );
-	x = 1;
-	con_set_cursor_xy( x, y );
+	con_set_cursor_xy( 1, con_cury );
 }
 
 static void _con_putc_plain( char c )
 {
 	union REGPACK r; 
 	unsigned v;
-	int x, y;
 
 	if ( con_is_device ) {
 		if ( c >= 0x20 ) {
 			/* handle printable characters */
 			v = ( con_textattr << 8 ) | c;
-			con_get_cursor_xy( &x, &y );
-
-			vid_mem[(y-1) * con_width + (x-1)] = v;
+			vid_mem[(con_cury-1) * con_width + (con_curx-1)] = v;
 
 			con_advance_cursor();
 		}
@@ -451,8 +443,11 @@ static void _con_putc_ansi( char c )
 			for ( i = 0; i < CON_MAX_ARG; i++ ) arg[i] = -1;
 			state++;
 		}
+		else {
+			_con_putc_plain( c );
+			return;
+		}
 		break;
-
 	case S_START:
 		/* skip [ following escape character */
 		if ( c == '[' ) state++;
@@ -495,10 +490,6 @@ static void _con_putc_ansi( char c )
 	}
 
 	switch ( state ) {
-	case S_NONE:
-		_con_putc_plain( c );
-		break;
-
 	case S_ERR:
 		con_error = 1;
 		state = S_NONE;
