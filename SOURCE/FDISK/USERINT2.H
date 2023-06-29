@@ -24,6 +24,5 @@ void Menu_Routine( void );
 void Modify_Extended_Partition_Information( int logical_drive_number );
 void Modify_Primary_Partition_Information( int logical_drive );
 void Position_Cursor( int row, int column );
-void Print_Centered( int y, char *text, int style );
 
 #endif /* USERINT2_H */
