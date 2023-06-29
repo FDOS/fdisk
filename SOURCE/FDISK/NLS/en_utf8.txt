@@ -93,11 +93,9 @@
 # EXIT SCREEN                                                                #
 ##############################################################################
 
-# TODO: the "MUST" word below should be printed in high luminosity
-2.0:You MUST restart your system for your changes to take effect.
+2.0:You \e[1mMUST\e[22m restart your system for your changes to take effect.
 
-# TODO: same for the word "AFTER" below
-2.1:Any drives you have created or changed must be formatted AFTER you restart.
+2.1:Any drives you have created or changed must be formatted \e[1mAFTER\e[22m you restart.
 
 2.2:System will now restart
 2.3:Press any key when ready . . .
