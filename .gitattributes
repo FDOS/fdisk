@@ -1,19 +1,10 @@
-* text eol=auto
-*.bat text eol=crlf
-*.BAT text eol=crlf
-*.c text eol=crlf
-*.C text eol=crlf
-*.com -text
-*.COM -text
-*.exe -text
-*.EXE -text
-*.lib -text
-*.LIB -text
-*.h text eol=crlf
-*.prj -text
-*.PRJ -text
-*.zip -text
-*.ZIP -text
-*.sh text eol=lf
-*.HTM text
-*.htm text
+*.com binary
+*.COM binary
+*.exe binary
+*.EXE binary
+*.lib binary
+*.LIB binary
+*.prj binary
+*.PRJ binary
+*.zip binary
+*.ZIP binary
