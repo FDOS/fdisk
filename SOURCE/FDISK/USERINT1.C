@@ -479,13 +479,7 @@ int Standard_Menu( int menu )
    int minimum_option;
    int maximum_number_of_options = 0;
 
-   char copyleft[80] = "";
-   char program_name[60] = "";
-   char program_description[60] = "";
-   char version[30] = "";
-
    const char *title;
-
    const char *option_1 = "";
    const char *option_2 = "";
    const char *option_3 = "";
@@ -498,14 +492,6 @@ int Standard_Menu( int menu )
    for ( ;; ) {
       Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
       minimum_option = 1;
-
-      strcpy( program_name, FD_NAME );
-      strcat( program_name, " V" );
-      strcat( program_name, VERSION );
-
-      strcpy( program_description, "Fixed Disk Setup Program" );
-      strcpy( copyleft, "GNU GPL (c) " COPYLEFT " by Brian E. Reifsnyder"
-                        " and The FreeDOS Community" );
 
       if ( menu == MM ) {
          maximum_number_of_options = 4;
@@ -560,15 +546,15 @@ int Standard_Menu( int menu )
       }
 
       if ( flags.display_name_description_copyright == TRUE ) {
-         Print_Centered( 0, program_name, STANDARD );
-         Print_Centered( 1, program_description, STANDARD );
-         Print_Centered( 2, copyleft, STANDARD );
+         Print_Centered( 0, FD_NAME " V" VERSION, STANDARD );
+         Print_Centered( 1, "Fixed Disk Setup Program", STANDARD );
+         Print_Centered( 2, "GNU GPL (c) " COPYLEFT " by Brian E. Reifsnyder", STANDARD );
+         Print_Centered( 3, "and The FreeDOS Community", STANDARD );
 
          if ( flags.use_freedos_label == TRUE ) {
-            strcpy( version, "Version:  " );
-            strcat( version, VERSION );
-            Position_Cursor( ( 76 - strlen( version ) ), 24 );
-            con_printf( "%s", version );
+            unsigned short verlen = strlen("Version:  ") + strlen(VERSION);
+            Position_Cursor((76 - verlen), 24);
+            con_printf( "Version:  %s", VERSION );
          }
       }
 
