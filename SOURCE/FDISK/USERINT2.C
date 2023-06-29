@@ -40,6 +40,7 @@ void Ask_User_About_FAT32_Support( void )
    con_puts( svarlang_str(1, 1) );
    con_puts( svarlang_str(1, 2) );
    con_puts( svarlang_str(1, 3) );
+   con_puts("");
    con_puts( svarlang_str(1, 4) );
    con_puts( svarlang_str(1, 5) );
    con_puts( svarlang_str(1, 6) );
