@@ -92,7 +92,6 @@ static const char *parseline(unsigned short *id, const char *s) {
   }
   /* did I collect everything? */
   if ((dotpos == 0) || (colpos == 0)) return(NULL);
-  if (s[colpos + 1] == 0) return(NULL);
 
   *id = atoi(s);
   *id <<= 8;
@@ -167,6 +166,10 @@ static unsigned short gen_langstrings(unsigned char *buff, const char *langid, s
       puts(linebuf);
       len = 0;
       break;
+    }
+    if (strlen(ptr) == 0) {
+      printf("WARNING: %s[#%u] ignoring empty string %u.%u\r\n", fname, linecount, id >> 8, id & 0xff);
+      continue;
     }
 
     /* warn about dirty lines */
