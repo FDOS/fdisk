@@ -603,27 +603,27 @@ int Standard_Menu( int menu )
 
       if ( minimum_option <= 1 ) {
          Color_Print_At( 4, 10, "1.  " );
-         con_printf( "%s", option_1 );
+         con_print(option_1);
       }
       if ( maximum_number_of_options > 1 && minimum_option <= 2 ) {
          Color_Print_At( 4, 11, "2.  " );
-         con_printf( "%s", option_2 );
+         con_print(option_2);
       }
 
       if ( maximum_number_of_options > 2 && minimum_option <= 3 ) {
          Color_Print_At( 4, 12, "3.  " );
-         con_printf( "%s", option_3 );
+         con_print(option_3);
       }
 
       if ( maximum_number_of_options > 3 && minimum_option <= 4 ) {
          Color_Print_At( 4, 13, "4.  " );
-         con_printf( "%s", option_4 );
+         con_print(option_4);
       }
 
       if ( ( menu == MM ) && ( flags.more_than_one_drive == TRUE ) ) {
          maximum_number_of_options = 5;
          Color_Print_At( 4, 14, "5.  " );
-         con_printf( "%s", option_5 );
+         con_print(option_5);
       }
 
       if ( menu == MM && flags.extended_options_flag == TRUE &&
