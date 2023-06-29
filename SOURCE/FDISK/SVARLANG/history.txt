@@ -1,4 +1,7 @@
 
+20230629
+- deflang.c has each message on a different line so it is nicer to VCSes
+
 20230628
 - added support for \e sequences in translation strings
 - implemented svarlang_getver()
