@@ -162,7 +162,7 @@ void Display_Information( void )
 
 
 /* Print Centered Text */
-void Print_Centered( int y, char *text, int style )
+void Print_Centered( int y, const char *text, int style )
 {
    int x = 40 - strlen( text ) / 2;
    int was_bold = con_get_bold();

@@ -9,7 +9,7 @@ void Dump_Partition_Information( void );
 void Display_CL_Partition_Table( void );
 void Print_UL( unsigned long number );
 void Print_UL_B( unsigned long number );
-void Print_Centered( int y, char *text, int style );
+void Print_Centered( int y, const char *text, int style );
 void Display_All_Drives( void );
 int IsRecognizedFatPartition( unsigned partitiontype );
 void Pause( void );

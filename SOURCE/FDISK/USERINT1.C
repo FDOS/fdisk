@@ -23,6 +23,9 @@
 #include "ansicon.h"
 #include "printf.h"
 
+#include "svarlang/svarlang.h"
+
+
 void Clear_Screen( int type )
 {
    con_clrscr();
@@ -120,21 +123,15 @@ void Exit_Screen( void )
       Clear_Screen( NOEXTRAS );
 
       if ( flags.reboot == FALSE ) {
-         Print_At( 4, 11, "You " );
-         Color_Print( "MUST" );
-         con_print( " restart your system for your changes to take effect." );
-         Print_At(
-            4, 12,
-            "Any drives you have created or changed must be formatted" );
-         Color_Print_At( 4, 13, "AFTER" );
-         con_print( " you restart." );
+         Print_At(4, 11, svarlang_str(2,0)); /* You must restart your system */
+         Print_At(4, 12, svarlang_str(2,1)); /* Any drives created must be formatted AFTER restart */
 
          Input( 0, 0, 0, ESC, 0, 0, ESCE, 0, 0, '\0', '\0' );
          Clear_Screen( NOEXTRAS );
       }
       else {
-         Color_Print_At( 4, 13, "System will now restart" );
-         Print_At( 4, 15, "Press any key when ready . . ." );
+         Color_Print_At(4, 13, svarlang_str(2,2)); /* System will now restart */
+         Print_At(4, 15, svarlang_str(2,3)); /* Press key when ready... */
 
          /* Wait for a keypress. */
          get_keypress();
@@ -151,7 +148,7 @@ void Warn_Incompatible_Ext( void )
 {
    Clear_Screen( NOEXTRAS );
 
-   Color_Print_At( 38, 4, "ERROR" );
+   Color_Print_At( 38, 4, svarlang_str(250, 4)); /* ERROR */
 
    Position_Cursor( 0, 7 );
    con_print(
@@ -482,18 +479,11 @@ int Standard_Menu( int menu )
    int minimum_option;
    int maximum_number_of_options = 0;
 
-   char copyleft[80] = "";
-   char program_name[60] = "";
-   char program_description[60] = "";
-   char version[30] = "";
-
-   char title[60] = "";
-
-   char option_1[60] = "";
-   char option_2[60] = "";
-   char option_3[60] = "";
-   char option_4[60] = "";
-   char option_5[60] = "Change current fixed disk drive";
+   const char *title;
+   const char *option_1 = "";
+   const char *option_2 = "";
+   const char *option_3 = "";
+   const char *option_4 = "";
 
    char optional_char_1 = '\0';
    char optional_char_2 = '\0';
@@ -502,49 +492,36 @@ int Standard_Menu( int menu )
       Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
       minimum_option = 1;
 
-      strcpy( program_name, FD_NAME );
-      strcat( program_name, " V" );
-      strcat( program_name, VERSION );
-
-      strcpy( program_description, "Fixed Disk Setup Program" );
-      strcpy( copyleft, "GNU GPL (c) " COPYLEFT " by Brian E. Reifsnyder"
-                        " and The FreeDOS Community" );
-
       if ( menu == MM ) {
          maximum_number_of_options = 4;
-         strcpy( title, "FDISK Options" );
-         strcpy( option_1, "Create DOS partition or Logical DOS Drive" );
-         strcpy( option_2, "Set Active partition" );
-         strcpy( option_3, "Delete partition or Logical DOS Drive" );
+         title = svarlang_str(3, 0); /* "FDISK Options" */
+         option_1 = svarlang_str(3, 1); /* "Create DOS part or Logical Drive" */
+         option_2 = svarlang_str(3, 2); /* Set Active partition */
+         option_3 = svarlang_str(3, 3); /* Del part or Logical DOS Drive */
 
-         if ( flags.extended_options_flag == FALSE ) {
-            strcpy( option_4, "Display partition information" );
-         }
-         else {
-            strcpy( option_4, "Display/Modify partition information" );
+         if (flags.extended_options_flag == FALSE) {
+            option_4 = svarlang_str(3,4); /* Display partition information */
+         } else {
+            option_4 = svarlang_str(3,5); /* Display/Modify partition info */
          }
       }
 
       if ( menu == CP ) {
          maximum_number_of_options = 3;
-         strcpy( title, "Create DOS Partition or Logical DOS Drive" );
-         strcpy( option_1, "Create Primary DOS Partition" );
-         strcpy( option_2, "Create Extended DOS Partition" );
-         strcpy(
-            option_3,
-            "Create Logical DOS Drive(s) in the Extended DOS Partition" );
-         strcpy( option_4, "" );
+         title = svarlang_str(4, 0); /* Create DOS Partition or Logical DOS Drive */
+         option_1 = svarlang_str(4, 1); /* Create Primary DOS Partition */
+         option_2 = svarlang_str(4, 2); /* Create Extended DOS Partition */
+         option_3 = svarlang_str(4, 3); /* Create Log DOS Drive in Ext Part */
+         option_4 = "";
       }
 
       if ( menu == DP ) {
          maximum_number_of_options = 4;
-         strcpy( title, "Delete DOS Partition or Logical DOS Drive" );
-         strcpy( option_1, "Delete Primary DOS Partition" );
-         strcpy( option_2, "Delete Extended DOS Partition" );
-         strcpy(
-            option_3,
-            "Delete Logical DOS Drive(s) in the Extended DOS Partition" );
-         strcpy( option_4, "Delete Non-DOS Partition" );
+         title = svarlang_str(5, 0); /* Del DOS Part or Logical DOS Drive */
+         option_1 = svarlang_str(5, 1); /* Delete Primary DOS Partition */
+         option_2 = svarlang_str(5, 2); /* Delete Extended DOS Partition */
+         option_3 = svarlang_str(5, 3); /* Del Log DOS Drive in Ext DOS Part */
+         option_4 = svarlang_str(5, 4); /* Delete Non-DOS Partition */
          if ( flags.version == FOUR ) {
             maximum_number_of_options = 3;
          }
@@ -552,15 +529,15 @@ int Standard_Menu( int menu )
 
       if ( menu == MBR ) {
          maximum_number_of_options = 4;
-         strcpy( title, "MBR Maintenance" );
-         strcpy( option_1, "Create BootEasy MBR (disabled)" );
-         strcpy( option_2, "Load MBR (partitions and code) from saved file" );
-         strcpy( option_3, "Save the MBR (partitions and code) to a file" );
-         strcpy( option_4, "Remove boot code from the MBR" );
+         title = svarlang_str(6, 0); /* MBR Maintenance */
+         option_1 = svarlang_str(6, 1); /* Create BootEasy MBR (disabled) */
+         option_2 = svarlang_str(6, 2); /* Load MBR from saved file */
+         option_3 = svarlang_str(6, 3); /* Save MBR to a file */
+         option_4 = svarlang_str(6, 4); /* Remove boot code from the MBR */
       }
 
       /* Display Program Name and Copyright Information */
-      Clear_Screen( 0 );
+      Clear_Screen(0);
 
       if ( ( flags.extended_options_flag == TRUE ) && ( menu == MM ) ) {
          /* */
@@ -568,22 +545,22 @@ int Standard_Menu( int menu )
       }
 
       if ( flags.display_name_description_copyright == TRUE ) {
-         Print_Centered( 0, program_name, STANDARD );
-         Print_Centered( 1, program_description, STANDARD );
-         Print_Centered( 2, copyleft, STANDARD );
+         Print_Centered( 0, FD_NAME " V" VERSION, STANDARD );
+         Print_Centered( 1, "Fixed Disk Setup Program", STANDARD );
+         Print_Centered( 2, "GNU GPL (c) " COPYLEFT " by Brian E. Reifsnyder", STANDARD );
+         Print_Centered( 3, "and The FreeDOS Community", STANDARD );
 
          if ( flags.use_freedos_label == TRUE ) {
-            strcpy( version, "Version:  " );
-            strcat( version, VERSION );
-            Position_Cursor( ( 76 - strlen( version ) ), 24 );
-            con_printf( "%s", version );
+            unsigned short verlen = strlen("Version:  ") + strlen(VERSION);
+            Position_Cursor((76 - verlen), 24);
+            con_printf( "Version:  %s", VERSION );
          }
       }
 
       flags.display_name_description_copyright = FALSE;
 
       /* Display Menu Title(s) */
-      Print_Centered( 4, title, BOLD );
+      Print_Centered(4, title, BOLD);
 
       /* Display Current Drive Number */
       Print_At( 4, 6, "Current fixed disk drive: " );
@@ -625,27 +602,27 @@ int Standard_Menu( int menu )
 
       if ( minimum_option <= 1 ) {
          Color_Print_At( 4, 10, "1.  " );
-         con_printf( "%s", option_1 );
+         con_print(option_1);
       }
       if ( maximum_number_of_options > 1 && minimum_option <= 2 ) {
          Color_Print_At( 4, 11, "2.  " );
-         con_printf( "%s", option_2 );
+         con_print(option_2);
       }
 
       if ( maximum_number_of_options > 2 && minimum_option <= 3 ) {
          Color_Print_At( 4, 12, "3.  " );
-         con_printf( "%s", option_3 );
+         con_print(option_3);
       }
 
       if ( maximum_number_of_options > 3 && minimum_option <= 4 ) {
          Color_Print_At( 4, 13, "4.  " );
-         con_printf( "%s", option_4 );
+         con_print(option_4);
       }
 
       if ( ( menu == MM ) && ( flags.more_than_one_drive == TRUE ) ) {
          maximum_number_of_options = 5;
          Color_Print_At( 4, 14, "5.  " );
-         con_printf( "%s", option_5 );
+         con_print(svarlang_str(3, 6)); /* Change current fixed disk drive */
       }
 
       if ( menu == MM && flags.extended_options_flag == TRUE &&
