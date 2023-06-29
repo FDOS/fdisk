@@ -104,6 +104,50 @@
 
 
 ##############################################################################
+# MAIN MENU                                                                  #
+##############################################################################
+
+3.0:FDISK Options
+3.1:Create DOS partition or Logical DOS Drive
+3.2:Set Active partition
+3.3:Delete partition or Logical DOS Drive
+3.4:Display partition information
+3.5:Display/Modify partition information
+3.6:Change current fixed disk drive
+
+
+##############################################################################
+# CREATE PARTITION MENU                                                      #
+##############################################################################
+
+4.0:Create DOS Partition or Logical DOS Drive
+4.1:Create Primary DOS Partition
+4.2:Create Extended DOS Partition
+4.3:Create Logical DOS Drive(s) in the Extended DOS Partition
+
+##############################################################################
+# DELETE PARTITION MENU                                                      #
+##############################################################################
+
+5.0:Delete DOS Partition or Logical DOS Drive
+5.1:Delete Primary DOS Partition
+5.2:Delete Extended DOS Partition
+5.3:Delete Logical DOS Drive(s) in the Extended DOS Partition
+5.4:Delete Non-DOS Partition
+
+
+##############################################################################
+# MBR MAINTENANCE MENU (EXTENDED OPTION)                                     #
+##############################################################################
+
+6.0:MBR Maintenance
+6.1:Create BootEasy MBR (disabled)
+6.2:Load MBR (partitions and code) from saved file
+6.3:Save the MBR (partitions and code) to a file
+6.4:Remove boot code from the MBR
+
+
+##############################################################################
 # GLOBAL STRINGS                                                             #
 ##############################################################################
 

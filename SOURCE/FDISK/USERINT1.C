@@ -484,7 +484,6 @@ int Standard_Menu( int menu )
    const char *option_2 = "";
    const char *option_3 = "";
    const char *option_4 = "";
-   const char *option_5 = "Change current fixed disk drive";
 
    char optional_char_1 = '\0';
    char optional_char_2 = '\0';
@@ -495,34 +494,34 @@ int Standard_Menu( int menu )
 
       if ( menu == MM ) {
          maximum_number_of_options = 4;
-         title = "FDISK Options";
-         option_1 = "Create DOS partition or Logical DOS Drive";
-         option_2 = "Set Active partition";
-         option_3 = "Delete partition or Logical DOS Drive";
+         title = svarlang_str(3, 0); /* "FDISK Options" */
+         option_1 = svarlang_str(3, 1); /* "Create DOS part or Logical Drive" */
+         option_2 = svarlang_str(3, 2); /* Set Active partition */
+         option_3 = svarlang_str(3, 3); /* Del part or Logical DOS Drive */
 
-         if ( flags.extended_options_flag == FALSE ) {
-            option_4 = "Display partition information";
+         if (flags.extended_options_flag == FALSE) {
+            option_4 = svarlang_str(3,4); /* Display partition information */
          } else {
-            option_4 = "Display/Modify partition information";
+            option_4 = svarlang_str(3,5); /* Display/Modify partition info */
          }
       }
 
       if ( menu == CP ) {
          maximum_number_of_options = 3;
-         title = "Create DOS Partition or Logical DOS Drive";
-         option_1 = "Create Primary DOS Partition";
-         option_2 = "Create Extended DOS Partition";
-         option_3 = "Create Logical DOS Drive(s) in the Extended DOS Partition";
+         title = svarlang_str(4, 0); /* Create DOS Partition or Logical DOS Drive */
+         option_1 = svarlang_str(4, 1); /* Create Primary DOS Partition */
+         option_2 = svarlang_str(4, 2); /* Create Extended DOS Partition */
+         option_3 = svarlang_str(4, 3); /* Create Log DOS Drive in Ext Part */
          option_4 = "";
       }
 
       if ( menu == DP ) {
          maximum_number_of_options = 4;
-         title = "Delete DOS Partition or Logical DOS Drive";
-         option_1 = "Delete Primary DOS Partition";
-         option_2 = "Delete Extended DOS Partition";
-         option_3 = "Delete Logical DOS Drive(s) in the Extended DOS Partition";
-         option_4 = "Delete Non-DOS Partition";
+         title = svarlang_str(5, 0); /* Del DOS Part or Logical DOS Drive */
+         option_1 = svarlang_str(5, 1); /* Delete Primary DOS Partition */
+         option_2 = svarlang_str(5, 2); /* Delete Extended DOS Partition */
+         option_3 = svarlang_str(5, 3); /* Del Log DOS Drive in Ext DOS Part */
+         option_4 = svarlang_str(5, 4); /* Delete Non-DOS Partition */
          if ( flags.version == FOUR ) {
             maximum_number_of_options = 3;
          }
@@ -530,11 +529,11 @@ int Standard_Menu( int menu )
 
       if ( menu == MBR ) {
          maximum_number_of_options = 4;
-         title = "MBR Maintenance";
-         option_1 = "Create BootEasy MBR (disabled)";
-         option_2 = "Load MBR (partitions and code) from saved file";
-         option_3 = "Save the MBR (partitions and code) to a file";
-         option_4 = "Remove boot code from the MBR";
+         title = svarlang_str(6, 0); /* MBR Maintenance */
+         option_1 = svarlang_str(6, 1); /* Create BootEasy MBR (disabled) */
+         option_2 = svarlang_str(6, 2); /* Load MBR from saved file */
+         option_3 = svarlang_str(6, 3); /* Save MBR to a file */
+         option_4 = svarlang_str(6, 4); /* Remove boot code from the MBR */
       }
 
       /* Display Program Name and Copyright Information */
@@ -623,7 +622,7 @@ int Standard_Menu( int menu )
       if ( ( menu == MM ) && ( flags.more_than_one_drive == TRUE ) ) {
          maximum_number_of_options = 5;
          Color_Print_At( 4, 14, "5.  " );
-         con_print(option_5);
+         con_print(svarlang_str(3, 6)); /* Change current fixed disk drive */
       }
 
       if ( menu == MM && flags.extended_options_flag == TRUE &&
