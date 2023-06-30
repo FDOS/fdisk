@@ -2,7 +2,179 @@
 # FDISK IN GERMAN
 #
 
-# ### HILFE DISPLAYUNG #######################################################
 
-0.0:Der Satzbau: FDISK [<Antrieb#>] [Befehl]...
-0.1:  kein Streit       läuft im Interaktionsmodus
+##############################################################################
+# HELP SCREEN                                                                #
+##############################################################################
+
+0.0:Syntax: FDISK [<Laufw#>] [Kommandos]...
+0.1:  kein Argument     Interaktiver Modus
+0.2:  /INFO             Zeigt Paritionsinformationen von <Laufw#> an
+0.3:  /REBOOT           Startet den Computer neu
+0.4:\t
+0.10:Kommandos zum Anlegen und Löschen von Partitionen:
+0.11:    <Größe> ist eine Zahl in Megabyte, oder MAX für maximale Größe,
+0.12:           oder <Zahl>,100 für Angabe in Prozent
+0.13:    <Typ#> numerischer Paritionstyp, standardmäßig FAT-12/16/32
+0.14:\t
+0.20:  /PRI:<Größe> [/SPEC:<Typ#>]              Erzeugt primäre Partition
+0.21:  /EXT:<Größe>                             Erzeugt erweiterte DOS Partition
+0.22:  /LOG:<Größe> [/SPEC:<Typ#>]              Erzeugt logisches Laufwerk
+0.23:  /PRIO,/EXTO,/LOGO                        wie oben, beschränkt auf FAT12/16
+0.24:  /AUTO                                    Automatische Partitionierung
+0.26:  /DELETE {/PRI[:#] | /EXT | /LOG:<Part#>  Löscht eine Partition. Logische...
+0.27:           | /NUM:<Part#>}                 ...Laufwerke starten bei /NUM=5
+0.29:  /DELETEALL                               Löscht alle Partitionen von <Laufw#>
+0.30:\t
+0.31:Verwaltung aktiver Partitionen:
+0.32:  /ACTIVATE:<Partition#>                   Markiert <Partition#> als aktiv
+0.33:  /DEACTIVATE                              Deaktiviert alle Partitionen
+0.34:\t
+0.40:MBR (Master Boot Record) Verwaltung:
+0.41:  /CLEARMBR                Löscht alle Partitionen und MBR Startprogramm
+0.42:  /LOADMBR                 Lädt Partitionstabelle und Code aus Datei "boot.mbr"
+0.43:  /SAVEMBR                 Speichert Part.tabelle und Code in Datei "boot.mbr"
+0.44:\t
+0.50:MBR Startprogrammmodifikationen ohne Änderung der Partitionstabelle:
+0.51:  /IPL                     Installiert neues Startprogramm in MBR <Laufw#>
+0.52:                           ...auch als /MBR und /CMBR zwecks Kompatibilität
+0.53:  /SMARTIPL                Installiert DriveSmart Startprogramm in MBR <Laufw#>
+0.54:  /LOADIPL                 Scheibt 440 Programm Bytes von \"boot.mbr\" in MBR
+0.55:\t
+0.60:Fortgeschrittene Partitionstabellenmodifikation:
+0.61:  /MODIFY:<part#>,<Typ#>                   Ändert Paritionstyp zu <Typ#>
+0.62:                                           ...logische Laufw. starten bei "5"
+0.63:  /MOVE:<srcpart#>,<destpart#>             Verschiebt Primäre Partition
+0.64:  /SWAP:<1stpart#>,<2ndpart#>              Vertauscht Primäre Partitionen
+0.65:\t
+0.70:Modifikation von Flags:
+0.71:  /CLEARFLAG[{:<Flag#>} | /ALL}]           Setzt <Flag#> oder alle Flags zurück
+0.72:  /SETFLAG:<Flag#>[,<Wert>]                Setzt <Flag#> auf 1 oder <Wert>
+0.73:  /TESTFLAG:<Flag#>[,<Wert>]               Testet <Flag#> auf 1 oder <Wert>
+0.74:\t
+0.80:Anzeige von Laufwerksinformationen:
+0.81:  /STATUS       Zeigt aktuelles Partitionslayout an
+0.82:  /DUMP         Zur Fehlersuche: Listet alle Partitionsinformationen auf
+0.83:\t
+0.90:Interaktiver Benutzermodus:
+0.91:  /UI           Erzwingt Start von Benutzerinterface, wenn letztes Argument
+0.92:  /MONO         Erzwingt monochromen Bildschirmmodus
+0.93:  /FPRMT        Fragt nach FAT32/FAT16 im Interaktiven Modus
+0.94:  /XO           Aktiviert erweiterte Programmfunktionen
+0.95:\t
+0.100:Kompatibilitätsoptionen:
+0.101:  /X            Deaktiviert erweiterte INT 13 Funktionen und LBA
+0.102:\t
+0.200:Dieses Programm ist lizensiert unter den Bedingungen der
+0.201:GNU General Public License, Version 2.
+0.202:\t
+0.203:\t
+0.204:Dieses Programm wird so geliefert, wie es ist, und ohne jegliche Garantie.
+0.205:Der Autor dieser Software übernimmt keine Verantwortung für die Verwendung oder
+0.206:den Missbrauch dieser Software.  Durch die Benutzung dieser Software erklärt
+0.207:sich der Benutzer mit den mit den oben genannten Bedingungen einverstanden.
+
+##############################################################################
+# FAT32 SUPPORT SCREEN                                                       #
+##############################################################################
+
+1.0:\e[5;5HFDISK erlaubt das Anlegen von Partitionen größer als 2,048 MB unter
+1.1:    Verwendung des FAT32 Dateisystems.  Wenn Sie das Anlegen großer
+1.2:    Partitionen erlauben, wird jede Partition größer als 512 MB mit dem
+1.3:    FAT32 Dateisystem angelegt.
+1.4:    WICHTIG:  Manche Betriebsystem unterstützen keinen Zugriff auf
+1.5:    DOS Partitionen, die größer als 512 MB sind.
+1.6:\t
+1.7:\e[5;18HSupport für große Partitionen (FAT32) aktivieren (J/N)....?
+
+
+##############################################################################
+# EXIT SCREEN                                                                #
+##############################################################################
+
+2.0:Sie \e[1mMÜSSEN\e[22m den Computer neustarten, um die Änderungen zu übernehmen.
+
+2.1:Alle neu angelegten Partitionen müssen \e[1mNACH\e[22m Neustart formatiert werden.
+
+2.2:System wird neugestartet
+2.3:Drücken Sie eine belibige Taste zum Fortfahren . . .
+
+
+##############################################################################
+# MAIN MENU                                                                  #
+##############################################################################
+
+3.0:FDISK Optionen
+3.1:Partition anlegen
+3.2:Aktive Partition setzen
+3.3:Partition löschen
+3.4:Partitionsinformationen anzeigen
+3.5:Partitionsinformationen anzeigen / modifizieren
+3.6:Laufwerk auswählen
+
+
+##############################################################################
+# CREATE PARTITION MENU                                                      #
+##############################################################################
+
+4.0:Partition anlegen
+4.1:Primäre DOS Partition anlegen
+4.2:Erweiterte DOS Partition anlegen
+4.3:Logische DOS Partition in erweiterter Partition anlegen
+
+
+##############################################################################
+# DELETE PARTITION MENU                                                      #
+##############################################################################
+
+5.0:Partition löschen
+5.1:Primäre DOS Partition löschen
+5.2:Erweiterte DOS Partition löschen
+5.3:Logische DOS Partition aus erweiterter Partition löschen
+5.4:Nicht-DOS Partition löschen
+
+
+##############################################################################
+# MBR MAINTENANCE MENU (EXTENDED OPTION)                                     #
+##############################################################################
+
+6.0:MBR Wartung
+6.1:BootEasy MBR anlegen (deaktiviert)
+6.2:MBR (Partitionen und Startprogramm) aus Datei boot.mgr laden
+6.3:MBR (Partitionen und Startprogramm) in Datei boot.mgr schreiben
+6.4:Startprogramm aus MBR löschen
+
+
+##############################################################################
+# GLOBAL STRINGS                                                             #
+##############################################################################
+
+# Yes-No letters, as used to answer "Yes/No" questions (upper- and lower-case)
+250.0:JN
+250.1:jn
+250.2:Ungültige Eingabe, bitte J oder N angeben
+250.3:Zum Fortfahren Taste drücken
+250.4:FEHLER
+
+
+##############################################################################
+# ERROR MESSAGES                                                             #
+##############################################################################
+255.0:\n    Fehler beim Einlesen der Partitionstabellen.
+255.1:\n    Keine Festplatte gefunden.
+255.2:\nKeine Festplattennummer angegeben.
+255.3:\nPartitionsnummer ist ungültig (1-4).
+255.4:\nPartition kann nicht aktiviert werden.
+255.5:\nFehler beim automatischen Partitionieren der Festplatte.
+255.6:\nFehler beim Säubern des MBR Sektors.
+255.7:\nFehler beim Löschen des MBR Startprogramms.
+255.9:\nFehler beim Deaktivieren der Partition.
+255.10:\nFehler beim Säubern der Partitionstabelle.
+255.11:\nFehler beim Schreiben des MBR Startprogramms.
+255.12:\nFehler beim Installieren des MBR Startprogramms aus Datei.
+255.13:\nFehler beim Installieren des MBR aus Datei.
+255.14:\nFehler beim Schreiben des MBR.
+255.15:\nFehler beim Schreiben der Partitionstabellen.
+255.16:\nFehler beim Speichern des MBR.
+255.17:\nFehler beim Schreiben des Smart IPL.
+255.18:\nFalsches Kommando oder Syntaxfehler. Aufruf mit FDISK /? für Hilfe.

@@ -41,7 +41,7 @@
 0.53:  /SMARTIPL                Installs DriveSmart IPL into MBR <drive#>
 0.54:  /LOADIPL                 Writes 440 code bytes from \"boot.mbr\" into MBR
 0.55:\t
-0.60:Advanced partition table modification:\n
+0.60:Advanced partition table modification:
 0.61:  /MODIFY:<part#>,<type#>                    Changes partition type to <type#>
 0.62:                                             ...logical drives start at "5"
 0.63:  /MOVE:<srcpart#>,<destpart#>               Moves primary partitions
