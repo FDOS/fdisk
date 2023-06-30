@@ -109,7 +109,9 @@
    
       0            All Attributes Off
       1            Bold On
+      5            Blinking On
      22            Bold Off
+     25            Blinking Off
      30            Black foreground        (ISO 6429 standard)
      31            Red foreground          (ISO 6429 standard)
      32            Green foreground        (ISO 6429 standard)
@@ -126,12 +128,6 @@
      45            Magenta background      (ISO 6429 standard)
      46            Cyan background         (ISO 6429 standard)
      47            White backgound         (ISO 6429 standard)
-
-TODO      4            Underscore On           (monochrome displays only)
-TODO      5            Blink On
-TODO      7            Reverse Video On
-TODO??    8            Concealed On            (ISO 6429 standard)
-  
  */
 
 
@@ -201,6 +197,7 @@ void con_set_textcolor( int color );
 void con_set_backcolor( int color );
 void con_set_bold( int flag );
 int con_get_bold( void );
+void con_set_blinking( int flag );
 
 #ifdef __cplusplus
 }

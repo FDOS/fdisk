@@ -239,6 +239,7 @@ static void _con_putc_plain( char c )
 {
 	union REGPACK r; 
 	unsigned v;
+	int i, n;
 
 	if ( con_is_device ) {
 		if ( c >= 0x20 ) {
@@ -251,11 +252,15 @@ static void _con_putc_plain( char c )
 		else {
 			/* handle control characters */
 			switch ( c ) {
-			case 10: /* new line */
+			case '\n': /* new line */
 				con_nl();
 				break;
-			case 13: /* carrige return */
+			case '\r': /* carrige return */
 				con_cr();
+				break;
+			case '\t':
+				n = 8 - ( con_curx & 7 );
+				for ( i = 0; i <= n; i++ ) _con_putc_plain( ' ' );
 				break;
 			}
 		}
@@ -350,6 +355,11 @@ void con_set_backcolor( int color )
 	con_textattr = ( con_textattr & 0x8f ) | ( (color & 7) << 4 );
 }
 
+void con_set_blinking( int flag )
+{
+	con_textattr = ( con_textattr & 0x7f ) | ( (flag & 1) << 7 );	
+}
+
 static int handle_ansi_function( char function )
 {
 	int i, argi;
@@ -406,8 +416,14 @@ static int handle_ansi_function( char function )
 			else if ( argi == 1 ) {
 				con_set_bold( 1 );
 			}
+			else if ( argi == 5 ) {
+				con_set_blinking( 1 );
+			}
 			else if ( argi == 22 ) {
 				con_set_bold( 0 );			
+			}
+			else if ( argi == 25 ) {
+				con_set_blinking( 0 );
 			}
 			else if ( argi >= 30 && argi <= 37 ) {
 				con_set_textcolor( argi - 30 );
