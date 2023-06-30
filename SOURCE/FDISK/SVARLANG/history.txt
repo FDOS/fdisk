@@ -1,4 +1,8 @@
 
+20230630
+- tlumacz.exe warns about empty strings (patch by Bernd Boeckmann)
+- tlumacz.exe does not abort when a malformed line is found
+
 20230629
 - deflang.c has each message on a different line so it is nicer to VCSes
 
