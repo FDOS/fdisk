@@ -161,13 +161,16 @@ static unsigned short gen_langstrings(unsigned char *buff, const char *langid, s
 
     /* read id and get ptr to actual string ("1.15:string") */
     ptr = parseline(&id, linebuf);
+
+    /* handle malformed lines */
     if (ptr == NULL) {
-      printf("ERROR: line #%u of %s is malformed (linelen = %u):\r\n", linecount, fname, linelen);
+      printf("WARNING: %s[#%u] is malformed (linelen = %u):\r\n", fname, linecount, linelen);
       puts(linebuf);
-      len = 0;
-      break;
+      continue;
     }
-    if (strlen(ptr) == 0) {
+
+    /* ignore empty strings (but emit a warning) */
+    if (ptr[0] == 0) {
       printf("WARNING: %s[#%u] ignoring empty string %u.%u\r\n", fname, linecount, id >> 8, id & 0xff);
       continue;
     }
