@@ -1,0 +1,180 @@
+#
+# FDISK IN FRENCH
+#
+
+
+##############################################################################
+# HELP SCREEN                                                                #
+##############################################################################
+
+0.0:Syntaxe : FDISK [<lecteur#>] [commandes]...
+0.1:  aucun argument    S'exécute en mode interactif
+0.2:  /INFO             Affiche les informations de partition du <lecteur#>
+0.3:  /REBOOT           Redémarre l'ordinateur
+0.4:\t
+0.10:Commandes pour créer et effacer des partitions :
+0.11: <taille> est un nombre pour mégaoctets ou MAX pour la taille maximale
+0.12:           ou <nombre>,100 pour <nombre> qui doit être en pourcentage
+0.13: <type#> est le type numérique de partition ou FAT-12/16/32 si /SPEC absent
+0.14:\t
+0.20:  /PRI:<taille> [/SPEC:<type#>]      Crée une partition primaire
+0.21:  /EXT:<taille>                      Crée une partition DOS étendue
+0.22:  /LOG:<taille> [/SPEC:<type#>]      Crée un lecteur logique
+0.23:  /PRIO,/EXTO,/LOGO                  identique à ci-dessus mais évite FAT32
+0.24:  /AUTO                              Partitionne le disque automatiquement
+0.26:  /DELETE {/PRI[:#] | /EXT | /LOG:<part#>  Efface une partition
+0.27:           | /NUM:<part#>}     ...les lecteurs logiques commencent à /NUM=5
+0.29:  /DELETEALL                     Efface toutes les partitions du <lecteur#>
+0.30:\t
+0.31:Définition des partitions actives :
+0.32:  /ACTIVATE:<partition#>             Définit la <partition#> active
+0.33:  /DEACTIVATE                        Désactive toutes les partitions
+0.34:\t
+0.40:Gestion MBR (Master Boot Record) :
+0.41:  /CLEARMBR   Efface toutes les partitions et le code d'amorçage
+0.42:  /LOADMBR    Charge la table des part. et le code de "boot.mbr" dans MBR
+0.43:  /SAVEMBR    Sauvegarde la table des partitions et le code dans "boot.mbr"
+0.44:\t
+0.50:Modifications de code MBR laissant les partitions intactes :
+0.51:  /IPL        Installe le code d'amorçage standard dans le MBR <lecteur#>
+0.52:              ...identique à  /MBR et /CMBR pour la compatibilité
+0.53:  /SMARTIPL   Installe DriveSmart IPL dans le MBR <lecteur#>
+0.54:  /LOADIPL    Écrit 440 octets de code depuis \"boot.mbr\" dans le MBR
+0.55:\t
+0.60:Modification de la table des partitions avancée :
+0.61:  /MODIFY:<part#>,<type#>        Modifie le type de partition en <type#>
+0.62:                                 ...les lecteurs logiques démarrent à "5"
+0.63:  /MOVE:<srcpart#>,<destpart#>   Déplace les partitions primaires
+0.64:  /SWAP:<1erepart#>,<2ndepart#>  Échange les partitions primaires
+0.65:\t
+0.70:Pour gérer les indicateurs sur un disque dur :
+0.71:  /CLEARFLAG[{:<indicateur#>} | /ALL}] Réinitialise <indicateur#> ou all pour tout sur <lecteur#>
+0.72:  /SETFLAG:<indicateur#>[,<valeur>] Définit <indicateur#> sur 1 ou <valeur>
+0.73:  /TESTFLAG:<indicateur#>[,<valeur>] Teste <indicateur#> pour 1 ou <valeur>
+0.74:\t
+0.80:Pour obtenir des informations sur les disques durs :
+0.81:  /STATUS       Affiche le schéma de partition actuel.
+0.82:  /DUMP         Décharge les infos de partition de tous les DD (débogage)
+0.83:\t
+0.90:Options de l'interface utilisateur interactive :
+0.91:  /UI        Toujours démarre l'IU si donné en tant que dernier argument.
+0.92:  /MONO      Force l'interface utilisateur à se lancer en mode monochrome.
+0.93:  /FPRMT     Affiche une invite pour FAT32/FAT16 en mode interactif.
+0.94:  /XO        Active les options étendues.
+0.95:\t
+0.100:Options de compatibilité :
+0.101:  /X            Désactive ext. INT 13 et LBA pour les commandes suivantes
+0.102:\t
+0.200:Ce programme est sous Copyright %s de Brian E. Reifsnyder et de la
+0.201:communauté FreeDOS selon les termes de la licence publique générale GNU,
+0.202:version 2.
+0.203:\t
+0.204:Ce programme est fourni en tant que tel, sans aucune garantie. L'auteur de
+0.205:ce logiciel ne prend aucune responsabilité concernant l'utilisation ou la
+0.206:mauvaise utilisation de ce logiciel. En utilisant ce logiciel, il est
+0.207:entendu que l'opérateur accepte les termes qui précédent.
+
+
+##############################################################################
+# FAT32 SUPPORT SCREEN                                                       #
+##############################################################################
+
+1.0:\e[5;5HFDISK est capable d'utiliser le support de grands disques pour vous
+1.1:    permettre de créer des partions supérieures à 2,048 Mo en utilisant des
+1.2:    partitions FAT32. Si vous activez ce support, toutes les partitions ou
+1.3:    lecteurs logiques supérieurs à 512 Mo seront créés en utilisant FAT32.
+1.4:    IMPORTANT : si vous activez le support des grands disques, certains OS
+1.5:    seront incapables d'accéder aux partitions et aux lecteurs logiques qui
+1.6:    sont supérieurs à 512 Mo en taille.
+1.7:\e[5;18HSouhaitez-vous utiliser le support des grands disques (FAT32) (O/N)....?
+
+
+##############################################################################
+# EXIT SCREEN                                                                #
+##############################################################################
+
+2.0:Vous \e[1mDEVEZ\e[22m redémarrer votre système pour que les modifications prennent effet.
+
+2.1:Tout lecteur que vous avez créé ou modifié doit être formaté \e[1mAPRÈS\e[22m redémarrage.
+
+2.2:Le système va maintenant redémarrer
+2.3:Appuyez sur une touche lorsque vous serez prêt . . .
+
+
+##############################################################################
+# MAIN MENU                                                                  #
+##############################################################################
+
+3.0:Options FDISK
+3.1:Créer une partition DOS ou bien un lecteur logique DOS
+3.2:Définir la partition active
+3.3:Effacer la partition ou le lecteur logique DOS
+3.4:Afficher les informations de partition
+3.5:Afficher/Modifier les informations de partition
+3.6:Modifier le lecteur de disque fixe actuel
+
+
+##############################################################################
+# CREATE PARTITION MENU                                                      #
+##############################################################################
+
+4.0:Créer une partition DOS ou bien un lecteur logique DOS
+4.1:Créer une partition DOS primaire
+4.2:Créer une partition DOS étendue
+4.3:Créer des lecteurs logiques DOS dans la partition DOS étendue
+
+##############################################################################
+# DELETE PARTITION MENU                                                      #
+##############################################################################
+
+5.0:Effacer la partition DOS ou bien le lecteur logique DOS
+5.1:Effacer la partition DOS primaire
+5.2:Effacer la partition DOS étendue
+5.3:Effacer les lecteurs logiques DOS dans la partition DOS étendue
+5.4:Effacer des partitions non DOS
+
+
+##############################################################################
+# MBR MAINTENANCE MENU (EXTENDED OPTION)                                     #
+##############################################################################
+
+6.0:Maintenance MBR
+6.1:Créer un MBR BootEasy (désactivé)
+6.2:Charger le MBR (partitions et code) depuis un fichier sauvegardé
+6.3:Sauvegarder le MBR (partitions et code) sur un fichier
+6.4:Enlever le code d'amorçage du MBR
+
+
+##############################################################################
+# GLOBAL STRINGS                                                             #
+##############################################################################
+
+# Yes-No letters, as used to answer "Yes/No" questions (upper- and lower-case)
+250.0:ON
+250.1:on
+250.2:Entrée invalide, veuillez entrer O-N
+250.3:Appuyez sur une touche pour continuer
+250.4:ERREUR
+
+
+##############################################################################
+# ERROR MESSAGES                                                             #
+##############################################################################
+255.0:\n    Erreur lors de la lecture des tables de partition.
+255.1:\n    Aucun disque fixe présent.
+255.2:\nAucun numéro de lecteur n'a été entré.
+255.3:\nLe numéro de partition est hors de la plage (1-4).
+255.4:\nImpossible d'activer la partition.
+255.5:\nErreur lors de la partition automatique du disque dur.
+255.6:\nErreur lors du nettoyage du secteur MBR.
+255.7:\nErreur lors de l'effacement de l'IPL.
+255.9:\nErreur lors de la désactivation de la partition.
+255.10:\nErreur lors du nettoyage de la table des partitions.
+255.11:\nErreur lors de l'écriture de l'IPL.
+255.12:\nErreur lors de l'installation de l'IPL depuis le fichier.
+255.13:\nErreur lors de l'installation du MBR depuis le fichier.
+255.14:\nErreur lors de l'écriture du MBR.
+255.15:\nErreur lors de l'écriture des tables de partition.
+255.16:\nErreur lors de la sauvegarde du MBR.
+255.17:\nErreur lors de l'écriture de Smart IPL.
+255.18:\nCommande invalide ou erreur de syntaxe. Invoquez FDISK /? pour l'aide.
