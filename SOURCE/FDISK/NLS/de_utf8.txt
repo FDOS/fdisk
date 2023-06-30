@@ -14,8 +14,8 @@
 0.4:\t
 0.10:Kommandos zum Anlegen und Löschen von Partitionen:
 0.11:    <Größe> ist eine Zahl in Megabyte, oder MAX für maximale Größe,
-0.12:           oder <Zahl>,100 für Angabe in Prozent
-0.13:    <Typ#> numerischer Paritionstyp, standardmäßig FAT-12/16/32
+0.12:            oder <Zahl>,100 für Angabe in Prozent
+0.13:    <Typ#>  numerischer Paritionstyp, standardmäßig FAT-12/16/32
 0.14:\t
 0.20:  /PRI:<Größe> [/SPEC:<Typ#>]              Erzeugt primäre Partition
 0.21:  /EXT:<Größe>                             Erzeugt erweiterte DOS Partition
@@ -65,14 +65,14 @@
 0.100:Kompatibilitätsoptionen:
 0.101:  /X            Deaktiviert erweiterte INT 13 Funktionen und LBA
 0.102:\t
-0.200:Dieses Programm ist lizensiert unter den Bedingungen der
-0.201:GNU General Public License, Version 2.
-0.202:\t
+0.200:\t
+0.201:Dieses Programm ist lizensiert unter den Bedingungen der
+0.202:GNU General Public License, Version 2.
 0.203:\t
 0.204:Dieses Programm wird so geliefert, wie es ist, und ohne jegliche Garantie.
 0.205:Der Autor dieser Software übernimmt keine Verantwortung für die Verwendung oder
 0.206:den Missbrauch dieser Software.  Durch die Benutzung dieser Software erklärt
-0.207:sich der Benutzer mit den mit den oben genannten Bedingungen einverstanden.
+0.207:sich der Benutzer mit den oben genannten Bedingungen einverstanden.
 
 ##############################################################################
 # FAT32 SUPPORT SCREEN                                                       #
@@ -153,7 +153,7 @@
 250.0:JN
 250.1:jn
 250.2:Ungültige Eingabe, bitte J oder N angeben
-250.3:Zum Fortfahren Taste drücken
+250.3:Zum Fortfahren Taste drücken . . .
 250.4:FEHLER
 
 
@@ -161,11 +161,11 @@
 # ERROR MESSAGES                                                             #
 ##############################################################################
 255.0:\n    Fehler beim Einlesen der Partitionstabellen.
-255.1:\n    Keine Festplatte gefunden.
-255.2:\nKeine Festplattennummer angegeben.
+255.1:\n    Keine Laufwerk gefunden.
+255.2:\nKeine Laufwerksnummer angegeben.
 255.3:\nPartitionsnummer ist ungültig (1-4).
 255.4:\nPartition kann nicht aktiviert werden.
-255.5:\nFehler beim automatischen Partitionieren der Festplatte.
+255.5:\nFehler beim automatischen Partitionieren das Laufwerks.
 255.6:\nFehler beim Säubern des MBR Sektors.
 255.7:\nFehler beim Löschen des MBR Startprogramms.
 255.9:\nFehler beim Deaktivieren der Partition.
