@@ -16,3 +16,4 @@ Jim Hall                makefile
 Tom Ehlert              program size reduction, code simplifications,
                           new bootloader, bug fixes
 Bernd Boeckmann         Open Watcom C port, critical bug fixes, code cleanup
+Mateusz Viste           svarlang lib, code improvements, translations
