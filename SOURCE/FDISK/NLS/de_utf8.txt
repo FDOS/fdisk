@@ -39,7 +39,7 @@
 0.51:  /IPL                     Installiert neues Startprogramm in MBR <Laufw#>
 0.52:                           ...auch als /MBR und /CMBR zwecks Kompatibilität
 0.53:  /SMARTIPL                Installiert DriveSmart Startprogramm in MBR <Laufw#>
-0.54:  /LOADIPL                 Scheibt 440 Programm Bytes von \"boot.mbr\" in MBR
+0.54:  /LOADIPL                 Schreibt 440 Programm Bytes von \"boot.mbr\" in MBR
 0.55:\t
 0.60:Fortgeschrittene Partitionstabellenmodifikation:
 0.61:  /MODIFY:<part#>,<Typ#>                   Ändert Paritionstyp zu <Typ#>
@@ -160,8 +160,8 @@
 ##############################################################################
 # ERROR MESSAGES                                                             #
 ##############################################################################
-255.0:\n    Fehler beim Einlesen der Partitionstabellen.
-255.1:\n    Keine Laufwerk gefunden.
+255.0:\nFehler beim Einlesen der Partitionstabellen.
+255.1:\nKeine Laufwerke gefunden.
 255.2:\nKeine Laufwerksnummer angegeben.
 255.3:\nPartitionsnummer ist ungültig (1-4).
 255.4:\nPartition kann nicht aktiviert werden.
