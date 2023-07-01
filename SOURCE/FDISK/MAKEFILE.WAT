@@ -31,7 +31,12 @@ CFLAGS += -DFD_FREEDOS=$(FREEDOS)
 
 objs  = main.obj cmd.obj deflang.obj fdiskio.obj helpscr.obj
 objs += pdiskio.obj pcompute.obj ansicon.obj printf.obj userint0.obj
-objs += compat.obj int24.obj bootnorm.obj smartmbr.obj
+objs += compat.obj bootnorm.obj
+
+!ifdef SMART_MBR
+CFLAGS += -DSMART_MBR=1
+objs += smartmbr.obj
+!endif
 
 !ifdef LITE
 CFLAGS += -DFDISKLITE=1
@@ -47,8 +52,17 @@ dist-svardos: ..\..\fdisk.svp
 .C.OBJ : .AUTODEPEND
 	$(CC) $(CFLAGS) $*.C
 
-.ASM.OBJ :
-	$(AS) $(ASFLAGS) $*.ASM -o $@
+#.ASM.OBJ :
+#	$(AS) $(ASFLAGS) $*.ASM -o $@
+
+bootnorm.bin : bootnorm.asm
+	$(AS) bootnorm.asm -o bootnorm.bin
+
+bootnorm.c : bintoc.exe bootnorm.bin
+	bintoc.exe bootnorm.bin bootnorm.c bootnormal_code
+
+bintoc.exe : bintoc.c
+  $(CL) $(CLFLAGS) bintoc.c
 
 fdisk.exe : $(objs) fdisk.lnk
 	$(LD) $(LDFLAGS) @fdisk
@@ -57,7 +71,7 @@ fdisk.exe : $(objs) fdisk.lnk
 	-del ..\..\nls\fdisk.lng
 	-mkdir ..\..\nls
 	-copy fdisk.lng ..\..\nls\
-	-$(PACKER) $(PACKERFLAGS) ..\..\bin\fdisk.exe
+#	-$(PACKER) $(PACKERFLAGS) ..\..\bin\fdisk.exe
 
 fdisk.lnk : $(objs)
 	@echo NAME $^& >$^@

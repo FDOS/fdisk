@@ -4,15 +4,6 @@
 // Copyright:  1998-2023 under the terms of the GNU GPL, Version 2
 */
 
-/*
-CATS message store for main.c:
-
-$set 1
-1 Syntax Error
-2 Operation Terminated
-
-*/
-
 #define MAIN
 
 #include <conio.h>
@@ -37,7 +28,7 @@ $set 1
 #include "userint2.h"
 #endif
 #include "ansicon.h"
-
+#include "printf.h"
 #include "svarlang\svarlang.h"
 
 static int Get_Environment_Settings( char *environment[] );
@@ -61,11 +52,11 @@ static int Get_Environment_Settings( char *environment[] )
    int number;
    int sub_buffer_index;
 
-   if ( environment[0][0] == NULL ) {
+   if ( environment[0][0] == '\0' ) {
       return ( 1 );
    }
 
-   while ( ( environment[line_index][0] != NULL ) && ( line_index < 64 ) ) {
+   while ( ( environment[line_index][0] != '\0' ) && ( line_index < 64 ) ) {
       /* Clear the command_buffer and setting_buffer */
       character_index = 0;
 
@@ -105,14 +96,13 @@ static int Get_Environment_Settings( char *environment[] )
       done_looking = FALSE;
 
       do {
-         if ( ( environment[line_index][character_index] == NULL ) ||
-              ( environment[line_index][character_index] == 0 ) ||
+         if ( ( environment[line_index][character_index] == '\0' ) ||
               ( environment[line_index][character_index] == 32 ) ) {
             done_looking = TRUE;
          }
 
-         if ( ( environment[line_index][character_index] != '=' ) &&
-              ( environment[line_index][character_index] != NULL ) ) {
+         if ( ( environment[line_index][character_index] != '\0' ) &&
+              ( environment[line_index][character_index] != '=' ) ) {
             setting_buffer[sub_buffer_index] =
                environment[line_index][character_index];
 
@@ -432,10 +422,9 @@ static void Initialization( char *environment[] )
 void Reboot_PC( void )
 {
    /* Note:  Reboot is a cold start. */
-   void( ( far * fp )(void)) =
-      ( void( far * )( void ) )( ( 0xffffL << 16 ) | 0x0000L );
-   *(int far *)( ( 0x0040L << 16 ) | 0x0072 ) = 0;
-   fp();
+   void __far ( *fp )(void) = MK_FP( 0xffff, 0 );
+   *(int __far *)( MK_FP( 0x0040, 0x0072 ) ) = 0;
+   (*fp)();
 }
 
 /* Re-Initialize LBA related functions. */
@@ -471,17 +460,20 @@ void Re_Initialization( void )
 	this is annoying and must be stopped
 */
 
-extern void cdecl far int24_handler( void );
+const unsigned char __far int24_handler[3] = {
+   0x31, 0xc0,    /* xor ax,ax    */
+   0xcf           /* iret         */
+};
 
-void( interrupt far *old_int24 )( void );
+void __interrupt __far ( *old_int24 )( void );
 
-static void restore_int24( void ) { setvect( 0x24, old_int24 ); }
+static void restore_int24( void ) { _dos_setvect( 0x24, old_int24 ); }
 
 static void int24_init( void )
 {
 
-   old_int24 = getvect( 0x24 );
-   setvect( 0x24, (void( interrupt far * )())int24_handler );
+   old_int24 = _dos_getvect( 0x24 );
+   _dos_setvect( 0x24, (void __interrupt __far (*)())int24_handler );
    atexit( restore_int24 );
 }
 
@@ -505,12 +497,8 @@ void main( int argc, char *argv[] )
    int location;
    int fat32_temp;
 
-   extern void cdecl far smart_mbr( void );
-
-   /* Watcom C output buffering conflicts with cursor positioning functions
-      so disable it */
-#ifdef __WATCOMC__
-   setbuf( stdout, NULL );
+#ifdef SMART_MBR
+   extern void __cdecl __far smart_mbr( void );
 #endif
 
    /* initialize console io with interpretation of esc seq enabled */
@@ -519,9 +507,11 @@ void main( int argc, char *argv[] )
    /* initialize the SvarLANG library (loads translation strings) */
    svarlang_autoload("FDISK");
 
+#ifdef SMART_MBRT
    if ( memicmp( argv[1], "SMART", 5 ) == 0 ) {
       smart_mbr();
    }
+#endif
 
    int24_init();
 
@@ -888,6 +878,7 @@ void main( int argc, char *argv[] )
             Shift_Command_Line_Options( 1 );
          }
 
+#ifdef SMART_MBR
          if ( 0 == strcmp( arg[0].choice, "SMARTIPL" ) ) {
             flags.use_iui = FALSE;
             Ensure_Drive_Number();
@@ -900,6 +891,7 @@ void main( int argc, char *argv[] )
 
             Shift_Command_Line_Options( 1 );
          }
+#endif
 
          if ( 0 == strcmp( arg[0].choice, "STATUS" ) ) {
             flags.use_iui = FALSE;

@@ -21,7 +21,6 @@
 /* bootloader pointers */
 /*extern char booteasy_code[];*/
 extern char bootnormal_code[];
-extern void __cdecl __far BootSmart_code();
 
 
 /* Automatically partition the selected hard drive */
@@ -237,7 +236,11 @@ static int Create_BootNormal_MBR( void )
    return Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
 }
 
+
+#ifdef SMART_MBR
 /* Create Normal MBR */
+extern void __cdecl __far BootSmart_code();
+
 int Create_BootSmart_IPL( void )
 {
    int error_code;
@@ -263,6 +266,7 @@ int Create_BootSmart_IPL( void )
 
    return Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
 }
+#endif
 
 /* Create Master Boot Code */
 int Create_MBR( void )

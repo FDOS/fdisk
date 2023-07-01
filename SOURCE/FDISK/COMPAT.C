@@ -1,5 +1,5 @@
 
-#if defined( __WATCOMC__ )
+#if defined( __WATCOMC__ ) || defined( __GNUC__ )
 
 #include "compat.h"
 #include <bios.h>
@@ -7,8 +7,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef __GNUC__
+#include <libi86/stdlib.h>
+#endif
 
 /* Watcom C does not have this */
+#ifdef __WATCOMC__
 char *searchpath( char *fn )
 {
    static char full_path[_MAX_PATH];
@@ -20,6 +24,7 @@ char *searchpath( char *fn )
 
    return NULL;
 }
+#endif
 
 /* Watcom C does have biosdisk equivalent _bios_disk */
 int biosdisk( unsigned function, unsigned drive, unsigned head,
@@ -27,7 +32,7 @@ int biosdisk( unsigned function, unsigned drive, unsigned head,
               void __far *sector_buffer )
 {
    struct diskinfo_t dinfo;
-   unsigned error, carry = 0;
+   unsigned error;
 
    dinfo.drive = drive;
    dinfo.head = head;
@@ -41,10 +46,11 @@ int biosdisk( unsigned function, unsigned drive, unsigned head,
    /* fix for watcom _bios_disk not checking carry flag after INT13H call */
    /* see __ibm_bios_disk in: */
    /* https://github.com/open-watcom/open-watcom-v2/blob/master/bld/clib/bios/a/bdisk086.asm */
+   /*
    asm adc carry, 0;
    if ( !carry ) {
       error = 0;
-   }
+   }*/
 
    return error;
 }
