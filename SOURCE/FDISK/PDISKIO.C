@@ -40,7 +40,7 @@ static void Clear_Partition_Table_Area_Of_Sector_Buffer( void );
 /*void Error_Handler( int error );*/
 static void Get_Partition_Information( void );
 
-static void StorePartitionInSectorBuffer( char *sector_buffer,
+static void StorePartitionInSectorBuffer( unsigned char *sector_buffer,
                                           struct Partition *pPart );
 
 static void Load_Brief_Partition_Table( void );
@@ -1150,8 +1150,8 @@ int Write_Partition_Tables( void )
    for ( drive_index = 0; drive_index < 7; drive_index++ ) {
       Partition_Table *pDrive = &part_table[drive_index];
 
-      if ( pDrive->part_values_changed != TRUE &&
-              flags.partitions_have_changed != TRUE ||
+      if ( ( pDrive->part_values_changed != TRUE &&
+             flags.partitions_have_changed != TRUE ) ||
            !pDrive->usable ) {
          continue; /* nothing done, continue with next drive */
       }
@@ -1339,7 +1339,7 @@ static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
    return ( error_code );
 }
 
-static void StorePartitionInSectorBuffer( char *sector_buffer,
+static void StorePartitionInSectorBuffer( unsigned char *sector_buffer,
                                           struct Partition *pPart )
 {
    unsigned long start_cyl = pPart->start_cyl;
