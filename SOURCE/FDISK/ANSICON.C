@@ -22,15 +22,14 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-/* TODO:
-   - implement TAB character
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <i86.h>
+#ifdef __GNUC__
+#include <libi86/string.h>
+#endif
 #include "ansicon.h"
 
 #define CON_MAX_ARG  4
@@ -56,7 +55,7 @@ static char con_is_device;
 static char con_is_monochrome;
 static char cursor_sync_disabled;
 
-static unsigned short far *vid_mem;
+static unsigned short __far *vid_mem;
 
 static void con_get_hw_cursor( int *x, int *y );
 static void con_set_hw_cursor( int x, int y );
@@ -86,7 +85,11 @@ void con_init( int interpret_esc )
 	/* screen size ? */
 	con_width = r.h.ah;
 	if ( detect_ega() ) {
-		con_height = (*(unsigned char far *) MK_FP(0x40, 0x84)) + 1;
+		con_height = (*(unsigned char __far *) MK_FP(0x40, 0x84)) + 1;
+		/* set >=ega blinking bit */
+		r.w.ax = 0x1003;
+		r.w.bx = 1;
+		intr( 0x10, &r );
 	}
 	else {
 		con_height = 25;
@@ -503,6 +506,9 @@ static void _con_putc_ansi( char c )
 			state = S_ERR;
 		}
 		break;
+
+	default:
+		break;
 	}
 
 	switch ( state ) {
@@ -513,6 +519,9 @@ static void _con_putc_ansi( char c )
 
 	case S_FINI:
 		state = S_NONE;
+
+	default:
+		break;
 	}
 }
 
