@@ -166,6 +166,16 @@ void con_get_cursor_xy( int *x, int *y )
 	*y = con_cury;
 }
 
+int con_get_cursor_x( void )
+{
+	return con_curx;
+}
+
+int con_get_cursor_y( void )
+{
+	return con_cury;
+}
+
 static void con_get_hw_cursor( int *x, int *y )
 {
 	union REGPACK r; 

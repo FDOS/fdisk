@@ -46,9 +46,9 @@ void Ask_User_About_FAT32_Support( void )
    con_puts( svarlang_str(1, 6) );
 
    /* "do you want to use large disk (FAT32) support (Y/N)...?" */
-   con_puts( svarlang_str(1, 7) );
-
-   flags.fat32 = (int)Input( 1, strlen(svarlang_str(1, 7)) + 5, 17, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
+   con_print( svarlang_str(1, 7) );
+   con_print( "  " );
+   flags.fat32 = (int)Input( 1, -1, -1, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
 }
 
 int Inform_About_Trimmed_Disk( void )

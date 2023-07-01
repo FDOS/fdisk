@@ -39,7 +39,10 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
   size_of_field:                 number of characters for the user to enter,
                                  if size of field is 0 then no input box
 				 is drawn on the screen.
+             
   x_position, y_position:        screen coordinates to place the input box
+                                 may be -1 to make Input use current cursor pos
+
   type                           type of input--CHAR  A single character as
                                                       specified by min_range
                                                       and max_range.  min_range
@@ -109,6 +112,13 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
    char yeschar = 'y';
    char NOchar = 'N';  /* char that represents "no" */
    char nochar = 'n';
+
+   if ( x_position == -1 ) {
+      x_position = con_get_cursor_x() - 1;
+   }
+   if ( y_position == -1 ) {
+      y_position = con_get_cursor_y() - 1;
+   }
 
    /* load localized version of "Y/N" if needed */
    if (type == YN) {

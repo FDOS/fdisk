@@ -1,7 +1,7 @@
 #ifndef COMPAT_H
 #define COMPAT_H
 
-#if defined( __WATCOMC__ )
+#if defined( __WATCOMC__ ) || defined( __GNUC__ )
 
 #define asm __asm
 

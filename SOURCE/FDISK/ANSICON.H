@@ -182,6 +182,9 @@ void con_scroll( int n );
 /* Cursor functions. Upper left corner is (1,1). */
 void con_set_cursor_xy( int x, int y );
 void con_get_cursor_xy( int *x, int *y );
+int con_get_cursor_x( void );
+int con_get_cursor_y( void );
+
 void con_set_cursor_rel( int dx, int dy );
 /* Enables / disables hardware cursor synchronisation. Can be disabled to
  * enhance performance while printing to screen. May be nested. 
