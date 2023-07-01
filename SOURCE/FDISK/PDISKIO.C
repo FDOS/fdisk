@@ -5,6 +5,7 @@
 #include <bios.h>
 #include <conio.h>
 #include <dos.h>
+#include <i86.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -65,43 +66,32 @@ extern void Pause( void );
 /* Check for interrupt 0x13 extensions */
 void Check_For_INT13_Extensions( void )
 {
+   union REGPACK r;
    Partition_Table *pDrive;
-   int carry;
    int drive = 0x80;
 
-   unsigned char ah_register = 0;
-   unsigned short bx_register = 0;
-   unsigned short cx_register = 0;
    pDrive = part_table;
 
    for ( drive = 0x80; drive < 0x88; drive++, pDrive++ ) {
-      carry = 0;
-      asm {
-      mov ah,0x41
-      mov bx,0x55aa
-      mov dl,BYTE PTR drive
-      int 0x13
-
-      mov BYTE PTR ah_register,ah
-      mov WORD PTR bx_register,bx
-      mov WORD PTR cx_register,cx
-      adc WORD PTR carry,0 /* Set carry if CF=1 */
-      }
+      r.h.ah = 0x41;
+      r.w.bx = 0x55aa;
+      r.h.dl = drive;
+      intr( 0x13, &r );
 
       pDrive->ext_int_13 = FALSE;
 
-      if ( ( !carry ) && ( bx_register == 0xaa55 ) ) {
+      if ( ( ( r.w.flags & INTR_CF ) == 0 ) && ( r.w.bx == 0xaa55 ) ) {
          flags.use_extended_int_13 = TRUE;
          pDrive->ext_int_13 = TRUE;
 
-         if ( ( cx_register & 0x0001 ) == 1 ) {
+         if ( ( r.w.cx & 0x0001 ) == 1 ) {
             pDrive->use_access_packet = TRUE;
          }
          else {
             pDrive->use_access_packet = FALSE;
          }
 
-         pDrive->ext_int_13_version = ah_register;
+         pDrive->ext_int_13_version = r.h.ah;
       }
    }
 }
@@ -170,8 +160,10 @@ void Clear_Sector_Buffer( void ) { memset( sector_buffer, 0, SECT_SIZE ); }
 static unsigned long combine_cs( unsigned long cylinder,
                                  unsigned long sector )
 {
-   unsigned long value = 0;
+   unsigned short c = cylinder;
+   unsigned short s = sector;
 
+#if 0
    asm {
     mov ax,WORD PTR cylinder
     mov bx,WORD PTR sector
@@ -190,8 +182,9 @@ static unsigned long combine_cs( unsigned long cylinder,
 
     mov WORD PTR value,dx
    }
+#endif
 
-   return ( value );
+   return (s & 0x3f) | ((c & 0x0300) >> 2) | ((c & 0xff) << 8);
 }
 
 int Num_Ext_Part( Partition_Table *pDrive )
@@ -402,6 +395,7 @@ void extract_chs( unsigned char *p, unsigned long *cyl, unsigned long *head,
 /* Get the parameters of the hard disk */
 static int Get_Hard_Drive_Parameters( int physical_drive )
 {
+   union REGPACK r;
    int error_code = 0;
 
    unsigned int total_number_hard_disks = 0;
@@ -431,44 +425,27 @@ static int Get_Hard_Drive_Parameters( int physical_drive )
       return 0;
    }
 
-   /* Get the hard drive parameters with normal int 0x13 calls. */
-   asm {
-    mov ah, 0x08
-    mov dl, BYTE PTR physical_drive
-    int 0x13
-
-    mov bl,cl
-    and bl,00111111B
-
-    mov BYTE PTR error_code, ah
-    mov BYTE PTR total_sectors, bl
-    mov BYTE PTR total_number_hard_disks,dl
-
-    mov bl,cl
-    mov cl,ch
-    shr bl,1
-    shr bl,1
-    shr bl,1
-    shr bl,1
-    shr bl,1
-    shr bl,1
-
-    mov ch,bl
-
-    mov WORD PTR total_cylinders, cx
-    mov BYTE PTR total_heads, dh
-   }
-
-   if ( flags.total_number_hard_disks == 255 )
-   {
-      flags.total_number_hard_disks = total_number_hard_disks;
-   }
-   if ( total_number_hard_disks == 0 ) {
-      return 255;
+   r.w.ax = 0x0800;
+   r.h.dl = physical_drive;
+   intr( 0x13, &r );
+   if ( r.w.flags & INTR_CF ) {
+      error_code = ( r.h.ah ) ? r.h.ah : 1;
    }
 
    if ( error_code > 0 ) {
       return error_code;
+   }
+
+   total_number_hard_disks = r.h.dl;
+   total_heads = r.h.dh;
+   total_sectors = r.h.cl & 0x3f;
+   total_cylinders = r.h.ch | ( (r.h.cl & 0xc0 ) << 2 );
+
+   if ( flags.total_number_hard_disks == 255 ) {
+      flags.total_number_hard_disks = total_number_hard_disks;
+   }
+   if ( total_number_hard_disks == 0 ) {
+      return 255;
    }
 
    // USB CF card adapters simulate existing hard drives,
@@ -487,22 +464,22 @@ static int Get_Hard_Drive_Parameters( int physical_drive )
       /* Note:  Supported interrupt 0x13 extensions have already been      */
       /* checked for in the function Check_For_INT13_Extensions().         */
 
-      unsigned int result_buffer_segment = FP_SEG( result_buffer );
-      unsigned int result_buffer_offset = FP_OFF( result_buffer );
-
       unsigned long legacy_total_cylinders = total_cylinders;
       unsigned long sectors_per_cylinder =
          total_sectors * ( total_heads + 1 );
       unsigned long number_of_physical_sectors;
       unsigned long number_of_physical_sectors_hi;
-      asm {
-      mov ah,0x48
-      mov dl,BYTE PTR physical_drive
-      mov ds,result_buffer_segment
-      mov si,result_buffer_offset
-      int 0x13
 
-      mov BYTE PTR error_code,ah
+      r.w.ax = 0x4800;
+      r.h.dl = physical_drive;
+      r.w.ds = FP_SEG( result_buffer );
+      r.w.si = FP_OFF( result_buffer );
+      intr( 0x13, &r );
+      if ( r.w.flags & INTR_CF ) {
+         error_code = ( r.h.ah ) ? r.h.ah : 1;
+      }
+      else {
+         error_code = 0;
       }
 
       if ( error_code > 0 ) return ( error_code );
@@ -518,7 +495,7 @@ static int Get_Hard_Drive_Parameters( int physical_drive )
       pDrive->size_truncated = number_of_physical_sectors_hi != 0;
       if ( pDrive->size_truncated ) {
          number_of_physical_sectors = 0xffffffffUL;
-      };
+      }
 
       /* -1 to store last accessible cylinder number not total_cylinders !! */
       total_cylinders = number_of_physical_sectors / sectors_per_cylinder - 1;
@@ -1099,17 +1076,14 @@ static int Read_Physical_Sectors_CHS( int drive, long cylinder, long head,
 static int Read_Physical_Sectors_LBA_only( int drive, ulong LBA_address,
                                            int number_of_sectors )
 {
+   union REGPACK r;
    unsigned int error_code = 0;
-
-   /* Get the segment and offset of disk_address_packet. */
-   unsigned int disk_address_packet_address_offset =
-      FP_OFF( disk_address_packet );
 
    /* Add number_of_sectors to disk_address_packet */
    disk_address_packet[2] = number_of_sectors;
 
    if ( number_of_sectors == 1 ) {
-      *(void far **)( disk_address_packet + 4 ) = sector_buffer;
+      *(void __far **)( disk_address_packet + 4 ) = sector_buffer;
    }
    else {
       con_print( "sector != 1\n" );
@@ -1119,18 +1093,22 @@ static int Read_Physical_Sectors_LBA_only( int drive, ulong LBA_address,
    /* Transfer LBA_address to disk_address_packet */
    *(_u32 *)( disk_address_packet + 8 ) = LBA_address;
 
-   /* Load the registers and call the interrupt. */
-   asm {
-    mov ah,0x42
-    mov dl,BYTE PTR drive
-    mov si,disk_address_packet_address_offset
-    int 0x13
+   r.w.ax = 0x4200;
+   r.h.dl = drive;
+   r.w.si = FP_OFF( disk_address_packet );
+   r.w.ds = FP_SEG( disk_address_packet );
+   intr( 0x13, &r );
 
-    mov BYTE PTR error_code,ah
+   if ( r.w.flags & INTR_CF ) {
+      error_code = ( r.h.ah ) ? r.h.ah : 1;
+   }
+   else {
+      error_code = 0;
    }
 
    return ( error_code );
 }
+
 
 /* Read a physical sector using LBA values */
 static int Read_Physical_Sectors_LBA( int drive, long cylinder, long head,
@@ -1321,11 +1299,8 @@ static int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
 static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
                                        long sector, int number_of_sectors )
 {
+   union REGPACK r;
    unsigned int error_code = 0;
-
-   /* Get the segment and offset of disk_address_packet. */
-   unsigned int disk_address_packet_address_off =
-      FP_OFF( disk_address_packet );
 
    /* Translate CHS values to LBA values. */
    unsigned long LBA_address =
@@ -1338,7 +1313,7 @@ static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
    disk_address_packet[2] = number_of_sectors;
 
    if ( number_of_sectors == 1 ) {
-      *(void far **)( disk_address_packet + 4 ) = sector_buffer;
+      *(void __far **)( disk_address_packet + 4 ) = sector_buffer;
    }
    else {
       con_print( "sector != 1\n" );
@@ -1348,15 +1323,17 @@ static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
    /* Transfer LBA_address to disk_address_packet */
    *(_u32 *)( disk_address_packet + 8 ) = LBA_address;
 
-   /* Load the registers and call the interrupt. */
-   asm {
-      mov ah,0x43
-      mov al,0x00
-      mov dl,BYTE PTR drive
-      mov si,disk_address_packet_address_off
-      int 0x13
+   r.w.ax = 0x4300;
+   r.h.dl = drive;
+   r.w.si = FP_OFF( disk_address_packet );
+   r.w.ds = FP_SEG( disk_address_packet );
+   intr( 0x13, &r );
 
-      mov BYTE PTR error_code,ah
+   if ( r.w.flags & INTR_CF ) {
+      error_code = ( r.h.ah ) ? r.h.ah : 1;
+   }
+   else {
+      error_code = 0;
    }
 
    return ( error_code );
