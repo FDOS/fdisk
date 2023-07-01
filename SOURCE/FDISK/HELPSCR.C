@@ -62,7 +62,7 @@ void Display_Help_Screen( void )
      if (*s == 0) continue;
      if (i == 200) {   /* special case: COPYLEFT needs to be inserted */
        con_printf(s, COPYLEFT);
-       con_nl();
+       con_putc('\n');
      } else {
        con_puts(s);
      }

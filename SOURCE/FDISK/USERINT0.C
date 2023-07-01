@@ -45,13 +45,13 @@ int IsRecognizedFatPartition( unsigned partitiontype )
 /* Pause Routine */
 void Pause( void )
 {
-   con_nl();
+   con_putc('\n');
    con_print(svarlang_str(250,3));
 
    /* wait for keypress */
    con_readkey();
 
-   con_cr();
+   con_putc('\r');
    con_clreol();
 }
 
@@ -256,7 +256,7 @@ void Display_CL_Partition_Table( void )
          con_printf( " %6lu/%03lu/%02lu", pDrive->pri_part[index].end_cyl,
                  pDrive->pri_part[index].end_head,
                  pDrive->pri_part[index].end_sect );
-         con_nl();
+         con_putc('\n');
       }
 
       index++;
@@ -315,7 +315,7 @@ void Display_CL_Partition_Table( void )
             con_printf( " %6lu/%03lu/%02lu", pDrive->log_drive[index - 4].end_cyl,
                     pDrive->log_drive[index - 4].end_head,
                     pDrive->log_drive[index - 4].end_sect );
-            con_nl();
+            con_putc('\n');
          }
 
          index++;
@@ -324,7 +324,7 @@ void Display_CL_Partition_Table( void )
          "\nLargest continious free space in extended partition = %lu MBytes\n",
          Max_Log_Free_Space_In_MB() );
    }
-   con_nl();
+   con_putc('\n');
 }
 
 

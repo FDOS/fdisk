@@ -249,7 +249,7 @@ int con_readkey( void )
 	return 0x100 | r.h.al;
 }
 
-void con_nl( void )
+static void con_nl( void )
 {
 	int x, y;
 
@@ -264,7 +264,7 @@ void con_nl( void )
 	con_set_cursor_xy( x, y );
 }
 
-void con_cr( void ) {
+static void con_cr( void ) {
 	con_set_cursor_xy( 1, con_cury );
 }
 
@@ -300,12 +300,17 @@ static void _con_putc_plain( char c )
 	}
 	else {
 		/* writing to file, use DOS calls */
+		if ( c == '\n' ) {
+			/* hack in a CR befor NL when writing to a file */
+			r.h.ah = 2;
+			r.h.dl = '\r';
+			intr( 0x21, &r );
+		}
 		r.h.ah = 2;
 		r.h.dl = c;
 		intr( 0x21, &r );
 	}
 }
-
 
 void con_scroll( int n )
 {
@@ -577,7 +582,7 @@ void con_puts( const char *s )
 {
 	con_disable_cursor_sync();
 	con_print( s );
-	con_nl();
+	con_putc( '\n' );
 	con_enable_cursor_sync();
 }
 

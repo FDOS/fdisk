@@ -168,8 +168,6 @@ void con_putc( char c );
 void con_print( const char *s );
 void con_print_at( int x, int y, const char *s );
 void con_puts( const char *s );  /* like con_print with trailing new-line */
-void con_nl( void );
-void con_cr( void );   
 
 /* Clear screen and move cursor to home position. */
 void con_clrscr( void );
