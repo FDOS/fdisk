@@ -136,8 +136,9 @@ int Create_DOS_Partition_Interface( int type )
 
       Print_Centered( 4, "Create Primary DOS Partition", BOLD );
 
-      Print_At( 4, 6, "Current fixed disk drive: " );
-      Color_Printf( "%d", ( flags.drive_number - 127 ) );
+      /* NLS:Current fixed disk drive: */
+      Print_At( 4, 6, svarlang_str( 9, 0 ) );
+      Color_Printf( " %d", ( flags.drive_number - 127 ) );
 
       Print_At(
          4, 8,
@@ -201,8 +202,9 @@ int Create_DOS_Partition_Interface( int type )
          Print_Centered( 4, "Create Extended DOS Partition", BOLD );
       }
 
-      Print_At( 4, 6, "Current fixed disk drive: " );
-      Color_Printf( "%d", ( flags.drive_number - 127 ) );
+      /* NLS:Current fixed disk drive: */
+      Print_At( 4, 6, svarlang_str( 9, 0 ) );
+      Color_Printf( " %d", ( flags.drive_number - 127 ) );
 
       Display_Primary_Partition_Information_SS();
 
@@ -287,8 +289,9 @@ int Create_DOS_Partition_Interface( int type )
       Print_Centered( 4, "Create Extended DOS Partition", BOLD );
    }
 
-   Print_At( 4, 6, "Current fixed disk drive: " );
-   Color_Printf( "%d", ( flags.drive_number - 127 ) );
+   /* NLS:Current fixed disk drive: */
+   Print_At( 4, 6, svarlang_str( 9, 0 ) );
+   Color_Printf( " %d", ( flags.drive_number - 127 ) );
 
    Display_Primary_Partition_Information_SS();
 
@@ -999,8 +1002,9 @@ void Display_Primary_Partition_Information_SS( void )
 
    Determine_Drive_Letters();
 
-   Print_At( 4, 6, "Current fixed disk drive: " );
-   Color_Printf( "%d", ( flags.drive_number - 127 ) );
+   /* NLS:Current fixed disk drive: */
+   Print_At( 4, 6, svarlang_str( 9, 0 ) );
+   Color_Printf( " %d", ( flags.drive_number - 127 ) );
 
    if ( ( pDrive->pri_part[0].num_type > 0 ) ||
         ( pDrive->pri_part[1].num_type > 0 ) ||
@@ -1198,8 +1202,9 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
 
       Determine_Drive_Letters();
 
-      Print_At( 6, 6, "Current fixed disk drive: " );
-      Color_Printf( "%d", ( flags.drive_number - 127 ) );
+      /* NLS:Current fixed disk drive: */
+      Print_At( 4, 6, svarlang_str( 9, 0 ) );
+      Color_Printf( " %d", ( flags.drive_number - 127 ) );
 
       Print_At(
          4, 8,
@@ -1245,7 +1250,8 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
       Print_At( 69, 9, "%6lu",
                 pDrive->log_drive[logical_drive_number].end_cyl );
 
-      Print_At( 4, 12, "Choose one of the following:" );
+      /* NLS:"Choose one of the following: */
+      Print_At( 4, 8, svarlang_str( 9, 2 ) );
 
       Color_Print_At( 4, 14, "1." );
       con_print( "  Change partition type" );
@@ -1257,10 +1263,12 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
     Color_Print_At(44,15,"4.");
     con_print("  Reserved for future use.");
 */
-      Print_At( 4, 17, "Enter choice: " );
+      /* NLS:Enter choice: */
+      Print_At( 4, 17, svarlang_str( 9, 1 ) );
+      con_print("  ");
 
       flags.esc = FALSE;
-      input = (int)Input( 1, 19, 17, NUM, 1, 3, ESCC, -1, 0, '\0', '\0' );
+      input = (int)Input( 1, -1, -1, NUM, 1, 3, ESCC, -1, 0, '\0', '\0' );
       if ( flags.esc == TRUE ) {
          input = 99;
          finished = TRUE;
@@ -1327,8 +1335,9 @@ void Modify_Primary_Partition_Information( int partition_number )
 
       Determine_Drive_Letters();
 
-      Print_At( 4, 6, "Current fixed disk drive: " );
-      Color_Printf( "%d", ( flags.drive_number - 127 ) );
+      /* NLS:Current fixed disk drive: */
+      Print_At( 4, 6, svarlang_str( 9, 0 ) );
+      Color_Printf( " %d", ( flags.drive_number - 127 ) );
 
       Print_At(
          4, 8,
@@ -1377,7 +1386,8 @@ void Modify_Primary_Partition_Information( int partition_number )
       /* Ending Cylinder */
       Print_At( 69, 9, "%6lu", pDrive->pri_part[partition_number].end_cyl );
 
-      Print_At( 4, 12, "Choose one of the following:" );
+      /* NLS:"Choose one of the following: */
+      Print_At( 4, 8, svarlang_str( 9, 2 ) );
 
       Color_Print_At( 4, 14, "1." );
       con_print( "  Change partition type" );
@@ -1388,10 +1398,12 @@ void Modify_Primary_Partition_Information( int partition_number )
       Color_Print_At( 44, 15, "4." );
       con_print( "  Remove active status" );
 
-      Print_At( 4, 17, "Enter choice: " );
+      /* NLS:Enter choice: */
+      Print_At( 4, 17, svarlang_str( 9, 1 ) );
+      con_print("  ");
 
       flags.esc = FALSE;
-      input = (int)Input( 1, 19, 17, NUM, 1, 4, ESCC, -1, 0, '\0', '\0' );
+      input = (int)Input( 1, -1, -1, NUM, 1, 4, ESCC, -1, 0, '\0', '\0' );
       if ( flags.esc == TRUE ) {
          input = 99;
          finished = TRUE;

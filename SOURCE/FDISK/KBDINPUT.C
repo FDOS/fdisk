@@ -154,23 +154,25 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
    /* Display the return message */
    if ( ( return_message == ESCR ) || ( return_message == ESCE ) ||
         ( return_message == ESCC ) ) {
-      Print_At( 4, 24, "                                                 " );
-      Print_At(4, 24, "Press");
-      Color_Print( " Esc " );
-      con_print("to");
-      con_print( " " );
+      con_set_cursor_xy( 5, 25 );
+      con_clreol();
+      /* NLS:Press ESC to */
+      con_print( svarlang_str( 250, 5 ) );
    }
 
    if ( return_message == ESCR ) {
-      con_print("return to FDISK options");
+      /* NLS:return to FDISK options */
+      con_print( svarlang_str( 250, 6 ) );
    }
 
    if ( return_message == ESCE ) {
-      con_print("exit FDISK");
+      /* NLS:exit FDISK */
+      con_print( svarlang_str( 250, 7 ) );
    }
 
    if ( return_message == ESCC ) {
-      con_print("continue");
+      /* NLS:continue */
+      con_print( svarlang_str( 250, 8) );
    }
 
    /* Set the default value for NUM type, if applicable */
@@ -244,14 +246,14 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
 
       /* Clear error messages from screen */
       if ( type != YN ) {
-         Print_At(
-            4, 22,
-            "                                                              " );
+         con_set_cursor_xy( 5, 23 );
+         con_clreol();
       }
 
-      Print_At( 4, 23,
-                "                                                    " );
-      Position_Cursor( 4, 24 );
+      con_set_cursor_xy( 5, 24 );
+      con_clreol();
+      con_set_cursor_xy( 5, 25 );
+
 
       /* Esc key has been hit */
       if ( input == 27 ) {

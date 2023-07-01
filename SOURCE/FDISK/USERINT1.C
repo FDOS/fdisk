@@ -259,8 +259,9 @@ void Interactive_User_Interface( void )
                Print_Centered( 4, "Create Extended DOS Partition", BOLD );
             }
 
-            Print_At( 4, 6, "Current fixed disk drive: " );
-            Color_Printf( "%d", ( flags.drive_number - 127 ) );
+            /* NLS:Current fixed disk drive: */
+            Print_At( 4, 6, svarlang_str( 9, 0 ) );
+            Color_Printf( " %d", ( flags.drive_number - 127 ) );
 
             Display_Primary_Partition_Information_SS();
 
@@ -279,8 +280,10 @@ void Interactive_User_Interface( void )
             Clear_Screen( 0 );
 
             Print_Centered( 4, "Create Extended DOS Partition", BOLD );
-            Print_At( 4, 6, "Current fixed disk drive: " );
-            Color_Printf( "%d", ( flags.drive_number - 127 ) );
+
+            /* NLS:Current fixed disk drive: */
+            Print_At( 4, 6, svarlang_str( 9, 0 ) );
+            Color_Printf( " %d", ( flags.drive_number - 127 ) );
 
             Display_Primary_Partition_Information_SS();
 
@@ -562,9 +565,9 @@ int Standard_Menu( int menu )
       /* Display Menu Title(s) */
       Print_Centered(4, title, BOLD);
 
-      /* Display Current Drive Number */
-      Print_At( 4, 6, "Current fixed disk drive: " );
-      Color_Printf( "%d", ( flags.drive_number - 127 ) );
+      /* NLS:Current fixed disk drive: */
+      Print_At( 4, 6, svarlang_str( 9, 0 ) );
+      Color_Printf( " %d", ( flags.drive_number - 127 ) );
 
       if ( part_table[flags.drive_number - 128].usable ) {
          Color_Printf( "   %lu",
@@ -598,7 +601,8 @@ int Standard_Menu( int menu )
       }
 
       /* Display Menu */
-      Print_At( 4, 8, "Choose one of the following:" );
+      /* NLS:"Choose one of the following: */
+      Print_At( 4, 8, svarlang_str( 9, 2 ) );
 
       if ( minimum_option <= 1 ) {
          Color_Print_At( 4, 10, "1.  " );
@@ -664,16 +668,17 @@ int Standard_Menu( int menu )
          Print_At( 4, 22, "a partition is set active" );
       }
 
-      /* Get input from user */
-      Print_At( 4, 17, "Enter choice: " );
+      /* NLS:Enter choice: */
+      Print_At( 4, 17, svarlang_str( 9, 1 ) );
+      con_print("  ");
 
       if ( menu == MM ) {
-         input = (int)Input( 1, 19, 17, NUM, minimum_option,
+         input = (int)Input( 1, -1, -1, NUM, minimum_option,
                              maximum_number_of_options, ESCE, 1, 0,
                              optional_char_1, optional_char_2 );
       }
       else {
-         input = (int)Input( 1, 19, 17, NUM, 1, maximum_number_of_options,
+         input = (int)Input( 1, -1, -1, NUM, 1, maximum_number_of_options,
                              ESCR, -1, 0, '\0', '\0' );
       }
 
