@@ -156,23 +156,21 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
         ( return_message == ESCC ) ) {
       con_set_cursor_xy( 5, 25 );
       con_clreol();
-      /* NLS:Press ESC to */
-      con_print( svarlang_str( 250, 5 ) );
    }
 
    if ( return_message == ESCR ) {
       /* NLS:return to FDISK options */
-      con_print( svarlang_str( 250, 6 ) );
+      con_print( svarlang_str( 250, 5 ) );
    }
 
    if ( return_message == ESCE ) {
       /* NLS:exit FDISK */
-      con_print( svarlang_str( 250, 7 ) );
+      con_print( svarlang_str( 250, 6 ) );
    }
 
    if ( return_message == ESCC ) {
       /* NLS:continue */
-      con_print( svarlang_str( 250, 8) );
+      con_print( svarlang_str( 250, 7) );
    }
 
    /* Set the default value for NUM type, if applicable */

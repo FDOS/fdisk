@@ -222,10 +222,10 @@
 250.2:Invalid entry, please enter Y-N
 250.3:Press any key to continue
 250.4:ERROR
-250.5:Press \e[2mESC\e[22m to
-250.6: return to FDISK options
-250.7: exit FDISK
-250.8: continue
+250.5:Press \e[1mESC\e[22m to return to FDISK options
+250.6:Press \e[1mESC\e[22m to exit FDISK
+250.7:Press \e[1mESC\e[22m to continue
+
 
 ##############################################################################
 # ERROR MESSAGES                                                             #

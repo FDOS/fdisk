@@ -221,10 +221,9 @@
 250.2:Ungültige Eingabe, bitte J oder N angeben
 250.3:Zum Fortfahren Taste drücken . . .
 250.4:FEHLER
-250.5:Drücken Sie \e[1mESC\e[22m
-250.6:, um zu den FDISK Optionen zurückzukehren
-250.7:, um FDISK zu beenden
-250.8: zum Fortfahren
+250.5:Drücken Sie \e[1mESC\e[22m, um zu den FDISK Optionen zurückzukehren
+250.6:Drücken Sie \e[1mESC\e[22m, um FDISK zu beenden
+250.7:Drücken Sie \e[1mESC\e[22m, um Fortzufahren
 
 
 ##############################################################################
