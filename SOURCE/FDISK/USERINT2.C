@@ -1175,7 +1175,7 @@ void List_Partition_Types( void )
          Color_Print( "Any Key" );
          con_print( " to continue" );
 
-         get_keypress();
+         con_readkey();
       }
 
       row++;

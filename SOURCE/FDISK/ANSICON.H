@@ -159,6 +159,9 @@ int con_is_tty( void );
 unsigned con_get_width( void );
 unsigned con_get_height( void );
 
+/* keyboard functions */
+int con_readkey( void );
+
 /* Display output routines. The functions interpret ANSI escape sequences
  * if enabled via con_init(). */
 void con_putc( char c ); 

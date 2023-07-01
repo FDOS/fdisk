@@ -134,7 +134,7 @@ void Exit_Screen( void )
          Print_At(4, 15, svarlang_str(2,3)); /* Press key when ready... */
 
          /* Wait for a keypress. */
-         get_keypress();
+         con_readkey();
 
          Reboot_PC();
       }

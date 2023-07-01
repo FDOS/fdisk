@@ -14,28 +14,6 @@
 #include "userint0.h"
 
 
-
-/* waits for a key press and returns it.
- * extended keys are returned ORed with 0x100 */
-int get_keypress(void) {
-  unsigned char inkey = 0;
-  int extflag = 0;
-
-  asm {
-    mov ah, 7  /* direct character input, without echo */
-    int 0x21
-    or inkey, al
-    jnz amgood  /* AL=0 means "extended key" */
-    mov extflag, 0x100
-    int 0x21    /* extended keypress -> call input again to get the scancode */
-    mov inkey, al
-    amgood:
-  }
-
-  return(extflag | inkey);
-}
-
-
 int IsRecognizedFatPartition( unsigned partitiontype )
 {
    switch ( partitiontype ) {
@@ -71,7 +49,7 @@ void Pause( void )
    con_print(svarlang_str(250,3));
 
    /* wait for keypress */
-   get_keypress();
+   con_readkey();
 
    con_cr();
    con_clreol();

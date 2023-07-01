@@ -226,7 +226,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       }
 
       /* Obtain keypress from keyboard */
-      input = get_keypress();
+      input = con_readkey();
 
       /* Zero the default value if type==NUMP, the enter, esc, or backspace key */
       /* has not been pressed, and the default value is pre-entered. */

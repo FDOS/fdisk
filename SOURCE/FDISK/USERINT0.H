@@ -3,7 +3,6 @@
 #ifndef USERINT3_H
 #define USERINT3_H
 
-int get_keypress(void);
 void Display_Information( void );
 void Dump_Partition_Information( void );
 void Display_CL_Partition_Table( void );

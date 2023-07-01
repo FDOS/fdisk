@@ -234,6 +234,21 @@ static void con_advance_cursor( void )
 	con_set_cursor_xy( x, y );
 }
 
+/* waits for a key press and returns it.
+ * extended keys are returned ORed with 0x100 */
+int con_readkey( void )
+{
+	union REGPACK r;
+
+	r.h.ah = 7;
+	intr( 0x21, &r );
+	if ( r.h.al > 0 ) return r.h.al;
+
+	r.h.ah = 7;
+	intr( 0x21, &r );
+	return 0x100 | r.h.al;
+}
+
 void con_nl( void )
 {
 	int x, y;
