@@ -275,9 +275,9 @@ static void _con_putc_plain( char c )
 	int i, n;
 
 	if ( con_is_device ) {
-		if ( c >= 0x20 ) {
+		if ( (unsigned char)c >= 0x20 ) {
 			/* handle printable characters */
-			v = ( con_textattr << 8 ) | c;
+			v = ( con_textattr << 8 ) | (unsigned char)c;
 			vid_mem[(con_cury-1) * con_width + (con_curx-1)] = v;
 
 			con_advance_cursor();
