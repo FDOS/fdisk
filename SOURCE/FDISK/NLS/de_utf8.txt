@@ -159,6 +159,51 @@
 
 
 ##############################################################################
+# CMD.C                                                                      #
+##############################################################################
+
+8.0:\nSyntaxfehler\n\nProgramm abgebrochen.\n
+8.1:\nFehler beim Löschen des Flags.\n
+8.2:\nFlag %d wurde zurückgesetzt.\n
+8.3:\nUngültige Partitionsgröße angegeben.\n
+8.4:\nErweiterte Partition existiert bereits.\n
+8.5:\nFehler beim Erstellen der erweiterten Partition.\n
+8.7:\nKeine nutzbare erweiterte Partition gefunden.\n
+8.8:\nFehler beim Erstellen der logischen Partition.\n
+8.10:\nFehler beim Erstellen der primären Partition.\n
+8.11:\nNummer der primären Partition # (%ld) muss zwischen 1 und 4 liegen.\n
+8.12:\nKeine Partition zum Löschen gefunden.\n
+8.13:\n%d primäre Partition(en) gefunden, bitte Paritionsnummer angeben.\n
+8.14:\nFehler beim Löschen der primären Partition.\n
+8.15:\nFehler beim Löschen der erweiterten Partition.\n
+8.16:\nNummer der logischen Partition %d ist ungültig.\n
+8.17:\nPartitionsnummer ist ungültig.\n
+8.18:\nUngültiges Argument für Löschkommando.\n
+8.19:\nFehler beim Löschen der logischen Partition.\n
+8.20:\nPartitionstyp der neu anzulegenden Partition ist ungültig.\n
+8.21:\nFehler beim Ändern des Partitionstyps.\n
+8.22:\nPartitionsnummer der Quellpartition ist ungültig.\n
+8.23:\nPartitionsnummer der Zielpartition ist ungültig.\n
+8.24:\nFehler beim Verschieben des Partitionsslots.\n
+8.25:\nUngültige Flag Nummer.\n
+8.26:\nFlag Wert ist ungültig.\n
+8.27:\nFehler beim setzen von Flag.\n
+8.28:\nFlag %d wurde gesetzt auf %d.\n
+8.29:Fixed Disk Drive Status
+8.30:\nFehler beim Vertauschen der Partitionen.\n
+8.31:\nFlag %d ist gesetzt auf %d.\n
+8.32:\nFlag %d ist nicht gesetzt auf %d.\n
+8.34:\n<%s> muss eine Ziffer sein; Abbruch\n
+8.35:\nmehr als ein Laufwerk angegeben; Abbruch\n
+8.36:\n<%s> muss mit  '-' oder '/' anfangen; Abbruch\n
+8.37:\n<%s> ':' erwartet; Abbruch\n
+8.38:\n<%s> ',' erwartet; Abbruch\n
+8.39:\n<%s> Ende der Zeichenkette erwartet; Abbruch\n
+8.40:\nUngültige Laufwerksangabe.\n
+8.41:\nAlle Flags wurden zurückgesetzt.\n
+
+
+##############################################################################
 # GLOBAL STRINGS                                                             #
 ##############################################################################
 

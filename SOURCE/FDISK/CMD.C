@@ -1,29 +1,3 @@
-/*
-CATS message store for cmd.c:
-
-$set 2
-1 Syntax Error
-2 Program Terminated
-3 All flags have been cleared
-4 Flag
-5 has been cleared
-6 Invalid partition size specified
-7 Primary DOS Partition not found
-8 Extended DOS Partition not found
-9 Logical drive number is out of range
-10 Partition number is out of range
-11 New partition type is out of range
-12 Source partition number is out of range
-13 Destination partition number is out of range
-14 Invalid flag number
-15 Flag value is out of range
-16 Fixed Disk Drive Status
-17 Source partition number is out of range
-18 Destination partition number is out of range
-19 Invalid drive designation
-20 no partition deleted
-*/
-
 #include <conio.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -39,6 +13,7 @@ $set 2
 #include "userint0.h"
 #include "ansicon.h"
 #include "printf.h"
+#include "svarlang\svarlang.h"
 
 #ifndef FDISKLITE
 #include "userint1.h"
@@ -51,7 +26,8 @@ void Command_Line_Clear_Flag( void )
    int option_count = 1;
 
    if ( ( 0 == strcmp( arg[1].choice, "ALL" ) ) && ( arg[0].value != 0 ) ) {
-      con_print( "\nSyntax Error\n\nProgram Terminated\n" );
+      /* NLS:Syntax Error\n\nProgram Terminated */
+      con_print( svarlang_str( 8, 0 ) );
       exit( 1 );
    }
 
@@ -66,17 +42,18 @@ void Command_Line_Clear_Flag( void )
          index++;
       } while ( index <= 64 );
 
-      con_print("\nAll flags have been cleared.\n");
+      /* NLS:All flags have been cleared. */
+      con_print( svarlang_str( 8, 41 ) );
    }
    else {
       if ( Clear_Flag( (int)arg[0].value ) != 0 ) {
-         con_print( "\nError clearing flag.\n" );
+         /* NLS:Error clearing flag. */
+         con_print( svarlang_str( 8, 1 ) );
          exit( 9 );
       }
 
-      con_print("\nFlag");
-      con_printf( " %d ", arg[0].value );
-      con_print("has been cleared.\n" );
+      /* NLS:Flag %d has been cleared */
+      con_printf( svarlang_str( 8, 2 ), arg[0].value );
    }
 
    Shift_Command_Line_Options( option_count );
@@ -92,12 +69,14 @@ void Command_Line_Create_Extended_Partition( void )
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    if ( arg[0].value == 0 ) {
-      con_print( "\nInvalid partition size specifed.\n" );
+      /* NLS:Invalid partition size specifed. */
+      con_print( svarlang_str( 8, 3 ) );
       exit( 9 );
    }
 
    if ( pDrive->ptr_ext_part ) {
-      con_print( "\nExtended partition already exists.\n" );
+      /* NLS:Extended partition already exists. */
+      con_print( svarlang_str( 8, 4 ) );
       exit( 9 );
    }
 
@@ -130,7 +109,8 @@ void Command_Line_Create_Extended_Partition( void )
    error_code = Create_Primary_Partition( 5, arg[0].value );
 
    if ( error_code == 99 ) {
-      con_print( "\nError creating extended partition.\n" );
+      /* NLS:Error creating extended partition.*/
+      con_print( svarlang_str( 8, 5 ) );
       exit( 9 );
    }
 
@@ -148,13 +128,14 @@ void Command_Line_Create_Logical_DOS_Drive( void )
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    if ( arg[0].value == 0 ) {
-      con_print( "\nInvalid partition size specifed.\n" );
-
+      /* NLS:Invalid partition size specifed. */
+      con_print( svarlang_str( 8, 3 ) );
       exit( 9 );
    }
 
    if ( !pDrive->ext_usable ) {
-      con_print( "\nNo usable extended partition found.\n" );
+      /* NLS:No usable extended partition found. */
+      con_print( svarlang_str( 8, 7 ) );
       exit( 9 );
    }
 
@@ -198,7 +179,8 @@ void Command_Line_Create_Logical_DOS_Drive( void )
    }
 
    if ( error_code == 99 ) {
-      con_print( "\nError creating logical drive.\n" );
+      /* NLS:Error creating logical drive. */
+      con_print( svarlang_str( 8, 8 ) );
       exit( 9 );
    }
 
@@ -217,7 +199,8 @@ void Command_Line_Create_Primary_Partition( void )
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    if ( arg[0].value == 0 ) {
-      con_print( "\nInvalid partition size specifed.\n" );
+      /* NLS:Invalid partition size specified. */
+      con_print( svarlang_str( 8, 3 ) );
       exit( 9 );
    }
 
@@ -258,7 +241,8 @@ void Command_Line_Create_Primary_Partition( void )
 
    part_no = Create_Primary_Partition( part_type, arg[0].value );
    if ( part_no == 99 ) {
-      con_print( "\nError creating primary partition.\n" );
+      /* NLS:Error creating primary partition. */
+      con_print( svarlang_str( 8, 10 ) );
       exit( 9 );
    }
    Set_Active_Partition_If_None_Is_Active( part_no );
@@ -277,8 +261,8 @@ void Command_Line_Delete( void )
       if ( arg[1].value != 0 ) /* specified what to delete */
       {
          if ( arg[1].value < 1 || arg[1].value > 4 ) {
-            con_printf( "primary partition # (%ld) must be 1..4.\n",
-                    (long)arg[1].value );
+            /* NLS:primary partition # (%ld) must be 1..4. */
+            con_printf( svarlang_str( 8, 11 ), (long)arg[1].value );
             exit( 9 );
          }
 
@@ -295,12 +279,12 @@ void Command_Line_Delete( void )
             }
          }
          if ( count == 0 ) {
-            con_print( "No partition to delete found.\n" ); /* but continue */
+            /* NLS:No partition to delete found. */
+            con_print( svarlang_str( 8, 12 ) ); /* but continue */
          }
          else if ( count > 1 ) {
-            con_printf(
-               "%d primary partitions found, you must specify number to delete.\n",
-               count );
+            /* NLS:%d primary partitions found, you must specify number... */
+            con_printf( svarlang_str( 8, 13 ), count );
             exit( 9 );
          }
          else {
@@ -308,7 +292,8 @@ void Command_Line_Delete( void )
          }
       }
       if ( error_code == 99 ) {
-         con_printf( "\nError deleting primary partition.\n" );
+         /* NLS:Error deleting primary partition. */
+         con_printf( svarlang_str( 8, 14 ) );
          exit( 9 );
       }
    } /* end PRI */
@@ -318,7 +303,8 @@ void Command_Line_Delete( void )
       error_code = Delete_Extended_Partition();
 
       if ( error_code == 99 ) {
-         con_print( "\nError deleting extended partition.\n" );
+         /* NLS:Error deleting extended partition. */
+         con_print( svarlang_str( 8, 15 ) );
          exit( 9 );
       }
    }
@@ -329,8 +315,8 @@ void Command_Line_Delete( void )
          error_code = Delete_Logical_Drive( (int)( arg[1].value - 1 ) );
       }
       else {
-         con_printf( "\nLogical drive number %d is out of range.\n",
-                 arg[1].value );
+         /* NLS:Logical drive number %d is out of range. */
+         con_printf( svarlang_str( 8, 16 ), arg[1].value );
          exit( 9 );
       }
    }
@@ -344,18 +330,21 @@ void Command_Line_Delete( void )
          error_code = Delete_Logical_Drive( (int)( arg[1].value - 5 ) );
       }
       else {
-         con_print( "\nPartition number is out of range.\n" );
+         /* NLS:Partition number is out of range. */
+         con_print( svarlang_str( 8, 17 ) );
          exit( 9 );
       }
    }
 
    else {
-      con_print( "\nInvalid delete argument.\n" );
+      /* NLS:Invalid delete argument. */
+      con_print( svarlang_str( 8, 18 ) );
       exit( 9 );
    }
 
    if ( error_code != 0 ) {
-      con_print( "\nError deleting logical drive.\n" );
+      /* NLS:Error deleting logical drive. */
+      con_print( svarlang_str( 8, 19 ) );
       exit( 9 );
    }
 
@@ -384,13 +373,15 @@ void Command_Line_Modify( void )
 {
 
    if ( ( arg[0].extra_value == 0 ) || ( arg[0].extra_value > 255 ) ) {
-      con_print( "\nNew partition type is out of range.\n" );
+      /* NLS:New partition type is out of range. */
+      con_print( svarlang_str( 8, 20 ) );
       exit( 9 );
    }
 
    if ( Modify_Partition_Type( (int)( arg[0].value - 1 ),
                                arg[0].extra_value ) != 0 ) {
-      con_print( "\nError modifying partition type.\n" );
+      /* NLS:Error modifying partition type. */
+      con_print( svarlang_str( 8, 21 ) );
       exit( 9 );
    }
 
@@ -401,18 +392,21 @@ void Command_Line_Modify( void )
 void Command_Line_Move( void )
 {
    if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
-      con_print( "\nSource partition number is out of range.\n" );
+      /* NLS:Source partition number is out of range. */
+      con_print( svarlang_str( 8, 22 ) );
       exit( 9 );
    }
 
    if ( ( arg[0].extra_value < 1 ) || ( arg[0].extra_value > 4 ) ) {
-      con_print( "\nDestination partition number is out of range.\n" );
+      /* NLS:Destination partition number is out of range. */
+      con_print( svarlang_str( 8, 23 ) );
       exit( 9 );
    }
 
    if ( Primary_Partition_Slot_Transfer( MOVE, (int)arg[0].value,
                                          arg[0].extra_value ) != 0 ) {
-      con_print( "\nError moving partition slot.\n" );
+      /* NLS:Error moving partition slot. */
+      con_print( svarlang_str( 8, 24 ) );
       exit( 9 );
    }
 
@@ -423,7 +417,8 @@ void Command_Line_Move( void )
 void Command_Line_Set_Flag( void )
 {
    if ( ( arg[0].value < 1 ) || ( arg[0].value > 64 ) ) {
-      con_print( "\nInvalid flag number.\n" );
+      /* NLS:Invalid flag number. */
+      con_print( svarlang_str( 8, 25 ) );
       exit( 9 );
    }
 
@@ -432,17 +427,19 @@ void Command_Line_Set_Flag( void )
    }
 
    if ( ( arg[0].extra_value < 1 ) || ( arg[0].extra_value > 64 ) ) {
-      con_print( "\nFlag value is out of range.\n" );
+      /* NLS:Flag value is out of range. */
+      con_print( svarlang_str( 8, 26 ) );
       exit( 9 );
    }
 
    if ( Set_Flag( (int)arg[0].value, arg[0].extra_value ) != 0 ) {
-      con_print( "\nError setting flag.\n" );
+      /* NLS:Error setting flag. */
+      con_print( svarlang_str( 8, 27 ) );
       exit( 9 );
    }
 
-   con_printf( "\nFlag %d has been set to ", arg[0].value );
-   con_printf( "%d.\n", arg[0].extra_value );
+   /* NLS:Flag %d has been set to %d. */
+   con_printf( svarlang_str( 8, 28 ), arg[0].value, arg[0].extra_value );
 
    Shift_Command_Line_Options( 1 );
 }
@@ -452,7 +449,8 @@ void Command_Line_Status( void )
 {
    flags.monochrome = TRUE;
    con_clrscr();
-   Print_Centered( 1, "Fixed Disk Drive Status", 0 );
+   /* NLS:Fixed Disk Drive Status */
+   Print_Centered( 1, svarlang_str( 8, 29 ), 0 );
    Display_All_Drives();
 
    Shift_Command_Line_Options( 1 );
@@ -462,18 +460,21 @@ void Command_Line_Status( void )
 void Command_Line_Swap( void )
 {
    if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
-      con_print( "\nSource partition number is out of range.\n" );
+      /* NLS:Source partition number is out of range. */
+      con_print( svarlang_str( 8, 22 ) );
       exit( 9 );
    }
 
    if ( ( arg[0].extra_value < 1 ) || ( arg[0].extra_value > 4 ) ) {
-      con_print( "\nDestination partition number is out of range.\n" );
+      /* NLS:Destination partition number is out of range. */
+      con_print( svarlang_str( 8, 23 ) );
       exit( 9 );
    }
 
    if ( Primary_Partition_Slot_Transfer( SWAP, (int)arg[0].value,
                                          arg[0].extra_value ) != 0 ) {
-      con_print( "\nError swapping partitions.\n" );
+      /* NLS:Error swapping partitions. */
+      con_print( svarlang_str( 8, 30 ) );
       exit( 9 );
    }
 
@@ -492,15 +493,13 @@ void Command_Line_Test_Flag( void )
       /* The error level returned will be 20 for false and 21 for true.    */
 
       if ( flag == arg[0].extra_value ) {
-         con_printf( "\nFlag %d is set to ", arg[0].value );
-         con_printf( "%d.\n", arg[0].extra_value );
-
+         /* NLS:Flag %d is set to %d. */
+         con_printf( svarlang_str( 8, 31 ), arg[0].value, arg[0].extra_value );
          exit( 21 );
       }
       else {
-         con_printf( "\nFlag %d is not set to ", arg[0].value );
-         con_printf( "%d.\n", arg[0].extra_value );
-
+         /* NLS:Flag %d is not set to %d. */
+         con_printf( svarlang_str( 8, 32 ), arg[0].value, arg[0].extra_value );
          exit( 20 );
       }
    }
@@ -509,9 +508,7 @@ void Command_Line_Test_Flag( void )
       /* the flag is set to.  The error level returned will be the value  */
       /* of the flag + 30.                                                */
 
-      con_printf( "\nFlag %d is set to ", arg[0].value );
-      con_printf( "%d.\n", flag );
-
+      con_printf( svarlang_str( 8, 31 ), arg[0].value, flag );
       exit( ( 30 + flag ) );
    }
 }
@@ -534,7 +531,8 @@ void Command_Line_X( void )
    } while ( index < MAX_DISKS );
 
    if ( Read_Partition_Tables() != 0 ) {
-      con_print( ESC_BOLD_ON "\n    Error reading partition tables.\n" ESC_BOLD_OFF );
+      /* NLS:Error reading partition tables. */
+      con_print( svarlang_str( 255, 0 ) );
       exit( 1 );
    }
    /*if ( flags.maximum_drive_number == 0 ) {
@@ -573,7 +571,8 @@ int Get_Options( char *argv[], int argc )
 
       if ( 1 == strlen( argptr ) ) {
          if ( !isdigit( *argptr ) ) {
-            con_printf( "<%s> should be a digit; terminated\n", argptr );
+            /* NLS:<%s> should be a digit; terminated */
+            con_printf( svarlang_str( 8, 34 ), argptr );
             exit( 9 );
          }
 
@@ -583,7 +582,8 @@ int Get_Options( char *argv[], int argc )
 
          }
          else if ( flags.drive_number != ( argptr[0] - '0' ) + 127 ) {
-            con_print( "more than one drive specified; terminated\n" );
+            /* NLS:more than one drive specified; terminated */
+            con_print( svarlang_str( 8, 35 ) );
             exit( 9 );
          }
          number_of_options--;
@@ -591,7 +591,8 @@ int Get_Options( char *argv[], int argc )
       }
 
       if ( *argptr != '-' && *argptr != '/' ) {
-         con_printf( "<%s> should start with '-' or '/'; terminated\n", argptr );
+         /* NLS:<%s> should start with '-' or '/'; terminated */
+         con_printf( svarlang_str( 8, 36 ), argptr );
          exit( 9 );
       }
 
@@ -615,7 +616,8 @@ int Get_Options( char *argv[], int argc )
       }
 
       if ( *argptr != ':' ) {
-         con_printf( "<%s> ':' expected; terminated\n", argptr );
+         /* NLS:<%s> ':' expected; terminated */
+         con_printf( svarlang_str( 8, 37 ), argptr );
          exit( 9 );
       }
 
@@ -633,7 +635,8 @@ int Get_Options( char *argv[], int argc )
          }
 
          if ( *argptr != ',' ) {
-            con_printf( "<%s> ',' expected; terminated\n", argptr );
+            /* NLS:<%s> ',' expected; terminated */
+            con_printf( svarlang_str( 8, 38 ), argptr );
             exit( 9 );
          }
 
@@ -655,7 +658,8 @@ int Get_Options( char *argv[], int argc )
 
       if ( *argptr != 0 ) /* done */
       {
-         con_printf( "<%s> expected end of string; terminated\n", argptr );
+         svarlang_str( 8, 39 );
+         con_printf( svarlang_str( 8, 39 ), argptr );
          exit( 9 );
       }
    }
@@ -663,7 +667,8 @@ int Get_Options( char *argv[], int argc )
    /* check to make sure the drive is a legitimate number */
    if ( ( flags.drive_number < 0x80 ) ||
         ( flags.drive_number > flags.maximum_drive_number ) ) {
-      con_print( "\nInvalid drive designation.\n" );
+      /* NLS:Invalid drive designation. */
+      con_print( svarlang_str( 8, 40 ) );
       exit( 5 );
    }
 

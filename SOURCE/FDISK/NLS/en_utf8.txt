@@ -123,6 +123,7 @@
 4.2:Create Extended DOS Partition
 4.3:Create Logical DOS Drive(s) in the Extended DOS Partition
 
+
 ##############################################################################
 # DELETE PARTITION MENU                                                      #
 ##############################################################################
@@ -156,6 +157,52 @@
 7.4:\nError reading sector.\n
 7.5:\nSector flagging functions have been disabled.\n
 7.6:Creating Drive Smart MBR for disk %d\n
+
+
+##############################################################################
+# CMD.C                                                                      #
+##############################################################################
+
+8.0:\nSyntax Error\n\nProgram Terminated\n
+8.1:\nError clearing flag.\n
+8.2:\nFlag %d has been cleared.\n
+8.3:\nInvalid partition size specified.\n
+8.4:\nExtended partition already exists.\n
+8.5:\nError creating extended partition.\n
+8.7:\nNo usable extended partition found.\n
+8.8:\nError creating logical drive.\n
+8.10:\nError creating primary partition.\n
+8.11:\nprimary partition # (%ld) must be 1..4.\n
+8.12:\nNo partition to delete found.\n
+8.13:\n%d primary partitions found, you must specify number to delete.\n
+8.14:\nError deleting primary partition.\n
+8.15:\nError deleting extended partition.\n
+8.16:\nLogical drive number %d is out of range.\n
+8.17:\nPartition number is out of range.\n
+8.18:\nInvalid delete argument.\n
+8.19:\nError deleting logical drive.\n
+8.20:\nNew partition type is out of range.\n
+8.21:\nError modifying partition type.\n
+8.22:\nSource partition number is out of range.\n
+8.23:\nDestination partition number is out of range.\n
+8.24:\nError moving partition slot.\n
+8.25:\nInvalid flag number.\n
+8.26:\nFlag value is out of range.\n
+8.27:\nError setting flag.\n
+8.28:\nFlag %d has been set to %d.\n
+8.29:Fixed Disk Drive Status
+8.30:\nError swapping partitions.\n
+8.31:\nFlag %d is set to %d.\n
+8.32:\nFlag %d is not set to %d.\n
+8.34:\n<%s> should be a digit; terminated\n
+8.35:\nmore than one drive specified; terminated\n
+8.36:\n<%s> should start with '-' or '/'; terminated\n
+8.37:\n<%s> ':' expected; terminated\n
+8.38:\n<%s> ',' expected; terminated\n
+8.39:\n<%s> expected end of string; terminated\n
+8.40:\nInvalid drive designation.\n
+8.41:\nAll flags have been cleared.\n
+
 
 ##############################################################################
 # GLOBAL STRINGS                                                             #
