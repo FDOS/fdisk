@@ -13,7 +13,6 @@
 /////////////////////////////////////////////////////////////////////////////
 */
 
-#include <io.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -42,7 +41,7 @@ void Display_Help_Screen( void )
    unsigned char linestopause;
    unsigned char screenh = con_get_height();
 
-   if ( !isatty( fileno( stdout ) ) ) {
+   if ( !con_is_tty() ) {
       flags.do_not_pause_help_information = TRUE;
    }
 
