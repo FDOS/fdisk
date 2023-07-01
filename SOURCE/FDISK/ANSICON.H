@@ -153,6 +153,7 @@ extern int con_error;
  * interpret_esc = 0 : interpretation of escape sequences disabled
  * interpret_esc = 1 : interpretation of escape sequences enabled */
 void con_init( int interpret_esc );
+int con_is_tty( void );
 
 /* Return screen dimensions */
 unsigned con_get_width( void );

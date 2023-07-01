@@ -123,6 +123,11 @@ void con_disable_cursor_sync( void )
 	cursor_sync_disabled++;
 }
 
+int con_is_tty( void )
+{
+	return con_is_device;
+}
+
 /* function to enable cursor sync */
 void con_enable_cursor_sync( void )
 {
