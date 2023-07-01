@@ -49,6 +49,5 @@ int biosdisk( unsigned function, unsigned drive, unsigned head,
    return error;
 }
 
-#elif defined( __TURBOC__ ) /* BORLANDC */
+#endif
 
-#endif /* __TURBOC__ */

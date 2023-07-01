@@ -15,10 +15,14 @@ int biosdisk( unsigned function, unsigned drive, unsigned head,
               void __far *sector_buffer );
 char *searchpath( char *fn );
 
-#elif defined( __TURBOC__ ) /* Borland / Turbo C */
+#endif /* COMPAT_H */
 
-#define far_memcpy _fmemcpy
+#if defined( __GNUC__ )
+
+#ifndef stricmp
+#define stricmp strcasecmp
+#endif
 
 #endif
 
-#endif /* COMPAT_H */
+#endif

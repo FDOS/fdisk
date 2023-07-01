@@ -1,25 +1,13 @@
-/*
-CATS message store for fdiskio.c:
-
-$set 3
-1
-2
-
-
-*/
-
 #define FDISKIO
 
 #include <conio.h>
-#ifndef __WATCOMC__
-#include <dir.h>
-#endif
 #include <dos.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-//#include "bootcode.h"
+#ifdef __GNUC__
+#include <libi86/string.h>
+#endif
 #include "compat.h"
 #include "fdiskio.h"
 #include "main.h"
@@ -27,12 +15,13 @@ $set 3
 #include "pdiskio.h"
 #include "ansicon.h"
 #include "printf.h"
+#include "svarlang\svarlang.h"
 
 
 /* bootloader pointers */
 /*extern char booteasy_code[];*/
 extern char bootnormal_code[];
-extern void cdecl far BootSmart_code();
+extern void __cdecl __far BootSmart_code();
 
 
 /* Automatically partition the selected hard drive */
@@ -53,7 +42,8 @@ int Automatically_Partition_Hard_Drive( void )
              0 ) &&
            ( brief_partition_table[( flags.drive_number - 128 )][index] !=
              18 ) ) {
-         con_print( "\nThe hard drive has already been partitioned.\n" );
+         /* NLS:The hard drive has already been partitioned */
+         con_print( svarlang_str( 7, 0 ) );
          return 99;
       }
 
@@ -140,7 +130,7 @@ int Clear_Partition_Table( void )
 }
 
 /* Create Alternate Master Boot Code */
-int Load_MBR( ipl_only )
+int Load_MBR( int ipl_only )
 {
    FILE *file_pointer;
    char home_path[255];
@@ -177,7 +167,8 @@ int Load_MBR( ipl_only )
    }
 
    if ( !file_pointer ) {
-      con_print( "\nThe \"boot.mbr\" file has not been found.\n" );
+      /* NLS:The "boot.mbr" file has not been found */
+      con_print( svarlang_str( 7, 1 ) );
       return 8;
    }
 
@@ -251,7 +242,8 @@ int Create_BootSmart_IPL( void )
 {
    int error_code;
 
-   con_printf( "Creating Drive Smart MBR for disk %d\n",
+   /* NLS:Creating Drive Smart MBR for disk %d */
+   con_printf( svarlang_str( 7, 6 ),
            flags.drive_number - 0x7F );
 
    error_code = Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
@@ -267,7 +259,7 @@ int Create_BootSmart_IPL( void )
       sector_buffer[0x1ff] = 0xaa;
    }
 
-   far_memcpy( sector_buffer, BootSmart_code, SIZE_OF_IPL );
+   _fmemcpy( sector_buffer, BootSmart_code, SIZE_OF_IPL );
 
    return Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
 }
@@ -381,8 +373,9 @@ void Load_External_Lookup_Table( void )
       index = atoi( character_number );
 
       if ( ( index < 0 ) || ( index > 255 ) ) {
+         /* NLS:Partition type out of range in line %d of "fdiskpt.ini" */
          con_printf(
-            "\nPartition type out of range in line %d of \"fdiskpt.ini\".\n",
+            svarlang_str( 7, 2 ),
             line_counter );
          fclose(file);
          exit( 9 );
@@ -409,8 +402,8 @@ void Load_External_Lookup_Table( void )
 /* Read and process the fdisk.ini file */
 void Process_Fdiskini_File( void )
 {
-   static char *error_str =
-      "Error encountered on line %d of the \"fdisk.ini\" file.\n";
+   /* NLS:Error encountered on line %d of the "fdisk.ini" file. */
+   const char *error_str = svarlang_str( 7, 3 );
    //  char char_number[2];
    char command_buffer[20];
    char home_path[255];
@@ -1232,12 +1225,14 @@ int Test_Flag( int flag_number )
    if ( flags.flag_sector != 0 ) {
       if ( Read_Physical_Sectors( ( flags.drive_number ), 0, 0,
                                   ( flags.flag_sector ), 1 ) != 0 ) {
-         con_print( "\nError reading sector.\n" );
+         /* NLS:Error reading sector. */
+         con_print( svarlang_str( 7, 4 ) );
          exit( 8 );
       }
    }
    else {
-      con_print( "\nSector flagging functions have been disabled.\n" );
+      /* NLS:Sector flagging functions have been disabled. */
+      con_print( svarlang_str( 7, 5 ) );
       exit( 9 );
    }
    return ( sector_buffer[( 446 + flag_number - 1 )] );
