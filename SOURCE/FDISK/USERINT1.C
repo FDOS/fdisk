@@ -102,8 +102,12 @@ void BlinkPrintAt( int column, int row, const char *format, ... )
 
    Position_Cursor( column, row );
 
+   con_set_bold( 1 );
+   con_set_blinking( 1 );
    va_start( arglist, format );
    con_printf( format, arglist );
+   con_set_blinking( 0 );
+   con_set_bold( 0 );
    va_end( arglist );
 }
 

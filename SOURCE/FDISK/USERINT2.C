@@ -652,36 +652,61 @@ void Delete_N_DOS_Partition_Interface( void )
 {
    int input = 0;
    int error_code;
+   int drive = flags.drive_number - 0x80;
+   Partition_Table *pDrive = &part_table[drive];
+   Partition *p;
 
    Clear_Screen( 0 );
-   Print_Centered( 4, "Delete Non-DOS Partition", BOLD );
+   /* NLS:Delete Non-DOS Partition */
+   Print_Centered( 4, svarlang_str( 5, 4 ) , BOLD );
 
    Display_Primary_Partition_Information_SS();
 
-   BlinkPrintAt( 4, 18, "WARNING!" );
+   BlinkPrintAt( 4, 18, svarlang_str( 250, 5 ) );
 
-   con_print( " Data in the deleted Non-DOS Partition will be lost." );
-   Print_At( 4, 19, "What Non-DOS Partition do you want to delete..? " );
+   con_putc( ' ' );
+   /* Data in the deleted Non-DOS Partition will be lost */
+   con_print( svarlang_str( 10, 0 ) );
 
    flags.esc = FALSE;
+   con_print( "  " );
    input =
-      (int)Input( 1, 52, 19, NUM, 1, 4, ESCR, -1, 0, '\0',
+      (int)Input( 1, -1, -1, NUM, 1, 4, ESCR, -1, 0, '\0',
                   '\0' ); /* 4 needs changed to the max num of partitions */
 
    if ( flags.esc == FALSE ) {
-      error_code = Delete_Primary_Partition( input - 1 );
-
       Clear_Screen( 0 );
-      Print_Centered( 4, "Delete Non-DOS Partition", BOLD );
-      Display_Primary_Partition_Information_SS();
+      Print_Centered( 4, svarlang_str( 5, 4 ), BOLD );
 
-      if ( !error_code ) {
-         Color_Print_At( 4, 21, "Non-DOS Partition deleted" );
+      p = &pDrive->pri_part[input - 1];
+
+      if ( p->num_type == 0 ) {
+         /* NLS:Not a partition! */
+         Display_Primary_Partition_Information_SS();
+         Color_Print_At( 4, 21, svarlang_str( 10, 1 ) );         
+      }
+      else if ( Is_Dos_Part( p->num_type ) ) {
+         /* NLS:Refusing to delete DOS partition! */
+         Display_Primary_Partition_Information_SS();
+         Color_Print_At( 4, 21, svarlang_str( 10, 2 ) );
       }
       else {
-         Color_Print_At( 4, 21, "Error deleting Non-DOS Partition!" );
+         error_code = Delete_Primary_Partition( input - 1 );
+   
+         Display_Primary_Partition_Information_SS();
+   
+         if ( !error_code ) {
+            /* NLS:Non-DOS Partition deleted */
+            Color_Print_At( 4, 21, svarlang_str( 10, 3 ) );
+         }
+         else {
+            /* NLS:Error deleting Non-DOS Partition! */
+            Color_Print_At( 4, 21, svarlang_str( 10, 4 ) );
+         }
       }
-      Print_At( 4, 24, "                                    " );
+
+      con_set_cursor_xy( 5, 25 );
+      con_clreol();
 
       Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
@@ -782,7 +807,8 @@ void Display_Extended_Partition_Information_SS( void )
             column_index = 41;
             print_index = 4;
 
-            Print_At( 41, 3, "Drv Volume Label  Mbytes  System  Usage" );
+            /* NLS:Drv Volume Label  Mbytes  System  Usage */
+            Print_At( 41, 3, svarlang_str( 10, 12 ) );
          }
 
          if ( brief_partition_table[( flags.drive_number - 128 )][index] >
@@ -828,20 +854,14 @@ void Display_Extended_Partition_Information_SS( void )
       } while ( index < 27 );
    }
    else {
-      Color_Print_At( 4, 10, "No logical drives defined" );
+      /* NLS:No logical drives defined */
+      Color_Print_At( 4, 10, svarlang_str( 10, 5 ) );
    }
 
-   Print_At( 4, 17, "Total Extended Partition size is " );
+   con_set_cursor_xy( 5, 18 );
+   /* NLS:Total Extended Partition size is [...] */
+   con_printf( svarlang_str( 10, 6 ), part_table[flags.drive_number - 128].ext_size_mb );
 
-   if ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
-        ( flags.version == W98 ) ) {
-      Print_UL_B( part_table[flags.drive_number - 128].ext_size_mb );
-   }
-   else {
-      Color_Printf( "%7lu",
-                    ( part_table[flags.drive_number - 128].ext_size_mb ) );
-   }
-   con_print( " Mbytes (1 Mbyte = 1048576 bytes)" );
 }
 
 /* Display Or Modify Logical Drive Information in the extended partition */
@@ -1017,9 +1037,8 @@ void Display_Primary_Partition_Information_SS( void )
         ( pDrive->pri_part[2].num_type > 0 ) ||
         ( pDrive->pri_part[3].num_type > 0 ) ) {
       if ( flags.extended_options_flag == FALSE ) {
-         Print_At(
-            4, 8,
-            "Partition  Status  Type     Volume Label   Mbytes  System    Usage" );
+         /* NLS:Partition  Status  Type     Volume Label   Mbytes  System    Usage */
+         Print_At( 4, 8, svarlang_str( 10, 10 ) );
 
          for ( index = 0; index < 4; index++ ) {
             if ( pDrive->pri_part[index].num_type > 0 ) {
@@ -1082,9 +1101,8 @@ void Display_Primary_Partition_Information_SS( void )
          } /* while(index<4);*/
       }
       else {
-         Print_At(
-            4, 8,
-            "Partition   Status   Mbytes    Description    Usage  Start Cyl  End Cyl" );
+         /* NLS:Partition   Status   Mbytes    Description    Usage  Start Cyl  End Cyl*/
+         Print_At(4, 8, svarlang_str( 10, 11 ) );
 
          for ( index = 0; index < 4; index++ ) {
             if ( pDrive->pri_part[index].num_type > 0 ) {
@@ -1139,20 +1157,13 @@ void Display_Primary_Partition_Information_SS( void )
       }
    }
    else {
-      Color_Print_At( 4, 21, "No partitions defined" );
+      /* NLS:No partitions defined */
+      Color_Print_At( 4, 21, svarlang_str( 10, 7 ) );
    }
 
-   Print_At( 4, 14, "Total disk space is " );
+   /* NLS:Total disk space is [...] */
+   Print_At( 4, 14, svarlang_str( 10, 8 ), pDrive->disk_size_mb );
 
-   if ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
-        ( flags.version == W98 ) ) {
-      Print_UL_B( pDrive->disk_size_mb );
-   }
-   else {
-      Color_Printf( "%7lu", pDrive->disk_size_mb );
-   }
-
-   con_print( " Mbytes (1 Mbyte = 1048576 bytes)" );
 }
 
 /* List the Partition Types */

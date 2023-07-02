@@ -69,9 +69,9 @@
 0.201:The FreeDOS Community under the terms of the GNU General Public License,
 0.202:version 2.
 0.203:\t
-0.204:This program comes as-is and without warranty of any kind.  The author of
+0.204:This program comes as-is and without warranty of any kind. The author of
 0.205:this software assumes no responsibility pertaining to the use or mis-use of
-0.206:this software.  By using this software, the operator is understood to be
+0.206:this software. By using this software, the operator is understood to be
 0.207:agreeing to the terms of the above.
 
 
@@ -81,9 +81,9 @@
 
 1.0:\e[5;5HFDISK is capable of using large disk support to allow you to
 1.1:    create partitions that are greater than 2,048 MB by using FAT32
-1.2:    partitions.  If you enable large disk support, any partitions or
+1.2:    partitions. If you enable large disk support, any partitions or
 1.3:    logical drives greater than 512 MB will be created using FAT32.
-1.4:    IMPORTANT:  If you enable large disk support, some operating systems
+1.4:    IMPORTANT: If you enable large disk support, some operating systems
 1.5:    will be unable to access the partitions and logical drives that are
 1.6:    over 512 MB in size.
 1.7:\e[5;18HDo you want to use large disk (FAT32) support (Y/N)....?
@@ -241,6 +241,25 @@
 # USERINT2.C                                                                 #
 ##############################################################################
 
+# Delete logical partition
+10.0:Data in the deleted Non-DOS Partition will be lost.\n    What Non-DOS Partition do you want to delete?
+10.1:Not a partition!
+10.2:Refusing to delete DOS partition!
+10.3:Non-DOS Partition deleted.
+10.4:Error deleting Non-DOS Partition!
+
+# Display extended partition
+10.5:No logical drives defined.
+10.6:Total Extended Partition size is %7lu Mbytes (1 Mbyte = 1048576 bytes)
+
+# Display primary partitions
+10.7:No partitions defined.
+10.8:Total disk space is %7lu Mbytes (1 Mbyte = 1048576 bytes)
+
+# Table headers
+10.10:Partition  Status  Type     Volume Label   Mbytes  System    Usage
+10.11:Partition   Status   Mbytes    Description    Usage  Start Cyl  End Cyl
+10.12:Drv Volume Label  Mbytes  System  Usage
 
 ##############################################################################
 # KBDINPUT.C                                                                 #
@@ -267,7 +286,7 @@
 250.2:Invalid entry, please enter Y-N
 250.3:Press any key to continue
 250.4:ERROR
-
+250.5:WARNING!
 
 ##############################################################################
 # ERROR MESSAGES                                                             #
