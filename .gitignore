@@ -1,7 +1,6 @@
 # generated files
 source/fdisk/*.exe
 source/fdisk/bootnorm.bin
-source/fdisk/bootnorm.c
 source/fdisk/fdisk.lng
 source/fdisk/svarlang/*.lib
 
