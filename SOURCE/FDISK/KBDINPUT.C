@@ -160,17 +160,17 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
 
    if ( return_message == ESCR ) {
       /* NLS:return to FDISK options */
-      con_print( svarlang_str( 250, 5 ) );
+      con_print( svarlang_str( 20, 5 ) );
    }
 
    if ( return_message == ESCE ) {
       /* NLS:exit FDISK */
-      con_print( svarlang_str( 250, 6 ) );
+      con_print( svarlang_str( 20, 6 ) );
    }
 
    if ( return_message == ESCC ) {
       /* NLS:continue */
-      con_print( svarlang_str( 250, 7) );
+      con_print( svarlang_str( 20, 7) );
    }
 
    /* Set the default value for NUM type, if applicable */
@@ -309,9 +309,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                data = 0;
                proper_input_given = FALSE;
 
-               Color_Print_At(
-                  4, 22,
-                     "Requested partition size exceeds the maximum available space");
+               /* NLS: Requested partition size exceeds the maximum available space */
+               Color_Print_At( 4, 22, svarlang_str( 20, 8 ) );
 
                /* Set input=0xff to avoid processing this time around */
                input = '\xff';
@@ -354,9 +353,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                data = 0;
                proper_input_given = FALSE;
 
-               Color_Print_At(
-                  4, 22,
-                     "Requested partition size exceeds the maximum available space");
+               Color_Print_At( 4, 22, svarlang_str( 20, 8 ) );
 
                /* Set input=0xff to avoid processing this time around */
                input = '\xff';
@@ -370,7 +367,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
          if ( ( debug.input_routine == TRUE ) && ( type == 99 ) ) {
             Clear_Screen( NULL );
 
-            con_printf( "Input entered by user:  %d", data );
+            /* NLS:Input entered by user:  %d */
+            con_printf( svarlang_str( 20, 9 ), data );
             Pause();
          }
 #endif
@@ -378,9 +376,10 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
 
 #ifdef DEBUG
       if ( debug.input_routine == TRUE ) {
-         Print_At( 50, 22, "                  " );
-
-         Print_At( 50, 22, "Input:  %d", input );
+         con_set_cursor_xy( 51, 23 );
+         con_clreol();
+         /* NLS: Input:  %d */
+         con_printf( svarlang_str( 20, 10 ) , input );
       }
 #endif
 
@@ -529,11 +528,11 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
             data = 99;
 
             Position_Cursor( 4, 23 );
-            Color_Printf( "Invalid entry, please enter %c-", min_range );
-            Color_Printf( "%c.", max_range );
+            /* NLS:Invalid entry, please enter %c-%c. */
+            Color_Printf( "%s %c-%c.", svarlang_str( 20, 11 ), min_range, max_range );
          }
 
-         Position_Cursor( ( x_position + 1 ), y_position );
+         Position_Cursor( ( x_position + 1 ), y_position );         
          Color_Printf( "%c", line_buffer[0] );
       }
 
@@ -599,8 +598,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                  ( input > 9 ) ) {
                proper_input_given = FALSE;
 
-               Color_Print_At( 4, 23, "Invalid entry, please enter %lu-%lu.",
-                               min_range, max_range );
+               Color_Print_At( 4, 23, "%s %lu-%lu.",
+                               svarlang_str( 20, 11 ), min_range, max_range );
                invalid_input = TRUE;
             }
 
@@ -609,9 +608,9 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                    ( ( input > max_range ) && ( input < 10 ) ) ) ) {
                proper_input_given = FALSE;
 
-               Color_Print_At( 4, 23, "%d is not a choice, please enter ",
-                               input );
-               Color_Printf( "%lu-%lu.", min_range, max_range );
+               /* NLS:is not a choice, please enter */
+               Color_Print_At( 4, 23, "%d %s %lu-%lu.",
+                               input, svarlang_str( 20, 12 ), min_range, max_range );
                invalid_input = TRUE;
             }
 
@@ -620,7 +619,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                  ( size_of_field > 1 ) ) {
                proper_input_given = FALSE;
 
-               Color_Print_At( 4, 23, "Invalid entry.");
+               /* NLS:Invalid entry. */
+               Color_Print_At( 4, 23, svarlang_str( 20, 13 ) );
                invalid_input = TRUE;
             }
 
@@ -705,7 +705,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                    ( input > 9 ) ) ) {
                proper_input_given = FALSE;
 
-               Color_Print_At( 4, 23, "Invalid entry, please enter %lu-%lu.",
+               /* NLS: Invalid entry, please enter */
+               Color_Print_At( 4, 23, "%s %lu-%lu.", svarlang_str( 20, 11 ),
                                min_range, max_range );
                invalid_input = TRUE;
             }
@@ -715,9 +716,9 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                    ( ( input > max_range ) && ( input < 10 ) ) ) ) {
                proper_input_given = FALSE;
 
-               Color_Print_At( 4, 23, "%d is not a choice, please enter ",
-                               input );
-               Color_Printf( "%lu-%lu.", min_range, max_range );
+               /* NLS:is not a choice, please enter */
+               Color_Print_At( 4, 23, "%d %s %lu-%lu.",
+                               input, svarlang_str( 20, 12 ), min_range, max_range );
                invalid_input = TRUE;
             }
 
@@ -728,7 +729,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                    ( size_of_field > 1 ) ) ) {
                proper_input_given = FALSE;
 
-               Color_Print_At( 4, 23, "Invalid entry.");
+               /* NLS:Invalid entry. */
+               Color_Print_At( 4, 23, svarlang_str( 20, 13 ) );
                invalid_input = TRUE;
             }
 
