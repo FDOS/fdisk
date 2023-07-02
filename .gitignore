@@ -3,7 +3,6 @@ source/fdisk/*.exe
 source/fdisk/bootnorm.bin
 source/fdisk/bootnorm.c
 source/fdisk/fdisk.lng
-nls/fdisk.lng
 
 # compiler-specific build artifacts
 *.dsk
