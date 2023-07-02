@@ -31,7 +31,7 @@ CFLAGS += -DFD_FREEDOS=$(FREEDOS)
 
 objs  = main.obj cmd.obj deflang.obj fdiskio.obj helpscr.obj
 objs += pdiskio.obj pcompute.obj ansicon.obj printf.obj userint0.obj
-objs += compat.obj bootnorm.obj
+objs += compat.obj bootnorm.obj svarlang.obj autoload.obj
 
 !ifdef SMART_MBR
 CFLAGS += -DSMART_MBR=1
@@ -52,17 +52,8 @@ dist-svardos: ..\..\fdisk.svp
 .C.OBJ : .AUTODEPEND
 	$(CC) $(CFLAGS) $*.C
 
-#.ASM.OBJ :
-#	$(AS) $(ASFLAGS) $*.ASM -o $@
 
-bootnorm.bin : bootnorm.asm
-	$(AS) bootnorm.asm -o bootnorm.bin
-
-bootnorm.c : bintoc.exe bootnorm.bin
-	bintoc.exe bootnorm.bin bootnorm.c bootnormal_code
-
-bintoc.exe : bintoc.c
-  $(CL) $(CLFLAGS) bintoc.c
+# --- FDISK -----------------------------------------------------------------
 
 fdisk.exe : $(objs) fdisk.lnk
 	$(LD) $(LDFLAGS) @fdisk
@@ -82,7 +73,6 @@ fdisk.lnk : $(objs)
 	@echo DEBUG ALL >>$^@
 !endif
 	@for %i in ($(objs)) do @echo FILE %i >>$^@
-	@echo LIB SVARLANG\SVARLNGS.LIB >>$^@
 
 ..\..\fdisk.zip : fdisk.exe
 	cd ..\..
@@ -101,10 +91,29 @@ fdisk.lnk : $(objs)
 	rename appinfo.tmp appinfo
 	cd source\fdisk
 
-test.exe : test.c compat.c
-  $(CL) $(CLFLAGS) test.c compat.c
 
-# clean up:
+# --- SVARLANG --------------------------------------------------------------
+
+svarlang.obj : svarlang\svarlang.c
+	$(CC) $(CFLAGS) $[@
+
+autoload.obj : svarlang\autoload.c
+	$(CC) $(CFLAGS) $[@
+
+
+# --- BOOTLOADER ------------------------------------------------------------
+
+bootnorm.bin : bootnorm.asm
+	$(AS) bootnorm.asm -o bootnorm.bin
+
+bootnorm.c : bintoc.exe bootnorm.bin
+	bintoc.exe bootnorm.bin bootnorm.c bootnormal_code
+
+bintoc.exe : bintoc.c
+  $(CL) $(CLFLAGS) bintoc.c
+
+
+# --- CLEANUP ---------------------------------------------------------------
 
 clean : .SYMBOLIC
 	rm -f *.OBJ
