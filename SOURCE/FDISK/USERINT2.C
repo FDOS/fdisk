@@ -134,7 +134,8 @@ int Create_DOS_Partition_Interface( int type )
    if ( type == PRIMARY ) {
       Clear_Screen( 0 );
 
-      Print_Centered( 4, "Create Primary DOS Partition", BOLD );
+      /* NLS:Create Primary DOS Partition */
+      Print_Centered( 4, svarlang_str( 4, 1 ), BOLD );
 
       /* NLS:Current fixed disk drive: */
       Print_At( 4, 6, svarlang_str( 9, 0 ) );
@@ -196,10 +197,12 @@ int Create_DOS_Partition_Interface( int type )
       Clear_Screen( 0 );
 
       if ( type == PRIMARY ) {
-         Print_Centered( 4, "Create Primary DOS Partition", BOLD );
+         /* NLS:Create Primary DOS Partition */
+         Print_Centered( 4, svarlang_str( 4, 1 ), BOLD );
       }
       else {
-         Print_Centered( 4, "Create Extended DOS Partition", BOLD );
+         /* NLS:Create Extended DOS Partition */
+         Print_Centered( 4, svarlang_str( 4, 2 ), BOLD );
       }
 
       /* NLS:Current fixed disk drive: */
@@ -283,11 +286,14 @@ int Create_DOS_Partition_Interface( int type )
    Clear_Screen( 0 );
 
    if ( type == PRIMARY ) {
-      Print_Centered( 4, "Create Primary DOS Partition", BOLD );
+      /* NLS:Create Primary DOS Partition */
+      Print_Centered( 4, svarlang_str( 4, 1 ), BOLD );
    }
    else {
-      Print_Centered( 4, "Create Extended DOS Partition", BOLD );
+      /* NLS:Create Extended DOS Partition */
+      Print_Centered( 4, svarlang_str( 4, 2 ), BOLD );
    }
+
 
    /* NLS:Current fixed disk drive: */
    Print_At( 4, 6, svarlang_str( 9, 0 ) );

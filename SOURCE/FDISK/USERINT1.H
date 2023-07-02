@@ -5,7 +5,7 @@
 
 void Clear_Screen( int type );
 void Print_At( int column, int row, const char *, ... );
-void Color_Print( char *text );
+void Color_Print( const char *text );
 void Color_Printf( const char *format, ... );
 void Color_Print_At( int column, int row, const char *, ... );
 void Normal_Print_At( int column, int row, const char *, ... );

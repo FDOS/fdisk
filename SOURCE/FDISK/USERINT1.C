@@ -34,7 +34,7 @@ void Clear_Screen( int type )
    }
 }
 
-void Color_Print( char *text )
+void Color_Print( const char *text )
 {
    int was_bold = con_get_bold();
    con_set_bold(1);
@@ -253,10 +253,12 @@ void Interactive_User_Interface( void )
             Clear_Screen( 0 );
 
             if ( menu == CPDP ) {
-               Print_Centered( 4, "Create Primary DOS Partition", BOLD );
+               /* NLS:Create Primary DOS Partition */
+               Print_Centered( 4, svarlang_str( 4, 1 ), BOLD );
             }
             else {
-               Print_Centered( 4, "Create Extended DOS Partition", BOLD );
+               /* NLS:Create Extended DOS Partition */
+               Print_Centered( 4, svarlang_str( 4, 2 ), BOLD );
             }
 
             /* NLS:Current fixed disk drive: */
@@ -265,7 +267,8 @@ void Interactive_User_Interface( void )
 
             Display_Primary_Partition_Information_SS();
 
-            Color_Print_At( 4, 22, "No space to create a DOS partition." );
+            /* NLS:No space to create a DOS partition. */
+            Color_Print_At( 4, 22, svarlang_str( 9, 13 ) );
 
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
@@ -279,7 +282,8 @@ void Interactive_User_Interface( void )
          if ( Num_Ext_Part( pDrive ) > 0 ) {
             Clear_Screen( 0 );
 
-            Print_Centered( 4, "Create Extended DOS Partition", BOLD );
+            /* NLS:Create Extended DOS Partition */
+            Print_Centered( 4, svarlang_str( 4, 2 ), BOLD );
 
             /* NLS:Current fixed disk drive: */
             Print_At( 4, 6, svarlang_str( 9, 0 ) );
@@ -287,7 +291,8 @@ void Interactive_User_Interface( void )
 
             Display_Primary_Partition_Information_SS();
 
-            Color_Print_At( 4, 22, "Extended DOS Partition already exists." );
+            /* NLS:Extended DOS Partition already exists.*/
+            Color_Print_At( 4, 22, svarlang_str( 9, 14 ) );
 
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
          }
@@ -298,11 +303,10 @@ void Interactive_User_Interface( void )
 
       if ( menu == CLDD ) {
          if ( pDrive->ptr_ext_part == NULL ) {
-            Color_Print_At( 4, 22,
-                            "Cannot create Logical DOS Drive without" );
-            Color_Print_At(
-               4, 23, "an Extended DOS Partition on the current drive." );
-            Print_At( 4, 24, "                                        " );
+            con_set_cursor_xy( 5, 23 );
+            Color_Print( svarlang_str( 9, 15 ) );
+            con_set_cursor_xy( 5, 25 );
+            con_clreol();
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
@@ -330,8 +334,10 @@ void Interactive_User_Interface( void )
          } while ( index < 4 );
 
          if ( counter == 0 ) {
-            Color_Print_At( 4, 22, "No Primary DOS Partition to delete." );
-            Print_At( 4, 24, "                                        " );
+            /* NLS:No Primary DOS Partition to delete. */
+            Color_Print_At( 4, 22, svarlang_str( 9, 16 ) );
+            con_set_cursor_xy( 5, 25 );
+            con_clreol();
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
@@ -343,8 +349,10 @@ void Interactive_User_Interface( void )
 
       if ( menu == DEDP ) {
          if ( pDrive->ptr_ext_part == NULL ) {
-            Color_Print_At( 4, 22, "No Extended DOS Partition to delete." );
-            Print_At( 4, 24, "                                        " );
+            /* NLS:No Extended DOS Partition to delete. */
+            Color_Print_At( 4, 22, svarlang_str( 9, 17 ) );
+            con_set_cursor_xy( 5, 25 );
+            con_clreol();
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
@@ -356,8 +364,10 @@ void Interactive_User_Interface( void )
       if ( menu == DLDD ) {
          if ( ( pDrive->num_of_log_drives == 0 ) ||
               ( pDrive->ptr_ext_part == NULL ) ) {
-            Color_Print_At( 4, 22, "No Logical DOS Drive(s) to delete." );
-            Print_At( 4, 24, "                                        " );
+            /* NLS:No Logical DOS Drive(s) to delete. */
+            Color_Print_At( 4, 22, svarlang_str( 9, 18 ) );
+            con_set_cursor_xy( 5, 25 );
+            con_clreol();
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
@@ -381,8 +391,10 @@ void Interactive_User_Interface( void )
          } while ( index < 4 );
 
          if ( counter == 0 ) {
-            Color_Print_At( 4, 22, "No Non-DOS Partition to delete." );
-            Print_At( 4, 24, "                                        " );
+            /* NLS: No Non-DOS Partition to delete. */
+            Color_Print_At( 4, 22, svarlang_str( 9, 19 ) );
+            con_set_cursor_xy( 5, 25 );
+            con_clreol();
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
          }
@@ -550,8 +562,6 @@ int Standard_Menu( int menu )
       if ( flags.display_name_description_copyright == TRUE ) {
          Print_Centered( 0, FD_NAME " V" VERSION, STANDARD );
          Print_Centered( 1, "Fixed Disk Setup Program", STANDARD );
-         Print_Centered( 2, "GNU GPL (c) " COPYLEFT " by Brian E. Reifsnyder", STANDARD );
-         Print_Centered( 3, "and The FreeDOS Community", STANDARD );
 
          if ( flags.use_freedos_label == TRUE ) {
             unsigned short verlen = strlen("Version:  ") + strlen(VERSION);
@@ -575,7 +585,8 @@ int Standard_Menu( int menu )
          con_print( " Mbytes" );
       }
       else {
-         Color_Print( " is unusable!" );
+         con_putc( ' ' );
+         con_print( svarlang_str( 9, 20 ) );
          minimum_option = 5;
       }
 
@@ -592,8 +603,10 @@ int Standard_Menu( int menu )
          } while ( index < 4 );
 
          if ( counter == 0 ) {
-            Color_Print_At( 4, 22, "No partitions to delete." );
-            Print_At( 4, 24, "                                        " );
+            /* NLS:No partitions to delete. */
+            Color_Print_At( 4, 22, svarlang_str( 9, 21 ) );
+            con_set_cursor_xy( 5, 25 );
+            con_clreol();
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             menu = MM;
             return ( menu );
@@ -662,10 +675,9 @@ int Standard_Menu( int menu )
            ( pDrive->pri_part[1].active_status == 0 ) &&
            ( pDrive->pri_part[2].active_status == 0 ) &&
            ( pDrive->pri_part[3].active_status == 0 ) ) {
-         Color_Print_At( 4, 21, "WARNING! " );
-         con_print(
-            "No partitions are set active - disk 1 is not startable unless" );
-         Print_At( 4, 22, "a partition is set active" );
+         con_set_cursor_xy( 5, 23 );
+         /* NLS: No partitions are set active [...] */
+         con_print( svarlang_str( 9, 22 ) );
       }
 
       /* NLS:Enter choice: */

@@ -190,19 +190,22 @@ void Display_CL_Partition_Table( void )
 
    Determine_Drive_Letters();
 
-   con_printf( "\nCurrent fixed disk drive: %1d",
-           ( flags.drive_number - 127 ) );
+   /* NLS:Current fixed disk drive: */
+   con_printf( "\n%s %1d", svarlang_str( 9, 0 ), ( flags.drive_number - 127 ) );
 
-   con_printf( "   %lu sectors, geometry %lu/%03lu/%02lu", pDrive->disk_size_sect,
+   con_printf( "   %lu %s %lu/%03lu/%02lu", pDrive->disk_size_sect, svarlang_str( 9, 3 ),
            pDrive->total_cyl + 1, pDrive->total_head + 1,
            pDrive->total_sect );
 
    if ( !Is_Pri_Tbl_Empty() ) {
-      con_printf( "\n\nPartition   Status   Mbytes   Description      Usage" );
-      con_printf( "    Start CHS       End CHS\n" );
+      /* NLS:Partition   Status   Mbytes   Description [...] */
+      con_printf( svarlang_str( 9, 10 ) );
    }
    else {
-      con_printf("\n\nNo partitions defined.\n");
+      /*NLS:No partitions defined. */
+      con_print("\n\n");
+      con_print( svarlang_str( 9, 4 ) );
+      con_print("\n");
    }
 
    index = 0;
@@ -261,16 +264,18 @@ void Display_CL_Partition_Table( void )
 
       index++;
    } while ( index < 4 );
+   /* NLS:Largest continious free space for primary partition */
    con_printf(
-      "\nLargest continious free space for primary partition = %lu MBytes\n",
+      svarlang_str( 9, 5 ), 
       Max_Pri_Free_Space_In_MB() );
 
    /* Check to see if there are any drives to display */
    if ( ( brief_partition_table[( flags.drive_number - 128 )][4] > 0 ) ||
         ( brief_partition_table[( flags.drive_number - 128 )][5] > 0 ) ) {
-      con_printf( "\nContents of Extended DOS Partition:\n" );
-      con_printf( "Drv Volume Label  Mbytes  System   Usage" );
-      con_printf( "    Start CHS       End CHS\n" );
+      /* NLS:Contents of Extended DOS Partition: */
+      con_printf( svarlang_str( 9, 6 ) );
+      /* NLS:Drv Volume Label  Mbytes  System [...] */
+      con_printf( svarlang_str( 9, 11 ) );
 
       /* Display information for each Logical DOS Drive */
       index = 4;
@@ -320,9 +325,8 @@ void Display_CL_Partition_Table( void )
 
          index++;
       } while ( index < 27 );
-      con_printf(
-         "\nLargest continious free space in extended partition = %lu MBytes\n",
-         Max_Log_Free_Space_In_MB() );
+      /*NLS:Largest continious free space in extended partition [...] */
+      con_printf( svarlang_str( 9, 7 ), Max_Log_Free_Space_In_MB() );
    }
    con_putc('\n');
 }
@@ -346,7 +350,8 @@ void Display_All_Drives( void )
    Determine_Drive_Letters();
 
    con_set_cursor_xy( 3, 3 );
-   con_print( "Disk   Drv   Mbytes    Free  Usage" );
+   /* NLS:Disk   Drv   Mbytes    Free  Usage */
+   con_print( svarlang_str( 9, 12 ) );
 
    for ( drive = 1; drive <= flags.maximum_drive_number - 127; drive++ ) {
       if ( current_line > 18 ) {
@@ -354,7 +359,7 @@ void Display_All_Drives( void )
          current_column_offset = 45;
 
          con_set_cursor_xy( 44, 3 );
-         con_print( "Disk   Drv   Mbytes    Free  Usage" );
+         con_print( svarlang_str( 9, 12 ) );
       }
 
       /* Print physical drive information */
@@ -371,7 +376,8 @@ void Display_All_Drives( void )
       /* Print size of drive */
 
       if ( !part_table[drive - 1].usable ) {
-         con_printf( "    -------- unusable ---------" );
+         /* NLS:-------- unusable --------- */
+         con_printf( svarlang_str( 9, 8 ) );
          current_line++;
          continue;
       }
@@ -474,5 +480,6 @@ void Display_All_Drives( void )
    }
 
    con_set_cursor_xy( 5, 21 );
-   con_print( "(1 Mbyte = 1048576 bytes)" );
+   /*NLS:(1 Mbyte = 1048576 bytes) */
+   con_print( svarlang_str( 9, 9 ) );
 }

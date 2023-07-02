@@ -101,6 +101,7 @@
 2.3:Press any key when ready . . .
 
 
+
 ##############################################################################
 # MAIN MENU                                                                  #
 ##############################################################################
@@ -205,11 +206,55 @@
 
 
 ##############################################################################
-# USERINT1.C                                                                 #
+# USERINT0.C, USERINT1.C                                                     #
 ##############################################################################
+
 9.0:Current fixed disk drive:
 9.1:Enter choice:
 9.2:Choose one of the following:
+9.3:sectors, geometry
+9.4:No partitions defined.
+9.5:\nLargest continious free space for primary partition = %lu MBytes\n
+9.6:\nContents of Extended DOS Partition:\n
+9.7:\nLargest continious free space in extended partition = %lu MBytes\n
+9.8:    -------- unusable ---------
+9.9:(1 Mbyte = 1048576 bytes)
+
+# The following are table headers, must stay adjusted as is
+9.10:\n\nPartition   Status   Mbytes   Description      Usage    Start CHS       End CHS\n
+9.11:Drv Volume Label  Mbytes  System   Usage    Start CHS       End CHS\n
+9.12:Disk   Drv   Mbytes    Free  Usage
+
+9.13:No space to create a DOS partition.
+9.14:Extended DOS Partition already exists.
+9.15:Cannot create Logical DOS Drive without\n    an Extended DOS Partition on the current drive.
+9.16:No Primary DOS Partition to delete.
+9.17:No Extended DOS Partition to delete.
+9.18:No Logical DOS Drive(s) to delete.
+9.19:No Non-DOS Partition to delete.
+9.20:is unusable!
+9.21:No partitions to delete.
+9.22:\e[1mWARNING!\e[22m No partitions are set active - disk 1 is not startable unless\n    a partition is set active
+
+
+##############################################################################
+# USERINT2.C                                                                 #
+##############################################################################
+
+
+##############################################################################
+# KBDINPUT.C                                                                 #
+##############################################################################
+
+20.5:Press \e[1mESC\e[22m to return to FDISK options
+20.6:Press \e[1mESC\e[22m to exit FDISK
+20.7:Press \e[1mESC\e[22m to continue
+20.8:Requested partition size exceeds the maximum available space
+20.9:Input entered by user:  %d
+20.10:Input:  %d
+20.11:Invalid entry, please enter
+20.12:is not a choice, please enter
+20.13:Invalid entry.
 
 
 ##############################################################################
@@ -222,14 +267,12 @@
 250.2:Invalid entry, please enter Y-N
 250.3:Press any key to continue
 250.4:ERROR
-250.5:Press \e[1mESC\e[22m to return to FDISK options
-250.6:Press \e[1mESC\e[22m to exit FDISK
-250.7:Press \e[1mESC\e[22m to continue
 
 
 ##############################################################################
 # ERROR MESSAGES                                                             #
 ##############################################################################
+
 255.0:\n    Error reading partition tables.
 255.1:\n    No fixed disks present.
 255.2:\nNo drive number has been entered.
