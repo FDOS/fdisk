@@ -1,6 +1,11 @@
 Free FDISK Change Log
 =====================
 
+Version 1.?.? (2023-??-??)
+--------------------------
+Bugfixes:
+ - LOW: Prevent user from deleting DOS partitions from the Non-DOS partition
+     removal menu.
 
 Version 1.3.7 (2023-06-26)
 --------------------------
