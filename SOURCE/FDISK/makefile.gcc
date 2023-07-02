@@ -1,0 +1,15 @@
+# This makefile is for Free FDISK and I16-GCC (DOS)
+
+CC=i16gcc
+LD=i16gcc
+LIBS = -li86
+CFLAGS = -mcmodel=small -Os
+
+fdisk.exe : main.o cmd.o helpscr.o compat.o pdiskio.o fdiskio.o pcompute.o \
+            userint0.o userint1.o userint2.o kbdinput.o ansicon.o printf.o \
+            svarlang\svarlang.o svarlang\autoload.o deflang.o bootnorm.o
+	$(LD) -Xlinker -Map=fdisk.map -Os -mcmodel=small -o $@ $^ $(LIBS)
+
+clean:
+	del *.o
+	del svarlang\*.o
