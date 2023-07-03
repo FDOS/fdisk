@@ -64,7 +64,7 @@ dist-svardos: ..\..\fdisk.svp
 fdisk.exe : $(objs) fdisk.lng fdisk.lnk
 	$(LD) $(LDFLAGS) @fdisk
 
-fdisk.lnk : $(objs)
+fdisk.lnk : makefile.wat
 	@echo NAME $^& >$^@
 	@echo SYSTEM DOS >>$^@
 	@echo OPTION QUIET >>$^@
@@ -120,13 +120,13 @@ bootnorm.c : bintoc\bintoc.exe bootnorm.bin
 
 # --- NLS -------------------------------------------------------------------
 
-fdisk.lng : nls\deflang.c
+fdisk.lng : nls\out.lng
 	copy nls\out.lng fdisk.lng >NUL
 
-deflang.c : nls\deflang.c
+deflang.c : nls\out.lng
 	copy nls\deflang.c deflang.c >NUL
 
-nls\deflang.c : svarlang\tlumacz.exe nls\en.txt nls\de.txt
+nls\out.lng : svarlang\tlumacz.exe nls\en.txt nls\de.txt
 	@cd nls
 	..\svarlang\tlumacz en de
 	@cd ..
