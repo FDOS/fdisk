@@ -26,16 +26,22 @@ ASFLAGS  = -t -f obj
 LD       = wlink
 LDFLAGS  =
 !ifdef __LINUX__
+SEP=/
 CP = cp
+BINTOC = bintoc/bintoc.exe
+UTF8TOCP = utf8tocp/utf8tocp.exe
+TLUMACZ = ../svarlang/tlumacz.exe
 !else
+SEP=\
 CP = copy
+BINTOC = bintoc\bintoc.exe
+UTF8TOCP = utf8tocp\utf8tocp.exe
+TLUMACZ = ..\svarlang\tlumacz.exe
 !endif
 
 PACKER      = upx
 PACKERFLAGS = -qq --best --8086
 
-BINTOC = bintoc/bintoc.exe
-UTF8TOCP = utf8tocp/utf8tocp.exe
 
 !ifdef DEBUG
 CFLAGS += -d2 -mm
@@ -92,15 +98,15 @@ fdisk.lnk : Makefile
 
 ../../fdisk.zip : fdisk.exe
 	rm -f ../../bin/fdisk.exe
-	$(CP) fdisk.exe ..\..\bin
+	$(CP) fdisk.exe ..$(SEP)..$(SEP)bin
 	rm -f ../../nls/fdisk.lng
-	-mkdir ../../nls
-	$(CP) fdisk.lng ../../nls
+	-mkdir ..$(SEP)..$(SEP)nls
+	$(CP) fdisk.lng ..$(SEP)..$(SEP)nls
 	$(PACKER) $(PACKERFLAGS) ../../bin/fdisk.exe
 	cd ../..
-  zip -9rkDX fdisk.zip appinfo bin doc help nls source/fdisk/*.[ch] &
-  source/fdisk/*.asm source/fdisk/makefile.* license readme.md
-  cd source/fdisk
+	zip -9rkDX fdisk.zip appinfo bin doc help nls source/fdisk/*.[ch] &
+	source/fdisk/*.asm source/fdisk/makefile.* license readme.md
+	cd source/fdisk
 
 ..\..\fdisk.svp : fdisk.exe
 	cd ..\..
@@ -135,14 +141,14 @@ bootnorm.c : bintoc/bintoc.exe bootnorm.bin
 # --- NLS -------------------------------------------------------------------
 
 fdisk.lng : nls/out.lng
-	$(CP) nls/out.lng fdisk.lng
+	$(CP) $[@ $^@
 
 deflang.c : nls/out.lng
-	$(CP) nls/deflang.c deflang.c
+	$(CP) nls$(SEP)deflang.c deflang.c
 
 nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/de.txt
 	@cd nls
-	../svarlang/tlumacz.exe en de
+	$(TLUMACZ) en de
 	@cd ..
 
 nls/en.txt : nls/en_utf8.txt utf8tocp/utf8tocp.exe 
