@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "svarlang.h"
 
@@ -135,14 +136,15 @@ static unsigned short unesc_string(char *linebuff) {
 static unsigned short gen_langstrings(unsigned char *buff, const char *langid, struct bitmap *b, const struct bitmap *refb, const unsigned char *refblock) {
   unsigned short len = 0, linelen;
   FILE *fd;
-  char fname[] = "XX.TXT";
+  char fname[] = "xx.txt";
   static char linebuf[8192];
   const char *ptr;
   unsigned short id, linecount;
 
   bitmap_init(b);
 
-  memcpy(fname + strlen(fname) - 6, langid, 2);
+  fname[strlen(fname) - 6] = tolower( langid[0] );
+  fname[strlen(fname) - 5] = tolower( langid[1] );
 
   fd = fopen(fname, "rb");
   if (fd == NULL) {
@@ -317,7 +319,7 @@ int main(int argc, char **argv) {
   fclose(fd);
 
   /* compute the deflang.c file containing a dump of the reference block */
-  fd = fopen("DEFLANG.C", "wb");
+  fd = fopen("deflang.c", "wb");
   if (fd == NULL) {
     puts("ERROR: FAILED TO OPEN OR CREATE DEFLANG.C");
     ecode = 1;
