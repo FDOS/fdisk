@@ -74,8 +74,8 @@ objs += smartmbr.obj
 !endif
 
 all : fdisk.exe
-dist : ..\..\fdisk.zip
-dist-svardos: ..\..\fdisk.svp
+dist : ../../fdisk.zip
+dist-svardos: ../../fdisk.svp
 
 .c.obj : .AUTODEPEND
 	$(CC) $(CFLAGS) -fo=$*.obj $*.c
@@ -97,15 +97,15 @@ fdisk.lnk : Makefile
 	@for %i in ($(objs)) do @echo FILE %i >>$^@
 
 ../../fdisk.zip : fdisk.exe
-	rm -f ../../bin/fdisk.exe
+	-rm -f ../../bin/fdisk.exe
 	$(CP) fdisk.exe ..$(SEP)..$(SEP)bin
-	rm -f ../../nls/fdisk.lng
+	-rm -f ../../nls/fdisk.lng
 	-mkdir ..$(SEP)..$(SEP)nls
 	$(CP) fdisk.lng ..$(SEP)..$(SEP)nls
 	$(PACKER) $(PACKERFLAGS) ../../bin/fdisk.exe
 	cd ../..
 	zip -9rkDX fdisk.zip appinfo bin doc help nls source/fdisk/*.[ch] &
-	source/fdisk/*.asm source/fdisk/makefile.* license readme.md
+	source/fdisk/*.asm source/fdisk/makefile.* LICENSE README.md
 	cd source/fdisk
 
 ..\..\fdisk.svp : fdisk.exe
