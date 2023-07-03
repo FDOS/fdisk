@@ -1,5 +1,10 @@
+fdisk.zip
+bin/fdisk.exe
+nls/fdisk.lng
+
 # generated files
 source/fdisk/*.exe
+source/fdisk/deflang.c
 source/fdisk/bootnorm.bin
 source/fdisk/fdisk.lng
 source/fdisk/svarlang/*.lib
