@@ -13,14 +13,23 @@
 #  wmake -f makefile.wat dist
 
 TOOL_CC     = wcc386
-TOOL_CFLAGS = -q -ox -wx -we
+TOOL_CFLAGS = -q -ox -wx
 
 CC       = wcc
 CFLAGS   = -q -0 -bt=dos -wx -we
+!ifdef __LINUX__
+CFLAGS   += -i=$(%WATCOM)/h 
+!endif
+
 AS       = nasm
 ASFLAGS  = -t -f obj
 LD       = wlink
 LDFLAGS  =
+!ifdef __LINUX__
+CP = cp
+!else
+CP = copy
+!endif
 
 PACKER      = upx
 PACKERFLAGS = -qq --best --8086
@@ -69,9 +78,9 @@ dist-svardos: ..\..\fdisk.svp
 # --- FDISK -----------------------------------------------------------------
 
 fdisk.exe : $(objs) fdisk.lng fdisk.lnk
-	$(LD) $(LDFLAGS) @fdisk
+	$(LD) $(LDFLAGS) @fdisk.lnk
 
-fdisk.lnk : makefile.wat
+fdisk.lnk : Makefile
 	@echo NAME $^& >$^@
 	@echo SYSTEM DOS >>$^@
 	@echo OPTION QUIET >>$^@
@@ -81,17 +90,17 @@ fdisk.lnk : makefile.wat
 !endif
 	@for %i in ($(objs)) do @echo FILE %i >>$^@
 
-..\..\fdisk.zip : fdisk.exe
-	rm -f ..\..\bin\fdisk.exe
-	copy fdisk.exe ..\..\bin\
-	rm -f ..\..\nls\fdisk.lng
-	-mkdir ..\..\nls
-	copy fdisk.lng ..\..\nls\
-	$(PACKER) $(PACKERFLAGS) ..\..\bin\fdisk.exe
-	cd ..\..
-  zip -9rkDX fdisk.zip appinfo bin doc help nls source\fdisk\*.[ch] &
-  source\fdisk\*.asm source\fdisk\makefile.* license readme.md
-  cd source\fdisk
+../../fdisk.zip : fdisk.exe
+	rm -f ../../bin/fdisk.exe
+	$(CP) fdisk.exe ..\..\bin
+	rm -f ../../nls/fdisk.lng
+	-mkdir ../../nls
+	$(CP) fdisk.lng ../../nls
+	$(PACKER) $(PACKERFLAGS) ../../bin/fdisk.exe
+	cd ../..
+  zip -9rkDX fdisk.zip appinfo bin doc help nls source/fdisk/*.[ch] &
+  source/fdisk/*.asm source/fdisk/makefile.* license readme.md
+  cd source/fdisk
 
 ..\..\fdisk.svp : fdisk.exe
 	cd ..\..
@@ -126,14 +135,14 @@ bootnorm.c : bintoc/bintoc.exe bootnorm.bin
 # --- NLS -------------------------------------------------------------------
 
 fdisk.lng : nls/out.lng
-	copy nls/out.lng fdisk.lng >NUL
+	$(CP) nls/out.lng fdisk.lng
 
 deflang.c : nls/out.lng
-	copy nls/deflang.c deflang.c >NUL
+	$(CP) nls/deflang.c deflang.c
 
 nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/de.txt
 	@cd nls
-	../svarlang/tlumacz en de
+	../svarlang/tlumacz.exe en de
 	@cd ..
 
 nls/en.txt : nls/en_utf8.txt utf8tocp/utf8tocp.exe 
@@ -167,30 +176,30 @@ utf8tocp/utf8tocp.exe : utf8tocp/utf8tocp.obj
 # --- CLEANUP ---------------------------------------------------------------
 
 clean : .SYMBOLIC
-	rm -f *.OBJ
+	rm -f *.obj
 
 clobber : .SYMBOLIC
-	rm -f *.BAK
-	rm -f *.BIN
-	rm -f *.ERR
-	rm -f *.EXE
-	rm -f *.LNK
-	rm -f *.LST
-	rm -f *.MAP
-	rm -f *.OBJ
-	rm -f *.TMP
-	rm -f *.ZIP
-	rm -f bintoc\*.exe
-	rm -f bintoc\*.obj
-	rm -f svarlang\*.exe
-	rm -f svarlang\*.obj
-	rm -f utf8tocp\*.exe
-	rm -f utf8tocp\*.obj
+	rm -f *.bak
+	rm -f *.bin
+	rm -f *.err
+	rm -f *.exe
+	rm -f *.lnk
+	rm -f *.lst
+	rm -f *.map
+	rm -f *.obj
+	rm -f *.tmp
+	rm -f *.zip
+	rm -f bintoc/*.exe
+	rm -f bintoc/*.obj
+	rm -f svarlang/*.exe
+	rm -f svarlang/*.obj
+	rm -f utf8tocp/*.exe
+	rm -f utf8tocp/*.obj
 
 # language files
 	rm -f deflang.c
 	rm -f fdisk.lng
-	rm -f nls\en.txt
-	rm -f nls\de.txt
-	rm -f nls\deflang.c
-	rm -f nls\out.lng
+	rm -f nls/en.txt
+	rm -f nls/de.txt
+	rm -f nls/deflang.c
+	rm -f nls/out.lng
