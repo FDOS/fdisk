@@ -35,27 +35,25 @@ CFLAGS += -DRELEASE=$(RELEASE)
 CFLAGS += -DFD_FREEDOS=$(FREEDOS)
 !endif
 
-objs  = main.obj cmd.obj deflang.obj fdiskio.obj helpscr.obj
-objs += pdiskio.obj pcompute.obj ansicon.obj printf.obj userint0.obj
-objs += compat.obj bootnorm.obj svarlang.obj autoload.obj
+objs  = main.obj cmd.obj fdiskio.obj pdiskio.obj pcompute.obj helpscr.obj
+objs += compat.obj userint0.obj
+objs +=  
+!ifdef LITE
+CFLAGS += -DFDISKLITE=1
+!else
+objs += userint1.obj userint2.obj
+!endif
+objs += kbdinput.obj ansicon.obj printf.obj bootnorm.obj svarlang.obj
+objs += autoload.obj deflang.obj 
 
 !ifdef SMART_MBR
 CFLAGS += -DSMART_MBR=1
 objs += smartmbr.obj
 !endif
 
-!ifdef LITE
-CFLAGS += -DFDISKLITE=1
-!else
-objs += kbdinput.obj userint1.obj userint2.obj
-!endif
-
-
 all : fdisk.exe
 dist : ..\..\fdisk.zip
 dist-svardos: ..\..\fdisk.svp
-
-buildreq : bintoc\bintoc.exe svarlang\tlumacz.exe utf8tocp\utf8tocp.exe .symbolic
 
 .C.OBJ : .AUTODEPEND
 	$(CC) $(CFLAGS) $*.C
@@ -63,7 +61,7 @@ buildreq : bintoc\bintoc.exe svarlang\tlumacz.exe utf8tocp\utf8tocp.exe .symboli
 
 # --- FDISK -----------------------------------------------------------------
 
-fdisk.exe : buildreq $(objs) fdisk.lnk
+fdisk.exe : $(objs) fdisk.lng fdisk.lnk
 	$(LD) $(LDFLAGS) @fdisk
 
 fdisk.lnk : $(objs)
@@ -77,9 +75,9 @@ fdisk.lnk : $(objs)
 	@for %i in ($(objs)) do @echo FILE %i >>$^@
 
 ..\..\fdisk.zip : fdisk.exe
-	-rm ..\..\bin\fdisk.exe
+	rm -f ..\..\bin\fdisk.exe
 	copy fdisk.exe ..\..\bin\
-	-rm ..\..\nls\fdisk.lng
+	rm -f ..\..\nls\fdisk.lng
 	-mkdir ..\..\nls
 	copy fdisk.lng ..\..\nls\
 	$(PACKER) $(PACKERFLAGS) ..\..\bin\fdisk.exe
@@ -94,7 +92,7 @@ fdisk.lnk : $(objs)
 	mkdir appinfo
 	copy appinfo.tmp\fdisk.lsm appinfo\
 	zip -9rkDX fdisk.svp appinfo bin doc nls
-	del appinfo\fdisk.lsm
+	rm -f appinfo\fdisk.lsm
 	rmdir appinfo
 	rename appinfo.tmp appinfo
 	cd source\fdisk
@@ -122,22 +120,22 @@ bootnorm.c : bintoc\bintoc.exe bootnorm.bin
 
 # --- NLS -------------------------------------------------------------------
 
-deflang.c fdisk.lng : nls\en.txt nls\de.txt
+fdisk.lng : nls\deflang.c
+	copy nls\out.lng fdisk.lng
+
+deflang.c : nls\deflang.c
+	copy nls\deflang.c deflang.c
+
+nls\deflang.c : svarlang\tlumacz.exe nls\en.txt nls\de.txt
 	cd nls
 	..\svarlang\tlumacz en de
 	cd ..
-	rm -f fdisk.lng
-	rm -f deflang.c
-	copy nls\out.lng fdisk.lng
-	copy nls\deflang.c deflang.c
-	rm -f nls\deflang.c
-	rm -f nls\out.lng
 
-nls\en.txt : nls\en_utf8.txt
-	$(UTF8TOCP) 437 $< >$@
+nls\en.txt : nls\en_utf8.txt utf8tocp\utf8tocp.exe 
+	$(UTF8TOCP) 437 $[@ >$^@
 
-nls\de.txt : nls\de_utf8.txt
-	$(UTF8TOCP) 850 $< >$@
+nls\de.txt : nls\de_utf8.txt utf8tocp\utf8tocp.exe 
+	$(UTF8TOCP) 850 $[@ >$^@
 
 
 # --- TOOLS -----------------------------------------------------------------
@@ -185,6 +183,10 @@ clobber : .SYMBOLIC
 	rm -f utf8tocp\*.obj
 
 # language files
+	rm -f deflang.c
+	rm -f fdisk.lng
 	rm -f nls\en.txt
 	rm -f nls\de.txt
+	rm -f nls\deflang.c
+	rm -f nls\out.lng
 
