@@ -270,7 +270,7 @@
 10.32:Fehler beim Löschen der logischen Partition!
 
 # Delete primary Partition
-10.40:\e[1;5mWARNING!\e[22;25m Alle Daten der Primären DOS Partition gehen verloren.\n    Welche Partition möchten Sie löschen...?
+10.40:\e[1;5mWARNING!\e[22;25m Alle Daten der primären DOS Partition gehen verloren.\n    Welche Partition möchten Sie löschen...?
 10.41:Primäre DOS Parition wurde gelöscht.
 10.42:Fehler beim Löschen der primären DOS Partition!
 10.43:Löschen von erweiterter Partition verweigert!
