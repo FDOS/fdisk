@@ -316,7 +316,7 @@
 250.4:FEHLER
 250.5:WARNUNG!
 250.6:AKTIV
-250.250:Datenträgereinrichtungsprogramm
+250.250:Einrichtungsprogramm für Datenträger
 
 
 ##############################################################################
