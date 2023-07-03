@@ -14,34 +14,6 @@
 #include "userint0.h"
 
 
-int IsRecognizedFatPartition( unsigned partitiontype )
-{
-   switch ( partitiontype ) {
-   case 1:
-   case 4:
-   case 6:
-      return TRUE;
-   case 0x0e:
-      if ( flags.version == W95 || flags.version == W95B ||
-           flags.version == W98 ) {
-         return TRUE;
-      }
-      break;
-   case 0x0b:
-      if ( flags.version == W95B || flags.version == W98 ) {
-         return TRUE;
-      }
-      break;
-   case 0x0c:
-      if ( flags.version == W95B || flags.version == W98 ) {
-         return TRUE;
-      }
-      break;
-   }
-   return FALSE;
-}
-
-
 /* Pause Routine */
 void Pause( void )
 {

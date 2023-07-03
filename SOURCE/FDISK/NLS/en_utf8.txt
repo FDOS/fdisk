@@ -270,13 +270,19 @@
 10.31:Logical drive deleted
 10.32:Error deleting logical drive!
 
-# Delete primary Partition
+# Delete primary partition
 10.40:\e[1;5mWARNING!\e[22;25m Data in the deleted Primary DOS Partition will be lost.\n    What primary partition do you want to delete...?
 10.41:Primary DOS Partition deleted
 10.42:Error deleting primary DOS Partition!
 10.43:Refusing to delete extended partition!
 10.44:Not a DOS partition!
 
+# Set active partition
+10.50:No partitions to make active.
+10.51:Enter the number of the partition you want to make active...........:
+10.52:%d is not a choice. Please enter a valid choice.
+10.53:The only startable partition on Drive %d is already set active.
+10.54:Partition %d was activated.
 
 10.200:Are you sure (Y/N)..............................?
 
@@ -310,6 +316,7 @@
 250.4:ERROR
 250.5:WARNING!
 250.6:ACTIVE
+250.250:Fixed Disk Setup Program
 
 
 ##############################################################################

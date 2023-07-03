@@ -1493,44 +1493,32 @@ int Set_Active_Partition_Interface( void )
    int partition_settable[4];
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+   Partition *p;
 
    /* Check to see if other partitions that can be set active exist.*/
    /* Also check to see what partitions are available to set active.*/
-   do {
+   for ( index = 0; index <= 3; index++ ) {
+      p = &pDrive->pri_part[index];
       partition_settable[index] = FALSE;
 
-      if ( ( pDrive->pri_part[index].num_type == 1 ) ||
-           ( pDrive->pri_part[index].num_type == 4 ) ||
-           ( pDrive->pri_part[index].num_type == 6 )
-
-           || ( ( ( pDrive->pri_part[index].num_type == 0x0b ) ||
-                  ( pDrive->pri_part[index].num_type == 0x0c ) ) &&
-                ( ( flags.version == W95B ) || ( flags.version == W98 ) ) )
-
-           || ( ( pDrive->pri_part[index].num_type == 0x0e ) &&
-                ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
-                  ( flags.version == W98 ) ) ) &&
-                 ( flags.set_any_pri_part_active == FALSE ) ) {
+      if ( IsRecognizedFatPartition( p->num_type ) ) {
          available_partition_counter++;
          if ( ( available_partition_counter == 1 ) &&
-              ( pDrive->pri_part[index].active_status == 0x80 ) ) {
+              ( p->active_status == 0x80 ) ) {
             first_available_partition_active = TRUE;
          }
          partition_settable[index] = TRUE;
       }
-
-      if ( ( pDrive->pri_part[index].num_type > 0 ) &&
+      else if ( ( p->num_type > 0 ) &&
            ( flags.set_any_pri_part_active == TRUE ) ) {
          available_partition_counter++;
          if ( ( available_partition_counter == 1 ) &&
-              ( pDrive->pri_part[index].active_status == 0x80 ) ) {
+              ( p->active_status == 0x80 ) ) {
             first_available_partition_active = TRUE;
          }
          partition_settable[index] = TRUE;
       }
-
-      index++;
-   } while ( index <= 3 );
+   }
 
    if ( ( available_partition_counter == 1 ) &&
         ( first_available_partition_active == TRUE ) ) {
@@ -1538,25 +1526,28 @@ int Set_Active_Partition_Interface( void )
    }
 
    Clear_Screen( 0 );
-   Print_Centered( 4, "Set Active Partition", BOLD );
+   /* NLS:Set active partition */
+   Print_Centered( 4, svarlang_str( 3, 2 ), BOLD );
 
    Display_Primary_Partition_Information_SS();
 
    if ( available_partition_counter == 0 ) {
-      Color_Print_At( 4, 22, "No partitions to make active." );
+      /* NLS:No partitions to make active.*/
+      Color_Print_At( 4, 22, svarlang_str(10, 50) );
 
       Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
 
    if ( ( only_active_partition_active == FALSE ) &&
         ( available_partition_counter > 0 ) ) {
-      Print_At(
-         4, 16,
-         "Enter the number of the partition you want to make active...........: " );
+      con_set_cursor_xy( 5, 17 );
+      /*NLS:Enter the number of the partition you want to make active */
+      con_print( svarlang_str( 10, 51 ));
+      con_print( " " );
 
       for ( ;; ) {
          flags.esc = FALSE;
-         input = (int)Input( 1, 70, 16, NUM, 1, 4, ESCR, -1, 0, '\0', '\0' );
+         input = (int)Input( 1, -1, -1, NUM, 1, 4, ESCR, -1, 0, '\0', '\0' );
          if ( flags.esc == TRUE ) {
             return ( 1 );
          }
@@ -1566,28 +1557,28 @@ int Set_Active_Partition_Interface( void )
             break;
          }
          else {
-            Color_Print_At(
-               4, 23, "%d is not a choice. Please enter a valid choice.",
-               input );
+            con_set_cursor_xy( 5, 24 );
+            /* NLS:%d is not a choice. Please enter a valid choice. */
+            Color_Printf( svarlang_str( 10, 52 ), input );
          }
       }
 
       Set_Active_Partition( input - 1 );
 
       Clear_Screen( 0 );
-      Print_Centered( 4, "Set Active Partition", BOLD );
+      Print_Centered( 4, svarlang_str( 3, 2 ), BOLD );
 
-      /* */
+      con_set_cursor_xy( 5, 23 );
+      Color_Printf( svarlang_str( 10, 54 ), input );
       Display_Primary_Partition_Information_SS();
 
       Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
 
    if ( only_active_partition_active == TRUE ) {
-      Color_Print_At(
-         4, 22,
-         "The only startable partition on Drive %d is already set active.",
-         ( flags.drive_number - 127 ) );
+      con_set_cursor_xy( 5, 23 );
+      /* NLS: The only [...] already set active */
+      Color_Printf( svarlang_str( 10, 53 ), ( flags.drive_number - 127 ) );
 
       Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }

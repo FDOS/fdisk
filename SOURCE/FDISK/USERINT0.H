@@ -10,7 +10,6 @@ void Print_UL( unsigned long number );
 void Print_UL_B( unsigned long number );
 void Print_Centered( int y, const char *text, int style );
 void Display_All_Drives( void );
-int IsRecognizedFatPartition( unsigned partitiontype );
 void Pause( void );
 
 #endif

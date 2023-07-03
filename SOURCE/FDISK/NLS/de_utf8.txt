@@ -276,6 +276,12 @@
 10.43:Löschen von erweiterter Partition verweigert!
 10.44:Keine primäre DOS Partition!
 
+# Set active partition
+10.50:Keine Partitionen vorhanden.
+10.51:Nummer der zu aktivierenden Partition...........:
+10.52:%d ist ungültig. Bitte treffen Sie eine gültige Auswahl!
+10.53:Die einzige startbare Partition auf Datenträger %d ist bereits aktiv.
+10.54:Partition %d wurde aktiviert.
 
 10.200:Sind Sie sicher (J/N)..............................?
 
@@ -310,6 +316,8 @@
 250.4:FEHLER
 250.5:WARNUNG!
 250.6:AKTIV
+250.250:Datenträgereinrichtungsprogramm
+
 
 ##############################################################################
 # ERROR MESSAGES                                                             #
