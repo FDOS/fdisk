@@ -13,20 +13,29 @@
 #  wmake -f makefile.wat dist
 
 TOOL_CC     = wcc386
-TOOL_CFLAGS = -q -ox -wx -we
+TOOL_CFLAGS = -q -ox -wx
 
 CC       = wcc
 CFLAGS   = -q -0 -bt=dos -wx -we
+!ifdef __LINUX__
+CFLAGS   += -i=$(%WATCOM)/h 
+!endif
+
 AS       = nasm
 ASFLAGS  = -t -f obj
 LD       = wlink
 LDFLAGS  =
+!ifdef __LINUX__
+CP = cp
+!else
+CP = copy
+!endif
 
 PACKER      = upx
 PACKERFLAGS = -qq --best --8086
 
-BINTOC = bintoc\bintoc
-UTF8TOCP = utf8tocp\utf8tocp
+BINTOC = bintoc/bintoc.exe
+UTF8TOCP = utf8tocp/utf8tocp.exe
 
 !ifdef DEBUG
 CFLAGS += -d2 -mm
@@ -62,16 +71,16 @@ all : fdisk.exe
 dist : ..\..\fdisk.zip
 dist-svardos: ..\..\fdisk.svp
 
-.C.OBJ : .AUTODEPEND
-	$(CC) $(CFLAGS) $*.C
+.c.obj : .AUTODEPEND
+	$(CC) $(CFLAGS) -fo=$*.obj $*.c
 
 
 # --- FDISK -----------------------------------------------------------------
 
 fdisk.exe : $(objs) fdisk.lng fdisk.lnk
-	$(LD) $(LDFLAGS) @fdisk
+	$(LD) $(LDFLAGS) @fdisk.lnk
 
-fdisk.lnk : makefile.wat
+fdisk.lnk : Makefile
 	@echo NAME $^& >$^@
 	@echo SYSTEM DOS >>$^@
 	@echo OPTION QUIET >>$^@
@@ -81,17 +90,17 @@ fdisk.lnk : makefile.wat
 !endif
 	@for %i in ($(objs)) do @echo FILE %i >>$^@
 
-..\..\fdisk.zip : fdisk.exe
-	rm -f ..\..\bin\fdisk.exe
-	copy fdisk.exe ..\..\bin\
-	rm -f ..\..\nls\fdisk.lng
-	-mkdir ..\..\nls
-	copy fdisk.lng ..\..\nls\
-	$(PACKER) $(PACKERFLAGS) ..\..\bin\fdisk.exe
-	cd ..\..
-  zip -9rkDX fdisk.zip appinfo bin doc help nls source\fdisk\*.[ch] &
-  source\fdisk\*.asm source\fdisk\makefile.* license readme.md
-  cd source\fdisk
+../../fdisk.zip : fdisk.exe
+	rm -f ../../bin/fdisk.exe
+	$(CP) fdisk.exe ..\..\bin
+	rm -f ../../nls/fdisk.lng
+	-mkdir ../../nls
+	$(CP) fdisk.lng ../../nls
+	$(PACKER) $(PACKERFLAGS) ../../bin/fdisk.exe
+	cd ../..
+  zip -9rkDX fdisk.zip appinfo bin doc help nls source/fdisk/*.[ch] &
+  source/fdisk/*.asm source/fdisk/makefile.* license readme.md
+  cd source/fdisk
 
 ..\..\fdisk.svp : fdisk.exe
 	cd ..\..
@@ -107,11 +116,11 @@ fdisk.lnk : makefile.wat
 
 # --- SVARLANG --------------------------------------------------------------
 
-svarlang.obj : svarlang\svarlang.c
-	$(CC) $(CFLAGS) $[@
+svarlang.obj : svarlang/svarlang.c
+	$(CC) $(CFLAGS) -fo=$^@ $[@
 
-autoload.obj : svarlang\autoload.c
-	$(CC) $(CFLAGS) $[@
+autoload.obj : svarlang/autoload.c
+	$(CC) $(CFLAGS) -fo=$^@ $[@
 
 
 # --- BOOTLOADER ------------------------------------------------------------
@@ -119,78 +128,78 @@ autoload.obj : svarlang\autoload.c
 bootnorm.bin : bootnorm.asm
 	$(AS) bootnorm.asm -o bootnorm.bin
 
-bootnorm.c : bintoc\bintoc.exe bootnorm.bin
+bootnorm.c : bintoc/bintoc.exe bootnorm.bin
 	$(BINTOC) bootnorm.bin bootnorm.c bootnormal_code
 
 
 # --- NLS -------------------------------------------------------------------
 
-fdisk.lng : nls\out.lng
-	copy nls\out.lng fdisk.lng >NUL
+fdisk.lng : nls/out.lng
+	$(CP) nls/out.lng fdisk.lng
 
-deflang.c : nls\out.lng
-	copy nls\deflang.c deflang.c >NUL
+deflang.c : nls/out.lng
+	$(CP) nls/deflang.c deflang.c
 
-nls\out.lng : svarlang\tlumacz.exe nls\en.txt nls\de.txt
+nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/de.txt
 	@cd nls
-	..\svarlang\tlumacz en de
+	../svarlang/tlumacz.exe en de
 	@cd ..
 
-nls\en.txt : nls\en_utf8.txt utf8tocp\utf8tocp.exe 
+nls/en.txt : nls/en_utf8.txt utf8tocp/utf8tocp.exe 
 	$(UTF8TOCP) 437 $[@ >$^@
 
-nls\de.txt : nls\de_utf8.txt utf8tocp\utf8tocp.exe 
+nls/de.txt : nls/de_utf8.txt utf8tocp/utf8tocp.exe 
 	$(UTF8TOCP) 850 $[@ >$^@
 
 
 # --- TOOLS -----------------------------------------------------------------
 
-bintoc\bintoc.obj : bintoc\bintoc.c
+bintoc/bintoc.obj : bintoc/bintoc.c
 	$(TOOL_CC) $(TOOL_CFLAGS) -fo=$@ $<
 
-bintoc\bintoc.exe : bintoc\bintoc.obj
+bintoc/bintoc.exe : bintoc/bintoc.obj
 	$(LD) option quiet name $@ file $<
 
-svarlang\tlumacz.obj : svarlang\tlumacz.c
+svarlang/tlumacz.obj : svarlang/tlumacz.c
 	$(TOOL_CC) $(TOOL_CFLAGS) -fo=$@ $<
 
-svarlang\tlumacz.exe : svarlang\tlumacz.obj
+svarlang/tlumacz.exe : svarlang/tlumacz.obj
 	$(LD) option quiet name $@ file $<
 
-utf8tocp\utf8tocp.obj : utf8tocp\utf8tocp.c
+utf8tocp/utf8tocp.obj : utf8tocp/utf8tocp.c
 	$(TOOL_CC) $(TOOL_CFLAGS) -fo=$@ $<
 
-utf8tocp\utf8tocp.exe : utf8tocp\utf8tocp.obj
+utf8tocp/utf8tocp.exe : utf8tocp/utf8tocp.obj
 	$(LD) option quiet name $@ file $<
 
 
 # --- CLEANUP ---------------------------------------------------------------
 
 clean : .SYMBOLIC
-	rm -f *.OBJ
+	rm -f *.obj
 
 clobber : .SYMBOLIC
-	rm -f *.BAK
-	rm -f *.BIN
-	rm -f *.ERR
-	rm -f *.EXE
-	rm -f *.LNK
-	rm -f *.LST
-	rm -f *.MAP
-	rm -f *.OBJ
-	rm -f *.TMP
-	rm -f *.ZIP
-	rm -f bintoc\*.exe
-	rm -f bintoc\*.obj
-	rm -f svarlang\*.exe
-	rm -f svarlang\*.obj
-	rm -f utf8tocp\*.exe
-	rm -f utf8tocp\*.obj
+	rm -f *.bak
+	rm -f *.bin
+	rm -f *.err
+	rm -f *.exe
+	rm -f *.lnk
+	rm -f *.lst
+	rm -f *.map
+	rm -f *.obj
+	rm -f *.tmp
+	rm -f *.zip
+	rm -f bintoc/*.exe
+	rm -f bintoc/*.obj
+	rm -f svarlang/*.exe
+	rm -f svarlang/*.obj
+	rm -f utf8tocp/*.exe
+	rm -f utf8tocp/*.obj
 
 # language files
 	rm -f deflang.c
 	rm -f fdisk.lng
-	rm -f nls\en.txt
-	rm -f nls\de.txt
-	rm -f nls\deflang.c
-	rm -f nls\out.lng
+	rm -f nls/en.txt
+	rm -f nls/de.txt
+	rm -f nls/deflang.c
+	rm -f nls/out.lng

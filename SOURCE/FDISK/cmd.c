@@ -13,7 +13,7 @@
 #include "userint0.h"
 #include "ansicon.h"
 #include "printf.h"
-#include "svarlang\svarlang.h"
+#include "svarlang/svarlang.h"
 
 #ifndef FDISKLITE
 #include "userint1.h"
