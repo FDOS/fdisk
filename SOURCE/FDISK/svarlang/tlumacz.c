@@ -44,7 +44,7 @@ static int bitmap_get(const struct bitmap *b, unsigned short id) {
 }
 
 static void bitmap_init(struct bitmap *b) {
-  bzero(b, sizeof(struct bitmap));
+  memset(b, 0, sizeof(struct bitmap));
 }
 
 

@@ -29,7 +29,7 @@
 #endif
 #include "ansicon.h"
 #include "printf.h"
-#include "svarlang\svarlang.h"
+#include "svarlang/svarlang.h"
 
 static int Get_Environment_Settings( char *environment[] );
 static void Initialization( char *environment[] );

@@ -9,7 +9,7 @@
 
 #include "ansicon.h"
 #include "printf.h"
-#include "svarlang\svarlang.h"
+#include "svarlang/svarlang.h"
 
 #include "userint0.h"
 

@@ -25,7 +25,7 @@
 #include "ansicon.h"
 #include "printf.h"
 
-#include "svarlang\svarlang.h"
+#include "svarlang/svarlang.h"
 
 /* Get input from keyboard */
 unsigned long Input( int size_of_field, int x_position, int y_position,

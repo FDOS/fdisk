@@ -88,6 +88,8 @@ main( int argc, char **argv )
    unsigned char *data;
    long size;
 
+   (void) argc;
+
    if ( !argv[1] || !argv[2] || !argv[3] ) {
       return EXIT_FAILURE;
    }

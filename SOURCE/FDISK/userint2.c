@@ -21,7 +21,7 @@
 #include "userint2.h"
 #include "ansicon.h"
 #include "printf.h"
-#include "svarlang\svarlang.h"
+#include "svarlang/svarlang.h"
 
 
 /* Ask user if they want to use large disk support (FAT 32) */

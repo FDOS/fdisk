@@ -25,8 +25,8 @@ LDFLAGS  =
 PACKER      = upx
 PACKERFLAGS = -qq --best --8086
 
-BINTOC = bintoc\bintoc
-UTF8TOCP = utf8tocp\utf8tocp
+BINTOC = bintoc/bintoc.exe
+UTF8TOCP = utf8tocp/utf8tocp.exe
 
 !ifdef DEBUG
 CFLAGS += -d2 -mm
@@ -62,8 +62,8 @@ all : fdisk.exe
 dist : ..\..\fdisk.zip
 dist-svardos: ..\..\fdisk.svp
 
-.C.OBJ : .AUTODEPEND
-	$(CC) $(CFLAGS) $*.C
+.c.obj : .AUTODEPEND
+	$(CC) $(CFLAGS) -fo=$*.obj $*.c
 
 
 # --- FDISK -----------------------------------------------------------------
@@ -107,11 +107,11 @@ fdisk.lnk : makefile.wat
 
 # --- SVARLANG --------------------------------------------------------------
 
-svarlang.obj : svarlang\svarlang.c
-	$(CC) $(CFLAGS) $[@
+svarlang.obj : svarlang/svarlang.c
+	$(CC) $(CFLAGS) -fo=$^@ $[@
 
-autoload.obj : svarlang\autoload.c
-	$(CC) $(CFLAGS) $[@
+autoload.obj : svarlang/autoload.c
+	$(CC) $(CFLAGS) -fo=$^@ $[@
 
 
 # --- BOOTLOADER ------------------------------------------------------------
@@ -119,48 +119,48 @@ autoload.obj : svarlang\autoload.c
 bootnorm.bin : bootnorm.asm
 	$(AS) bootnorm.asm -o bootnorm.bin
 
-bootnorm.c : bintoc\bintoc.exe bootnorm.bin
+bootnorm.c : bintoc/bintoc.exe bootnorm.bin
 	$(BINTOC) bootnorm.bin bootnorm.c bootnormal_code
 
 
 # --- NLS -------------------------------------------------------------------
 
-fdisk.lng : nls\out.lng
-	copy nls\out.lng fdisk.lng >NUL
+fdisk.lng : nls/out.lng
+	copy nls/out.lng fdisk.lng >NUL
 
-deflang.c : nls\out.lng
-	copy nls\deflang.c deflang.c >NUL
+deflang.c : nls/out.lng
+	copy nls/deflang.c deflang.c >NUL
 
-nls\out.lng : svarlang\tlumacz.exe nls\en.txt nls\de.txt
+nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/de.txt
 	@cd nls
-	..\svarlang\tlumacz en de
+	../svarlang/tlumacz en de
 	@cd ..
 
-nls\en.txt : nls\en_utf8.txt utf8tocp\utf8tocp.exe 
+nls/en.txt : nls/en_utf8.txt utf8tocp/utf8tocp.exe 
 	$(UTF8TOCP) 437 $[@ >$^@
 
-nls\de.txt : nls\de_utf8.txt utf8tocp\utf8tocp.exe 
+nls/de.txt : nls/de_utf8.txt utf8tocp/utf8tocp.exe 
 	$(UTF8TOCP) 850 $[@ >$^@
 
 
 # --- TOOLS -----------------------------------------------------------------
 
-bintoc\bintoc.obj : bintoc\bintoc.c
+bintoc/bintoc.obj : bintoc/bintoc.c
 	$(TOOL_CC) $(TOOL_CFLAGS) -fo=$@ $<
 
-bintoc\bintoc.exe : bintoc\bintoc.obj
+bintoc/bintoc.exe : bintoc/bintoc.obj
 	$(LD) option quiet name $@ file $<
 
-svarlang\tlumacz.obj : svarlang\tlumacz.c
+svarlang/tlumacz.obj : svarlang/tlumacz.c
 	$(TOOL_CC) $(TOOL_CFLAGS) -fo=$@ $<
 
-svarlang\tlumacz.exe : svarlang\tlumacz.obj
+svarlang/tlumacz.exe : svarlang/tlumacz.obj
 	$(LD) option quiet name $@ file $<
 
-utf8tocp\utf8tocp.obj : utf8tocp\utf8tocp.c
+utf8tocp/utf8tocp.obj : utf8tocp/utf8tocp.c
 	$(TOOL_CC) $(TOOL_CFLAGS) -fo=$@ $<
 
-utf8tocp\utf8tocp.exe : utf8tocp\utf8tocp.obj
+utf8tocp/utf8tocp.exe : utf8tocp/utf8tocp.obj
 	$(LD) option quiet name $@ file $<
 
 

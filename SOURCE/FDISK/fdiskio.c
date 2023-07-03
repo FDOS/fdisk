@@ -15,7 +15,7 @@
 #include "pdiskio.h"
 #include "ansicon.h"
 #include "printf.h"
-#include "svarlang\svarlang.h"
+#include "svarlang/svarlang.h"
 
 
 /* bootloader pointers */
