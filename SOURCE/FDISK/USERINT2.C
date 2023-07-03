@@ -411,6 +411,9 @@ int Create_Logical_Drive_Interface( void )
             return ( 1 );
          }
 
+         con_set_cursor_xy( 5, 18 );
+         con_clreol();
+
          Print_At( 4, 17, "Total Extended Partition size is " );
 
          if ( ( flags.version == 4 ) || ( flags.version == 5 ) ||
@@ -508,28 +511,31 @@ void Delete_Extended_DOS_Partition_Interface( void )
 
    Clear_Screen( 0 );
 
-   Print_Centered( 4, "Delete Extended DOS Partition(s)", BOLD );
+   /* NLS:Delete Extended DOS Partition */
+   Print_Centered( 4, svarlang_str( 5, 2 ), BOLD );
 
    Display_Primary_Partition_Information_SS();
 
-   BlinkPrintAt( 4, 18, "WARNING!" );
-
-   con_print( " Data in the deleted Extended DOS Partition(s) will be lost." );
-   Print_At( 4, 19, "Do you wish to continue (Y/N).................? " );
+   con_set_cursor_xy( 5, 19 );
+   /* NLS:WARNING! Data in the deleted Extended DOS[...] */
+   con_print( svarlang_str( 10, 20 ) );
+   con_print( " " );
 
    flags.esc = FALSE;
-   input = (int)Input( 1, 52, 19, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
+   input = (int)Input( 1, -1, -1, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
 
    if ( ( flags.esc == FALSE ) && ( input == TRUE ) ) {
       Delete_Extended_Partition();
 
       Clear_Screen( 0 );
-      Print_Centered( 4, "Delete Extended DOS Partition(s)", BOLD );
+      Print_Centered( 4, svarlang_str( 5, 2 ), BOLD );
       Display_Primary_Partition_Information_SS();
 
-      Color_Print_At( 4, 21, "Extended DOS Partition(s) deleted" );
+      /* NLS:Extended DOS Partition deleted */
+      Color_Print_At( 4, 21, svarlang_str( 10, 21 ) );
 
-      Print_At( 4, 24, "                                    " );
+      con_set_cursor_xy( 5, 25 );
+      con_clreol();
 
       Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
@@ -552,17 +558,10 @@ int Delete_Logical_Drive_Interface( void )
 
    Clear_Screen( 0 );
 
-   Print_Centered(
-      1, "Delete Logical DOS Drive(s) in the Extended DOS Partition", BOLD );
+   /* NLS:Delete Logical DOS Drive[...] */
+   Print_Centered( 1, svarlang_str( 5, 3 ) , BOLD );
 
    Display_Extended_Partition_Information_SS();
-
-   BlinkPrintAt( 4, 19, "WARNING!" );
-   con_print( " Data in a deleted Logical DOS Drive will be lost." );
-
-   Print_At(
-      4, 20,
-      "What drive do you want to delete...............................? " );
 
    Determine_Drive_Letters();
 
@@ -572,6 +571,11 @@ int Delete_Logical_Drive_Interface( void )
    input_ok = FALSE;
 
    do {
+      con_set_cursor_xy( 5, 20 );
+      /* NLS:WARNING! Data in a deleted Logical[...] */
+      con_print(  svarlang_str( 10, 30 ) );
+      con_print( " " );
+
       flags.esc = FALSE;
 
       if ( ( flags.del_non_dos_log_drives == TRUE ) &&
@@ -580,12 +584,12 @@ int Delete_Logical_Drive_Interface( void )
             pDrive->num_of_non_dos_log_drives = 9;
          }
 
-         input = (int)Input( 1, 69, 20, CHAR, 67, 90, ESCR, 0, 0, '1',
+         input = (int)Input( 1, -1, -1, CHAR, 67, 90, ESCR, 0, 0, '1',
                              pDrive->num_of_non_dos_log_drives + '0' );
       }
       else {
          input =
-            (int)Input( 1, 69, 20, CHAR, 67, 90, ESCR, 0, 0, '\0', '\0' );
+            (int)Input( 1, -1, -1, CHAR, 67, 90, ESCR, 0, 0, '\0', '\0' );
       }
       /* Note:  min_range and max_range will need adjusted!!!!! */
       /* Changes will have to be made because the first logical drive letter */
@@ -613,17 +617,19 @@ int Delete_Logical_Drive_Interface( void )
          } while ( index <= 26 );
       }
       if ( input_ok == FALSE ) {
-         Color_Print_At( 4, 22, "Illegal drive letter" );
+         /* NLS:Illegal drive letter */
+         Color_Print_At( 4, 22, svarlang_str( 10, 250 ) );
       }
 
    } while ( input_ok == FALSE );
 
    drive_to_delete = input;
 
-   Normal_Print_At( 4, 22,
-                    "Are you sure (Y/N)..............................? " );
+   /* NLS:Are you sure (Y/N)? */
+   Normal_Print_At( 4, 22, svarlang_str( 10, 200) );
+   con_print( " " );
    flags.esc = FALSE;
-   input = (int)Input( 1, 54, 22, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
+   input = (int)Input( 1, -1, -1, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
 
    if ( ( input == TRUE ) && ( flags.esc == FALSE ) ) {
       error_code = Delete_Logical_Drive( drive_to_delete );
@@ -631,15 +637,13 @@ int Delete_Logical_Drive_Interface( void )
       Clear_Screen( 0 );
 
       if ( !error_code ) {
-         Color_Print_At( 4, 22, "Logical drive deleted" );
+         Color_Print_At( 4, 22, svarlang_str( 10, 31 ) );
       }
       else {
-         Color_Print_At( 4, 22, "Error deleting logical drive!" );
+         Color_Print_At( 4, 22, svarlang_str( 10, 31 ) );
       }
 
-      Print_Centered(
-         1, "Delete Logical DOS Drive(s) in the Extended DOS Partition",
-         BOLD );
+      Print_Centered( 1, svarlang_str( 5, 3 ), BOLD );
       Display_Extended_Partition_Information_SS();
       input = (int)Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
@@ -725,17 +729,18 @@ void Delete_Primary_DOS_Partition_Interface( void )
 
    Clear_Screen( 0 );
 
-   Print_Centered( 4, "Delete Primary DOS Partition", BOLD );
+   /* Delete Primary DOS Partition */
+   Print_Centered( 4, svarlang_str( 5, 1 ), BOLD );
    Display_Primary_Partition_Information_SS();
 
-   BlinkPrintAt( 4, 19, "WARNING!" );
-
-   con_print( " Data in the deleted Primary DOS Partition will be lost." );
-   Print_At( 4, 20, "What primary partition do you want to delete..? " );
+   con_set_cursor_xy( 5, 20 );
+   /* NLS:WARNING! Data in the deleted [...] */ 
+   con_printf( svarlang_str( 10, 40 ) );
+   con_print( " " );
 
    flags.esc = FALSE;
    input =
-      (int)Input( 1, 52, 20, NUM, 1, 4, ESCR, -1, 0, '\0',
+      (int)Input( 1, -1, -1, NUM, 1, 4, ESCR, -1, 0, '\0',
                   '\0' ); /* 4 needs changed to the max num of partitions */
 
    if ( flags.esc == FALSE ) {
@@ -744,38 +749,42 @@ void Delete_Primary_DOS_Partition_Interface( void )
       p = &pDrive->pri_part[partition_to_delete];
       if ( Is_Dos_Part( p->num_type ) ) {
 
-         Print_At( 4, 22,
-                   "Are you sure (Y/N)..............................? " );
+         /* NLS:Are you sure? */
+         Print_At( 4, 22, svarlang_str( 10, 200 ) );
+         con_print( " " );
 
          flags.esc = FALSE;
-         input = (int)Input( 1, 54, 22, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
+         input = (int)Input( 1, -1, -1, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
 
          if ( ( input == TRUE ) && ( flags.esc == FALSE ) ) {
             if ( input ) {
                Clear_Screen( 0 );
 
-               Print_Centered( 4, "Delete Primary DOS Partition", BOLD );
+               Print_Centered( 4, svarlang_str( 5, 1 ), BOLD );
 
                error_code = Delete_Primary_Partition( partition_to_delete );
                Display_Primary_Partition_Information_SS();
 
                if ( !error_code ) {
-                  Color_Print_At( 4, 22, "Primary DOS Partition deleted" );
+                  /* NLS:Primary DOS Partition deleted */
+                  Color_Print_At( 4, 22, svarlang_str( 10, 41 ) );
                }
                else {
-                  Color_Print_At( 4, 22,
-                                  "Error deleting primary DOS Partition!" );
+                  /* NLS:Error deleting primary DOS Partition! */
+                  Color_Print_At( 4, 22, svarlang_str( 10, 42 ) );
                }
                Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             }
          }
       }
       else if ( Is_Supp_Ext_Part( p->num_type ) ) {
-         Color_Print_At( 4, 22, "Refusing to delete extended partition!" );
+         /* NLS:Refusing to delete extended partition! */
+         Color_Print_At( 4, 22, svarlang_str( 10, 43 ) );
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
       else {
-         Color_Print_At( 4, 22, "Not a DOS partition!" );
+         /* NLS:Not a DOS partition! */
+         Color_Print_At( 4, 22, svarlang_str( 10, 44 ) );
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
    }
@@ -797,7 +806,8 @@ void Display_Extended_Partition_Information_SS( void )
    /* Check to see if there are any drives to display */
    if ( ( brief_partition_table[( flags.drive_number - 128 )][4] > 0 ) ||
         ( brief_partition_table[( flags.drive_number - 128 )][5] > 0 ) ) {
-      Print_At( 0, 3, "Drv Volume Label  Mbytes  System  Usage" );
+      /* NLS:Drv Volume Label  Mbytes  System  Usage */
+      Print_At( 0, 3, svarlang_str( 10, 12 ) );
 
       /* Display information for each Logical DOS Drive */
       index = 4;
@@ -807,7 +817,6 @@ void Display_Extended_Partition_Information_SS( void )
             column_index = 41;
             print_index = 4;
 
-            /* NLS:Drv Volume Label  Mbytes  System  Usage */
             Print_At( 41, 3, svarlang_str( 10, 12 ) );
          }
 
@@ -859,6 +868,7 @@ void Display_Extended_Partition_Information_SS( void )
    }
 
    con_set_cursor_xy( 5, 18 );
+   con_clreol();
    /* NLS:Total Extended Partition size is [...] */
    con_printf( svarlang_str( 10, 6 ), part_table[flags.drive_number - 128].ext_size_mb );
 
@@ -1057,7 +1067,7 @@ void Display_Primary_Partition_Information_SS( void )
 
                /* Status */
                if ( pDrive->pri_part[index].active_status > 0 ) {
-                  Print_At( 15, ( cursor_offset + 9 ), "ACTIVE" );
+                  Print_At( 15, ( cursor_offset + 9 ), svarlang_str( 250, 6 ) );
                }
 
                /* Type */
@@ -1162,7 +1172,9 @@ void Display_Primary_Partition_Information_SS( void )
    }
 
    /* NLS:Total disk space is [...] */
-   Print_At( 4, 14, svarlang_str( 10, 8 ), pDrive->disk_size_mb );
+   con_set_cursor_xy( 5, 15 );
+   con_clreol();
+   con_printf( svarlang_str( 10, 8 ), pDrive->disk_size_mb );
 
 }
 

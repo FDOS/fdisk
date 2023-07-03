@@ -259,7 +259,29 @@
 # Table headers
 10.10:Partition  Status  Type     Volume Label   Mbytes  System    Usage
 10.11:Partition   Status   Mbytes    Description    Usage  Start Cyl  End Cyl
-10.12:Drv Volume Label  Mbytes  System  Usage
+10.12:Drv Volume Label  Mbytes System   Usage
+
+# Delete extended partition
+10.20:\e[1;5mWARNING!\e[22;25m Data in the deleted Extended DOS Partition will be lost.\n    Do you wish to continue (Y/N).................?
+10.21:Extended DOS Partition deleted
+
+# Delete logical drives
+10.30:\e[1;5mWARNING!\e[22;25m Data in a deleted Logical DOS Drive will be lost.\n    What drive do you want to delete...............................? 
+10.31:Logical drive deleted
+10.32:Error deleting logical drive!
+
+# Delete primary Partition
+10.40:\e[1;5mWARNING!\e[22;25m Data in the deleted Primary DOS Partition will be lost.\n    What primary partition do you want to delete...?
+10.41:Primary DOS Partition deleted
+10.42:Error deleting primary DOS Partition!
+10.43:Refusing to delete extended partition!
+10.44:Not a DOS partition!
+
+
+10.200:Are you sure (Y/N)..............................?
+
+# Error strings
+10.250:Illegal drive letter
 
 ##############################################################################
 # KBDINPUT.C                                                                 #
@@ -287,6 +309,8 @@
 250.3:Press any key to continue
 250.4:ERROR
 250.5:WARNING!
+250.6:ACTIVE
+
 
 ##############################################################################
 # ERROR MESSAGES                                                             #

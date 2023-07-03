@@ -13,7 +13,7 @@
 
 #endif /* FDISKLITE */
 
-#define VERSION  "1.3.7"
+#define VERSION  "1.?.?"
 #define COPYLEFT "1998 - 2023"
 
 #define DEFAULT_VERSION 8
