@@ -1,7 +1,16 @@
-# This makefile is for Free FDISK and Open Watcom.
+# MAKEFILE FOR Free FDISK
+# This file is for Open Watcom 1.9 (DOS or Win32)
 #
 # Created by Bernd Boeckmann
-#   for version 1.3.4 and Open Watcom 1.9.
+#
+# Additional tools needed to build
+#  - NASM (tested with version 2.0.15)
+#
+# Build with:
+#  wmake -f makefile.wat
+#
+# To create a ZIP distribution:
+#  wmake -f makefile.wat dist
 
 TOOL_CC     = wcc386
 TOOL_CFLAGS = -q -ox -wx -we
@@ -12,8 +21,6 @@ AS       = nasm
 ASFLAGS  = -t -f obj
 LD       = wlink
 LDFLAGS  =
-CL       = wcl
-CLFLAGS  = $(CFLAGS)
 
 PACKER      = upx
 PACKERFLAGS = -qq --best --8086
@@ -107,7 +114,6 @@ autoload.obj : svarlang\autoload.c
 	$(CC) $(CFLAGS) $[@
 
 
-
 # --- BOOTLOADER ------------------------------------------------------------
 
 bootnorm.bin : bootnorm.asm
@@ -115,7 +121,6 @@ bootnorm.bin : bootnorm.asm
 
 bootnorm.c : bintoc\bintoc.exe bootnorm.bin
 	$(BINTOC) bootnorm.bin bootnorm.c bootnormal_code
-
 
 
 # --- NLS -------------------------------------------------------------------
