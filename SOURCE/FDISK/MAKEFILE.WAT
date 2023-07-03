@@ -35,16 +35,16 @@ CFLAGS += -DRELEASE=$(RELEASE)
 CFLAGS += -DFD_FREEDOS=$(FREEDOS)
 !endif
 
-objs  = main.obj cmd.obj fdiskio.obj pdiskio.obj pcompute.obj helpscr.obj
-objs += compat.obj userint0.obj
+objs  = main.obj cmd.obj fdiskio.obj pdiskio.obj pcompute.obj compat.obj
+objs += helpscr.obj userint0.obj
 objs +=  
 !ifdef LITE
 CFLAGS += -DFDISKLITE=1
 !else
 objs += userint1.obj userint2.obj
 !endif
-objs += kbdinput.obj ansicon.obj printf.obj bootnorm.obj svarlang.obj
-objs += autoload.obj deflang.obj 
+objs += kbdinput.obj ansicon.obj printf.obj bootnorm.obj
+objs += svarlang.obj autoload.obj deflang.obj 
 
 !ifdef SMART_MBR
 CFLAGS += -DSMART_MBR=1
@@ -121,15 +121,15 @@ bootnorm.c : bintoc\bintoc.exe bootnorm.bin
 # --- NLS -------------------------------------------------------------------
 
 fdisk.lng : nls\deflang.c
-	copy nls\out.lng fdisk.lng
+	copy nls\out.lng fdisk.lng >NUL
 
 deflang.c : nls\deflang.c
-	copy nls\deflang.c deflang.c
+	copy nls\deflang.c deflang.c >NUL
 
 nls\deflang.c : svarlang\tlumacz.exe nls\en.txt nls\de.txt
-	cd nls
+	@cd nls
 	..\svarlang\tlumacz en de
-	cd ..
+	@cd ..
 
 nls\en.txt : nls\en_utf8.txt utf8tocp\utf8tocp.exe 
 	$(UTF8TOCP) 437 $[@ >$^@
@@ -189,4 +189,3 @@ clobber : .SYMBOLIC
 	rm -f nls\de.txt
 	rm -f nls\deflang.c
 	rm -f nls\out.lng
-

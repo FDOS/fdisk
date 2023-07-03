@@ -4,10 +4,17 @@ nls/fdisk.lng
 
 # generated files
 source/fdisk/*.exe
+source/fdisk/bintoc/*.exe
+source/fdisk/svarlang/*.exe
+source/fdisk/utf8tocp/*.exe
 source/fdisk/deflang.c
 source/fdisk/bootnorm.bin
 source/fdisk/fdisk.lng
 source/fdisk/svarlang/*.lib
+source/fdisk/nls/de.txt
+source/fdisk/nls/en.txt
+source/fdisk/nls/deflang.c
+source/fdisk/nls/out.lng
 
 # compiler-specific build artifacts
 *.dsk
