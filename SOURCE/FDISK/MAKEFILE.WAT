@@ -3,6 +3,9 @@
 # Created by Bernd Boeckmann
 #   for version 1.3.4 and Open Watcom 1.9.
 
+TOOL_CC     = wcc386
+TOOL_CFLAGS = -q -ox -wx -we
+
 CC       = wcc
 CFLAGS   = -q -0 -bt=dos -wx -we
 AS       = nasm
@@ -14,6 +17,9 @@ CLFLAGS  = $(CFLAGS)
 
 PACKER      = upx
 PACKERFLAGS = -qq --best --8086
+
+BINTOC = bintoc\bintoc
+UTF8TOCP = utf8tocp\utf8tocp
 
 !ifdef DEBUG
 CFLAGS += -d2 -mm
@@ -49,20 +55,16 @@ all : fdisk.exe
 dist : ..\..\fdisk.zip
 dist-svardos: ..\..\fdisk.svp
 
+buildreq : bintoc\bintoc.exe svarlang\tlumacz.exe utf8tocp\utf8tocp.exe .symbolic
+
 .C.OBJ : .AUTODEPEND
 	$(CC) $(CFLAGS) $*.C
 
 
 # --- FDISK -----------------------------------------------------------------
 
-fdisk.exe : $(objs) fdisk.lnk
+fdisk.exe : buildreq $(objs) fdisk.lnk
 	$(LD) $(LDFLAGS) @fdisk
-	-del ..\..\bin\fdisk.exe
-	-copy fdisk.exe ..\..\bin\
-	-del ..\..\nls\fdisk.lng
-	-mkdir ..\..\nls
-	-copy fdisk.lng ..\..\nls\
-#	-$(PACKER) $(PACKERFLAGS) ..\..\bin\fdisk.exe
 
 fdisk.lnk : $(objs)
 	@echo NAME $^& >$^@
@@ -75,6 +77,12 @@ fdisk.lnk : $(objs)
 	@for %i in ($(objs)) do @echo FILE %i >>$^@
 
 ..\..\fdisk.zip : fdisk.exe
+	-rm ..\..\bin\fdisk.exe
+	copy fdisk.exe ..\..\bin\
+	-rm ..\..\nls\fdisk.lng
+	-mkdir ..\..\nls
+	copy fdisk.lng ..\..\nls\
+	$(PACKER) $(PACKERFLAGS) ..\..\bin\fdisk.exe
 	cd ..\..
   zip -9rkDX fdisk.zip appinfo bin doc help nls source\fdisk\*.[ch] &
   source\fdisk\*.asm source\fdisk\makefile.* license readme.md
@@ -101,16 +109,56 @@ autoload.obj : svarlang\autoload.c
 	$(CC) $(CFLAGS) $[@
 
 
+
 # --- BOOTLOADER ------------------------------------------------------------
 
 bootnorm.bin : bootnorm.asm
 	$(AS) bootnorm.asm -o bootnorm.bin
 
-bootnorm.c : bintoc.exe bootnorm.bin
-	bintoc.exe bootnorm.bin bootnorm.c bootnormal_code
+bootnorm.c : bintoc\bintoc.exe bootnorm.bin
+	$(BINTOC) bootnorm.bin bootnorm.c bootnormal_code
 
-bintoc.exe : bintoc.c
-  $(CL) $(CLFLAGS) bintoc.c
+
+
+# --- NLS -------------------------------------------------------------------
+
+deflang.c fdisk.lng : nls\en.txt nls\de.txt
+	cd nls
+	..\svarlang\tlumacz en de
+	cd ..
+	rm -f fdisk.lng
+	rm -f deflang.c
+	copy nls\out.lng fdisk.lng
+	copy nls\deflang.c deflang.c
+	rm -f nls\deflang.c
+	rm -f nls\out.lng
+
+nls\en.txt : nls\en_utf8.txt
+	$(UTF8TOCP) 437 $< >$@
+
+nls\de.txt : nls\de_utf8.txt
+	$(UTF8TOCP) 850 $< >$@
+
+
+# --- TOOLS -----------------------------------------------------------------
+
+bintoc\bintoc.obj : bintoc\bintoc.c
+	$(TOOL_CC) $(TOOL_CFLAGS) -fo=$@ $<
+
+bintoc\bintoc.exe : bintoc\bintoc.obj
+	$(LD) option quiet name $@ file $<
+
+svarlang\tlumacz.obj : svarlang\tlumacz.c
+	$(TOOL_CC) $(TOOL_CFLAGS) -fo=$@ $<
+
+svarlang\tlumacz.exe : svarlang\tlumacz.obj
+	$(LD) option quiet name $@ file $<
+
+utf8tocp\utf8tocp.obj : utf8tocp\utf8tocp.c
+	$(TOOL_CC) $(TOOL_CFLAGS) -fo=$@ $<
+
+utf8tocp\utf8tocp.exe : utf8tocp\utf8tocp.obj
+	$(LD) option quiet name $@ file $<
 
 
 # --- CLEANUP ---------------------------------------------------------------
@@ -129,3 +177,14 @@ clobber : .SYMBOLIC
 	rm -f *.OBJ
 	rm -f *.TMP
 	rm -f *.ZIP
+	rm -f bintoc\*.exe
+	rm -f bintoc\*.obj
+	rm -f svarlang\*.exe
+	rm -f svarlang\*.obj
+	rm -f utf8tocp\*.exe
+	rm -f utf8tocp\*.obj
+
+# language files
+	rm -f nls\en.txt
+	rm -f nls\de.txt
+
