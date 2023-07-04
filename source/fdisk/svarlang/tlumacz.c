@@ -110,7 +110,7 @@ static unsigned short unesc_string(char *linebuff) {
   unsigned short i;
   for (i = 0; linebuff[i] != 0; i++) {
     if (linebuff[i] != '\\') continue;
-    memmove(linebuff + i, linebuff + i + 1, strlen(linebuff + i + 1));
+    memmove(linebuff + i, linebuff + i + 1, strlen(linebuff + i));
     if (linebuff[i] == 0) break;
     switch (linebuff[i]) {
       case 'e':
