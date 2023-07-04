@@ -143,13 +143,15 @@ bootnorm.c : bintoc/bintoc.exe bootnorm.bin
 fdisk.lng : nls/out.lng
 	$(CP) $[@ $^@
 
-deflang.c : nls/out.lng
+deflang.c : nls/deflang.c
 	$(CP) nls$(SEP)deflang.c deflang.c
 
-nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/de.txt
+nls/deflang.c nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/de.txt
 	@cd nls
 	$(TLUMACZ) en de
 	@cd ..
+
+nls/deflang.c : nls/out.lng
 
 nls/en.txt : nls/en_utf8.txt utf8tocp/utf8tocp.exe 
 	$(UTF8TOCP) 437 $[@ >$^@
@@ -195,6 +197,7 @@ clobber : .SYMBOLIC
 	rm -f *.obj
 	rm -f *.tmp
 	rm -f *.zip
+	rm -f *.map
 	rm -f bintoc/*.exe
 	rm -f bintoc/*.obj
 	rm -f svarlang/*.exe
