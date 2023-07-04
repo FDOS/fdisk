@@ -7,6 +7,7 @@ LD=ia16-elf-gcc
 LIBS = -li86
 CFLAGS = -mcmodel=small -Os
 
+NASM=nasm
 CP=cp
 
 FDISK_OBJS = main.o cmd.o helpscr.o compat.o pdiskio.o fdiskio.o pcompute.o \
@@ -18,6 +19,9 @@ fdisk.exe : $(FDISK_OBJS) fdisk.lng
 
 bootnorm.c : bootnorm.bin bintoc/bintoc
 	bintoc/bintoc bootnorm.bin bootnorm.c bootnormal_code
+
+bootnorm.bin : bootnorm.asm
+	$(NASM) -f bin -o $@ $<
 
 
 # --- translations ----------------------------------------------------------
@@ -53,13 +57,17 @@ utf8tocp/utf8tocp : utf8tocp/utf8tocp.c
 # --- clean up --------------------------------------------------------------
 
 clean:
-	rm -f *.o
+	rm -f *.o *.obj *.OBJ *.bin *.BIN
 	rm -f *.exe
+	rm -f *.map *.MAP
 	rm -f fdisk.lng out.lng
-	rm -f nls/en.txt nls/de.txt nls/out.lng
-	rm -f bintoc/*.o
-	rm -f bintoc/bintoc
-	rm -f svarlang/*.o
-	rm -f svarlang/svarlang
-	rm -f utf8tocp/*.o
-	rm -f utf8tocp/utf8tocp
+	rm -f nls/en.txt nls/de.txt nls/out.lng nls/DEFLANG.C
+	rm -f bintoc/bintoc bintoc/*.o
+	rm -f bintoc/*.exe bintoc/*.obj
+	rm -f bintoc/*.EXE bintoc/*.OBJ
+	rm -f svarlang/tlumacz svarlang/*.o
+	rm -f svarlang/*.exe svarlang/*.obj
+	rm -f svarlang/*.EXE svarlang/*.OBJ
+	rm -f utf8tocp/utf8tocp utf8tocp/*.o
+	rm -f utf8tocp/*.exe utf8tocp/*.obj
+	rm -f utf8tocp/*.EXE utf8tocp/*.OBJ
