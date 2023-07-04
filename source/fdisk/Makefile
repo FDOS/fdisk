@@ -140,18 +140,16 @@ bootnorm.c : bintoc/bintoc.exe bootnorm.bin
 
 # --- NLS -------------------------------------------------------------------
 
-fdisk.lng : nls/out.lng
-	$(CP) $[@ $^@
-
-deflang.c : nls/deflang.c
-	$(CP) nls$(SEP)deflang.c deflang.c
-
-nls/deflang.c nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/de.txt
+nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/de.txt
 	@cd nls
 	$(TLUMACZ) en de
 	@cd ..
 
-nls/deflang.c : nls/out.lng
+fdisk.lng : nls/out.lng
+	$(CP) $[@ $^@
+
+deflang.c : nls/out.lng
+	$(CP) nls$(SEP)deflang.c deflang.c
 
 nls/en.txt : nls/en_utf8.txt utf8tocp/utf8tocp.exe 
 	$(UTF8TOCP) 437 $[@ >$^@
