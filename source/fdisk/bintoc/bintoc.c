@@ -65,8 +65,7 @@ write_data_to_c_file( const unsigned char *data, long size,
    fprintf( f, "const unsigned char %s[%ld] = {\n", ident, size );
 
    for ( i = 0; i < size; i++ ) {
-      itoa( data[i], numbuf, 10 );
-      fputs( numbuf, f );
+      fprintf( f, "%d", data[i] );
 
       if ( i != size - 1 ) {
          fputs( ",", f );
