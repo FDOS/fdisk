@@ -23,19 +23,6 @@ extern char *_searchpath (const char *__file);
 #define stricmp strcasecmp
 #endif
 
-/* bits defined for flags field defined in REGPACKW and INTPACKW */
-
-enum {
-    INTR_CF     = 0x0001,       /* carry */
-    INTR_PF     = 0x0004,       /* parity */
-    INTR_AF     = 0x0010,       /* auxiliary carry */
-    INTR_ZF     = 0x0040,       /* zero */
-    INTR_SF     = 0x0080,       /* sign */
-    INTR_TF     = 0x0100,       /* trace */
-    INTR_IF     = 0x0200,       /* interrupt */
-    INTR_DF     = 0x0400,       /* direction */
-    INTR_OF     = 0x0800        /* overflow */
-};
 
 extern char **environ;
 
