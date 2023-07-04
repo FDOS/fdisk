@@ -15,9 +15,9 @@ systems.
  - IBM-XT compatible PC with 256k RAM and disk controller
 
 ## Documentation
- - [Build Instructions](doc/FDISK/INSTALL.md)
- - [Change Log](doc/FDISK/CHANGES.md)
- - [Command Line Syntax](doc/FDISK/USAGE.md)
+ - [Build Instructions](doc/fdisk/INSTALL.md)
+ - [Change Log](doc/fdisk/CHANGES.md)
+ - [Command Line Syntax](doc/fdisk/USAGE.md)
 
 ## Copyright
 
