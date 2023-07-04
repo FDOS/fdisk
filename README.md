@@ -15,9 +15,9 @@ systems.
  - IBM-XT compatible PC with 256k RAM and disk controller
 
 ## Documentation
- - [Build Instructions](DOC/FDISK/INSTALL.md)
- - [Change Log](DOC/FDISK/CHANGES.md)
- - [Command Line Syntax](DOC/FDISK/USAGE.md)
+ - [Build Instructions](doc/FDISK/INSTALL.md)
+ - [Change Log](doc/FDISK/CHANGES.md)
+ - [Command Line Syntax](doc/FDISK/USAGE.md)
 
 ## Copyright
 
@@ -28,3 +28,7 @@ This program comes as-is and without warranty of any kind.  The author of
 this software assumes no responsibility pertaining to the use or mis-use of
 this software.  By using this software, the operator is understood to be
 agreeing to the terms of the above.
+
+## Third party credits
+FDISK relies on the SvarLANG library for translations, created by
+Mateusz Viste.

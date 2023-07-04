@@ -1,65 +1,81 @@
 # Installation
 
 ## Building from source
-Free FDISK is confirmed to build with the following toolchains:
+Free FDISK is confirmed to build with the following compilers:
 
- - Open Watcom 1.9
- - Borland C++ 3.1
- - Turbo C++ 3.0
+ - Open Watcom >=1.9 (DOS, Win32)
+ - IA16-GCC and libi86 >= 20230703 (Mac)
 
-Beside a C Compiler the Netwide Assembler (NASM) must be installed.
+The assembler sources are verified to assemble with:
 
-If the executable packer UPX is installed and accessible via path the
-generated `FDISK.EXE` gets compressed during the creation build process.
+ - Netwide Assembler NASM version 2.15
 
-## Building/refreshing translation files
-FDISK relies on the SvarLANG library for translations. Every language is
-originally stored in a UTF-8 text file in the SOURCE\NLS directory.
+In addition, if you want to build a distribution ZIP file, the following tools
+must be installed:
 
-Executing the REGEN.BAT script converts the original UTF-8 text files into
-files with proper DOS codepages and compiles all the files inside a single
-FDISK.LNG resource file. This FDISK.LNG file contains all translations to be
-used by FDISK. This file must be placed in %NLSPATH% on the target system.
+ - Info-ZIP
+ - UPX
 
-Along with the FDISK.LNG file, a DEFLANG.C file is also generated in FDISK'S
-SOURCE directory. This file is used during FDISK's compilation process as it
-stores all english strings that are used if FDISK.LNG cannot be loaded.
+During the build process, beside the executable _fdisk.exe_, a translation
+file _fdisk.lng_ is created. This file contains translations for different
+languages. The file must be shipped along with the executable file, either
+in the same directory, or in a directory called `%NLSPATH%`.
+Otherwise the software is only displayed in english.
 
-NOTE: Rebuilding translation resources requires the UTF8TOCP tool to be
-installed and accessible in %PATH%.
+The translations are stored in UTF-8 encoded files in the 
+`source/fdisk/nls` folder. During build, these files get converted to their
+respective DOS codepage and assembled into the _fdisk.lng_ file.
+
+The whole build process can be triggered by one command, as shown below.
+If you want to update the translation file without building the software,
+you can invoke _regen.bat_ in the `source/fdisk/nls` directory. However,
+you may run into problems if the translation file gets considerably larger.
+So whenever there is a chance, trigger the rebuild of _fdisk.lng_ via one
+of the given build commands.
+
 
 ### Building with Open Watcom
-Open Watcom is the preferred toolchain. FDISK may be built by calling
-Watcom Make in the `SOURCE\FDISK` sub directory:
+Open Watcom is the preferred release toolchain. FDISK may be built by calling
+Watcom Make in the `source/fdisk` sub directory:
 ```
-wmake -f makefile.wat
-```
-
-### Building with Borland Tools
-FDISK may be built by calling Borland Make in the `SOURCE\FDISK` sub
-directory. It defaults to Borland C++ (bcc):
-```
-make -f makefile.bor
+wmake
 ```
 
-I you want to compile with Turbo C++ (tcc) you must specify it:
-```
-make -f makefile.bor -DCC=tcc
-```
-
-### Building a release version
+This builds _fdisk.exe_ and the translation file _fdisk.lng_.
 To build a release version to get rid of the "NON-RELEASE BUILD" nag invoke:
+
 ```
-wmake -f makefile.wat RELEASE=1
+wmake RELEASE=1
 ```
-or the Borland Tools equivalent.
 
 To build a FreeDOS FDISK branded release:
 ```
-wmake -f makefile.wat RELEASE=1 FREEDOS=1
+wmake RELEASE=1 FREEDOS=1
 ```
 
 To build a LITE release (without UI):
 ```
-wmake -f makefile.wat RELEASE=1 LITE=1
+wmake RELEASE=1 LITE=1
 ```
+
+You may also build the distribution ZIP file _fdisk.zip_ containing the
+executable, translation file, documentation and source code via:
+```
+wmake RELEASE=1 dist
+```
+
+### Building with IA16-GCC
+Experimental support is provided for building FDISK with the IA16-GCC
+toolchain. To build the software under Mac or Linux, run:
+```
+make -f Makefile.gcc
+```
+
+This generates the _fdisk.exe_ file and the translation file _fdisk.lng_.
+There is no support for generating distribution ZIP files yet.
+
+
+## Third party credits
+FDISK relies on the SvarLANG library for translations.
+
+
