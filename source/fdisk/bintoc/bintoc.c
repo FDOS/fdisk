@@ -57,7 +57,6 @@ write_data_to_c_file( const unsigned char *data, long size,
 {
    FILE *f;
    long i;
-   char numbuf[4];
 
    f = fopen( filename, "w" );
    if ( !f ) return 0;
