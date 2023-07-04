@@ -1,15 +1,65 @@
-# This makefile is for Free FDISK and I16-GCC (DOS)
+# This Makefile is for Free FDISK and I16-GCC, Mac (probably Linux as well)
 
-CC=i16gcc
-LD=i16gcc
+HOST_CC=cc
+
+CC=ia16-elf-gcc
+LD=ia16-elf-gcc
 LIBS = -li86
 CFLAGS = -mcmodel=small -Os
 
-fdisk.exe : main.o cmd.o helpscr.o compat.o pdiskio.o fdiskio.o pcompute.o \
-            userint0.o userint1.o userint2.o kbdinput.o ansicon.o printf.o \
-            svarlang\svarlang.o svarlang\autoload.o deflang.o bootnorm.o
-	$(LD) -Xlinker -Map=fdisk.map -Os -mcmodel=small -o $@ $^ $(LIBS)
+CP=cp
+
+FDISK_OBJS = main.o cmd.o helpscr.o compat.o pdiskio.o fdiskio.o pcompute.o \
+             userint0.o userint1.o userint2.o kbdinput.o ansicon.o printf.o \
+             svarlang/svarlang.o svarlang/autoload.o deflang.o bootnorm.o
+
+fdisk.exe : $(FDISK_OBJS) fdisk.lng
+	$(LD) -Xlinker -Map=fdisk.map -Os -mcmodel=small -o $@ $(FDISK_OBJS) $(LIBS)
+
+bootnorm.c : bootnorm.bin bintoc/bintoc
+	bintoc/bintoc bootnorm.bin bootnorm.c bootnormal_code
+
+
+# --- translations ----------------------------------------------------------
+
+fdisk.lng : nls/out.lng
+	$(CP) $< $@
+
+deflang.c : nls/out.lng
+	$(CP) nls/deflang.c deflang.c
+
+nls/out.lng : svarlang/tlumacz nls/en.txt nls/de.txt
+	cd nls; ../svarlang/tlumacz en de
+
+nls/en.txt : nls/en_utf8.txt utf8tocp/utf8tocp
+	utf8tocp/utf8tocp 437 $< >$@
+
+nls/de.txt : nls/de_utf8.txt utf8tocp/utf8tocp
+	utf8tocp/utf8tocp 850 $< >$@
+
+
+# --- build tools -----------------------------------------------------------
+
+bintoc/bintoc : bintoc/bintoc.c
+	$(HOST_CC) -o $@ $<
+
+svarlang/tlumacz : svarlang/tlumacz.c
+	$(HOST_CC) -o $@ $<
+
+utf8tocp/utf8tocp : utf8tocp/utf8tocp.c
+	$(HOST_CC) -o $@ $<
+
+
+# --- clean up --------------------------------------------------------------
 
 clean:
-	del *.o
-	del svarlang\*.o
+	rm -f *.o
+	rm -f *.exe
+	rm -f fdisk.lng out.lng
+	rm -f nls/en.txt nls/de.txt nls/out.lng
+	rm -f bintoc/*.o
+	rm -f bintoc/bintoc
+	rm -f svarlang/*.o
+	rm -f svarlang/svarlang
+	rm -f utf8tocp/*.o
+	rm -f utf8tocp/utf8tocp
