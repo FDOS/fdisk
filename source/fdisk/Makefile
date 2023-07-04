@@ -105,7 +105,7 @@ fdisk.lnk : Makefile
 	$(PACKER) $(PACKERFLAGS) ../../bin/fdisk.exe
 	cd ../..
 	zip -9rkDX fdisk.zip appinfo bin doc help nls source/fdisk/*.[ch] &
-	source/fdisk/*.asm source/fdisk/makefile.* LICENSE README.md
+	source/fdisk/*.asm source/fdisk/Makefile* LICENSE README.md
 	cd source/fdisk
 
 ..\..\fdisk.svp : fdisk.exe
