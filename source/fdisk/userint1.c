@@ -498,7 +498,7 @@ int Standard_Menu( int menu )
    int minimum_option;
    int maximum_number_of_options = 0;
 
-   const char *title;
+   const char *title = "";
    const char *option_1 = "";
    const char *option_2 = "";
    const char *option_3 = "";

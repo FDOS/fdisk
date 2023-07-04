@@ -1121,8 +1121,6 @@ void Process_Fdiskini_File( void )
    if ( flags.use_ambr == UNCHANGED ) {
       flags.use_ambr = FALSE;
    }
-#pragma warn - ccc
-#pragma warn - rch
    if ( flags.version == UNCHANGED ) {
       if ( DEFAULT_VERSION != FD ) {
          flags.version = DEFAULT_VERSION;
@@ -1132,8 +1130,6 @@ void Process_Fdiskini_File( void )
          flags.version = FREEDOS_VERSION;
       }
    }
-#pragma warn + ccc
-#pragma warn + rch
 
 #ifdef DEBUG
    /* If debug.all==TRUE then set all debugging options to true */

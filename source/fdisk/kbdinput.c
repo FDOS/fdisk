@@ -1,6 +1,3 @@
-/*
-
-*/
 
 #define KBDINPUT
 
@@ -106,7 +103,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
    int percent_just_entered = FALSE;
 
    unsigned long data_max_range = max_range;
-   unsigned long data;
+   unsigned long data = 0;
 
    char YESchar = 'Y'; /* char that represents "yes" */
    char yeschar = 'y';
@@ -430,8 +427,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       }
 
       /* Process a legitimate entry if type==NUMCHAR. */
-      if ( ( type == NUMCHAR ) && ( optional_char_1 != NULL ) &&
-           ( optional_char_2 != NULL ) ) {
+      if ( ( type == NUMCHAR ) && ( optional_char_1 != 0 ) &&
+           ( optional_char_2 != 0 ) ) {
          char_max_range = optional_char_2 - '0';
 
          if ( ( input >= '1' ) && ( input <= ( char_max_range + 48 ) ) ) {
@@ -484,8 +481,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
          }
       }
 
-      if ( ( type == CHAR ) && ( optional_char_1 != NULL ) &&
-           ( optional_char_2 != NULL ) ) {
+      if ( ( type == CHAR ) && ( optional_char_1 != 0 ) &&
+           ( optional_char_2 != 0 ) ) {
          char_max_range = optional_char_2 - '0';
 
          if ( ( input >= '1' ) && ( input <= ( char_max_range + 48 ) ) ) {
@@ -499,7 +496,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       }
 
       if ( ( ( type == YN ) || ( type == NUMYN ) ) &&
-           ( optional_char_1 != NULL ) && ( optional_char_2 != NULL ) ) {
+           ( optional_char_1 != 0 ) && ( optional_char_2 != 0 ) ) {
          char_max_range = optional_char_2 - '0';
 
          if ( ( input >= '1' ) && ( input <= ( char_max_range + 48 ) ) ) {

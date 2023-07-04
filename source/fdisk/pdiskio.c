@@ -648,11 +648,6 @@ static void Get_Partition_Information( void )
                   pDrive->log_drive[partnum].start_sect, 1 );
             }
 
-            if ( flags.verbose ) {
-               con_printf( "logical %u sect %lu label %11.11s\n", partnum,
-                       lba_sect, sector_buffer + label_offset );
-            }
-
             if ( sector_buffer[label_offset + 10] >= 32 &&
                  sector_buffer[label_offset + 10] <= 122 ) {
                /* Get Volume Label */
@@ -1170,9 +1165,9 @@ int Write_Partition_Tables( void )
 
    int drive_index = 0;
 
-   unsigned long extended_cylinder;
-   unsigned long extended_head;
-   unsigned long extended_sector;
+   unsigned long extended_cylinder = 0;
+   unsigned long extended_head = 0;
+   unsigned long extended_sector = 0;
 
    for ( drive_index = 0; drive_index < 7; drive_index++ ) {
       Partition_Table *pDrive = &part_table[drive_index];

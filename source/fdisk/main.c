@@ -490,7 +490,7 @@ static void Ensure_Drive_Number( void )
 //  MAIN ROUTINE
 /////////////////////////////////////////////////////////////////////////////
 */
-void main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
    int command_ok;
    int index;
@@ -963,4 +963,5 @@ void main( int argc, char *argv[] )
       Write_Partition_Tables();
       exit( 0 );
    }
+   return 0;
 }

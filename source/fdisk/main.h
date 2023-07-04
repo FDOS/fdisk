@@ -62,8 +62,6 @@
 //  types
 /////////////////////////////////////////////////////////////////////////////
 */
-#pragma warn - asc
-#pragma warn - ucp
 
 typedef unsigned long ulong;
 typedef unsigned int uint;
@@ -167,8 +165,8 @@ MEXTERN char path[256];
 MEXTERN int number_of_command_line_options;
 
 /* Buffers */
-MEXTERN unsigned char partition_lookup_table_buffer_short[256][9];
-MEXTERN unsigned char partition_lookup_table_buffer_long[256][17];
+MEXTERN char partition_lookup_table_buffer_short[256][9];
+MEXTERN char partition_lookup_table_buffer_long[256][17];
 
 /*
 /////////////////////////////////////////////////////////////////////////////
