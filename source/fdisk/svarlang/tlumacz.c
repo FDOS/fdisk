@@ -110,7 +110,7 @@ static unsigned short unesc_string(char *linebuff) {
   unsigned short i;
   for (i = 0; linebuff[i] != 0; i++) {
     if (linebuff[i] != '\\') continue;
-    strcpy(linebuff + i, linebuff + i + 1);
+    memmove(linebuff + i, linebuff + i + 1, strlen(linebuff + i + 1));
     if (linebuff[i] == 0) break;
     switch (linebuff[i]) {
       case 'e':
@@ -242,7 +242,7 @@ static unsigned short gen_langstrings(unsigned char *buff, const char *langid, s
 int main(int argc, char **argv) {
   FILE *fd;
   int ecode = 0;
-  char *buff, *refblock;
+  unsigned char *buff, *refblock;
   unsigned short refblocksz = 0;
   static struct bitmap bufbitmap;
   static struct bitmap refbitmap;
