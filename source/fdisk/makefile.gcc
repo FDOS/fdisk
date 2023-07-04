@@ -29,11 +29,13 @@ bootnorm.bin : bootnorm.asm
 fdisk.lng : nls/out.lng
 	$(CP) $< $@
 
-deflang.c : nls/out.lng
-	$(CP) nls/deflang.c deflang.c
+deflang.c : nls/deflang.c
+	$(CP) $< $@
 
-nls/out.lng : svarlang/tlumacz nls/en.txt nls/de.txt
+nls/deflang.c nls/out.lng : svarlang/tlumacz nls/en.txt nls/de.txt
 	cd nls; ../svarlang/tlumacz en de
+
+nls/out.lng : nls/deflang.c
 
 nls/en.txt : nls/en_utf8.txt utf8tocp/utf8tocp
 	utf8tocp/utf8tocp 437 $< >$@
