@@ -283,6 +283,22 @@
 10.53:Die einzige startbare Partition auf Datenträger %d ist bereits aktiv.
 10.54:Partition %d wurde aktiviert.
 
+# Create partition
+10.60:Soll der ganze vorhandene Speicherplatz für die primäre DOS Partition\n    verwendet und diese aktiviert werden...(J/N)?
+10.61:Soll der ganze vorhandene Speicherplatz für die primäre DOS Partition\n    verwendet werden...(J/N)?
+10.62:Dieses Laufwerk ist standardmäßig FAT-32. Stattdessen FAT-16 verwenden (J/N)?
+10.63:Die maximale Partitionsgröße beträgt \e[1m%7lu\e[22m Mbytes
+10.64:Geben Sie die gewünschte Größe in Mbyte oder in Prozent (%%) der\n    Lauferksgröße an...:
+10.65:Geben Sie die gewünschte Größe in Mbyte oder in Prozent (%%) der\n    Lauferksgröße an...:
+10.66:Primäre DOS Partition wurde erstellt.
+10.67:Erweiterte DOS Partition wurde erstellt.
+
+# Create logical partition
+10.70:Logische DOS Partition wurde erstellt. Laufwerksbuchstaben aktualisiert!
+10.71:Maximale Anzahl logischer DOS Partitionen erstellt!
+10.72:Geben Sie die Größe der logischen Partition in MByte oder in (%%) der\n    erweiterten Partition an...:
+10.73:Der gesammte verfügbare Speicher der erweiterten Partition\n    wurde zugewiesen.
+
 10.200:Sind Sie sicher (J/N)..............................?
 
 # Error strings

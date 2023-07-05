@@ -284,6 +284,23 @@
 10.53:The only startable partition on Drive %d is already set active.
 10.54:Partition %d was activated.
 
+# Create partition
+10.60:Do you wish to use the maximum available size for a Primary DOS Partition\n    and make the partition active (Y/N).....................?
+10.61:Do you wish to use the maximum available size for a Primary DOS Partition\n    (Y/N)...................................................?
+10.62:This drive is a FAT32 by default, switch to FAT16 (Y/N)?
+10.63:Maximum space available for partition is \e[1m%7lu\e[22m Mbytes
+10.64:Enter partition size in Mbytes or percent (%%) of disk space to\n    create a Primary DOS Partition.....:
+10.65:Enter partition size in Mbytes or percent (%%) of disk space to\n    create an Extended DOS Partition.....:
+10.66:Primary DOS Partition created
+10.67:Extended DOS Partition created
+
+# Create logical partition
+10.70:Logical DOS Drive created, drive letters changed or added
+10.71:Maximum number of Logical DOS Drives installed
+10.72:Enter logical drive size in Mbytes or percent (%%) of\n    extended partition size...:
+10.73:All available space in the Extended DOS Partition\n    is assigned to logical drives.
+
+
 10.200:Are you sure (Y/N)..............................?
 
 # Error strings

@@ -141,23 +141,19 @@ int Create_DOS_Partition_Interface( int type )
       Print_At( 4, 6, svarlang_str( 9, 0 ) );
       Color_Printf( " %d", ( flags.drive_number - 127 ) );
 
-      Print_At(
-         4, 8,
-         "Do you wish to use the maximum available size for a Primary DOS Partition" );
-
+      /* ask, if all space should be reserverd */
       if ( ( flags.drive_number - 128 ) == 0 ) {
          Print_At(
-            4, 9,
-            "and make the partition active (Y/N).....................? " );
+            4, 8, svarlang_str( 10, 60 ) );
       }
       else {
          Print_At(
-            4, 9,
-            "(Y/N)...................................................? " );
+            4, 8, svarlang_str( 10, 61 ) );
       }
+      con_print( " " );
 
       flags.esc = FALSE;
-      input = Input( 1, 62, 9, YN, 0, 0, ESCR, 1, 0, '\0', '\0' );
+      input = Input( 1, -1, -1, YN, 0, 0, ESCR, 1, 0, '\0', '\0' );
       if ( flags.esc == TRUE ) {
          return ( 1 );
       }
@@ -170,11 +166,11 @@ int Create_DOS_Partition_Interface( int type )
 
          if ( ( flags.fprmt == TRUE ) && ( type == PRIMARY ) &&
               ( input >= 128 ) && ( input <= 2048 ) ) {
-            Print_At(
-               4, 22,
-               "This drive is a FAT32 by default, switch to FAT16 (Y/N)?    " );
+            /* switch to FAT-16 ? */
+            Print_At( 4, 22, svarlang_str( 10, 62 ) );
+            con_print( " " );
             flags.fat32 =
-               !Input( 1, 61, 22, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
+               !Input( 1, -1, -1, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
          }
 
          /* Use the maximum available free space to create a DOS Partition */
@@ -211,48 +207,30 @@ int Create_DOS_Partition_Interface( int type )
 
       Display_Primary_Partition_Information_SS();
 
-      Print_At( 4, 15, "Maximum space available for partition is " );
-
-      if ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
-           ( flags.version == W98 ) ) {
-         Print_UL_B( maximum_partition_size_in_MB );
-      }
-      else {
-         Color_Printf( "%7lu", maximum_partition_size_in_MB );
-      }
-
-      con_print( " Mbytes " );
+      Print_At( 4, 15, svarlang_str( 10, 63 ), maximum_partition_size_in_MB );
 
       maximum_possible_percentage = Convert_To_Percentage(
          maximum_partition_size_in_MB, pDrive->disk_size_mb );
 
-      Color_Printf( "(%3d%%)", maximum_possible_percentage );
-
-      Print_At(
-         4, 18,
-         "Enter partition size in Mbytes or percent (%%) of disk space to" );
+      con_printf( " (\33[1m%d%%\33[22m)", maximum_possible_percentage );
 
       if ( type == PRIMARY ) {
-         Print_At(
-            4, 19,
-            "create a Primary DOS Partition.................................: " );
+         Print_At( 4, 18, svarlang_str( 10, 64 ) );
       }
       else {
-         Print_At(
-            4, 19,
-            "create an Extended DOS Partition...............................: " );
+         Print_At( 4, 18, svarlang_str( 10, 65 ) );
       }
-
+      con_print( " " );
       flags.esc = FALSE;
 
       if ( ( flags.version == 4 ) || ( flags.version == 5 ) ||
            ( flags.version == 6 ) ) {
-         input = Input( 4, 69, 19, NUMP, 1, maximum_partition_size_in_MB,
+         input = Input( 4, -1, -1, NUMP, 1, maximum_partition_size_in_MB,
                         ESCR, maximum_partition_size_in_MB,
                         maximum_possible_percentage, '\0', '\0' );
       }
       else {
-         input = Input( 7, 69, 19, NUMP, 1, maximum_partition_size_in_MB,
+         input = Input( 7, -1, -1, NUMP, 1, maximum_partition_size_in_MB,
                         ESCR, maximum_partition_size_in_MB,
                         maximum_possible_percentage, '\0', '\0' );
       }
@@ -263,10 +241,10 @@ int Create_DOS_Partition_Interface( int type )
 
       if ( ( flags.fprmt == TRUE ) && ( type == PRIMARY ) &&
            ( input >= 128 ) && ( input <= 2048 ) ) {
-         Print_At(
-            4, 22,
-            "This drive is a FAT32 by default, switch to FAT16 (Y/N)?    " );
-         flags.fat32 = !Input( 1, 61, 22, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
+         /* switch to FAT-16? */
+         Print_At( 4, 22, svarlang_str( 10, 62 ) );
+         con_print( " " );
+         flags.fat32 = !Input( 1, -1, -1, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
       }
 
       if ( type == PRIMARY ) {
@@ -302,11 +280,12 @@ int Create_DOS_Partition_Interface( int type )
    Display_Primary_Partition_Information_SS();
 
    Position_Cursor( 4, 21 );
+   /* partition successfully created */
    if ( type == PRIMARY ) {
-      Color_Print( "Primary DOS Partition created" );
+      Color_Print( svarlang_str( 10, 66 ) );
    }
    else {
-      Color_Print( "Extended DOS Partition created" );
+      Color_Print( svarlang_str( 10, 67 ) );
    }
 
    Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
@@ -387,23 +366,22 @@ int Create_Logical_Drive_Interface( void )
          Clear_Screen( 0 );
 
          if ( drive_created == TRUE ) {
-            Color_Print_At(
-               4, 22,
-               "Logical DOS Drive created, drive letters changed or added" );
+            /* drive created message */
+            Color_Print_At( 4, 22, svarlang_str( 10, 70 ) );
          }
 
-         Print_Centered(
-            1, "Create Logical DOS Drive in the Extended DOS Partition",
-            BOLD );
+         /* page title */
+         Print_Centered( 1, svarlang_str( 4, 3 ), BOLD );
 
          Display_Extended_Partition_Information_SS();
 
          if ( 'Z' == Determine_Drive_Letters() ) {
-            Print_At(
-               4, 22,
-               "                                                           " );
+            con_set_cursor_xy( 5, 23 );
+            con_clreol();
+
+            /* maximum number of Logical DOS Drives installed */
             Color_Print_At(
-               4, 22, "Maximum number of Logical DOS Drives installed." );
+               4, 22, svarlang_str( 10, 71 ) );
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             if ( flags.fprmt == TRUE ) {
                flags.fat32 = FALSE;
@@ -414,49 +392,33 @@ int Create_Logical_Drive_Interface( void )
          con_set_cursor_xy( 5, 18 );
          con_clreol();
 
-         Print_At( 4, 17, "Total Extended Partition size is " );
+         /* print extended partition size */
+         Print_At( 4, 17, svarlang_str( 10, 6 ), pDrive->ext_size_mb );
 
-         if ( ( flags.version == 4 ) || ( flags.version == 5 ) ||
-              ( flags.version == 6 ) ) {
-            Color_Printf( "%7lu", pDrive->ext_size_mb );
-         }
-         else {
-            Print_UL_B( pDrive->ext_size_mb );
-         }
-
-         con_print( " Mbytes (1 Mbyte = 1048576 bytes)" );
-
-         Print_At( 4, 18, "Maximum space available for partition is " );
-
-         if ( ( flags.version == 4 ) || ( flags.version == 5 ) ||
-              ( flags.version == 6 ) ) {
-            Color_Printf( "%7lu", maximum_partition_size_in_MB );
-         }
-         else {
-            Print_UL_B( maximum_partition_size_in_MB );
-         }
-
-         con_print( " Mbytes " );
+         /* print maximum partition size */
+         Print_At( 4, 18, svarlang_str( 10, 63 ), maximum_partition_size_in_MB );
 
          maximum_possible_percentage = (int)Convert_To_Percentage(
             maximum_partition_size_in_MB, pDrive->ext_size_mb );
 
-         Color_Printf( "(%3d%%)", maximum_possible_percentage );
+         con_printf( " (\33[1m%d%%\33[22m)", maximum_possible_percentage );
 
+         /* enter partition size */
          Print_At(
             4, 20,
-            "Enter logical drive size in Mbytes or percent (%%) of disk space:" );
+            svarlang_str( 10, 72 ) );
+         con_print( " " );
 
          flags.esc = FALSE;
 
          if ( ( flags.version == 4 ) || ( flags.version == 5 ) ||
               ( flags.version == 6 ) ) {
-            input = Input( 4, 69, 20, NUMP, 1, maximum_partition_size_in_MB,
+            input = Input( 4, -1, -1, NUMP, 1, maximum_partition_size_in_MB,
                            ESCR, maximum_partition_size_in_MB,
                            maximum_possible_percentage, '\0', '\0' );
          }
          else {
-            input = Input( 7, 69, 20, NUMP, 1, maximum_partition_size_in_MB,
+            input = Input( 7, -1, -1, NUMP, 1, maximum_partition_size_in_MB,
                            ESCR, maximum_partition_size_in_MB,
                            maximum_possible_percentage, '\0', '\0' );
          }
@@ -470,11 +432,13 @@ int Create_Logical_Drive_Interface( void )
 
          if ( ( flags.fprmt == TRUE ) && ( input >= 128 ) &&
               ( input <= 2048 ) ) {
+            /* switch th FAT-16? */
             Print_At(
                4, 21,
-               "This drive is a FAT32 by default, switch to FAT16 (Y/N)?    " );
+               svarlang_str( 10, 62 ) );
+               con_print( " " );
             flags.fat32 =
-               !Input( 1, 61, 21, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
+               !Input( 1, -1, -1, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
          }
 
          numeric_type = 6;
@@ -489,12 +453,10 @@ int Create_Logical_Drive_Interface( void )
    }
 
    Clear_Screen( 0 );
-   Print_Centered(
-      1, "Create Logical DOS Drive in the Extended DOS Partition", BOLD );
+   /* page title */
+   Print_Centered( 1, svarlang_str( 4, 3 ), BOLD );
    Display_Extended_Partition_Information_SS();
-   Color_Print_At( 4, 22,
-                   "All available space in the Extended DOS Partition" );
-   Color_Print_At( 4, 23, "is assigned to logical drives." );
+   Color_Print_At( 4, 22, svarlang_str( 10, 73 ) );
    Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
 
    if ( flags.fprmt == TRUE ) {

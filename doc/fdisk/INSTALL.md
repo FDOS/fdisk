@@ -19,10 +19,10 @@ must be installed:
 During the build process, beside the executable _fdisk.exe_, a translation
 file _fdisk.lng_ is created. This file contains translations for different
 languages. The file must be shipped along with the executable file, either
-in the same directory, or in a directory called `%NLSPATH%`.
-Otherwise the software is only displayed in english.
+in the same directory, or in a directory specified by the path variable
+`%NLSPATH%`. Otherwise, the software is only displayed in english.
 
-The translations are stored in UTF-8 encoded files in the 
+The translation sources are stored in UTF-8 encoded files in the 
 `source/fdisk/nls` folder. During build, these files get converted to their
 respective DOS codepage and assembled into the _fdisk.lng_ file.
 

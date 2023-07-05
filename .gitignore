@@ -17,6 +17,7 @@ source/fdisk/nls/deflang.c
 source/fdisk/nls/out.lng
 
 # compiler-specific build artifacts
+*.o
 *.dsk
 *.err
 *.lnk
