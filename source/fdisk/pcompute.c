@@ -294,7 +294,7 @@ int Create_Primary_Partition( int num_type, unsigned long size_in_MB )
    if ( Is_Ext_Part( num_type ) ) {
       pDrive->ptr_ext_part = &pDrive->pri_part[empty_part_num];
       pDrive->ext_num_sect = part_sz;
-      pDrive->ext_size_mb = size_in_MB;
+      pDrive->ext_size_mb = np->size_in_MB;
       pDrive->ext_usable = TRUE;
    }
 

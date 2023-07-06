@@ -6,6 +6,9 @@ Version 1.?.? (2023-??-??)
 Bugfixes:
  - LOW: Prevent user from deleting DOS partitions from the Non-DOS partition
      removal menu.
+ - LOW: Fix a display bug showing the extended partition a few MB smaller
+     than it actually is while creating logical partitions.
+
 
 Version 1.3.7 (2023-06-26)
 --------------------------
