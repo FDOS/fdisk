@@ -1164,10 +1164,10 @@ unsigned long chs_to_lba( Partition_Table *pDrive, unsigned long cylinder,
 /* Write partition tables */
 int Write_Partition_Tables( void )
 {
-   int error_code;
-   int index;
-
+   int error_code = 0;
    int drive_index = 0;
+   int drives_with_error = 0;
+   int index;
 
    unsigned long extended_cylinder = 0;
    unsigned long extended_head = 0;
@@ -1176,6 +1176,8 @@ int Write_Partition_Tables( void )
    for ( drive_index = 0; drive_index < 7; drive_index++ ) {
       Partition_Table *pDrive = &part_table[drive_index];
 
+      error_code = 0;
+      
       if ( ( pDrive->part_values_changed != TRUE &&
              flags.partitions_have_changed != TRUE ) ||
            !pDrive->usable ) {
@@ -1188,7 +1190,7 @@ int Write_Partition_Tables( void )
          Read_Physical_Sectors( ( drive_index + 0x80 ), 0, 0, 1, 1 );
 
       if ( error_code != 0 ) {
-         return ( error_code );
+         goto drive_error;
       }
 
       if ( *(unsigned short *)( sector_buffer + 510 ) != 0xAA55 ) {
@@ -1225,7 +1227,7 @@ int Write_Partition_Tables( void )
       error_code =
          Write_Physical_Sectors( ( drive_index + 0x80 ), 0, 0, 1, 1 );
       if ( error_code != 0 ) {
-         return ( error_code );
+         goto drive_error;
       }
 
       /* Write the Extended Partition Table, if applicable. */
@@ -1266,7 +1268,7 @@ int Write_Partition_Tables( void )
                ( drive_index + 0x80 ), extended_cylinder, extended_head,
                extended_sector, 1 );
             if ( error_code != 0 ) {
-               return ( error_code );
+               goto drive_error;
             }
 
             if ( pDrive->next_ext_exists[index] != TRUE ) {
@@ -1279,9 +1281,13 @@ int Write_Partition_Tables( void )
          }
       }
 
+      continue;
+
+   drive_error:
+      drives_with_error |= 1 << drive_index;
    } /* for (drive_index) */
 
-   return ( 0 );
+   return drives_with_error;
 }
 
 /* Write physical sectors */
