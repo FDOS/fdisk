@@ -861,8 +861,9 @@ static void Read_Table_Entry( unsigned char *buf, Partition_Table *pDrive,
    }
 
    p->size_in_MB =
-      Convert_Cyl_To_MB( p->end_cyl - p->start_cyl + 1,
-                         pDrive->total_head + 1, pDrive->total_sect );
+      Convert_Sect_To_MB( p->num_sect );
+      /*Convert_Cyl_To_MB( p->end_cyl - p->start_cyl + 1,
+                         pDrive->total_head + 1, pDrive->total_sect );*/
 }
 
 static int Read_Primary_Table( int drive, Partition_Table *pDrive,
