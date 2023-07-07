@@ -9,20 +9,91 @@
 0.2:  /INFO             Wyświetla informacje dot. partycji na <dysk#>
 0.3:  /REBOOT           Uruchamia ponownie komputer
 0.4:\t
+0.10:Polecenie tworzące lub usuwające partycje:
+0.11:    <rozm> rozmiar w megabajtach lub MAX dla maksymalnego rozmiaru
+0.12:           albo <liczba>,100 jeśli <liczba> jest w procentach
+0.13:    <typ#> identyfikator typu partycji lub FAT-12/16/32 jeśli nie podano /SPEC
+0.14:\t
+0.20:  /PRI:<rozm> [/SPEC:<typ#>]               Tworzy partycję podstawową
+0.21:  /EXT:<rozm>                              Tworzy partycję rozszerzoną
+0.22:  /LOG:<rozm> [/SPEC:<typ#>]               Tworzy dysk logiczny
+0.23:  /PRIO,/EXTO,/LOGO                        Jak wyżej, ale unika FAT32
+0.24:  /AUTO                                    Automatycznie partycjonuje dysk
+0.26:  /DELETE {/PRI[:#] | /EXT | /LOG:<part#>  Usuwa partycję
+0.27:           | /NUM:<part#>}            ...dyski logiczne zaczynają się od /NUM=5
+0.29:  /DELETEALL                               Usuwa wszystkie partycje z <dysk#>
+0.30:\t
+0.31:Ustawia aktywną partycję
+0.32:  /ACTIVATE:<partycja#>                    Ustawia <partycję#> jako aktywną
+0.33:  /DEACTIVATE                              Deaktywuje wszystkie partycje
+0.34:\t
+0.40:Zarządzanie MBR (Master Boot Record):
+0.41:  /CLEARMBR                Usuwa wszystkie partycje oraz kod rozruchowy
+0.42:  /LOADMBR                 Ładuje tablicę partycji oraz kod z "boot.mbr" do MBR
+0.43:  /SAVEMBR                 Zapisuje tablicę partycji i kod do pliku "boot.mbr"
+0.44:\t
+0.50:Zmiana kodu MBR z zachowaniem tablicy partycji:
+0.51:  /IPL                     Instaluje standardowy kod rozruchowy do MBR <dysku#>
+0.52:                           ...tak samo, jak /MBR i /CMBR (dla kompatybilności)
+0.53:  /SMARTIPL                Instaluje IPL DriveSmart do MBR <dysku#>
+0.54:  /LOADIPL                 Zapisuje 440 bajty kodu z "boot.mbr" do MBR
+0.55:\t
+0.60:Zaawansowane modyfikacje tablicy partycji:
+0.61:  /MODIFY:<part#>,<typ#>                     Zmienia typ partycji na <typ#>
+0.62:                                         ...dyski logiczne zaczynają się od "5"
+0.63:  /MOVE:<srcpart#>,<destpart#>               Przenosi partycję podstawową
+0.64:  /SWAP:<1stpart#>,<2ndpart#>                Zamienia partycje podst. miejscami
+0.65:\t
+0.70:Zarządzanie flagami dysku twardego:
+0.71:  /CLEARFLAG[{:<flaga#>} | /ALL}]      Usuwa <flagę#> lub wszystkie na <dysku#>
+0.72:  /SETFLAG:<flaga#>[,<wartość>]        Ustawia <flagę#> na 1 lub <wartość>
+0.73:  /TESTFLAG:<flaga#>[,<wartość>]       Sprawdza <flagę#> dla 1 lub <wartość>
+0.74:\t
+0.80:Wyświetlanie informacji o dysku (dyskach):
+0.81:  /STATUS       Wyświetla obecny układ partycji
+0.82:  /DUMP         Informacje o partycjach wszystkich dysków (debugging)
+0.83:\t
+0.90:Parametry dla trybu interaktywnego:
+0.91:  /UI           Zawsze uruchamia UI jeśli podane jako ostatni argument
+0.92:  /MONO         Wymusza tryb monochromatyczny interfejsu użytkownika
+0.93:  /FPRMT        Pyta o FAT32/FAT16 w trybie interaktywnym
+0.94:  /XO           Włącza rozszerzone opcje
+0.95:\t
+0.100:Opcje dla kompatybilności:
+0.101:  /X            Wyłącza rozsz. INT 13 i LBA dla następujących poleceń
+0.102:\t
+0.200:Ten program jest chroniony prawami autorskimi %s Briana E. Reifsnydera i
+0.201:społeczności FreeDOS na warunkach Powszechnej Licencji Publicznej GNU,
+0.202:wersja 2.
+0.203:\t
+0.204:Program jest dostarczony w takim stanie, w jakim się znajduje, bez jakiej-
+0.205:kolwiek gwarancji. Autor tego oprogramowania nie ponosi żadnej odpowiedzia-
+0.206:lności za użycie lub niewłaściwe użycie tego oprogramowania. Korzystanie z
+0.207:tego oprogramowania oznacza zgodę operatora na powyższe warunki.
 
 
 ##############################################################################
 # FAT32 SUPPORT SCREEN                                                       #
 ##############################################################################
 
-1.0:FDISK potrafi wykorzystać wsparcie dla dużych dysków, umożliwiając
-1.1:tworzenie partycji większych niż 2048 MB przy pomocy systemu plików FAT32
-1.2:Jeśli włączysz wsparcie dla dużych dysków, wszelkie partycje lub wolumeny
-1.3:logiczne większe niż 512 MB zostaną utworzone jako FAT32.
-1.4:WAŻNE:  Włączenie wsparcia dla dużych dysków może spowodować, że niektóre
-1.5:systemy operacyjne nie będą w stanie odczytać partycji lub logicznych
-1.6:wolumenów o rozmiarze powyżej 512 MB.
-1.7:Czy chcesz włączyć wsparcie dla dużych dysków (FAT32)? (T/N)
+1.0:\e[5;5HFDISK potrafi wykorzystać wsparcie dla dużych dysków, umożliwiając
+1.1:    tworzenie partycji większych niż 2048 MB przy pomocy systemu plików FAT32
+1.2:    Jeśli włączysz wsparcie dla dużych dysków, wszelkie partycje lub wolumeny
+1.3:    logiczne większe niż 512 MB zostaną utworzone jako FAT32.
+1.4:    WAŻNE: Włączenie wsparcia dla dużych dysków może spowodować, że niektóre
+1.5:    systemy operacyjne nie będą w stanie odczytać partycji lub logicznych
+1.6:    wolumenów o rozmiarze powyżej 512 MB.
+1.7:\e[5;18HCzy chcesz włączyć wsparcie dla dużych dysków (FAT32)? (T/N)
+
+
+##############################################################################
+# EXIT SCREEN                                                                #
+##############################################################################
+
+2.0:\e[1mMUSISZ\e[22m zrestartować twój system aby zmiany odniosły efekt.
+2.1:Wszelkie stworzone lub zmienione napędy muszą być sformatowane \e[1mPO\e[22m restarcie.
+2.2:System zostanie teraz zrestartowany
+2.3:Naciśnij dowolny klawisz, gdy będziesz gotowy . . .
 
 
 ##############################################################################
@@ -32,5 +103,9 @@
 # Yes-No letters, as used to answer "Yes/No" questions (upper- and lower-case)
 250.0:TN
 250.1:tn
-
 250.2:Nieprawidłowa odpowiedź, wprowadź T lub N
+250.3:Naciśnij dowolny klawisz aby kontynuować
+250.4:BŁĄD
+250.5:UWAGA!
+250.6:AKTYWNA
+250.250:Program Konfiguracyjny Dysków Stałych
