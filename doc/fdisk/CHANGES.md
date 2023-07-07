@@ -4,10 +4,21 @@ Free FDISK Change Log
 Version 1.?.? (2023-??-??)
 --------------------------
 Bugfixes:
- - LOW: Prevent user from deleting DOS partitions from the Non-DOS partition
-     removal menu.
+ - MEDIUM: Fix FDISK not letting the user delete all logical drives if the
+     first logical drive in EMBR chain is not the last to be deleted until
+     program is restarted.
+ - MEDIUM: Fix FDISK wrongly informing the user that no space in the extended
+     partition is left after deleting the last logical drive until program is
+     restarted.
  - LOW: Fix a display bug showing the extended partition a few MB smaller
      than it actually is while creating logical partitions.
+ - LOW: Prevent FDISK from using different rounding schemes for displaying
+     partition sizes, confusing the user by showing slightly different values
+     in some situations.
+
+Changes:
+ - Prohibit deletion of DOS partitions from the Non-DOS partition removal
+     menu.
 
 
 Version 1.3.7 (2023-06-26)

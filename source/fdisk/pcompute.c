@@ -170,7 +170,11 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    }
    p->num_type = numeric_type;
 
-   pDrive->num_of_log_drives++;
+   if ( free_space_loc != 0 || pDrive->num_of_log_drives == 0 ) {
+      /* make sure we do not increase drive number if previously cleared
+         first partition slot is re-created */
+      pDrive->num_of_log_drives++;
+   }
    pDrive->log_drive_created[free_space_loc] = TRUE;
    pDrive->part_values_changed = TRUE;
    flags.partitions_have_changed = TRUE;
@@ -407,7 +411,8 @@ static void Sort_Primary_Partitions( Partition_Table *pDrive, int drive_order[] 
 
 static void Determine_Log_Free_Space( Partition_Table *pDrive )
 {
-   int index, last_used_partition;
+   int index = 0;
+   int last_used_partition = UNUSED;
 
    /* Determine the location and size of the largest free space in the */
    /* extended partition, if it exists.                                */
@@ -417,11 +422,10 @@ static void Determine_Log_Free_Space( Partition_Table *pDrive )
       pDrive->log_end_cyl = 0;
       pDrive->log_free_loc = 0;
 
-      if ( pDrive->num_of_log_drives > 0 ) {
+      if ( ( pDrive->num_of_log_drives > 0 ) &&
+           !(( pDrive->num_of_log_drives == 1 ) && ( pDrive->log_drive[0].num_type == 0 )) ) {
          /* If there are logical drives in the extended partition first find  */
          /* the largest free space between the logical drives...if it exists. */
-         last_used_partition = UNUSED;
-         index = 0;
 
          /* Check to see if the first possible entry in the extended partition */
          /* is unused.  If it is unused and there is a logical drive after it  */
@@ -501,7 +505,7 @@ static void Determine_Log_Free_Space( Partition_Table *pDrive )
             }
          }
       }
-      else {
+      if ( last_used_partition == UNUSED ) {
          /* If the extended partition is empty. */
          pDrive->ext_free_space = ( pDrive->ptr_ext_part->end_cyl ) -
                                   pDrive->ptr_ext_part->start_cyl + 1;
