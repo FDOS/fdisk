@@ -4,12 +4,14 @@ Free FDISK Change Log
 Version 1.?.? (2023-??-??)
 --------------------------
 Bugfixes:
- - MEDIUM: Fix FDISK not letting the user delete all logical drives if the
-     first logical drive in EMBR chain is not the last to be deleted until
-     program is restarted.
+ - MEDIUM: Fix FDISK not reporting an error if partition table can not be
+     written. (since <= v1.2.1)
+ - MEDIUM: Fix FDISK not letting the user delete the last existing logical
+    drive until program is restarted, if the first logical drive in EMBR
+    chain is not the last to be deleted. (since v1.3.5)
  - MEDIUM: Fix FDISK wrongly informing the user that no space in the extended
      partition is left after deleting the last logical drive until program is
-     restarted.
+     restarted. (since v1.3.5)
  - LOW: Fix a display bug showing the extended partition a few MB smaller
      than it actually is while creating logical partitions.
  - LOW: Prevent FDISK from using different rounding schemes for displaying
@@ -19,6 +21,10 @@ Bugfixes:
 Changes:
  - Prohibit deletion of DOS partitions from the Non-DOS partition removal
      menu.
+ - Program is now translatable, with german being the first non-english
+     language supported.
+ - Program can be build with I16-GCC.
+ - Support for Borland / Turbo C was dropped.
 
 
 Version 1.3.7 (2023-06-26)

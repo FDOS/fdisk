@@ -496,6 +496,7 @@ int main( int argc, char *argv[] )
    int index;
    int location;
    int fat32_temp;
+   int result;
 
 #ifdef SMART_MBR
    extern void __cdecl __far smart_mbr( void );
@@ -960,8 +961,12 @@ int main( int argc, char *argv[] )
          Interactive_User_Interface();
       }
 #endif
-      Write_Partition_Tables();
-      exit( 0 );
+      result = Write_Partition_Tables();
+      if ( !result ) {
+         con_print( svarlang_str( 255, 15 ) );
+         con_print( "\n" );
+         exit( 8 );
+      }
    }
    return 0;
 }
