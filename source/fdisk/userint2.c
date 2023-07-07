@@ -62,30 +62,17 @@ int Inform_About_Trimmed_Disk( void )
 
    Clear_Screen( 0 );
 
-   Color_Print_At( 35, 3, "WARNING" );
+   Color_Print_At( 35, 3, svarlang_str( 250, 5 ) );
 
-   Print_At( 4, 5,
-             "You have at least one disk larger than 2,097,152 MB.  " FD_NAME
-             " can" );
-   Print_At( 4, 6, "NOT handle partitions exceeding this barrier!" );
-   Print_At(
-      4, 8,
-      "You may proceed but are in risk of data loss, especially if there" );
-   Print_At(
-      4, 9,
-      "are already partitions created with other tools exceeding the barrier." );
-   Print_At(
-      4, 10,
-      "It should be ok if Free FDISK is the only partitioning tool you are" );
-   Print_At(
-      4, 11,
-      "using, but we recommend using another disk utility to handle this type" );
-   Print_At( 4, 12, "of disk." );
+   con_set_cursor_xy( 5, 6 );
+   con_print( svarlang_str( 30, 1 ) );
+   con_print( svarlang_str( 30, 2 ) );
+   con_print( svarlang_str( 30, 3 ) );
 
-   Print_At( 4, 17,
-             "Are you sure you want to continue (Y/N).................?" );
+   Print_At( 4, 17, svarlang_str( 30, 4 ) );
 
-   return (int)Input( 1, 62, 17, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
+   con_print( " " );
+   return (int)Input( 1, -1, -1, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
 }
 
 /* Change Current Fixed Disk Drive */
@@ -95,16 +82,16 @@ void Change_Current_Fixed_Disk_Drive( void )
    int old_drive_number = flags.drive_number;
 
    Clear_Screen( 0 );
-   Print_Centered( 0, "Change Current Fixed Disk Drive", BOLD );
+   Print_Centered( 0, svarlang_str( 3, 6 ), BOLD );
 
    Display_All_Drives();
 
-   Print_At( 4, 21,
-             "Enter Fixed Disk Drive Number (1-%d).......................",
+   con_set_cursor_xy( 5, 22 );
+   con_printf( svarlang_str( 10, 190 ),
              ( flags.maximum_drive_number - 127 ) );
-
+   con_print( " " );
    new_drive_number =
-      (int)Input( 1, 62, 21, NUM, 1, ( flags.maximum_drive_number - 127 ),
+      (int)Input( 1, -1, -1, NUM, 1, ( flags.maximum_drive_number - 127 ),
                   ESCR, ( flags.drive_number - 127 ), 0, '\0', '\0' );
 
    if ( ( new_drive_number <= 0 ) ||
@@ -330,23 +317,18 @@ int Create_Logical_Drive_Interface( void )
 
       Clear_Screen( 0 );
 
-      Color_Print_At( 36, 4, "WARNING" );
-      Print_At( 4, 6,
-                FD_NAME " is currently in cylinder alignment mode, but the" );
-      Print_At( 4, 7,
-                "extended partition does not start on a cylinder boundary!" );
-      Print_At(
-         4, 9, "While unlikely, this MAY result in compatibility problems." );
+      Color_Print_At( 35, 3, svarlang_str( 250, 5 ) );
 
-      Print_At(
-         4, 11,
-         "If your system depends on proper cylinder alignment you should" );
-      Print_At( 4, 12, "consider re-creating the extended partition." );
+      con_set_cursor_xy( 5, 8 );
+      con_print( svarlang_str( 30, 10 ) );
+      con_print( svarlang_str( 30, 11 ) );
+      con_print( svarlang_str( 30, 12 ) );
 
       Print_At(
          4, 21,
-         "Create logical drive in non-aligned extended partition...?" );
-      yn = (int)Input( 1, 63, 21, YN, 0, 0, NONE, 1, 0, 0, 0 );
+         svarlang_str( 30, 13) );
+      con_print( " " );
+      yn = (int)Input( 1, -1, -1, YN, 0, 0, NONE, 1, 0, 0, 0 );
       if ( yn ) {
          allow_unaligned_ext = TRUE;
       }
@@ -429,6 +411,8 @@ int Create_Logical_Drive_Interface( void )
             }
             return ( 1 );
          }
+
+         if ( input == 0 ) continue;
 
          if ( ( flags.fprmt == TRUE ) && ( input >= 128 ) &&
               ( input <= 2048 ) ) {
@@ -602,7 +586,7 @@ int Delete_Logical_Drive_Interface( void )
          Color_Print_At( 4, 22, svarlang_str( 10, 31 ) );
       }
       else {
-         Color_Print_At( 4, 22, svarlang_str( 10, 31 ) );
+         Color_Print_At( 4, 22, svarlang_str( 10, 32 ) );
       }
 
       Print_Centered( 1, svarlang_str( 5, 3 ), BOLD );
@@ -850,11 +834,10 @@ Beginning:
    Clear_Screen( NOEXTRAS );
 
    if ( flags.extended_options_flag == FALSE ) {
-      Print_Centered( 1, "Display Logical DOS Drive Information", BOLD );
+      Print_Centered( 1, svarlang_str( 10, 83 ), BOLD );
    }
    else {
-      Print_Centered( 1, "Display/Modify Logical DOS Drive Information",
-                      BOLD );
+      Print_Centered( 1, svarlang_str( 3, 5 ), BOLD );
    }
 
    Display_Extended_Partition_Information_SS();
@@ -865,7 +848,8 @@ Beginning:
    else {
       Print_At(
          4, 18,
-         "Enter the character of the logical drive you want to modify.....?" );
+         svarlang_str( 10, 84 ) );
+      con_print( " ");
 
       Determine_Drive_Letters();
 
@@ -879,12 +863,12 @@ Beginning:
                pDrive->num_of_non_dos_log_drives = 9;
             }
 
-            input = (int)Input( 1, 69, 18, CHAR, 68, 90, ESCC, 0, 0, '1',
+            input = (int)Input( 1, -1, -1, CHAR, 68, 90, ESCC, 0, 0, '1',
                                 pDrive->num_of_non_dos_log_drives + '0' );
          }
          else {
             input =
-               (int)Input( 1, 69, 18, CHAR, 68, 90, ESCC, 0, 0, '\0', '\0' );
+               (int)Input( 1, -1, -1, CHAR, 68, 90, ESCC, 0, 0, '\0', '\0' );
          }
 
          if ( flags.esc == FALSE ) {
@@ -929,28 +913,26 @@ void Display_Partition_Information( void )
 Beginning:
 
    Clear_Screen( 0 );
+   /* page title */
    if ( flags.extended_options_flag == FALSE ) {
-      Print_Centered( 4, "Display Partition Information", BOLD );
+      Print_Centered( 4, svarlang_str( 3, 4 ), BOLD );
    }
    else {
-      Print_Centered( 4, "Display/Modify Partition Information", BOLD );
+      Print_Centered( 4, svarlang_str( 3, 5 ), BOLD );
    }
 
    Display_Primary_Partition_Information_SS();
 
    if ( pDrive->num_of_log_drives > 0 ) {
-      Print_At( 4, 17,
-                "The Extended DOS Partition contains Logical DOS Drives." );
-      Print_At(
-         4, 18,
-         "Do you want to display the logical drive information (Y/N)......?" );
-
+      Print_At( 4, 17, svarlang_str( 10, 80 ) );
+      con_print( " " );
+      con_save_cursor_xy();
       if ( flags.extended_options_flag == TRUE ) {
          Print_At(
-            4, 19,
-            "  (Optional:  Type the number of the partition to modify.)" );
+            4, 20, svarlang_str( 10, 81 ) );
 
-         input = (int)Input( 1, 69, 18, YN, 0, 0, ESCR, 1, 0, '1', '4' );
+         con_restore_cursor_xy();
+         input = (int)Input( 1, -1, -1, YN, 0, 0, ESCR, 1, 0, '1', '4' );
 
          if ( ( ( input - 48 ) >= 1 ) && ( ( input - 48 ) <= 4 ) ) {
             Modify_Primary_Partition_Information( ( input - 48 ) );
@@ -958,7 +940,7 @@ Beginning:
          }
       }
       else {
-         input = (int)Input( 1, 69, 18, YN, 0, 0, ESCR, 1, 0, '\0', '\0' );
+         input = (int)Input( 1, -1, -1, YN, 0, 0, ESCR, 1, 0, '\0', '\0' );
       }
 
       if ( input == TRUE ) {
@@ -975,10 +957,11 @@ Beginning:
       else {
          Print_At(
             4, 18,
-            "Enter the number of the partition you want to modify (1-4)......?" );
+            svarlang_str( 10, 82 ) );
+         con_print( " " );
 
          flags.esc = FALSE;
-         input = (int)Input( 1, 69, 18, NUM, 1, 4, ESCR, 1, 0, '\0', '\0' );
+         input = (int)Input( 1, -1, -1, NUM, 1, 4, ESCR, 1, 0, '\0', '\0' );
 
          if ( flags.esc == FALSE ) {
             Modify_Primary_Partition_Information( input );
@@ -1049,7 +1032,7 @@ void Display_Primary_Partition_Information_SS( void )
                Print_At( 23, ( cursor_offset + 9 ), type );
 
                /* Volume Label */
-               Print_At( 32, ( cursor_offset + 9 ), "%11s",
+               Print_At( 32, ( cursor_offset + 9 ), "%-11s",
                          pDrive->pri_part[index].vol_label );
 
                /* Mbytes */
@@ -1104,7 +1087,7 @@ void Display_Primary_Partition_Information_SS( void )
 
                /* Description */
                Print_At(
-                  33, ( cursor_offset + 9 ), "%15s",
+                  33, ( cursor_offset + 9 ), "%-15s",
                   partition_lookup_table_buffer_long[pDrive->pri_part[index]
                                                         .num_type] );
 
@@ -1150,7 +1133,7 @@ void List_Partition_Types( void )
       if ( ( index == 0 ) || ( index == 64 ) || ( index == 128 ) ||
            ( index == 192 ) ) {
          Clear_Screen( 0 );
-         Print_Centered( 1, "List Partition Types", BOLD );
+         Print_Centered( 1, svarlang_str( 10, 90) , BOLD );
          row = 4;
          column = 0;
       }
@@ -1166,10 +1149,8 @@ void List_Partition_Types( void )
       if ( ( index == 63 ) || ( index == 127 ) || ( index == 191 ) ||
            ( index == 255 ) ) {
 
-         Print_At( 0, 23, "Press " );
-         Color_Print( "Any Key" );
-         con_print( " to continue" );
-
+         con_set_cursor_xy( 1, 25 );
+         con_print( svarlang_str( 10, 91 ) );
          con_readkey();
       }
 
@@ -1189,7 +1170,7 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
 
    do {
       Clear_Screen( 0 );
-      Print_Centered( 4, "Display/Modify Logical Drive Information", BOLD );
+      Print_Centered( 4, svarlang_str( 10, 100 ), BOLD );
 
       Determine_Drive_Letters();
 
@@ -1199,7 +1180,7 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
 
       Print_At(
          4, 8,
-         "Partition            Mbytes    Description    Usage  Start Cyl  End Cyl" );
+         svarlang_str( 10, 101 ) );
 
       /* Drive Letter of Partition */
       if ( IsRecognizedFatPartition(
@@ -1222,7 +1203,7 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
       Print_UL( pDrive->log_drive[logical_drive_number].size_in_MB );
 
       /* Description */
-      Print_At( 33, 9, "%15s",
+      Print_At( 33, 9, "%-15s",
                 partition_lookup_table_buffer_long
                    [pDrive->log_drive[logical_drive_number].num_type] );
 
@@ -1242,20 +1223,20 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
                 pDrive->log_drive[logical_drive_number].end_cyl );
 
       /* NLS:"Choose one of the following: */
-      Print_At( 4, 8, svarlang_str( 9, 2 ) );
+      Print_At( 4, 12, svarlang_str( 9, 2 ) );
 
       Color_Print_At( 4, 14, "1." );
-      con_print( "  Change partition type" );
+      con_print( svarlang_str( 10, 102 ) );
       Color_Print_At( 4, 15, "2." );
-      con_print( "  List partition types" );
-      Color_Print_At( 44, 14, "3." );
-      con_print( "  Hide/Unhide partition" );
+      con_print( svarlang_str( 10, 90 ) );
+      Color_Print_At( 4, 16, "3." );
+      con_print( svarlang_str( 10, 104 ) );
       /*
     Color_Print_At(44,15,"4.");
     con_print("  Reserved for future use.");
 */
       /* NLS:Enter choice: */
-      Print_At( 4, 17, svarlang_str( 9, 1 ) );
+      Print_At( 4, 18, svarlang_str( 9, 1 ) );
       con_print("  ");
 
       flags.esc = FALSE;
@@ -1268,12 +1249,13 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
       if ( input == 1 ) {
          /* Change partition type */
          Print_At(
-            4, 19,
-            "Enter new partition type (1-255)..................................." );
+            4, 20,
+            svarlang_str( 10, 105 ) );
 
+         con_print( " " );
          flags.esc = FALSE;
          input =
-            (int)Input( 3, 71, 19, NUM, 1, 255, ESCC, -1, 0, '\0', '\0' );
+            (int)Input( 3, -1, -1, NUM, 1, 255, ESCC, -1, 0, '\0', '\0' );
          if ( flags.esc == FALSE ) {
             pDrive->log_drive[logical_drive_number].num_type = input;
 
@@ -1322,7 +1304,7 @@ void Modify_Primary_Partition_Information( int partition_number )
 
    do {
       Clear_Screen( 0 );
-      Print_Centered( 4, "Display/Modify Partition Information", BOLD );
+      Print_Centered( 4, svarlang_str( 3, 5 ), BOLD );
 
       Determine_Drive_Letters();
 
@@ -1332,7 +1314,7 @@ void Modify_Primary_Partition_Information( int partition_number )
 
       Print_At(
          4, 8,
-         "Partition   Status   Mbytes    Description    Usage  Start Cyl  End Cyl" );
+         svarlang_str( 10, 11 ) );
 
       /* Drive Letter of Partition */
       if ( IsRecognizedFatPartition(
@@ -1360,7 +1342,7 @@ void Modify_Primary_Partition_Information( int partition_number )
 
       /* Description */
       Print_At(
-         33, 9, "%15s",
+         33, 9, "%-15s",
          partition_lookup_table_buffer_long[pDrive->pri_part[partition_number]
                                                .num_type] );
 
@@ -1378,19 +1360,19 @@ void Modify_Primary_Partition_Information( int partition_number )
       Print_At( 69, 9, "%6lu", pDrive->pri_part[partition_number].end_cyl );
 
       /* NLS:"Choose one of the following: */
-      Print_At( 4, 8, svarlang_str( 9, 2 ) );
+      Print_At( 4, 12, svarlang_str( 9, 2 ) );
 
-      Color_Print_At( 4, 14, "1." );
-      con_print( "  Change partition type" );
-      Color_Print_At( 4, 15, "2." );
-      con_print( "  List partition types" );
-      Color_Print_At( 44, 14, "3." );
-      con_print( "  Hide/Unhide partition" );
-      Color_Print_At( 44, 15, "4." );
-      con_print( "  Remove active status" );
+      Color_Print_At( 4, 14, "1.  " );
+      con_print( svarlang_str( 10, 102 ) );
+      Color_Print_At( 4, 15, "2.  " );
+      con_print( svarlang_str( 10, 90 ) );
+      Color_Print_At( 4, 16, "3.  " );
+      con_print( svarlang_str( 10, 104 ) );
+      Color_Print_At( 4, 17, "4.  " );
+      con_print( svarlang_str( 10, 106 ) );
 
       /* NLS:Enter choice: */
-      Print_At( 4, 17, svarlang_str( 9, 1 ) );
+      Print_At( 4, 19, svarlang_str( 9, 1 ) );
       con_print("  ");
 
       flags.esc = FALSE;
@@ -1404,11 +1386,11 @@ void Modify_Primary_Partition_Information( int partition_number )
          /* Change partition type */
          Print_At(
             4, 19,
-            "Enter new partition type (1-255)..................................." );
+            svarlang_str( 10, 105 ) );
 
          flags.esc = FALSE;
          input =
-            (int)Input( 3, 71, 19, NUM, 1, 255, ESCC, -1, 0, '\0', '\0' );
+            (int)Input( 3, -1, -1, NUM, 1, 255, ESCC, -1, 0, '\0', '\0' );
          if ( flags.esc == FALSE ) {
             Modify_Partition_Type( partition_number, input );
             input = 99;
@@ -1506,9 +1488,12 @@ int Set_Active_Partition_Interface( void )
       /*NLS:Enter the number of the partition you want to make active */
       con_print( svarlang_str( 10, 51 ));
       con_print( " " );
+      con_save_cursor_xy();
 
       for ( ;; ) {
          flags.esc = FALSE;
+
+         con_restore_cursor_xy();
          input = (int)Input( 1, -1, -1, NUM, 1, 4, ESCR, -1, 0, '\0', '\0' );
          if ( flags.esc == TRUE ) {
             return ( 1 );

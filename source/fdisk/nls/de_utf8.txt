@@ -42,10 +42,10 @@
 0.54:  /LOADIPL                 Schreibt 440 Code Bytes von \"boot.mbr\" in MBR
 0.55:\t
 0.60:Fortgeschrittene Partitionstabellenmodifikation:
-0.61:  /MODIFY:<part#>,<Typ#>                   Ändert Paritionstyp zu <Typ#>
+0.61:  /MODIFY:<Part#>,<Typ#>                   Ändert Paritionstyp zu <Typ#>
 0.62:                                           ...logische Laufw. starten bei "5"
-0.63:  /MOVE:<srcpart#>,<destpart#>             Verschiebt primäre Partition
-0.64:  /SWAP:<1stpart#>,<2ndpart#>              Vertauscht primäre Partitionen
+0.63:  /MOVE:<Q.Part#>,<Z.Part#>                Verschiebt primäre Partition
+0.64:  /SWAP:<1.Part#>,<2.Part#>                Vertauscht primäre Partitionen
 0.65:\t
 0.70:Modifikation von Flags:
 0.71:  /CLEARFLAG[{:<Flag#>} | /ALL}]           Setzt <Flag#> oder alle Flags zurück
@@ -109,9 +109,11 @@
 3.1:Partition anlegen
 3.2:Aktive Partition setzen
 3.3:Partition löschen
-3.4:Partitionsinformationen anzeigen
-3.5:Partitionsinformationen anzeigen / modifizieren
+3.4:Eingerichtete Partitionen anzeigen
+3.5:Partitionen anzeigen / modifizieren
 3.6:Datenträger auswählen
+3.7:MBR Wartung
+3.8:Änderungen verwerfen und beenden
 
 
 ##############################################################################
@@ -141,8 +143,8 @@
 
 6.0:MBR Wartung
 6.1:BootEasy MBR anlegen (deaktiviert)
-6.2:MBR (Partitionen und Startprogramm) aus Datei boot.mgr laden
-6.3:MBR (Partitionen und Startprogramm) in Datei boot.mgr schreiben
+6.2:MBR (Partitionen und Startprogramm) aus Datei BOOT.MGR laden
+6.3:MBR (Partitionen und Startprogramm) in Datei BOOT.MGR schreiben
 6.4:Startprogramm aus MBR löschen
 
 
@@ -217,11 +219,11 @@
 9.6:\nInhalt der erweiterten DOS Partition:\n
 9.7:\nGrößter zusammenhängender Speicher für erweiterte Partition = %lu MBytes\n
 9.8:    ------- unbenutzbar -------
-9.9:(1 Mbyte = 1048576 bytes)
+9.9:(1 Mbyte = 1048576 Bytes)
 
 # The following are table headers, must stay adjusted as is
 9.10:\n\nPartition   Status   Mbytes   Beschreibung   Nutzung    CHS Start      CHS Ende\n
-9.11: LW Bezeichnung   Mbytes  System   Usage    Start CHS      Ende CHS\n
+9.11: LW Bezeichnung   Mbytes  System Nutzung    CHS Start      CHS Ende\n
 9.12:  #     LW   Mbytes    frei   bel.
 
 
@@ -249,15 +251,15 @@
 
 # Display extended partition
 10.5:Keine logischen Partitionen definiert.
-10.6:Größe der erw. Partition ist \e[1m%7lu\e[22m Mbytes (1 Mbyte = 1048576 Bytes)
+10.6:Größe der erw. Partition ist \e[1m%lu\e[22m Mbytes (1 Mbyte = 1048576 Bytes)
 
 # Display primary partitions
 10.7:Keine Partitionen definiert.
-10.8:Datenträgergröße beträgt \e[1m%7lu\e[22m Mbytes (1 Mbyte = 1048576 bytes)
+10.8:Datenträgergröße beträgt \e[1m%lu\e[22m Mbytes (1 Mbyte = 1048576 Bytes)
 
 # Table headers
 10.10:Partition  Status  Typ      Bezeichnung    Mbytes  System  Nutzung
-10.11:Partition   Status   Mbytes    Beschreibung Nutzung  Startzyl.  Endzyl.
+10.11:Partition   Status   Mbytes  Beschreibung   Nutzung  Startzyl.  Endzyl.
 10.12:LW Bezeichnung    Mbytes System Nutzung
 
 # Delete extended partition
@@ -287,7 +289,7 @@
 10.60:Soll der ganze vorhandene Speicherplatz für die primäre DOS Partition\n    verwendet und diese aktiviert werden...(J/N)?
 10.61:Soll der ganze vorhandene Speicherplatz für die primäre DOS Partition\n    verwendet werden...(J/N)?
 10.62:Dieses Laufwerk ist standardmäßig FAT-32. Stattdessen FAT-16 verwenden (J/N)?
-10.63:Die maximale Partitionsgröße beträgt \e[1m%7lu\e[22m Mbytes
+10.63:Die maximale Partitionsgröße beträgt \e[1m%lu\e[22m Mbytes
 10.64:Geben Sie die gewünschte Größe in Mbyte oder in Prozent (%%) der\n    Lauferksgröße an...:
 10.65:Geben Sie die gewünschte Größe in Mbyte oder in Prozent (%%) der\n    Lauferksgröße an...:
 10.66:Primäre DOS Partition wurde erstellt.
@@ -299,11 +301,58 @@
 10.72:Geben Sie die Größe der logischen Partition in MByte oder in (%%) der\n    erweiterten Partition an...:
 10.73:Der gesammte verfügbare Speicher der erweiterten Partition\n    wurde zugewiesen.
 
-10.200:Sind Sie sicher (J/N)..............................?
+# Display partition info
+10.80:Die erweiterte Partition beinhaltet logische Partitionen.\n    Sollen die logischen Partitionen angezeigt werden...?
+10.81:Optional: Angabe der Partitionsnummer der zu modifizierenden Partition.
+10.82:Geben Sie die Nummer der zu modifizierenden Partition ein (1-4)...?
+10.83:Anzeige der logischen Partitionen
+10.84:Bitte Laufwerksbuchstaben der zu modifizierenden Partition angeben:
+
+# List partition types
+10.90:Verfügbare Partitionstypen
+10.91:Beliebige Taste drücken zum Fortfahren . . .
+
+# Display / modify partition
+10.100:Logische Partitionen anzeigen / modifizieren
+10.101:Partition            Mbytes  Typ            Nutzung  Startzyl.  Endzyl.
+10.102:Paritionstyp ändern
+10.104:Partition sichtbar machen / verstecken
+10.105:Neuen Partitionstyp eingeben (1-255)...:
+10.106:Partition deaktivieren
+
+
+10.190:Bitte geben Sie die Datenträgernummer ein (1-%d)...:
+10.200:Sind Sie sicher (J/N)...?
 
 # Error strings
 10.250:Ungültiger Laufwerksbuchstabe!
 
+
+11.0:\nKann "boot.mbr" nicht finden...MBR nicht geladen!\n
+11.1:MBR wurde aus Datei "BOOT.MGR" geschrieben.
+11.2:MBR wurde in Datei "BOOT.MGR" gespeichert.
+11.3:Boot code wurde aus MBR entfernt.
+
+##############################################################################
+# WARNING SCREENS                                                            #
+##############################################################################
+
+30.1:Sie haben mindestens einen Datenträger größer als 2,097,152 MB. FDISK\n    kann keine Partitionen verwalten, die diese Grenze überschreiten!\n\n
+30.2:    Sie können fortfahren aber riskieren Datenverlust, insbesondere\n    wenn bereits Partitionen angelegt sind.\n\n
+30.3:    Sollte FDISK das einzige Partitionierungsprogramm sein, welches\n    Sie benutzen, sollte es keine Probleme geben.
+30.4:Möchten Sie fortfahren (J/N)...?
+
+30.10:FDISK ist so eingestellt, dass es Partitionen an Zylindern ausrichtet.\n   Allerdings beginnt die erweiterte Partition nicht an einer Zylindergrenze!\n\n
+30.11:    Dies kann zu Kompatibilitätsproblemen mit alten Systemen führen.\n\n
+30.12:    Sollte dies der Fall sein, erwägen Sie, die erweiterte Partition\n    neu zu erstellen.
+30.13:Logische Partition in unausgerichteter erweiterter erstellen...?
+
+30.20:    Ein inkompatibles erweitertes Partitionslayout wurde erkannt.\n
+30.21:    Die folgenden Aktionen wurden sicherheitshalber deaktiviert:\n\n
+30.22:      - Anlegen logischer Partitionen\n
+30.23:      - Löschen logischer Partitionen\n\n
+30.24:    Um das Bearbeiten zu aktivieren, erstellen Sie die erweiterte\n
+30.25:    Partition neu, oder verwenden Sie ein anderes Partitionierungstool.\n
 
 ##############################################################################
 # KBDINPUT.C                                                                 #
@@ -315,7 +364,7 @@
 20.8:Gewünschte Partitionsgröße überschreitet die Größe des freien Speichers.
 20.9:Ausgewählte Eingabe:  %d
 20.10:Eingabe:  %d
-20.11:Ungültige Eingabe. Akzeptierter Wertebereich
+20.11:Ungültige Eingabe. Akzeptierte Zeichen
 20.12:ist keine gültige Eingabe. Akzeptierte Eingabe
 20.13:Ungültige Eingabe.
 

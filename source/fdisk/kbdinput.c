@@ -526,7 +526,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
 
             Position_Cursor( 4, 23 );
             /* NLS:Invalid entry, please enter %c-%c. */
-            Color_Printf( "%s %c-%c.", svarlang_str( 20, 11 ), min_range, max_range );
+            Color_Printf( "%s %c-%c.", svarlang_str( 20, 11 ), (char)min_range, (char)max_range );
          }
 
          Position_Cursor( ( x_position + 1 ), y_position );         

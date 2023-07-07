@@ -111,8 +111,10 @@
 3.2:Set Active partition
 3.3:Delete partition or Logical DOS Drive
 3.4:Display partition information
-3.5:Display/Modify partition information
+3.5:Display / Modify partition information
 3.6:Change current fixed disk drive
+3.7:MBR maintenance
+3.8:Abort changes and exit
 
 
 ##############################################################################
@@ -250,15 +252,15 @@
 
 # Display extended partition
 10.5:No logical drives defined.
-10.6:Total Extended Partition size is %7lu Mbytes (1 Mbyte = 1048576 bytes)
+10.6:Total Extended Partition size is %lu Mbytes (1 Mbyte = 1048576 bytes)
 
 # Display primary partitions
 10.7:No partitions defined.
-10.8:Total disk space is %7lu Mbytes (1 Mbyte = 1048576 bytes)
+10.8:Total disk space is %lu Mbytes (1 Mbyte = 1048576 bytes)
 
 # Table headers
 10.10:Partition  Status  Type     Volume Label   Mbytes  System    Usage
-10.11:Partition   Status   Mbytes    Description    Usage  Start Cyl  End Cyl
+10.11:Partition   Status   Mbytes  Description      Usage  Start Cyl  End Cyl
 10.12:Drv Volume Label  Mbytes System   Usage
 
 # Delete extended partition
@@ -288,7 +290,7 @@
 10.60:Do you wish to use the maximum available size for a Primary DOS Partition\n    and make the partition active (Y/N).....................?
 10.61:Do you wish to use the maximum available size for a Primary DOS Partition\n    (Y/N)...................................................?
 10.62:This drive is a FAT32 by default, switch to FAT16 (Y/N)?
-10.63:Maximum space available for partition is \e[1m%7lu\e[22m Mbytes
+10.63:Maximum space available for partition is \e[1m%lu\e[22m Mbytes
 10.64:Enter partition size in Mbytes or percent (%%) of disk space to\n    create a Primary DOS Partition.....:
 10.65:Enter partition size in Mbytes or percent (%%) of disk space to\n    create an Extended DOS Partition.....:
 10.66:Primary DOS Partition created
@@ -300,11 +302,59 @@
 10.72:Enter logical drive size in Mbytes or percent (%%) of\n    extended partition size...:
 10.73:All available space in the Extended DOS Partition\n    is assigned to logical drives.
 
+# Display partition info
+10.80:The Extended DOS Partition contains Logical DOS Drives.\n    Do you want to display the logical drive information (Y/N)......?
+10.81:Optional:  Type the number of the partition to modify.
+10.82:Enter the number of the partition you want to modify (1-4)...?
+10.83:Display Logical DOS Drive Information
+10.84:Enter the character of the logical drive you want to modify...?
 
-10.200:Are you sure (Y/N)..............................?
+# List partition types
+10.90:List Partition Types
+10.91:Press any key to continue . . .
+
+# Display / modify partition
+10.100:Display/Modify Logical Drive Information
+10.101:Partition            Mbytes  Type             Usage  Start Cyl  End Cyl
+10.102:Change partition type
+10.104:Hide / Unhide partition
+10.105:Enter new partition type (1-255)...:
+10.106:Remove active status
+
+
+10.190:Enter Fixed Disk Drive Number (1-%d)...:
+10.200:Are you sure (Y/N)...?
 
 # Error strings
 10.250:Illegal drive letter
+
+
+11.0:\nUnable to find the \"boot.mbr\" file...MBR has not been loaded.\n
+11.1:MBR has been written using \"boot.mbr\"
+11.2:MBR has been saved to \"boot.mbr\"
+11.3:Boot code has been removed from MBR.
+
+
+##############################################################################
+# WARNING SCREENS                                                            #
+##############################################################################
+30.1:You have at least one disk larger than 2,097,152 MB. FDISK can\n    NOT handle partitions exceeding this barrier!\n\n
+30.2:    You may proceed but are in risk of data loss, especially if there\n    are already partitions created with other tools exceeding the barrier.\n\n
+30.3:    It should be ok if Free FDISK is the only partitioning tool you are\n    using, but we recommend using another disk utility to handle this type\n    of disk.
+30.4:Are you sure you want to continue (Y/N)...?
+
+30.10:FDISK is currently in cylinder alignment mode, but the\n    extended partition does not start on a cylinder boundary!\n\n
+30.11:    While unlikely, this MAY result in compatibility problems.\n\n
+30.12:If your system depends on proper cylinder alignment you should\n    consider re-creating the extended partition.
+30.13:Create logical drive in non-aligned extended partition...?
+
+30.20:    A non-compatible extended partition layout was detected on\n
+30.21:    this disk. The following actions are disabled:\n\n
+30.22:      - creating logical drives\n
+30.23:      - deleting logical drives\n\n
+30.24:    You may re-create the extended partition to enable editing or\n
+30.25:    use another disk utility to partition this disk.\n
+
 
 ##############################################################################
 # KBDINPUT.C                                                                 #

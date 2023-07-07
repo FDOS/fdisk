@@ -155,13 +155,12 @@ void Warn_Incompatible_Ext( void )
    Color_Print_At( 38, 4, svarlang_str(250, 4)); /* ERROR */
 
    Position_Cursor( 0, 7 );
-   con_print(
-      "    A non-compatible extended partition layout was detected on\n"
-      "    this disk. The following actions are disabled:\n\n"
-      "      - creating logical drives\n"
-      "      - deleting logical drives\n\n"
-      "    You may re-create the extended partition to enable editing or\n"
-      "    use another disk utility to partition this disk.\n" );
+   con_print( svarlang_str( 30, 20 ) );
+   con_print( svarlang_str( 30, 21 ) );
+   con_print( svarlang_str( 30, 22 ) );
+   con_print( svarlang_str( 30, 23 ) );
+   con_print( svarlang_str( 30, 24 ) );
+   con_print( svarlang_str( 30, 25 ) );
 
    Input( 0, 0, 0, ESC, 0, 0, ESCR, 0, 0, '\0', '\0' );
 }
@@ -438,13 +437,13 @@ void Interactive_User_Interface( void )
          if ( !file_pointer ) {
             Color_Print_At(
                4, 22,
-               "\nUnable to find the \"boot.mbr\" file...MBR has not been loaded.\n" );
+               svarlang_str( 11, 0 ) );
          }
          else {
             fclose(file_pointer);
             Load_MBR( 0 );
             Color_Print_At( 4, 22,
-                            "MBR has been written using \"boot.mbr\"" );
+                            svarlang_str( 11, 1 ) );
             Read_Partition_Tables();
          }
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
@@ -452,13 +451,13 @@ void Interactive_User_Interface( void )
 
       if ( menu == SMBR ) {
          Save_MBR();
-         Color_Print_At( 4, 22, "MBR has been saved to \"boot.mbr\"" );
+         Color_Print_At( 4, 22, svarlang_str( 11, 2 ) );
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
 
       if ( menu == RMBR ) {
          Remove_IPL();
-         Color_Print_At( 4, 22, "Boot code has been removed from MBR." );
+         Color_Print_At( 4, 22, svarlang_str( 11, 3 ) );
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
 
@@ -649,8 +648,8 @@ int Standard_Menu( int menu )
 
       if ( menu == MM && flags.extended_options_flag == TRUE &&
            minimum_option == 1 ) {
-         Color_Print_At( 50, 15, "M.  " );
-         con_print( "MBR maintenance" );
+         Color_Print_At( 40, 15, "M.  " );
+         con_print( svarlang_str( 3, 7 ) );
 
          optional_char_1 = 'M';
       }
@@ -659,8 +658,8 @@ int Standard_Menu( int menu )
       }
 
       if ( menu == MM && flags.allow_abort == TRUE && minimum_option == 1 ) {
-         Color_Print_At( 50, 16, "A.  " );
-         con_print( "Abort changes and exit" );
+         Color_Print_At( 40, 16, "A.  " );
+         con_print( svarlang_str( 3, 8 ) );
 
          optional_char_2 = 'A';
       }
