@@ -181,6 +181,20 @@ int con_get_cursor_y( void )
 	return con_cury;
 }
 
+static int curx_save = 1, cury_save = 1;
+
+void con_save_cursor_xy( void )
+{
+	curx_save = con_curx;
+	cury_save = con_cury;
+}
+
+void con_restore_cursor_xy( void )
+{
+	con_curx = curx_save;
+	con_cury = cury_save;
+}
+
 static void con_get_hw_cursor( int *x, int *y )
 {
 	union REGPACK r; 

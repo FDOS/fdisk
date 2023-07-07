@@ -186,6 +186,8 @@ void con_set_cursor_xy( int x, int y );
 void con_get_cursor_xy( int *x, int *y );
 int con_get_cursor_x( void );
 int con_get_cursor_y( void );
+void con_save_cursor_xy( void );
+void con_restore_cursor_xy( void );
 
 void con_set_cursor_rel( int dx, int dy );
 /* Enables / disables hardware cursor synchronisation. Can be disabled to
