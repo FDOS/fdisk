@@ -263,7 +263,7 @@
 10.12:LW Bezeichnung    Mbytes System Nutzung
 
 # Delete extended partition
-10.20:\e[1;5mWARNUNG!\e[22;25m Alle Daten der erweiterten Partition gehen verloren.\n    Möchten Sie fortfahren (J/N).................?
+10.20:\e[1;5mWARNUNG!\e[22;25m Alle Daten der erweiterten Partition und ihrer\n    logischen Partitionen gehen verloren. Sind Sie sicher (J/N)...?
 10.21:Erweiterte Partition wurde gelöscht.
 
 # Delete logical drives

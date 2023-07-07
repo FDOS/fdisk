@@ -264,7 +264,7 @@
 10.12:Drv Volume Label  Mbytes System   Usage
 
 # Delete extended partition
-10.20:\e[1;5mWARNING!\e[22;25m Data in the deleted Extended DOS Partition will be lost.\n    Do you wish to continue (Y/N).................?
+10.20:\e[1;5mWARNING!\e[22;25m Data in the deleted Extended DOS Partition and its\n    Logical Partitions will be lost. Continue (Y/N)...?
 10.21:Extended DOS Partition deleted
 
 # Delete logical drives
