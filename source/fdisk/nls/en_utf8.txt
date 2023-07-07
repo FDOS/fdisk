@@ -39,7 +39,7 @@
 0.51:  /IPL                     Installs the standard boot code into MBR <drive#>
 0.52:                           ...same as /MBR and /CMBR for compatibility
 0.53:  /SMARTIPL                Installs DriveSmart IPL into MBR <drive#>
-0.54:  /LOADIPL                 Writes 440 code bytes from \"boot.mbr\" into MBR
+0.54:  /LOADIPL                 Writes 440 code bytes from "boot.mbr" into MBR
 0.55:\t
 0.60:Advanced partition table modification:
 0.61:  /MODIFY:<part#>,<type#>                    Changes partition type to <type#>
@@ -53,14 +53,14 @@
 0.73:  /TESTFLAG:<flag#>[,<value>]                Tests <flag#> for 1 or <value>
 0.74:\t
 0.80:For obtaining information about the hard disk(s):
-0.81:  /STATUS       Displays the current partition layout.
+0.81:  /STATUS       Displays the current partition layout
 0.82:  /DUMP         Dumps partition information from all hard disks(for debugging)
 0.83:\t
 0.90:Interactive user interface switches:
-0.91:  /UI           Always starts UI if given as last argument.
-0.92:  /MONO         Forces the user interface to run in monochrome mode.
-0.93:  /FPRMT        Prompts for FAT32/FAT16 in interactive mode.
-0.94:  /XO           Enables extended options.
+0.91:  /UI           Always starts UI if given as last argument
+0.92:  /MONO         Forces the user interface to run in monochrome mode
+0.93:  /FPRMT        Prompts for FAT32/FAT16 in interactive mode
+0.94:  /XO           Enables extended options
 0.95:\t
 0.100:Compatibility options:
 0.101:  /X            Disables ext. INT 13 and LBA for the following commands
@@ -94,12 +94,9 @@
 ##############################################################################
 
 2.0:You \e[1mMUST\e[22m restart your system for your changes to take effect.
-
 2.1:Any drives you have created or changed must be formatted \e[1mAFTER\e[22m you restart.
-
 2.2:System will now restart
 2.3:Press any key when ready . . .
-
 
 
 ##############################################################################
@@ -268,7 +265,7 @@
 10.21:Extended DOS Partition deleted
 
 # Delete logical drives
-10.30:\e[1;5mWARNING!\e[22;25m Data in a deleted Logical DOS Drive will be lost.\n    What drive do you want to delete...............................? 
+10.30:\e[1;5mWARNING!\e[22;25m Data in a deleted Logical DOS Drive will be lost.\n    What drive do you want to delete...............................?
 10.31:Logical drive deleted
 10.32:Error deleting logical drive!
 
