@@ -3,6 +3,7 @@ CONTRIB.TXT
 Thanks to the following people for contributing:
 
 Name:                   Contributed:
+Brian Reifsneyder       original author
 Phil Brutsche           part.dat idea and null pointer error bug fix
 Roland Ronquist         ideas, advice, and testing
 John Price              information on how to modify the program to run on
@@ -15,5 +16,7 @@ Phil Marek              new command-line parsing code and a variable fix
 Jim Hall                makefile
 Tom Ehlert              program size reduction, code simplifications,
                           new bootloader, bug fixes
-Bernd Boeckmann         Open Watcom C port, critical bug fixes, code cleanup
-Mateusz Viste           svarlang lib, code improvements, translations
+Bernd Boeckmann         Open Watcom C and I16-GCC ports, critical bug fixes,
+                          code cleanup, german translation
+Mateusz Viste           svarlang lib, FDISK lite, code improvements,
+                          polish translation

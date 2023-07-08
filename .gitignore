@@ -1,3 +1,4 @@
+# distribution files
 fdisk.zip
 bin/fdisk.exe
 nls/fdisk.lng
@@ -5,8 +6,11 @@ nls/fdisk.lng
 # generated files
 source/fdisk/*.exe
 source/fdisk/bintoc/*.exe
+source/fdisk/bintoc/bintoc
 source/fdisk/svarlang/*.exe
+source/fdisk/svarlang/tlumacz
 source/fdisk/utf8tocp/*.exe
+source/fdisk/utf8tocp/utf8tocp
 source/fdisk/deflang.c
 source/fdisk/bootnorm.bin
 source/fdisk/fdisk.lng
