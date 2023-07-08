@@ -67,7 +67,7 @@
 0.102:\t
 0.200:Bu programın telif hakkı Copyright %s Brian E. Reifsnyder ve FreeDOS
 0.201:topluluğuna aittir, GNU Genel Kamu Lisansı, 2. sürüm kapsamında.
-0.202:
+0.202:\t
 0.203:\t
 0.204:Bu program olduğu gibi sağlanmıştır ve hiçbir garanti vermez. Bu yazılımın
 0.205:yazarı bu yazılımın kullanımı veya yanlış kullanımı için hiçbir sorumluluk
