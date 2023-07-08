@@ -12,7 +12,11 @@
 # To create a ZIP distribution:
 #  wmake -f makefile.wat dist
 
+!ifdef __MSDOS__
+TOOL_CC		= wcc
+!else
 TOOL_CC     = wcc386
+!endif
 TOOL_CFLAGS = -q -ox -wx
 
 CC       = wcc
