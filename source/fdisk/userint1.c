@@ -121,11 +121,6 @@ void Position_Cursor( int column, int row )
 void Exit_Screen( void )
 {
    if ( flags.partitions_have_changed == TRUE ) {
-      Write_Partition_Tables();
-      flags.partitions_have_changed = FALSE;
-
-      Clear_Screen( NOEXTRAS );
-
       if ( flags.reboot == FALSE ) {
          Print_At(4, 11, svarlang_str(2,0)); /* You must restart your system */
          Print_At(4, 12, svarlang_str(2,1)); /* Any drives created must be formatted AFTER restart */
@@ -471,10 +466,6 @@ void Interactive_User_Interface( void )
       }
 
    } while ( menu != EXIT );
-
-   if ( flags.return_from_iui == FALSE ) {
-      Exit_Screen();
-   }
 
 ret:
    /* clear screen with "normal" black background and position cursor at the

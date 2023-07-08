@@ -17,5 +17,6 @@ void Warn_Incompatible_Ext( void );
 /*void Display_Label( void );*/
 void Interactive_User_Interface( void );
 void Menu_Routine( void );
+void Exit_Screen( void );
 
 #endif /* USERINT1_H */

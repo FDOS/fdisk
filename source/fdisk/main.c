@@ -497,6 +497,7 @@ int main( int argc, char *argv[] )
    int location;
    int fat32_temp;
    int result;
+   int svarlang_result;
 
 #ifdef SMART_MBR
    extern void __cdecl __far smart_mbr( void );
@@ -506,7 +507,17 @@ int main( int argc, char *argv[] )
    con_init( 1 );
 
    /* initialize the SvarLANG library (loads translation strings) */
-   svarlang_autoload("FDISK");
+   svarlang_result = svarlang_autoload("FDISK");
+   if ( svarlang_result == -4 ) {
+      con_print("\nTranslations in FDISK.LNG to big. Binary must be updated!\n");
+      exit( 1 );
+   }
+
+   Determine_DOS_Version();
+   if ( os_version > OS_WIN_ME ) {
+      con_print( svarlang_str( 255, 19 ) );
+      exit( 1 );
+   }
 
 #ifdef SMART_MBRT
    if ( memicmp( argv[1], "SMART", 5 ) == 0 ) {
@@ -584,15 +595,8 @@ int main( int argc, char *argv[] )
 
    /* If "FDISK" is typed without any options */
    number_of_command_line_options = Get_Options( &*argv, argc );
-#ifndef FDISKLITE
-   if ( number_of_command_line_options == 0 ) {
-      Interactive_User_Interface();
-      exit( 0 );
-   }
-   else
-#endif
-   {
-      do {
+
+      while ( number_of_command_line_options > 0 ) {
          command_ok = FALSE;
 
          if ( 0 == strcmp( arg[0].choice, "ACTIVATE" ) ||
@@ -947,26 +951,33 @@ int main( int argc, char *argv[] )
             Display_Help_Screen();
             command_ok = TRUE;
 
-            Shift_Command_Line_Options( 1 );
+            exit( 0 );
          }
          if ( command_ok == FALSE ) {
             con_puts(svarlang_str(255, 18) );
             exit( 1 );
          }
 
-      } while ( number_of_command_line_options > 0 );
+      }
 
 #ifndef FDISKLITE
       if ( flags.use_iui == TRUE ) {
          Interactive_User_Interface();
       }
 #endif
+
       result = Write_Partition_Tables();
-      if ( !result ) {
+      if ( result != 0 ) {
          con_print( svarlang_str( 255, 15 ) );
          con_print( "\n" );
          exit( 8 );
       }
-   }
+
+#ifndef FDISKLITE
+      if ( flags.use_iui == TRUE ) {
+         Exit_Screen();
+      }
+#endif
+
    return 0;
 }

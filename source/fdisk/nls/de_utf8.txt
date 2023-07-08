@@ -406,3 +406,4 @@
 255.16:\nFehler beim Speichern des MBR.
 255.17:\nFehler beim Schreiben des Smart IPL.
 255.18:\nFalsches Kommando oder Syntaxfehler. Aufruf mit FDISK /? für Hilfe.
+255.19:\nBetriebsystem wird nicht unterstützt.\n

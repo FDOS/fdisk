@@ -63,6 +63,42 @@ extern void Print_Centered( int y, char *text, int style );
 extern void Position_Cursor( int row, int column );
 extern void Pause( void );
 
+int os_version = 0;
+int os_version_minor = 0;
+int os_gui_running = 0;
+
+
+void Determine_DOS_Version( void )
+{
+   union REGPACK r;
+
+   /* check for DOS <5 */
+   r.w.ax = 0x3000;
+   intr( 0x21, &r );
+   if ( r.h.al < 5 ) {
+      os_version = r.h.al;
+      os_version_minor = r.h.ah;
+      return;
+   }
+
+   /* check for real DOS version >= 5 */
+   r.w.ax = 0x3306;
+   intr( 0x21, &r );
+   os_version = r.h.bl;
+   os_version_minor = r.h.bh;
+
+   /* check for Win9X GUI mode */
+   if ( os_version == 7 || os_version == 8 ) {
+      r.w.ax = 0x1600;
+      intr( 0x2f, &r );
+
+      if ( r.h.al == 4 ) {
+         os_gui_running = 1;
+      }
+   }
+}
+
+
 /* Check for interrupt 0x13 extensions */
 void Check_For_INT13_Extensions( void )
 {
@@ -152,6 +188,24 @@ int IsRecognizedFatPartition( unsigned partitiontype )
    }
    return FALSE;
 }
+
+int Lock_Unlock_Drive( int drive_num, int lock )
+{
+   union REGPACK r;
+
+   /* do not try to lock drive when running under plain DOS */
+   if ( !os_gui_running ) return 1;
+
+   r.w.ax = 0x440d;
+   r.w.cx = ( lock ) ? 0x484b : 0x486b;  /* lock / unlock physical device */
+   r.h.bl = drive_num;
+   r.h.bh = 0;       /* lock level 0 */
+   r.w.dx = 0;
+   intr( 0x21, &r );
+
+   return (r.w.flags & INTR_CF) == 0;
+}
+
 
 /* Clear the Boot Sector of a partition */
 void Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head,
@@ -1184,6 +1238,10 @@ int Write_Partition_Tables( void )
          continue; /* nothing done, continue with next drive */
       }
 
+      if ( !Lock_Unlock_Drive( drive_index + 0x80, 1 ) ) {
+         goto drive_error;
+      }
+
       Clear_Sector_Buffer();
 
       error_code =
@@ -1281,9 +1339,11 @@ int Write_Partition_Tables( void )
          }
       }
 
+      Lock_Unlock_Drive( drive_index + 0x80, 0 );
       continue;
 
    drive_error:
+      Lock_Unlock_Drive( drive_index + 0x80, 0 );
       drives_with_error |= 1 << drive_index;
    } /* for (drive_index) */
 

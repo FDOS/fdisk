@@ -405,3 +405,4 @@
 255.16:\nError saving MBR.
 255.17:\nError writing Smart IPL.
 255.18:\nInvalid command or syntax error. Invoke FDISK /? for help.
+255.19:\nUnsupported operating system.\n

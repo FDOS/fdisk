@@ -6,6 +6,16 @@
 
 #define SECT_SIZE 512
 
+#define OS_UNKNOWN   0
+#define OS_DOS5      5
+#define OS_DOS7      7
+#define OS_WIN_ME    8
+#define OS_WIN_NT    32
+
+extern int os_version;
+extern int os_version_minor;
+extern int os_gui_running;
+
 /* Buffers */
 extern unsigned char sector_buffer[SECT_SIZE];
 
@@ -103,6 +113,8 @@ typedef struct part_table_structure {
 
 extern Partition_Table part_table[8];
 
+void Determine_DOS_Version( void );
+int Lock_Unlock_Drive( int drive_num, int lock );
 int Read_Partition_Tables( void );
 int Read_Physical_Sectors( int drive, long cylinder, long head, long sector,
                            int number_of_sectors );
