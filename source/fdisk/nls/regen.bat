@@ -11,11 +11,13 @@ IF NOT ERRORLEVEL 1 GOTO ERR_MISSINGUTF
 ..\utf8tocp\utf8tocp 437 en_utf8.txt > en.txt
 ..\utf8tocp\utf8tocp 850 de_utf8.txt > de.txt
 ..\utf8tocp\utf8tocp 850 fr_utf8.txt > fr.txt
+..\utf8tocp\utf8tocp maz pl_utf8.txt > pl.txt
+..\utf8tocp\utf8tocp 857 tr_utf8.txt > tr.txt
 
 :: ***************************************************************************
 
 :: "en" must come first here! first item is the reference language.
-..\svarlang\tlumacz en de fr
+..\svarlang\tlumacz en de fr pl tr
 
 :: CLEAN UP CONVERTED FILES
 DEL ??.txt
