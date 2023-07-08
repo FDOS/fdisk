@@ -3,26 +3,29 @@
 :: THIS SCRIPT REGENERATES THE TRANSLATIONS FILE (FDISK.LNG)
 
 :: LET'S MAKE SURE THAT UTF8TOCP IS AVAILABLE
-..\utf8tocp\utf8tocp DUPA DUPA > nul
+utf8tocp DUPA DUPA > nul
 IF NOT ERRORLEVEL 1 GOTO ERR_MISSINGUTF
 
 :: *** CONVERT UTF-8 TXT FILES TO PROPER CODEPAGES ***************************
 
-..\utf8tocp\utf8tocp 437 en_utf8.txt > en.txt
-..\utf8tocp\utf8tocp 850 de_utf8.txt > de.txt
-..\utf8tocp\utf8tocp 850 fr_utf8.txt > fr.txt
-..\utf8tocp\utf8tocp maz pl_utf8.txt > pl.txt
-..\utf8tocp\utf8tocp 857 tr_utf8.txt > tr.txt
+utf8tocp 437 en_utf8.txt > EN.TXT
+utf8tocp 850 de_utf8.txt > DE.TXT
+utf8tocp 850 fr_utf8.txt > FR.TXT
+utf8tocp maz pl_utf8.txt > PL.TXT
+utf8tocp 857 tr_utf8.txt > TR.TXT
 
 :: ***************************************************************************
 
 :: "en" must come first here! first item is the reference language.
-..\svarlang\tlumacz en de fr pl tr
+tlumacz en de fr pl tr > TLUMACZ.LOG
 
 :: CLEAN UP CONVERTED FILES
-DEL ??.txt
+DEL ??.TXT
 
-MOVE /Y out.lng ..\fdisk.lng
+IF EXIST FDISK.LNG DEL FDISK.LNG
+RENAME OUT.LNG FDISK.LNG
+
+ECHO DONE: FDISK.LNG HAS BEEN COMPUTED. SEE TLUMACZ.LOG FOR DETAILS.
 
 GOTO DONE
 
