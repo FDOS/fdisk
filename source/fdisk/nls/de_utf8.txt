@@ -79,10 +79,10 @@
 # FAT32 SUPPORT SCREEN                                                       #
 ##############################################################################
 
-1.0:\e[5;5HFDISK erlaubt das Anlegen von Partitionen größer als 2,048 MB unter
-1.1:    Verwendung des FAT-32 Dateisystems. Wenn Sie das Anlegen großer
-1.2:    Partitionen erlauben, wird jede Partition größer als 512 MB mit dem
-1.3:    FAT-32 Dateisystem angelegt.
+1.0:\e[5;5HFDISK erlaubt das Anlegen von Partitionen größer als 2,048 MB
+1.1:    unter Verwendung des FAT-32 Dateisystems. Wenn Sie das Anlegen
+1.2:    großer Partitionen erlauben, wird jede Partition größer als
+1.3:    512 MB mit dem FAT-32 Dateisystem angelegt.
 1.4:    WICHTIG: Manche Betriebsysteme unterstützen keinen Zugriff auf
 1.5:    DOS Partitionen, die größer als 512 MB sind.
 1.6:\t

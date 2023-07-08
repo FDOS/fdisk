@@ -1,30 +1,26 @@
 @ECHO OFF
 
-:: THIS SCRIPT REGENERATES THE TRANSLATIONS FILE (FDISK.LNG) AS WELL AS THE
-:: DEFLANG.C FILE THAT IS NEEDED AT FDISK'S COMPILE TIME.
+:: THIS SCRIPT REGENERATES THE TRANSLATIONS FILE (FDISK.LNG)
 
 :: LET'S MAKE SURE THAT UTF8TOCP IS AVAILABLE
-UTF8TOCP DUPA DUPA > nul
+..\utf8tocp\utf8tocp DUPA DUPA > nul
 IF NOT ERRORLEVEL 1 GOTO ERR_MISSINGUTF
 
 :: *** CONVERT UTF-8 TXT FILES TO PROPER CODEPAGES ***************************
 
-UTF8TOCP 850 DE_UTF8.TXT > DE.TXT
-UTF8TOCP 437 EN_UTF8.TXT > EN.TXT
-UTF8TOCP maz PL_UTF8.TXT > PL.TXT
+..\utf8tocp\utf8tocp 437 en_utf8.txt > en.txt
+..\utf8tocp\utf8tocp 850 de_utf8.txt > de.txt
+..\utf8tocp\utf8tocp 850 fr_utf8.txt > fr.txt
 
 :: ***************************************************************************
 
 :: "en" must come first here! first item is the reference language.
-..\SVARLANG\TLUMACZ en de pl
+..\svarlang\tlumacz en de fr
 
 :: CLEAN UP CONVERTED FILES
-DEL ??.TXT
+DEL ??.txt
 
-:: MOVE DEFLANG.C AND FDISK.LNG TO FDISK'S MAIN DIRECTORY
-TYPE DEFLANG.C > ..\DEFLANG.C
-DEL DEFLANG.C
-MOVE /Y OUT.LNG ..\FDISK.LNG
+MOVE /Y out.lng ..\fdisk.lng
 
 GOTO DONE
 
