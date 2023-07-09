@@ -26,63 +26,50 @@
 #include <string.h>
 #include "svarlang.h"
 
-/* Searches for a .LNG translation file
+int svarlang_autoload(char *name)
+{
+  int result;
+  result = svarlang_autoload_exepath( name );
+  if ( result == -2 ) {
+    /* revert to NLSPATH, if not found */
+    result = svarlang_autoload_nlspath( name );
+  }
+  return result;
+}
 
-   Argument progname may be:
-     a) the program name without path and with/without extension, like FDISK
-     b) a path to the executable file like C:\FDISK\FDISK.EXE
-
-   If the argument is of form a), the directories specified by the environment
-   variable NLSPATH are searched for the file progname.LNG. If NLSPATH is
-   empty or non-existing, the current working directory is searched.
-
-   If the argument is of form b), the .LNG file is first searched in the
-   path specified by progname. If it is not found, the locations specified in
-   a) are searched. */
-int svarlang_autoload(const char *progname) {
+int svarlang_autoload_nlspath(const char *progname) {
   const char *s;
   char langid[3];
-  char progpath[_MAX_PATH], *p;
-  const char *name;
-  size_t proglen;
-  int result;
-  
-  if ( progname == NULL ) return -1;
-  proglen = strlen(progname);
-  if ( proglen == 0 || proglen >= _MAX_PATH ) {
-    return -1;
-  }
-  strcpy( progpath, progname );
-
   s = getenv("LANG");
   if ((s == NULL) || (*s == 0)) return(-1);
   langid[0] = s[0];
   langid[1] = s[1];
   langid[2] = 0;
+  return(svarlang_load(progname, langid, getenv("NLSPATH")));
+}
 
-  for ( p = progpath + proglen - 1; p > progpath && *p != '\\'; p-- ) {
-    /* search for directory separator, and on the go remove extension */
-    if ( *p == '.' ) {
-      *p = '\0';
-    }
-  }
+int svarlang_autoload_exepath(char *exepath) {
+  const char *s;
+  char langid[3];
+  char ext[4];
+  size_t len;
+  int result;
+  
+  if ( exepath == NULL ) return -1;
+  len = strlen(exepath);
+  
+  /* get language identifier (like EN) from LANG env */
+  s = getenv("LANG");
+  if ((s == NULL) || (*s == 0)) return -1;
+  langid[0] = s[0];
+  langid[1] = s[1];
+  langid[2] = 0;
 
-  if ( *p == '\\' ) {
-    /* if separator is found, split dir and file name, and try to load file */
-    *p = 0;
-    name = p + 1;
+  if ( len < 4 ) return -1;
+  strcpy(ext, exepath + len - 3);
+  exepath[len-4] = '\0';
+  result = svarlang_load( exepath, langid, NULL );
+  strcpy(exepath + len - 3, ext);
 
-    result = svarlang_load( name, langid, progpath );
-    if ( result == 0 || result != -5 ) {
-      /* return if success or any error other than file not found */
-      return result;
-    }
-  }
-  else {
-    /* make sure name contains the filename with its extension stripped */
-    name = progpath;
-  }
-
-  /* search NLSPATH directories of the language specified by LANG env */
-  return(svarlang_load(name, langid, getenv("NLSPATH")));
+  return result;
 }
