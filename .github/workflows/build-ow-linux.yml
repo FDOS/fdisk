@@ -19,12 +19,12 @@ jobs:
         cd source/fdisk
         wmake
 
-    -name: Build distribution ZIP
+    - name: Build distribution ZIP
       run: |
         cd source/fdisk
         wmake dist
 
-    -name: Upload files
+    - name: Upload files
       uses: actions/upload-artifact@v3
       with:
         name: Distribution ZIP
