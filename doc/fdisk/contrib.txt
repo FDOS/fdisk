@@ -17,6 +17,7 @@ Jim Hall                makefile
 Tom Ehlert              program size reduction, code simplifications,
                           new bootloader, bug fixes
 Bernd Boeckmann         Open Watcom C and I16-GCC ports, critical bug fixes,
-                          code cleanup, german translation
+                          code cleanup, German translation
 Mateusz Viste           svarlang lib, FDISK lite, code improvements,
-                          polish translation
+                          Polish translation
+Emir SARI               Turkish translation
