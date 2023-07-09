@@ -48,6 +48,12 @@ int svarlang_autoload(const char *progname) {
   size_t proglen;
   int result;
   
+  s = getenv("LANG");
+  if ((s == NULL) || (*s == 0)) return(-1);
+  langid[0] = s[0];
+  langid[1] = s[1];
+  langid[2] = 0;
+
   if ( progname == NULL ) return -1;
   proglen = strlen(progname);
   if ( proglen == 0 || proglen >= _MAX_PATH ) {
