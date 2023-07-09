@@ -194,7 +194,7 @@ int Lock_Unlock_Drive( int drive_num, int lock )
    union REGPACK r;
 
    /* do not try to lock drive when running under plain DOS */
-   if ( !os_gui_running ) return 1;
+   if ( ( !os_gui_running ) || (os_version < OS_DOS7) ) return 1;
 
    r.w.ax = 0x440d;
    r.w.cx = ( lock ) ? 0x484b : 0x486b;  /* lock / unlock physical device */
