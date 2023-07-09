@@ -97,6 +97,31 @@
 
 
 ##############################################################################
+# MAIN MENU                                                                  #
+##############################################################################
+
+3.0:Opcje FDISK
+3.1:Utwórz partycję lub logiczny napęd DOS
+3.2:Ustaw aktywną partycję
+3.3:Usuń partycję lub logiczny napęd DOS
+3.4:Wyświetl informacje o partycjach
+3.5:Wyświetl / Zmień informacje o partycjach
+3.6:Zmień bieżący dysk
+3.7:Zarządzanie MBR
+3.8:Przerwij zmiany i wyjdź
+
+
+##############################################################################
+# CREATE PARTITION MENU                                                      #
+##############################################################################
+
+4.0:Utwórz partycję lub logiczny napęd DOS
+4.1:Utwórz partycję podstawową
+4.2:Utwórz partycję rozszerzoną
+4.3:Utwórz jeden logiczny napęd lub więcej wewnątrz partycji rozszerzonej
+
+
+##############################################################################
 # GLOBAL STRINGS                                                             #
 ##############################################################################
 
