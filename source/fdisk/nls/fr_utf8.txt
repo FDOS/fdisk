@@ -86,7 +86,7 @@
 1.4:    IMPORTANT : si vous activez le support des grands disques, certains OS
 1.5:    seront incapables d'accéder aux partitions et aux lecteurs logiques qui
 1.6:    sont supérieurs à 512 Mo en taille.
-1.7:\e[5;18HSouhaitez-vous utiliser le support des grands disques (FAT32) (O/N)....?
+1.7:\e[5;18HVoulez-vous utiliser le support des grands disques (FAT32) (O/N)....?
 
 
 ##############################################################################
@@ -223,9 +223,9 @@
 9.9:(1 Moctet = 1048576 octets)
 
 # The following are table headers, must stay adjusted as is
-9.10:\n\nPartition   État    Moctets   Description      Utilisation    Début CHS       Fin CHS\n
-9.11:Étiquette volume  Moctets  Système   Utilisation    Début CHS       Fin CHS\n
-9.12:Disque   Lect   Moctets    Libre  Utilisation
+9.10:\n\nPartition   État    Moctets   Description    Utilisation Début CHS   Fin CHS\n
+9.11:Étiquette volume  Moctets  Système   Utilisation    Début CHS     Fin CHS\n
+9.12:Disque  Lect   Moctets       Libre  Utilisation
 
 9.13:Pas d'espace pour créer une partition DOS.
 9.14:La partition DOS étendue existe déjà.
@@ -236,7 +236,7 @@
 9.19:Aucune partition non-DOS à effacer.
 9.20:est inutilisable !
 9.21:Aucune partition à effacer.
-9.22:\e[1mAVERTISSEMENT !\e[22m Aucune partition n'est définie comme active - le disque 1 n'est pas démarrable sauf si\n    une partition est définie comme active
+9.22:\e[1mAVERTISSEMENT !\e[22m Aucune partition n'est définie comme active - \n   le disque 1 n'est pas démarrable sauf si une partition est définie comme active
 
 
 ##############################################################################
@@ -259,21 +259,21 @@
 10.8:La taille totale de l'espace disque est de %lu Moctets (1 Moctet = 1048576 octets)
 
 # Table headers
-10.10:Partition  État  Type     Étiquette volume   Moctets  Système    Utilisation
+10.10:Partition  État    Type     Étiquette volume Moctets Système  Utilisation
 10.11:Partition   État   Moctets  Description      Utilisation  Cyl début  Cyl fin
-10.12:Étiquette Volume  Moctets Système   Utilisation
+10.12:Étiquette Volume   Moctets  Système  Utilisation
 
 # Delete extended partition
 10.20:\e[1;5mAVERTISSEMENT !\e[22;25m Les données dans la partition DOS étendue effacée et ses\n    partition logiques seront perdues. Continuer (O/N)...?
 10.21:La partition DOS étendue a été effacée
 
 # Delete logical drives
-10.30:\e[1;5mAVERTISSEMENT !\e[22;25m Les données dans un lecteur logique DOS effacé seront perdues.\n    Quel lecteur souhaitez-vous effacer...............................?
+10.30:\e[1;5mAVERTISSEMENT !\e[22;25m Les données dans un lecteur logique DOS effacé seront\n    perdues. Quel lecteur souhaitez-vous effacer...............................?
 10.31:Le lecteur logique a été effacé
 10.32:Erreur lors de la suppression du lecteur logique !
 
 # Delete primary partition
-10.40:\e[1;5mAVERTISSEMENT !\e[22;25m Les données dans une partition primaire DOS effacée seront perdues.\n    Quelle partition primaire souhaitez vous effacer...?
+10.40:\e[1;5mAVERTISSEMENT !\e[22;25m Les données dans une partition primaire DOS effacée seront\n    perdues. Quelle partition primaire souhaitez vous effacer...?
 10.41:La partition primaire DOS a été effacée
 10.42:Erreur lors de la suppression de la partition primaire DOS !
 10.43:Refus de la suppression de la partition étendue !
@@ -283,16 +283,16 @@
 10.50:Aucune partition à rendre active.
 10.51:Entrez le numéro de la partition que vous souhaitez rendre active...........:
 10.52:%d n'est pas un choix. Veuillez entrer un choix valide.
-10.53:L'unique partition démarrable sur le lecteur %d est déjà marquée comme active.
+10.53:L'unique partition démarrable sur le lecteur %d est déjà marquée comme active
 10.54:La partition %d a été activée.
 
 # Create partition
-10.60:Souhaitez-vous utiliser la taille maximale disponible pour une partition DOS primaire\n    et rendre la partition active (O/N).....................?
-10.61:Souhaitezz-vous utiliser la taille maximale disponible pour une partition DOS primaire\n    (O/N)...................................................?
+10.60:Souhaitez-vous utiliser la taille maximale disponible pour une partition\n     DOS primaire et rendre la partition active (O/N).....................?
+10.61:Souhaitez-vous utiliser la taille maximale disponible pour une partition\n     DOS primaire (O/N)...................................................?
 10.62:Ce lecteur est un FAT32 par défaut, basculer en FAT16 (O/N) ?
 10.63:La taille maximale disponible pour la partition est de \e[1m%lu\e[22m Moctets
-10.64:Entrez la taille de la partition en Moctets ou en pourcentage de l'espace disque (%%)\n    pour créer une partition DOS primaire.....:
-10.65:Entrez la taille de la partition en Moctets ou en pourcentage de l'espace disque (%%)\n    pour créer une partition DOS étendue.....:
+10.64:Entrez la taille de la partition en Moctets ou en pourcentage de l'espace\n   disque (%%) pour créer une partition DOS primaire.....:
+10.65:Entrez la taille de la partition en Moctets ou en pourcentage de l'espace\n   disque (%%) pour créer une partition DOS étendue.....:
 10.66:La partition primaire DOS a été créée.
 10.67:La partition étendue DOS a été créée.
 
@@ -303,7 +303,7 @@
 10.73:Tout l'espace disponible dans la partition étendue DOS\n    est attribué aux lecteurs logiques.
 
 # Display partition info
-10.80:La partition étendue ODS contient des lecteurs logiques DOS.\n    Souhaitez-vous afficher les informations des lecteurs logiques (O/N)......?
+10.80:La partition étendue DOS contient des lecteurs logiques DOS.\n    Souhaitez-vous afficher les informations des lecteurs logiques (O/N)......?
 10.81:Optionnel :  Tapez le numéro de la partition à modifier.
 10.82:Entrez le numéro de la partition que vous souhaitez modifier (1-4)...?
 10.83:Afficher les informations des lecteurs logiques DOS
@@ -338,9 +338,9 @@
 ##############################################################################
 # WARNING SCREENS                                                            #
 ##############################################################################
-30.1:Vous avez au moins un disque de taille supérieure à 2,097,152 Mo. FDISK ne peut\n    PAS gérer les partitions dépassant cette limite !\n\n
-30.2:    Vous pouvez continuer mais vous risquez une perte de données, particulièrement s'il\n    existe déjà des partitions créées avec d'autres outils dépassant cette limite.\n\n
-30.3:    Cela devrait être OK si FDISK libre est le seul outil de partitionnement que vous\n    utilisez, mais nous conseillons d'utiliser un autre utilitaire de disque pour gérer ce type\n    de disque.
+30.1:Vous avez au moins un disque de taille supérieure à 2,097,152 Mo. FDISK ne\n    peut PAS gérer les partitions dépassant cette limite !\n\n
+30.2:    Vous pouvez continuer mais vous risquez une perte de données, \n   particulièrement s'il existe déjà des partitions créées avec d'autres outils dépassant cette limite.\n\n
+30.3:    Cela devrait être OK si FDISK libre est le seul outil de partitionnement\n    que vous utilisez, mais nous conseillons d'utiliser un autre utilitaire de disque pour gérer ce type\n    de disque.
 30.4:Êtes-vous certain de vouloir continuer (O/N)...?
 
 30.10:FDISK est actuellement en mode d'alignement de cylindres, mais la\n    partition étendue ne démarre pas sur une limite de cylindre !\n\n
@@ -408,3 +408,4 @@
 255.16:\nErreur lors de la sauvegarde du MBR.
 255.17:\nErreur lors de l'écriture de Smart IPL.
 255.18:\nCommande invalide ou erreur de syntaxe. Invoquez FDISK /? pour l'aide.
+255.19:\nSystème d'exploitation non pris en charge.\n
