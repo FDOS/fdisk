@@ -27,6 +27,6 @@ jobs:
     - name: Upload files
       uses: actions/upload-artifact@v3
       with:
-        name: Distribution ZIP
+        name: fdisk.zip
         path: fdisk.zip
 
