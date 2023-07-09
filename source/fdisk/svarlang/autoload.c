@@ -23,16 +23,66 @@
  */
 
 #include <stdlib.h>
-
+#include <string.h>
 #include "svarlang.h"
 
+
+/* Searches for a .LNG translation file
+
+   Argument progname may be:
+     a) the program name without path and with/without extension, like FDISK
+     b) a path to the executable file with extension like C:\FDISK\FDISK.EXE
+
+   If the argument is of form a), the directories specified by the environment
+   variable NLSPATH are searched for the file progname.LNG. If NLSPATH is
+   empty or non-existing, the current working directory is searched.
+
+   If the argument is of form b), the .LNG file is first searched in the
+   path specified by progname. If it is not found, the locations specified in
+   a) are searched. */
 int svarlang_autoload(const char *progname) {
   const char *s;
   char langid[3];
+  char progpath[_MAX_PATH], *p;
+  const char *name;
+  size_t proglen;
+  int result;
+  
+  if ( progname == NULL ) return -1;
+  proglen = strlen(progname);
+  if ( proglen == 0 || proglen >= _MAX_PATH ) {
+    return -1;
+  }
+  strcpy( progpath, progname );
+
+  for ( p = progpath + proglen - 1; p > progpath && *p != '\\'; p-- ) {
+    /* search for directory separator, and on the go remove extension */
+    if ( *p == '.' ) {
+      *p = '\0';
+    }
+  }
+
+  if ( *p == '\\' ) {
+    /* if separator is found, split dir and file name, and try to load file */
+    *p = 0;
+    name = p + 1;
+
+    result = svarlang_load( name, langid, progpath );
+    if ( result == 0 || result != -5 ) {
+      /* return if success or any error other than file not found */
+      return result;
+    }
+  }
+  else {
+    /* make sure name contains the filename with its extension stripped */
+    name = progpath;
+  }
+
+  /* search NLSPATH directories of the language specified by LANG env */
   s = getenv("LANG");
   if ((s == NULL) || (*s == 0)) return(-1);
   langid[0] = s[0];
   langid[1] = s[1];
   langid[2] = 0;
-  return(svarlang_load(progname, langid, getenv("NLSPATH")));
+  return(svarlang_load(name, langid, getenv("NLSPATH")));
 }
