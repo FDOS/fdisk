@@ -12,5 +12,9 @@ jobs:
     runs-on: self-hosted
 
     steps:
+    - uses: actions/checkout@v3
+
     - name: wmake
-      run: wmake
+      run: |
+        cd source/fdisk
+        wmake
