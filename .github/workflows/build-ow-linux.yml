@@ -14,7 +14,19 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: wmake
+    - name: Build with wmake
       run: |
         cd source/fdisk
         wmake
+
+    -name: Build distribution ZIP
+      run: |
+        cd source/fdisk
+        wmake dist
+
+    -name: Upload files
+      uses: actions/upload-artifact@v3
+      with:
+        name: Distribution ZIP
+        path: fdisk.zip
+
