@@ -15,8 +15,7 @@ source/fdisk/deflang.c
 source/fdisk/bootnorm.bin
 source/fdisk/fdisk.lng
 source/fdisk/svarlang/*.lib
-source/fdisk/nls/de.txt
-source/fdisk/nls/en.txt
+source/fdisk/nls/??.txt
 source/fdisk/nls/deflang.c
 source/fdisk/nls/out.lng
 
