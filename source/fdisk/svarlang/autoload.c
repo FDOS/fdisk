@@ -26,12 +26,11 @@
 #include <string.h>
 #include "svarlang.h"
 
-
 /* Searches for a .LNG translation file
 
    Argument progname may be:
      a) the program name without path and with/without extension, like FDISK
-     b) a path to the executable file with extension like C:\FDISK\FDISK.EXE
+     b) a path to the executable file like C:\FDISK\FDISK.EXE
 
    If the argument is of form a), the directories specified by the environment
    variable NLSPATH are searched for the file progname.LNG. If NLSPATH is
@@ -85,10 +84,5 @@ int svarlang_autoload(const char *progname) {
   }
 
   /* search NLSPATH directories of the language specified by LANG env */
-  s = getenv("LANG");
-  if ((s == NULL) || (*s == 0)) return(-1);
-  langid[0] = s[0];
-  langid[1] = s[1];
-  langid[2] = 0;
   return(svarlang_load(name, langid, getenv("NLSPATH")));
 }
