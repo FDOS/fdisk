@@ -197,9 +197,9 @@ int Lock_Unlock_Drive( int drive_num, int lock )
    if ( ( !os_gui_running ) || (os_version < OS_DOS7) ) return 1;
 
    r.w.ax = 0x440d;
-   r.w.cx = ( lock ) ? 0x484b : 0x486b;  /* lock / unlock physical device */
+   r.w.cx = ( lock ) ? 0x084b : 0x086b;  /* lock / unlock physical device */
    r.h.bl = drive_num;
-   r.h.bh = 0;       /* lock level 0 */
+   r.h.bh = 1;       /* lock level */
    r.w.dx = 0;
    intr( 0x21, &r );
 
