@@ -4,161 +4,161 @@
 
 
 ##############################################################################
-# HELP SCREEN                                                                #
+# HELP SCREEN (YARDIM EKRANI)                                                #
 ##############################################################################
 
-0.0:Söz dizimi: FDISK [<sürücü#>] [komutlar]...
+0.0:Sözdizim: FDISK [<sürücü#>] [komutlar]...
 0.1:  argümansız        Etkileşimli kipte çalışır
-0.2:  /INFO             <sürücü#> hakkında bölüm bilgisi görüntüler
-0.3:  /REBOOT           Bilgisayarı tekrar başlatır
+0.2:  /INFO             <sürücü#>'nün bölüntü bilgisini görüntüler
+0.3:  /REBOOT           Bilgisayarı yeniden başlatır
 0.4:\t
-0.10:Bölüm oluşturmak ve silmek için komutlar:
-0.11:    <boyut> megabayt olarak bir sayıdır veya azami boyut için MAX
-0.12:           veya <sayı>,100  <sayı> yüzde olacak şekilde
-0.13:    <tür#> sayısal bir bölüm türüdür veya FAT-12/16/32 /SPEC sağlanmadıysa
+0.10:Bölüntü oluşturma ve silme komutları:
+0.11:    <boyut> MB türünden bir sayı, en yüksek değer için MAX veya <sayı>'nın
+0.12:      yüzde türünden olması için <sayı>,100
+0.13:    <tür#> bir sayısal bölüntü türüdür veya /SPEC verilmezse FAT-12/16/32'dir
 0.14:\t
-0.20:  /PRI:<boyut> [/SPEC:<tür#>]        Birincil bir bölüm oluşturur
-0.21:  /EXT:<boyut>                       Genişletilmiş bir DOS bölümü oluşturur
-0.22:  /LOG:<boyut> [/SPEC:<sürücü#>]     Mantıksal bir sürücü oluşturur
-0.23:  /PRIO,/EXTO,/LOGO                  yukarıdaki gibi, ama FAT32'den kaçınır
-0.24:  /AUTO                              Diski otomatik olarak bölümler
-0.26:  /DELETE {/PRI[:#] | /EXT | /LOG:<bölüm#>  Bir bölümü siler
-0.27:           | /NUM:<bölüm#>}          ...mantıksal sürücüler /NUM=5'de başlar
-0.29:  /DELETEALL                         <sürücü#>'den tüm bölümleri siler
+0.20:  /PRI:<boyut> [/SPEC:<tür#>]              Birincil bir bölüntü oluştur
+0.21:  /EXT:<boyut>                             Genişletilmiş DOS bölüntüsü oluştur
+0.22:  /LOG:<boyut> [/SPEC:<tür#>]              Mantıksal bir sürücü oluştur
+0.23:  /PRIO,/EXTO,/LOGO                        Yukarıdaki gibi; ancak FAT32 değil
+0.24:  /AUTO                                    Diski kendiliğinden bölüntüle
+0.26:  /DELETE {/PRI[:#] | /EXT | /LOG:<bölü#>  Bir bölüntüyü sil
+0.27:           | /NUM:<bölüntü#>}                mantıksal sürücüler /NUM=5'den
+0.29:  /DELETEALL                               <sürücü#>'den tüm bölüntüleri sil
 0.30:\t
-0.31:Etkin bölümlerin ayarlanmaları:
-0.32:  /ACTIVATE:<bölüm#>                   <bölüm#> etkin olarak ayarlanır
-0.33:  /DEACTIVATE                          Tüm bölümleri devre dışı bırakır
+0.31:Etkin bölüntüleri ayarlamak:
+0.32:  /ACTIVATE:<bölüntü#>                     <bölüntü#>'yü etkin kıl
+0.33:  /DEACTIVATE                              Tüm bölüntüleri devre dışı kıl
 0.34:\t
-0.40:MBR (Master Boot Record) yönetimi:
-0.41:  /CLEARMBR       Tüm bölümleri ve başlatma kodunu siler
-0.42:  /LOADMBR        Bölüm tablosunu ve "boot.mbr"'den kodu MBR'a yükler
-0.43:  /SAVEMBR        Bölüm tablosunu ve kodu "boot.mbr" dosyasına kaydeder
+0.40:MBR (Ana Önyükleme Kaydı) yönetimi:
+0.41:  /CLEARMBR                Tüm bölüntüleri ve önyükleme kodunu sil
+0.42:  /LOADMBR                 MBR'ye bölüntü tablosunu/"boot.mbr" kodunu yükle
+0.43:  /SAVEMBR                 Bölüntü tablosunu/kodunu "boot.mbr"ye kaydet
 0.44:\t
-0.50:Bölümlere dokunmadan MBR kod değişiklikleri:
-0.51:  /IPL            Standart başlatma kodunu <sürücü#> MBR'ına kurar
-0.52:                  ... /MBR ve /CMBR ile aynı, uyumluluk için
-0.53:  /SMARTIPL       <sürücü#> MBR'ına DriveSmart IPL'i kurar
-0.54:  /LOADIPL        \"boot.mbr\" konumundan 440 kod baytını MBR'a yazar
+0.50:Bölüntülere ellemeyen MBR kodu değişiklikleri:
+0.51:  /IPL                     Standart önyükleme kodunu MBR <sürücü#>'süne yükle
+0.52:                             uyumluluk için /MBR ve /CMBR ile aynı
+0.53:  /SMARTIPL                DriveSmart IPL'yi MBR <sürücü#>'süne kur
+0.54:  /LOADIPL                 440 bayt kodunu \"boot.mbr\"den MBR'ye kur
 0.55:\t
-0.60:Gelişmiş bölüm tablosu değişikliği:
-0.61:  /MODIFY:<bölüm#>,<tür#>             Bölüm türünü <tür#> olarak değiştirir
-0.62:                                      ...mantıksal sürücüler "5" ile başlar
-0.63:  /MOVE:<srcpart#>,<destpart#>        Birincil bölümleri taşır
-0.64:  /SWAP:<1stpart#>,<2ndpart#>         Birincil bölümleri takas eder
+0.60:Gelişmiş bölüntü tablosu değişiklikleri:
+0.61:  /MODIFY:<bölüntü#>,<tür#>                Bölüntü <tür#>'ünü değiştir
+0.62:                                             mantıksal sürücüler "5"te başlar
+0.63:  /MOVE:<kaynakbölü#>,<hedefbölü#>         Birincil bölüntüler taşı
+0.64:  /SWAP:<1.bölüntü#>,<2.bölü#>             Birincil bölüntüleri takas et
 0.65:\t
-0.70:Sabit disklerde bayrakların yönetimi:
-0.71:  /CLEARFLAG[{:<bayrak#>} | /ALL}]    Tüm <sürücü#>'lerde <bayrak#> sıfırlanır
-0.72:  /SETFLAG:<bayrak#>[,<değer>]        <bayrak#> 1 veya <değer> olarak ayarlanır
-0.73:  /TESTFLAG:<bayrak#>[,<değer>]       <bayrak#> 1 veya <değer> için denenir
+0.70:Bir sabit diskteki bayrakları işlemek:
+0.71:  /CLEARFLAG[{:<bayrak#>} | /ALL}]         <sürücü#>'deki <bayrak#>'ı sıfırla
+0.72:  /SETFLAG:<bayrak#>[,<değer>]             <bayrak#>'ı 1 veya <değer> kıl
+0.73:  /TESTFLAG:<bayrak#>[,<değer>]            <bayrak#>'ı 1 veya <değer>'le sına
 0.74:\t
-0.80:Sabit disklere dair bilgi elde etmek için:
-0.81:  /STATUS       Güncel bölüm şemasını görüntüler.
-0.82:  /DUMP         Tüm sabit disklerden bölüm bilgilerini döker (hata ayıklama)
+0.80:Sabit diskler üzerine bilgi almak:
+0.81:  /STATUS       Geçerli bölüntü yerleşimini görüntüle
+0.82:  /DUMP         Sabit disklerden bölüntü bilgisini dök (hata ayıklama için)
 0.83:\t
-0.90:Etkileşimli kullanıcı arayüzü seçenekleri:
-0.91:  /UI           Son seçenek olarak girilirse daima arayüzü başlatır.
-0.92:  /MONO         Kullanıcı arayüzünü tek renkli kipte çalışmaya zorlar.
-0.93:  /FPRMT        Etkileşimli kipte FAT32/FAT16 için istem görüntüler.
-0.94:  /XO           Genişletilmiş seçenekleri etkinleştirir.
+0.90:Etkileşimli kullanıcı arayüzü ayarları:
+0.91:  /UI           Arayüzü sanki son argümanla verilmiş gibi her zaman başlat
+0.92:  /MONO         Arayüzü iki renkli kipte çalışmaya zorla
+0.93:  /FPRMT        Etkileşimli kipte FAT32/FAT16 için sor
+0.94:  /XO           Genişletilmiş seçenekleri etkinleştir
 0.95:\t
 0.100:Uyumluluk seçenekleri:
-0.101:  /X            ext. INT 13 ve LBA şu komutlar için devre dışı bırakılır
+0.101:  /X            Şunlarda genişletilmiş INT 13 ve LBA'yı devre dışı kıl
 0.102:\t
-0.200:Bu programın telif hakkı Copyright %s Brian E. Reifsnyder ve FreeDOS
-0.201:topluluğuna aittir, GNU Genel Kamu Lisansı, 2. sürüm kapsamında.
-0.202:\t
+0.200:Telif hakkı %s, Brian E. Reifsnyder ve FreeDOS topluluğu.
+0.201:GNU Genel Kamu Lisansı 2. sürümü kapsamında lisanslanmıştır.
+0.202:
 0.203:\t
-0.204:Bu program olduğu gibi sağlanmıştır ve hiçbir garanti vermez. Bu yazılımın
-0.205:yazarı bu yazılımın kullanımı veya yanlış kullanımı için hiçbir sorumluluk
-0.206:kabul etmez. Bu yazılımı kullanarak, operatör yukarıdaki şartları kabul
-0.207:etmiş sayılır.
+0.204:Bu program olduğu gibi sunulur ve herhangi bir garanti içermez. Bu
+0.205:programın yazarı, programın (hatalı) kullanımından doğabilecek
+0.206:sorunlardan dolayı herhangi bir sorumluluk kabul etmez. Bu yazılımı
+0.207:kullanarak kullanıcı, yukarıdaki koşulları kabul etmiş sayılır.
 
 
 ##############################################################################
-# FAT32 SUPPORT SCREEN                                                       #
+# FAT32 SUPPORT SCREEN (FAT32 DESTEK EKRANI)                                 #
 ##############################################################################
 
-1.0:\e[5;5HFDISK, FAT32 bölümleri kullanarak 2048 MB'tan büyük bölümler is
-1.1:    oluşturmanıza imkân vermek için büyük disk desteğini kullanabilir.
-1.2:    Şayet büyük disk desteğini etkinleştirirseniz, 512 MB'tan büyük tüm
-1.3:    bölümler veya mantıksal sürücüler FAT32 kullanılarak oluşturulacaktır.
-1.4:    ÖNEMLİ: Büyük disk desteğini etkinleştirirseniz, bazı işletim
-1.5:    sistemleri 512 MB'tan büyük bölümlere ve mantıksal sürücülere
-1.6:    erişemeyecektir.
-1.7:\e[5;18HBüyük disk (FAT32) desteğini etkinleştirmek istiyor musunuz (E/H)....?
-
-
-##############################################################################
-# EXIT SCREEN                                                                #
-##############################################################################
-
-2.0:Değişikliklerin işleme alınması için bilgisayarınızı \e[1mTEKRAR\e[22m başlatmalısınız.
-
-2.1:Oluşturduğunuz veya değiştirdiğiniz sürücüler tekrar başlattıktan \e[1mSONRA\e[22m biçimlendirilmelidir.
-
-2.2:Sistem şimdi tekrar başlayacaktır
-2.3:Hazır olduğunuzda herhangi bir tuşa basın . . .
-
+1.0:\e[5;5HFDISK, büyük disk desteğini etkinleştirip FAT32 bölüntülerini
+1.1:    kullanarak 2.048 MB'den büyük bölüntüler oluşturma yeteneğine sahiptir.
+1.2:    Büyük disk desteğini etkinleştirirseniz 512 MB'den büyük tüm bölüntüler
+1.3:    veya mantıksal sürücüler FAT32 kullanılarak oluşturulur.
+1.4:    ÖNEMLİ: Büyük disk desteğini etkinleştirirseniz bazı işletim sistemleri
+1.5:    512 MB'den büyük bölüntülere ve mantıksal sürücülere erişemeyebilir.
+1.6:
+1.7:\e[5;18HBüyük disk (FAT32) desteğini kullanmak istiyor musunuz (E/H)?
 
 
 ##############################################################################
-# MAIN MENU                                                                  #
+# EXIT SCREEN (ÇIKIŞ EKRANI)                                                 #
 ##############################################################################
 
-3.0:FDISK Seçenekleri
-3.1:DOS Bölümü veya Mantıksal DOS Sürücüsü oluştur
-3.2:Etkin Bölümü ayarla
-3.3:Bölüm veya Mantıksal DOS Sürücüsü sil
-3.4:Bölüm bilgilerini görüntüle
-3.5:Bölüm bilgilerini Görüntüle / Değiştir
-3.6:Güncel sabit disk sürücüsünü değiştir
-3.7:MBR (Ana Önyükleme Kaydı) Bakımı
-3.8:Değişiklikleri iptal et ve çık
+2.0:Değişikliklerin etkili olması için sisteminizi yeniden \e[1mBAŞLATMALISINIZ\e[22m.
+
+2.1:Oluşturduğunuz/değiştirdiğiniz sürücüler, sistemi yeniden başlattıktan\n\e[1mSONRA\e[22m biçimlendirilmelidir.
+
+2.2:Sistem şimdi yeniden başlatılacak
+2.3:Hazır olunca herhangi bir düğmeye basın...
+
 
 
 ##############################################################################
-# CREATE PARTITION MENU                                                      #
+# MAIN MENU (ANA MENÜ)                                                       #
 ##############################################################################
 
-4.0:DOS Bölümü veya Mantıksal DOS Sürücüsü Oluştur
-4.1:Birincil DOS Bölümü Oluştur
-4.2:Genişletilmiş DOS Bölümü Oluştur
-4.3:Genişletilmiş DOS Bölümünde Mantıksal DOS Sürücüleri Oluştur
-
-
-##############################################################################
-# DELETE PARTITION MENU                                                      #
-##############################################################################
-
-5.0:DOS Bölümü veya Mantıksal DOS Sürücüsü Sil
-5.1:Birincil DOS Bölümü Sil
-5.2:Genişletilmiş DOS Bölümü Sil
-5.3:Genişletilmiş DOS Bölümünde Mantıksal DOS Sürücüleri Sil
-5.4:DOS Olmayan Bölümü Sil
+3.0:FDISK seçenekleri
+3.1:DOS Bölüntüsü veya Mantıksal DOS Sürücüsü oluştur
+3.2:Etkin bölüntüyü ayarla
+3.3:Bölüntüyü veya Mantıksal DOS Sürücüsü'nü sil
+3.4:Bölüntü bilgisini göster
+3.5:Bölüntü bilgisini görüntüle/değiştir
+3.6:Geçerli sabit diski değiştir
+3.7:MBR bakımı
+3.8:Değişikliklerden vazgeç ve çık
 
 
 ##############################################################################
-# MBR MAINTENANCE MENU (EXTENDED OPTION)                                     #
+# CREATE PARTITION MENU (BÖLÜNTÜ OLUŞTUR MENÜSÜ)                             #
 ##############################################################################
 
-6.0:MBR (Ana Önyükleme Kaydı) Bakımı
-6.1:BootEasy MBR Oluştur (devre dışı)
-6.2:Kaydedilmiş dosyadan MBR Yükle (bölümleri ve kodu)
-6.3:MBR'ı (bölümleri ve kodu) bir dosyaya kaydet
-6.4:MBR'dan önyükleme kodunu kaldır
+4.0:DOS Bölüntüsü veya Mantıksal DOS Sürücüsü oluştur
+4.1:Birincil DOS Bölüntüsü oluştur
+4.2:Genişletilmiş DOS Bölüntüsü oluştur
+4.3:Genişletilmiş DOS Bölüntüsü'nde Mantıksal DOS Sürücüsü oluştur
+
+
+##############################################################################
+# DELETE PARTITION MENU (BÖLÜNTÜ SİL MENÜSÜ)                                 #
+##############################################################################
+
+5.0:DOS Bölüntüsü'nü veya Mantıksal DOS Sürücüsü'nü sil
+5.1:Birincil DOS Bölüntüsü'nü sil
+5.2:Genişletilmiş DOS Bölüntüsü'nü sil
+5.3:Genişletilmiş DOS Bölüntüsü'ndeki Mantıksal DOS Sürücüsü'nü sil
+5.4:DOS olmayan bölüntüyü sil
+
+
+##############################################################################
+# MBR MAINTENANCE MENU (EXTENDED OPTION) - (MBR BAKIMI MENÜSÜ)               #
+##############################################################################
+
+6.0:MBR bakımı
+6.1:BootEasy MBR oluştur (devre dışı)
+6.2:Kayıtlı dosyadan MBR yükle (bölüntüler ve kod)
+6.3:MBR'yi dosyaya kaydet (bölüntüler ve kod)
+6.4:MBR'den önyükleme kodunu kaldır
 
 
 ##############################################################################
 # FDISKIO.C                                                                  #
 ##############################################################################
 
-7.0:\nSürücü zaten bölümlendirilmiş.\n
+7.0:\nSabit sürücü halihazırda bölüntülenmiş.\n
 7.1:\n"boot.mbr" dosyası bulunamadı.\n
-7.2:\nBölüm türü "fdiskpt.ini" dosyasının %d satırında aralık dışı.\n
-7.3:"fdisk.ini" dosyasının  %d satırında hatayla karşılaşıldı.\n
-7.4:\nSektör okumasında hata.\n
-7.5:\nSektör işaretleme işlevleri devre dışı bırakıldı.\n
+7.2:\n"fdiskpt.ini" içinde bölüntü türü %d. satırda erim dışında.\n
+7.3:"fdisk.ini" dosyasının %d. satırında hataya denk gelindi.\n
+7.4:\nDilim okunurken hata.\n
+7.5:\nDilim bayraklama işlevleri devre dışı.\n
 7.6:%d diski için Drive Smart MBR oluşturuluyor\n
 
 
@@ -166,44 +166,44 @@
 # CMD.C                                                                      #
 ##############################################################################
 
-8.0:\nSözdizimi hatası\n\nProgram Sonlandırıldı\n
-8.1:\nBayrağın silinmesinde hata.\n
-8.2:\n%d bayrağı silindi.\n
-8.3:\nGeçersiz bölüm boyutu belirtildi.\n
-8.4:\nGenişletilmiş bölüm zaten mevcut.\n
-8.5:\nGenişletilmiş bölüm oluşturulmasında hata.\n
-8.7:\nHiçbir kullanılabilir genişletilmiş bölüm bulunamadı.\n
-8.8:\nMantıksal sürücü oluşturulmasında hata.\n
-8.10:\nBirincil bölüm oluşturulmasında hata.\n
-8.11:\nbirincil bölüm # (%ld) 1..4 arasında olmalıdır.\n
-8.12:\nSilinecek hiçbir bölüm bulunamadı.\n
-8.13:\n%d birincil bölüm bulundu, silmek istediğinizin numarasını girmelisiniz.\n
-8.14:\nBirincil bölümün silinmesinde hata.\n
-8.15:\nGenişletilmiş bölümün silinmesinde hata.\n
-8.16:\n%d sayılı mantıksal sürücü aralık dışı.\n
-8.17:\nBölüm numarası aralık dışı.\n
+8.0:\nSözdizim Hatası\n\nProgram Sonlandırıldı\n
+8.1:\nBayrağı temizlerken hata.\n
+8.2:\n%d bayrağı temizlendi.\n
+8.3:\nGeçersiz bölüntü boyutu belirtildi.\n
+8.4:\nGenişletilmiş bölüntü halihazırda var.\n
+8.5:\nGenişletilmiş bölüntü oluşturulurken hata.\n
+8.7:\nKullanılabilir genişletilmiş bölüntü bulunamadı.\n
+8.8:\nMantıksal sürücü oluşturulurken hata.\n
+8.10:\nBirincil bölüntü oluşturulurken hata.\n
+8.11:\nBirincil bölüntü # (%ld) 1..4 arasında olmalı.\n
+8.12:\nSilinecek bölüntü bulunamadı.\n
+8.13:\n%d birincil bölüntü bulundu, silinecek numarayı belirtmelisiniz.\n
+8.14:\nBirincil bölüntü silinirken hata.\n
+8.15:\nGenişletilmiş bölüntü silinirken hata.\n
+8.16:\nMantıksal sürücü numarası %d erim dışında.\n
+8.17:\nBölüntü numarası erim dışında.\n
 8.18:\nGeçersiz silme argümanı.\n
-8.19:\nMantıksal sürücü silinmesinde hata.\n
-8.20:\nYeni bölüm türü aralık dışı.\n
-8.21:\nBölüm türü değiştirilmesinde hata.\n
-8.22:\nKaynak bölüm numarası aralık dışı.\n
-8.23:\nHedef bölüm numarası aralık dışı.\n
-8.24:\nBölüm oluğunun taşınmasında hata.\n
+8.19:\nMantıksal sürücü silinirken hata.\n
+8.20:\nYeni bölüntü türü erim dışında.\n
+8.21:\nBölüntü türü değiştirilirken hata.\n
+8.22:\nKaynak bölüntü numarası erim dışında.\n
+8.23:\nHedef bölüntü numarası erim dışında.\n
+8.24:\nBölüntü yuvası taşınırken hata.\n
 8.25:\nGeçersiz bayrak numarası.\n
-8.26:\nBayrak değeri aralık dışı.\n
-8.27:\nBayrağın ayarlanmasında hata.\n
+8.26:\nBayrak değeri erim dışında.\n
+8.27:\nBayrak ayarlanırken hata.\n
 8.28:\n%d bayrağı %d olarak ayarlandı.\n
-8.29:Sabit Disk Sürücü Durumu
-8.30:\nBölümlerin takasında hata.\n
+8.29:Sabit Disk Sürücüsü Durumu
+8.30:\nBölüntüler takas edilirken hata.\n
 8.31:\n%d bayrağı %d olarak ayarlandı.\n
 8.32:\n%d bayrağı %d olarak ayarlanmadı.\n
-8.34:\n<%s> bir rakam olmalıdır, sonlandırıldı\n
-8.35:\nbirden fazla sürücü belirtilmiş, sonlandırıldı\n
-8.36:\n<%s> '-' veya '/' ile başlamalıdır; sonlandırıldı\n
+8.34:\n<%s> bir basamak olmalı; sonlandırıldı\n
+8.35:\nBirden çok sürücü belirtildi; sonlandırıldı\n
+8.36:\n<%s>, '-' veya '/' ile başlamalı; sonlandırıldı\n
 8.37:\n<%s> ':' bekleniyordu; sonlandırıldı\n
 8.38:\n<%s> ',' bekleniyordu; sonlandırıldı\n
-8.39:\n<%s> dize sonu bekliyordu; sonlandırıldı\n
-8.40:\nGeçersiz sürücü ataması.\n
+8.39:\ndizi sonunda <%s> bekleniyordu; sonlandırıldı\n
+8.40:\nGeçersiz sürücü tanımı.\n
 8.41:\nTüm bayraklar temizlendi.\n
 
 
@@ -211,32 +211,32 @@
 # USERINT0.C, USERINT1.C                                                     #
 ##############################################################################
 
-9.0:Güncel sabit disk sürücüsü:
-9.1:Seçiminizi girin:
-9.2:Aşağıdakilerden birini seçin:
-9.3:sektörler, geometri
-9.4:Hiçbir bölüm tanımlanmamış.
-9.5:\nBirincil bölüm için azami sürekli boş alan = %lu MBayt\n
-9.6:\nGenişletilmiş DOS Bölümünün İçerikleri:\n
-9.7:\nGenişletilmiş bölümde azami sürekli boş alan = %lu MBayt\n
-9.8:    -------- kullanılamaz ---------
-9.9:(1 Mbayt = 1048576 bayt)
+9.0:Geçerli sabit disk sürücüsü:
+9.1:Seçim gir:
+9.2:Aşağıdakilerden birini seç:
+9.3:dilimler, geometri
+9.4:Tanımlı bölüntü yok.
+9.5:\nBirincil bölüntü için en büyük sürekli boş alan = %lu MB\n
+9.6:\nGenişletilmiş DOS Bölüntüsü içeriği:\n
+9.7:\nGenişletilmiş bölüntüdeki en büyük sürekli boş alan = %lu MB\n
+9.8:    ------ kullanılamaz ------
+9.9:(1 MB = 1048576 bayt)
 
 # The following are table headers, must stay adjusted as is
-9.10:\n\nBölüm     Durum     Mbayt     Açıklama      Kullanım    Başlangıç CHS       Son CHS\n
-9.11:Src Birim Etiketi   Mbayt  Sistem   Kullanım    Başlangıç CHS       Son CHS\n
-9.12:Disk   Src   Mbayt    Boş  Kullanım
+9.10:\n\nBölüntü     Durum    Mbayt    Açıklama      Kullanım     CHS Başı      CHS Sonu\n
+9.11:Src Bölüm  Etiket Mbayt   Sistem  Kullanım   CHS Başı      CHS Sonu\n
+9.12:Disk   Src   Mbayt     Boş   Kullanım
 
-9.13:DOS bölümü oluşturmak için alan yok.
-9.14:Genişletilmiş DOS Bölümü zaten mevcut.
-9.15:Güncel sürücüde Genişletilmiş bir DOS Bölümü olmadan\n  Mantıksal DOS Sürücüsü oluşturulamaz.
+9.13:Bir DOS bölüntüsü oluşturmak için yeterli alan yok.
+9.14:Genişletilmiş DOS Bölümü halihazırda var.
+9.15:Geçerli sürücüde bir Genişletilmiş DOS Bölümü\n    olmadan Mantıksal DOS Bölümü oluşturulamaz.
 9.16:Silinecek Birincil DOS Bölümü yok.
 9.17:Silinecek Genişletilmiş DOS Bölümü yok.
-9.18:Silinecek Mantıksal DOS Sürücüsü yok.
-9.19:Silinecek DOS olmayan Bölüm yok.
-9.20:kullanılamaz!
-9.21:Silinecek bölüm yok.
-9.22:\e[1mİKAZ!\e[22m Hiçbir bölüm etkin olarak ayarlanmamış - bir bölüm faal \n olarak ayarlanmadan disk 1 başlatılamaz
+9.18:Silinecek Mantıksal DOS Sürücüleri yok.
+9.19:Silinecek DOS olmayan bölüntü yok.
+9.20:kullanılamıyor!
+9.21:Silinecek bölüntü yok.
+9.22:\e[1mUYARI!\e[22m Hiçbir bölüntü etkin yapılmamış - bir bölüntü etkin yapılana değin\n    disk 1 başlatılamaz
 
 
 ##############################################################################
@@ -244,142 +244,140 @@
 ##############################################################################
 
 # Delete logical partition
-10.0:DOS olmayan bölümdeki veriler kaybolacaktır.\n    Hangi DOS olmayan Bölümü silmek istiyorsunuz?
-10.1:Bir bölüm değil!
-10.2:DOS bölümünü silme reddi!
-10.3:DOS olmayan Bölüm silindi.
-10.4:DOS olmayan Bölümün silinmesinde hata!
+10.0:Silinecek DOS olmayan bölüntüdeki veri kaybolacak.\n    Hangi DOS olmayan bölüntüyü silmek istiyorsunuz?
+10.1:Bir bölüntü değil!
+10.2:DOS bölüntüsünün silinmesi reddediliyor!
+10.3:DOS olmayan bölüntü silindi.
+10.4:DOS olmayan bölüntü silinirken hata!
 
 # Display extended partition
-10.5:Hiçbir mantıksal sürücü tanımlanmamış.
-10.6:Toplam Genişletilmiş Bölüm boyutu %lu Mbayttır (1 Mbayt = 1048576 bayt)
+10.5:Tanımlanmış mantıksal sürücü yok.
+10.6:Toplam Genişletilmiş Bölüntü boyutu %lu MB (1 MB = 1048576 bayt)
 
 # Display primary partitions
-10.7:Hiçbir bölüm tanımlanmamış.
-10.8:Toplam disk alanı %lu Mbayttır (1 Mbayt = 1048576 bayt)
+10.7:Tanımlanmış bölüntü yok.
+10.8:Toplam disk alanı %lu MB (1 MB = 1048576 bayt)
 
 # Table headers
-10.10:Bölüm    Durum    Tür     Birim Etiketi    Mbayt   Sistem   Kullanım
-10.11:Bölüm    Durum    Mbayt   Açıklama      Kullanım  Başangıç Sln  Son Sln
-10.12:Src Birim Etiketi  Mbayt  Sistem   Kullanım
+10.10:Bölüntü    Durum   Tür      Bölüm  Etiket  Mbayt   Sistem    Kullanım
+10.11:Bölüntü     Durum    Mbayt   Açıklama      Kullanım   Sil Başı Sil Sonu
+10.12:Src Bölüm  Etiket Mbayt  Sistem  Kullanım
 
 # Delete extended partition
-10.20:\e[1;5mİKAZ!\e[22;25m Genişletilmiş DOS Bölümündeki ve onun Mantıksal\n    Bölümlerindeki veriler kaybolacaktır. Devam edilsin mi (E/H)...?
-10.21:Genişletilmiş DOS Bölümü silindi
+10.20:\e[1;5mUYARI!\e[22;25m Genişletilmiş DOS Bölüntüsü'ndeki ve onun Mantıksal\n    Bölüntüleri'ndeki veri kaybolacak. Sürdürülsün mü (E/H)?
+10.21:Genişletilmiş DOS Bölüntüsü silindi
 
 # Delete logical drives
-10.30:\e[1;5mİKAZ!\e[22;25m Silinecek DOS Mantıksal Sürücüsündeki veriler.\n    kaybolacaktır. Hangi sürücüyü silmek istiyorsunuz...............................?
+10.30:\e[1;5mUYARI!\e[22;25m Mantıksal DOS Sürücüsü'ndeki veri kaybolacak.\n    Hangi sürücüyü silmek istiyorsunuz?
 10.31:Mantıksal sürücü silindi
-10.32:Mantıksal sürücünün silinmesinde hata!
+10.32:Mantıksal sürücü silinirken hata!
 
 # Delete primary partition
-10.40:\e[1;5mİKAZ!\e[22;25m Silinecek Birincil DOS Bölümündeki veriler kaybolacaktır.\n    Hangi birincil bölümü silmek istiyorsunuz...?
-10.41:Birincil DOS Bölümü silindi
-10.42:Birincil DOS Bölümünün silinmesinde hata!
-10.43:Genişletilmiş bölüm silme reddi!
-10.44:Bir DOS bölümü değil!
+10.40:\e[1;5mUYARI!\e[22;25m Silinecek Birincil DOS Bölüntüsü'ndeki veri kaybolacak.\n    Hangi birincil bölüntüyü silmek istiyorsunuz?
+10.41:Birincil DOS Bölüntüsü silindi
+10.42:Birincil DOS Bölüntüsü silinirken hata!
+10.43:Genişletilmiş bölüntüyü silme reddediliyor!
+10.44:Bir DOS bölüntüsü değil!
 
 # Set active partition
-10.50:Etkin olarak ayarlanacak hiçbir bölüm yok.
-10.51:Etkin olarak ayarlamak istediğiniz bölümün numarasını girin...........:
-10.52:%d bi seçim değildir. Lütfen geçerli bir seçim girin.
-10.53:%d sürücüsündeki tek başlatılabilir bölüm zaten etkin olarak ayarlanmış.
-10.54:%d bölüm etkin olarak ayarlandı.
+10.50:Etkin yapılacak bölüntü yok.
+10.51:Etkin yapmak istediğiniz bölüntünün numarasını girin:
+10.52:%d bir seçenek değil. Lütfen geçerli bir seçenek girin.
+10.53:Sürücü %d sürücüsündeki tek başlatılabilir bölüntü halihazırda etkin yapılmış.
+10.54:Bölüntü %d etkinleştirildi.
 
 # Create partition
-10.60:Birincil DOS Bölümü için azami mevcut boyutu kullanmak ve bölümü\n    etkin olarak ayarlamak istiyor musunuz (E/H).....................?
-10.61:Birincil DOS Bölümü için azami mevcut boyutu kullanmak istiyor musunuz\n    (E/H)...................................................?
-10.62:Bu sürücü varsayılan olarak FAT32, FAT16'ya geçiş yapılsın mı (E/H)?
-10.63:Bölüm için azami mevcut alan \e[1m%lu\e[22m Mbayttır
-10.64:Bölüm boyutunu Mbayt veya disk alanının yüzdesi (%%) olarak girin\n    Birincil DOS Bölümü oluşturmak için.....:
-10.65:Bölüm boyutunu Mbayt veya disk alanının yüzdesi (%%) olarak girin\n    Genişletilmiş DOS Bölümü oluşturmak için.....:
-10.66:Birincil DOS Bölümü oluşturuldu
-10.67:Genişletilmiş DOS Bölümü oluşturuldu
+10.60:Bir Birincil DOS BÖlüntüsü için kullanılabilir en çok alanı kullanmak\n    ve bölüntüyü etkin yapmak istiyor musunuz (E/H)?
+10.61:Bir Birincil DOS BÖlüntüsü için kullanılabilir en çok alanı kullanmak\n    istiyor musunuz (E/H)?
+10.62:Bu sürücü varsayılan olarak FAT32, FAT16'ya geçilsin mi (E/H)?
+10.63:Bölüntü için kullanılabilir en çok alan \e[1m%lu\e[22m MB
+10.64:Bir Birincil DOS Bölüntüsü oluşturmak için bölüntü boyutunu MB olarak\n    veya disk alanı yüzdesi (%%) olarak girin:
+10.65:Bir Genişletilmiş DOS Bölüntüsü oluşturmak için bölüntü boyutunu MB olarak\n    veya disk alanı yüzdesi (%%) olarak girin:
+10.66:Birincil DOS Bölüntüsü oluşturuldu
+10.67:Genişletilmiş DOS Bölüntüsü oluşturuldu
 
 # Create logical partition
 10.70:Mantıksal DOS Sürücüsü oluşturuldu, sürücü harfleri değiştirildi veya eklendi
-10.71:Azami Mantıksal DOS Sürücüsü kuruldu
-10.72:Mantıksal sürücü boyutunu Mbayt veya genişletilmiş bölümün\n  boyutunun yüzdesi (%%) olarak girin...:
-10.73:Genişletilmiş DOS Bölümündeki tüm mevcut alan\n    mantıksal sürücülere atanmış.
+10.71:Olabilecek en çok sayıda Mantıksal DOS Sürücüsü kuruldu
+10.72:Mantıksal sürücü boyutunu MB olarak veya genişletilmiş\n    bölüntü boyutu yüzdesi (%%) olarak girin:
+10.73:Genişletilmiş DOS Bölüntüsü'ndeki tüm kullanılabilir alan\n    mantıksal sürücülere atanmıştır.
 
 # Display partition info
-10.80:Genişletilmiş DOS Bölümü Mantıksal DOS Sürücüleri içermektedir.\n    Mantıksal sürücü bilgilerini görüntülemek ister misiniz (E/H)......?
-10.81:Seçime dayalı:  Değiştirilecek bölüm numarasını girin.
-10.82:Değiştirmek istediğiniz bölümün numarasını girin (1-4)...?
-10.83:Mantıksal DOS Sürücüsü Bilgilerini Görüntüle
-10.84:Değiştirmek istediğiniz mantıksal sürücünün harfini girin...?
+10.80:Genişletilmiş DOS Bölüntüsü Mantıksal DOS Sürücüleri içeriyor.\n    Mantıksal sürücü bilgisini görüntülemek istiyor musunuz (E/H)?
+10.81:İsteğe bağlı: Değiştirilecek sürücü numarasını girin.
+10.82:Değiştirmek istediğiniz bölüntünün numarasını girin (1-4).
+10.83:Mantıksal DOS Sürücüsü bilgisini görüntüle
+10.84:Değiştirmek istediğiniz mantıksal sürücünün karakterini girin.
 
 # List partition types
-10.90:Bölüm Türlerini Listele
-10.91:Devam etmek için herhangi bir tuşa basın . . .
+10.90:Bölüntü türlerini listele
+10.91:Sürdürmek için herhangi bir düğmeye basın...
 
 # Display / modify partition
-10.100:Mantıksal Sürücü Bilgilerini Görüntüle/Değiştir
-10.101:Bölüm            Mbayt  Tür           Kullanım  Başlangıç Sln  Son Sln
-10.102:Bölüm türünü değiştir
-10.104:Bölümü Gizle / Gizleme
-10.105:Yeni bölüm türünü girin (1-255)...:
+10.100:Mantıksal sürücü bilgisini görüntüle/değiştir
+10.101:Bölüntü              Mbayt   Tür           Kullanım   Sil Başı Sil Sonu
+10.102:Bölüntü türünü değiştir
+10.104:Bölüntüyü gizle/göster
+10.105:Yeni bölüntü türü gir (1-255):
 10.106:Etkin durumunu kaldır
 
-
-10.190:Sabit Disk Sürücü Numarasını Girin (1-%d)...:
-10.200:Emin misiniz (E/H)...?
+10.190:Sabit Disk Sürücüsü numarasını girin (1-%d):
+10.200:Emin misiniz (E/H)?
 
 # Error strings
-10.250:İllegal sürücü harfi
+10.250:Geçersiz sürücü harfi
 
-
-11.0:\n\"boot.mbr\" dosyası bulunamadı...MBR yüklenmedi.\n
-11.1:MBR, \"boot.mbr\ kullanarak yazıldı"
-11.2:MBR, \"boot.mbr\ konumuna kaydedildi"
-11.3:Önyükleme kodu MBR'dan kaldırıldı.
+11.0:\n\"boot.mbr\" dosyası bulunamıyor. MBR yüklenmedi.\n
+11.1:MBR, \"boot.mbr\" kullanılarak yazıldı.
+11.2:MBR, \"boot.mbr\" dosyasına kaydedildi.
+11.3:MBR'den önyükleme kodu kaldırıldı.
 
 
 ##############################################################################
-# WARNING SCREENS                                                            #
+# WARNING SCREENS (UYARI EKRANLARI)                                          #
 ##############################################################################
-30.1:En az bir diskinizin boyutu 2,097,152 MB'den büyük. FDISK bu sınırı\n    aşan bölümleri YÖNETEMEZ!\n\n
-30.2:    Devam edebilirsiniz, fakat veri kaybı tehlikesi vardır bilhassa diğer araçlarla bu\n    sınırı aşan bölümler zaten oluşturulmuşsa.\n\n
-30.3:    FDISK kullandığınız tek bölümleme aracıysa sorun olmaması gerekir, ancak bu tür diskleri\n    yönetmek için baka bir disk yardımcı aracı kullanmanızı tavsiye\n    ederiz.
-30.4:Devam etmek istediğinizden emin miziniz (E/H)...?
+30.1:En az bir diskiniz 2.097.152 MB'den büyük.\n    FDISK bu boyutu aşan diskleri işleyemez!\n\n
+30.2:    İşlemi sürdürebilirsiniz; ancak veri kaybı riski vardır, özellikle\n    bu sınırı aşan başka araçlarla oluşturulmuş bölüntüler varsa.\n\n
+30.3:    FDISK kullandığınız tek bölüntülendirme aracıysa bir sıkıntı olmamalıdır;\n    ancak bu tür diskleri işlemek için başka bir disk izlencesi\n    kullanmanızı öneririz.
+30.4:Sürdürmek istediğinizden emin misiniz (E/H)?
 
-30.10:FDISK güncel olarak silindir hizalama kipindedir, ancak genişletilmiş\n    bölüm silindir sınırında başlamamaktadır!\n\n
-30.11:    Muhtemel olmasa da bu, uyumluluk sorunlarına yol AÇABİLİR.\n\n
-30.12:Sisteminiz doğru silindir hizalanmasına bağlıysa, genişletilmiş bölümü\n    tekrar oluşturmayı düşünmelisiniz.
-30.13:Hizalanmamış genişletilmiş bölümde mantıksal sürücü oluşturulsun mu...?
+30.10:FDISK şu anda silindir hizalama kipinde; ancak genişletilmiş\n    bölüntü bir silindir kenarında başlamıyor!\n\n
+30.11:    Pek olası olmasa da, bu uyumluluk sorunlarına neden OLABİLİR.\n\n
+30.12:Sisteminiz düzgün silindir hizalamasına gerek duyuyorsa\n    genişletilmiş bölüntüyü yeniden oluşturmayı düşünün.
+30.13:Hizalanmamış genişletilmiş bölüntüde mantıksal sürücü oluşturulsun mu?
 
-30.20:    Uyumsuz bir genişletilmiş bölüm düzeni bu diskte tespit edildi.\n
+30.20:    Bu diskte uyumsuz genişletilmiş bölüntü yerleşimi algılandı.\n
 30.21:    Aşağıdaki eylemler devre dışı bırakıldı:\n\n
-30.22:      - mantıksal sürücü oluşturulması\n
-30.23:      - mantıksal sürücülerin silinmesi\n\n
-30.24:    Düzenlemeyi etkinleştirmek için genişletilmiş bölümü tekrar oluşturabilir\n
-30.25:    veya başka bu diski bölümlemek için bir disk aracı kullanabilirsiniz.\n
+30.22:      - Mantıksal sürücüler oluşturmak\n
+30.23:      - Mantıksal sürücüleri silmek\n\n
+30.24:    Düzenlemeyi etkinleştirmek için genişletilmiş bölüntüyü yeniden\n
+30.25:    oluşturabilir/diski bölüntülemede başka bir izlence kullanabilirsiniz.\n
 
 
 ##############################################################################
 # KBDINPUT.C                                                                 #
 ##############################################################################
 
-20.5:FDISK seçeneklerine dönmek için \e[1mESC\e[22m tuşuna basın
-20.6:FDISK'ten çıkmak için \e[1mESC\e[22m tuşuna basın
-20.7:Devam etmek için \e[1mESC\e[22m tuşuna basın
-20.8:Talep edilen bölüm boyutu mevcut azami alanı aşıyor
-20.9:Kullanıcı girdisi:  %d
-20.10:Girdi:  %d
-20.11:Geçersiz giriş, lütfen şunu girin
-20.12:bir seçim değil, lütfen şunu girin
+20.5:FDISK seçeneklerine geri dönmek için \e[1mESC\e[22m'ye basın
+20.6:FDISK'ten çıkmak için \e[1mESC\e[22m'ye basın
+20.7:Sürdürmek için \e[1mESC\e[22m'ye basın
+20.8:İstenen bölüntü boyutu kullanılabilir alan boyutunu aşıyor
+20.9:Kullanıcı girdisi: %d
+20.10:Girdi: %d
+20.11:Geçersiz girdi, lütfen şunu girin:
+20.12:bir seçenek değil, lütfen şunu girin:
 20.13:Geçersiz girdi.
 
 
 ##############################################################################
-# GLOBAL STRINGS                                                             #
+# GLOBAL STRINGS (GLOBAL DİZİLER)                                            #
 ##############################################################################
 
 # Yes-No letters, as used to answer "Yes/No" questions (upper- and lower-case)
 250.0:EH
 250.1:eh
-250.2:Geçersiz girdi, lütfen E-H girin
-250.3:Devam etmek için herhangi bir tuşa basın
+250.2:Geçersiz girdi, lütfen E veya H girin
+250.3:Sürdürmek için herhangi bir düğmeye basın
 250.4:HATA
 250.5:UYARI!
 250.6:ETKİN
@@ -387,24 +385,25 @@
 
 
 ##############################################################################
-# ERROR MESSAGES                                                             #
+# ERROR MESSAGES (HATA İLETİLERİ)                                            #
 ##############################################################################
 
-255.0:\n    Bölüm tablosu okumada hata.
-255.1:\n    Hiçbir sabit disk mevcut değil.
-255.2:\nHiçbir sürücü numarası girilmedi.
-255.3:\nBölüm numarası aralık dışı (1-4).
-255.4:\nBölüm etkinleştirilemez.
-255.5:\nSabit diskin kendiliğinden bölümlendirilmesinde hata.
-255.6:\nMBR sektörünün temizlenmesinde hata.
-255.7:\nIPL'in kaldırılmasında hata.
-255.9:\nBölümün devre dışı bırakılmasında hata.
-255.10:\nBölüm tablosunun temizlenmesinde hata.
-255.11:\IPL yazılmasında hata.
-255.12:\nIPL'in dosyadan kurulmasında hata.
-255.13:\nMBR'ın dosyadan kurulmasında hata.
-255.14:\nMBR'ın yazılmasında hata.
-255.15:\nBölüm tablosunun yazılmasında hata.
-255.16:\nMBR'ın kaydedilmesinde hata.
-255.17:\nSmart IPL'in yazılmasında hata.
-255.18:\nGeçersiz komut veya sözdizimi hatası. Yardım için FDISK /? kullanın.
+255.0:\n    Bölüntü tabloları okunurken hata.
+255.1:\n    Sabit disk yok.
+255.2:\nBir sürücü numarası girilmedi.
+255.3:\nBölüntü numarası erim dışında (1-4).
+255.4:\nBölüntü etkinleştirilemiyor.
+255.5:\nSabit disk kendiliğinden bölüntülenemiyor.
+255.6:\nMBR dilimi temizlenirken hata.
+255.7:\nIPL kaldırılırken hata.
+255.9:\nBölüntü devre dışı bırakılırken hata.
+255.10:\nBölüntü tablosu temizlenirken hata.
+255.11:\nIPL yazılırken hata.
+255.12:\nDosyadan IPL kurulurken hata.
+255.13:\nDosyadan MBR kurulurken hata.
+255.14:\nMBR yazılırken hata.
+255.15:\nBölüntü tabloları yazılırken hata.
+255.16:\nMBR kaydedilirken hata.
+255.17:\nSmart IPL yazılırken hata.
+255.18:\nGeçersiz komut veya sözdizim hatası. Yardım için FDISK /? çağırın.
+255.19:\nDesteklenmeyen işletim sistemi.\n
