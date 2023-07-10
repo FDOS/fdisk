@@ -16,8 +16,10 @@ Phil Marek              new command-line parsing code and a variable fix
 Jim Hall                makefile
 Tom Ehlert              program size reduction, code simplifications,
                           new bootloader, bug fixes
+Wilhelm Spiegl          extensive testing
 Bernd Boeckmann         Open Watcom C and I16-GCC ports, critical bug fixes,
-                          code cleanup, German translation
+                          code cleanup, german translation
 Mateusz Viste           svarlang lib, FDISK lite, code improvements,
-                          Polish translation
-Emir SARI               Turkish translation
+                          polish translation
+Emir SARI               turkish translation
+Berki Yenigün           turkish translation
