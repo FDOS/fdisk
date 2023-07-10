@@ -67,7 +67,7 @@
 0.102:\t
 0.200:Telif hakkı %s, Brian E. Reifsnyder ve FreeDOS topluluğu.
 0.201:GNU Genel Kamu Lisansı 2. sürümü kapsamında lisanslanmıştır.
-0.202:
+0.202:\t
 0.203:\t
 0.204:Bu program olduğu gibi sunulur ve herhangi bir garanti içermez. Bu
 0.205:programın yazarı, programın (hatalı) kullanımından doğabilecek
@@ -85,7 +85,7 @@
 1.3:    veya mantıksal sürücüler FAT32 kullanılarak oluşturulur.
 1.4:    ÖNEMLİ: Büyük disk desteğini etkinleştirirseniz bazı işletim sistemleri
 1.5:    512 MB'den büyük bölüntülere ve mantıksal sürücülere erişemeyebilir.
-1.6:
+1.6:\t
 1.7:\e[5;18HBüyük disk (FAT32) desteğini kullanmak istiyor musunuz (E/H)?
 
 
@@ -95,7 +95,7 @@
 
 2.0:Değişikliklerin etkili olması için sisteminizi yeniden \e[1mBAŞLATMALISINIZ\e[22m.
 
-2.1:Oluşturduğunuz/değiştirdiğiniz sürücüler, sistemi yeniden başlattıktan\n\e[1mSONRA\e[22m biçimlendirilmelidir.
+2.1:Oluşturduğunuz/değiştirdiğiniz sürücüler, sistemi yeniden başlattıktan\n    \e[1mSONRA\e[22m biçimlendirilmelidir.
 
 2.2:Sistem şimdi yeniden başlatılacak
 2.3:Hazır olunca herhangi bir düğmeye basın...
@@ -223,8 +223,8 @@
 9.9:(1 MB = 1048576 bayt)
 
 # The following are table headers, must stay adjusted as is
-9.10:\n\nBölüntü     Durum    Mbayt    Açıklama      Kullanım     CHS Başı      CHS Sonu\n
-9.11:Src Bölüm  Etiket Mbayt   Sistem  Kullanım   CHS Başı      CHS Sonu\n
+9.10:\n\nBölüntü     Durum     Mbayt   Açıklama      Kullanım     CHS Başı      CHS Sonu\n
+9.11:Src Bölüm  Etiket  Mbayt  Sistem  Kullanım   CHS Başı      CHS Sonu\n
 9.12:Disk   Src   Mbayt     Boş   Kullanım
 
 9.13:Bir DOS bölüntüsü oluşturmak için yeterli alan yok.
@@ -259,9 +259,9 @@
 10.8:Toplam disk alanı %lu MB (1 MB = 1048576 bayt)
 
 # Table headers
-10.10:Bölüntü    Durum   Tür      Bölüm  Etiket  Mbayt   Sistem    Kullanım
+10.10:Bölüntü    Durum   Tür      Bölüm  Etiket   Mbayt  Sistem    Kullanım
 10.11:Bölüntü     Durum    Mbayt   Açıklama      Kullanım   Sil Başı Sil Sonu
-10.12:Src Bölüm  Etiket Mbayt  Sistem  Kullanım
+10.12:Src Bölüm  Etiket  Mbayt Sistem  Kullanım
 
 # Delete extended partition
 10.20:\e[1;5mUYARI!\e[22;25m Genişletilmiş DOS Bölüntüsü'ndeki ve onun Mantıksal\n    Bölüntüleri'ndeki veri kaybolacak. Sürdürülsün mü (E/H)?
