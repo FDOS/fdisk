@@ -53,7 +53,7 @@ int svarlang_load(const char *progname, const char *lang, const char *paths);
 /* same as svarlang_load(), but loads from the path of the given executable.
  * exepath must point to the executable including its extension. Loads
  * language specified by LANG environment variable */
-int svarlang_autoload_exepath(char *exepath);
+int svarlang_autoload_exepath();
 /* same as svarlang_load(), but relies on getenv() to pull LANG and NLSPATH.
  * this call should be used only by "CORE" SvarDOS programs. */
 int svarlang_autoload_nlspath(const char *progname);

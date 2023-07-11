@@ -29,7 +29,7 @@
 int svarlang_autoload(char *name)
 {
   int result;
-  result = svarlang_autoload_exepath( name );
+  result = svarlang_autoload_exepath();
   if ( result == -2 ) {
     /* revert to NLSPATH, if not found */
     result = svarlang_autoload_nlspath( name );
@@ -48,15 +48,16 @@ int svarlang_autoload_nlspath(const char *progname) {
   return(svarlang_load(progname, langid, getenv("NLSPATH")));
 }
 
-int svarlang_autoload_exepath(char *exepath) {
+int svarlang_autoload_exepath() {
   const char *s;
   char langid[3];
   char ext[4];
   size_t len;
   int result;
+  char *exepath = __argv[0];
   
   if ( exepath == NULL ) return -1;
-  len = strlen(exepath);
+  len = strlen(__argv[0]);
   
   /* get language identifier (like EN) from LANG env */
   s = getenv("LANG");
