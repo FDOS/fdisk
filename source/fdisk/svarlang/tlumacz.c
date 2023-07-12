@@ -147,7 +147,7 @@ static svl_lang_t * svl_lang_new(char langid[2], size_t dict_cap, size_t strings
 }
 
 
-/* compacts the dict and string buffer and sorts dict by id */
+/* compacts the dict and string buffer */
 static void svl_compact_lang(svl_lang_t *l)
 {
   size_t bytes;
@@ -283,11 +283,14 @@ static unsigned short svl_gen_strings_for_lang(svl_lang_t *l, svl_lang_t *refl) 
       printf("WARNING: %s[#%u] string id %u.%u is flagged as 'dirty'\r\n", fname, linecount, id >> 8, id & 0xff);
     }
 
-    
     /* add the string contained in current line, if conditions are met */
     if (!svl_find(l, id)) {
       if (refl == NULL || svl_find(refl, id)) {
-        svl_add_str(l, id, ptr);
+        if (!svl_add_str(l, id, ptr)) {
+          printf("ERROR: %s[#%u] output size limit exceeded\r\n", fname, linecount);
+          fclose(fd);
+          return 0;
+        }
       }
       else {
         printf("WARNING: %s[#%u] has an invalid id (%u.%u not present in ref lang)\r\n", fname, linecount, id >> 8, id & 0xff);
@@ -305,8 +308,11 @@ static unsigned short svl_gen_strings_for_lang(svl_lang_t *l, svl_lang_t *refl) 
     for (i = 0; i < refl->num_strings; i++) {
       id = refl->dict[i].id;
       if (!svl_find(l, id)) {
-        svl_add_str(l, id, refl->strings + refl->dict[i].offset);
         printf("WARNING: %s is missing string %u.%u (pulled from ref lang)\r\n", fname, id >> 8, id & 0xff);
+        if (!svl_add_str(l, id, ptr)) {
+          printf("ERROR: %s[#%u] output size limit exceeded\r\n", fname, linecount);
+          return 0;
+        }
       }
     }
   }
