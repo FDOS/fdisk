@@ -18,7 +18,6 @@
 #define MEMBLOCKSZ 65000
 
 
-
 /* read a single line from fd and fills it into dst, returns line length
  * ending CR/LF is trimmed, as well as any trailing spaces */
 static unsigned short readl(char *dst, size_t dstsz, FILE *fd) {
@@ -235,7 +234,7 @@ static int svl_find(svl_lang_t *l, unsigned short id)
 
 /* opens a CATS-style file and compiles it into a ressources lang block
  * returns 0 on error, or the size of the generated data block otherwise */
-static unsigned short svl_gen_strings_for_lang(svl_lang_t *l, svl_lang_t *refl) {
+static unsigned short svl_lang_from_cats_file(svl_lang_t *l, svl_lang_t *refl) {
   unsigned short linelen;
   FILE *fd;
   char fname[] = "xx.txt";
@@ -328,7 +327,7 @@ static int svl_write_header(unsigned short num_strings, FILE *fd)
 }
 
 
-static int svl_write_strings(svl_lang_t *l, FILE *fd)
+static int svl_write_lang(svl_lang_t *l, FILE *fd)
 {
   unsigned short strings_bytes = svl_strings_bytes(l);
 
@@ -346,7 +345,7 @@ static int svl_write_c_source(svl_lang_t *l, const char *fn, unsigned short bigg
   unsigned short strings_bytes = svl_strings_bytes(l);
   unsigned short nextnlat = 0;
 
-  fd = fopen("deflang.c", "wb");
+  fd = fopen(fn, "wb");
   if (fd == NULL) {
     puts("ERROR: FAILED TO OPEN OR CREATE DEFLANG.C");
     return 0;
@@ -374,7 +373,6 @@ static int svl_write_c_source(svl_lang_t *l, const char *fn, unsigned short bigg
     fprintf(fd, "};\r\n\r\n");
 
     fprintf(fd, "unsigned short svarlang_dict[%u] = {\r\n", l->num_strings * 2);
-    nextnlat = 0;
     for (i = 0; i < l->num_strings; i++) {
       if (!fprintf(fd, "0x%04x,0x%04x", l->dict[i].id, l->dict[i].offset)) {
         fclose(fd);
@@ -419,7 +417,6 @@ int main(int argc, char **argv) {
   for (i = 1; i < argc; i++) {
     unsigned short sz;
     char id[3];
-    unsigned short strings_sz;
 
     if (strlen(argv[i]) != 2) {
       printf("INVALID LANG SPECIFIED: %s\r\n", argv[i]);
@@ -435,7 +432,7 @@ int main(int argc, char **argv) {
       return(1);
     }
 
-    sz = svl_gen_strings_for_lang(lang, reflang);
+    sz = svl_lang_from_cats_file(lang, reflang);
     if (sz == 0) {
       printf("ERROR COMPUTING LANG '%s'\r\n", id);
       ecode = 1;
@@ -444,7 +441,7 @@ int main(int argc, char **argv) {
       printf("computed %s lang block of %u bytes\r\n", id, sz);
       if (sz > biggest_langsz) biggest_langsz = sz;
     }
-    strings_sz = svl_strings_bytes(lang);
+    svl_compact_lang(lang);
 
     /* write header if first (reference) language */
     if (i == 1) {
@@ -457,13 +454,11 @@ int main(int argc, char **argv) {
     
     /* write lang ID to file, followed string table size, and then
        the dictionary and string table for current language */
-    if (!svl_write_strings(lang, fd)) {
+    if (!svl_write_lang(lang, fd)) {
       printf("ERROR WRITING TO OUTPUT FILE\r\n");
       ecode = 1;
       break;
     }
-
-    svl_compact_lang(lang);
 
     /* remember reference data for other languages */
     if (i == 1) {
