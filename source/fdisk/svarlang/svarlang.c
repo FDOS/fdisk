@@ -107,7 +107,8 @@ int svarlang_load(const char *progname, const char *lang, const char *nlspath) {
   while (fread(buff16, 1, 4, fd) == 4) {
     /* is it the lang I am looking for? */
     if (buff16[0] != langid) { /* skip dict and strings to next lang */
-      fseek(fd, svarlang_string_count * 4 + buff16[1], SEEK_CUR);
+      fseek(fd, svarlang_string_count * 4, SEEK_CUR);
+      fseek(fd, buff16[1], SEEK_CUR);
       continue;
     }
 
