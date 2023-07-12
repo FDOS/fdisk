@@ -15,8 +15,8 @@
 
 #include "svarlang.h"
 
-#define MEMBLOCKSZ 65000
-
+#define STRINGS_CAP 65000   /* string storage size in characters */
+#define DICT_CAP    10000   /* dictionary size in elements */ 
 
 /* read a single line from fd and fills it into dst, returns line length
  * ending CR/LF is trimmed, as well as any trailing spaces */
@@ -156,8 +156,8 @@ static void svl_compact_lang(svl_lang_t *l)
     l->strings_end += bytes;
     l->strings_cap = bytes;
   }
-  l->dict_cap = sizeof(dict_entry_t) * l->num_strings;
-  l->dict = realloc(l->dict, l->dict_cap);
+  l->dict_cap = l->num_strings;
+  l->dict = realloc(l->dict, l->dict_cap * sizeof(dict_entry_t));
 }
 
 
@@ -427,7 +427,7 @@ int main(int argc, char **argv) {
     id[1] = argv[i][1];
     id[2] = 0;
 
-    if ((lang = svl_lang_new(id, MEMBLOCKSZ, MEMBLOCKSZ)) == NULL) {
+    if ((lang = svl_lang_new(id, DICT_CAP, STRINGS_CAP)) == NULL) {
       printf("OUT OF MEMORY\r\n");
       return(1);
     }
