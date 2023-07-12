@@ -5,22 +5,6 @@
  *
  * computes an out.lng file that contains all language ressources.
  *
- * DAT format:
- *
- * 4-bytes signature:
- * "SvL\x1b"
- *
- * Then "LANG BLOCKS" follow. Each LANG BLOCK is prefixed with 4 bytes:
- * II LL    - II is the LANG identifier ("EN", "PL", etc) and LL is the size
- *            of the block (65535 bytes max).
- *
- * Inside a LANG BLOCK is a set of strings:
- *
- * II LL S  where II is the string's 16-bit identifier, LL is its length
- *          (1-65535) and S is the actual string. All strings are ASCIIZ (ie.
- *          they end with a NULL terminator).
- *
- * The list of strings ends with a single 0-long string.
  */
 
 
@@ -31,22 +15,7 @@
 
 #include "svarlang.h"
 
-
-struct bitmap {
-  unsigned char bits[8192];
-};
-
-static void bitmap_set(struct bitmap *b, unsigned short id) {
-  b->bits[id >> 3] |= 1 << (id & 7);
-}
-
-static int bitmap_get(const struct bitmap *b, unsigned short id) {
-  return(b->bits[id >> 3] & (1 << (id & 7)));
-}
-
-static void bitmap_init(struct bitmap *b) {
-  memset(b, 0, sizeof(struct bitmap));
-}
+#define MEMBLOCKSZ 65000
 
 
 
@@ -55,7 +24,7 @@ static void bitmap_init(struct bitmap *b) {
 static unsigned short readl(char *dst, size_t dstsz, FILE *fd) {
   unsigned short l, lastnonspace = 0;
 
-  if (fgets(dst, dstsz, fd) == NULL) return(0xffff); /* EOF */
+  if (fgets(dst, (int)dstsz, fd) == NULL) return(0xffff); /* EOF */
   /* trim at first CR or LF and return len */
   for (l = 0; (dst[l] != 0) && (dst[l] != '\r') && (dst[l] != '\n'); l++) {
     if (dst[l] != ' ') lastnonspace = l;
@@ -130,21 +99,153 @@ static unsigned short unesc_string(char *linebuff) {
   return(i);
 }
 
+#pragma pack(1)
+typedef struct dict_entry {
+    unsigned short id;
+    unsigned short offset;
+} dict_entry_t;
+#pragma pack()
+
+typedef struct svl_lang {
+  char id[2];
+  unsigned short num_strings;
+
+  dict_entry_t *dict;
+  size_t dict_cap;
+
+  char *strings;
+  char *strings_end;
+  size_t strings_cap;
+
+} svl_lang_t;
+
+
+static svl_lang_t * svl_lang_new(char langid[2], size_t dict_cap, size_t strings_cap)
+{
+  svl_lang_t *l;
+
+  l = malloc(sizeof(svl_lang_t));
+  if (!l) return NULL;
+
+  l->id[0] = (char)toupper(langid[0]);
+  l->id[1] = (char)toupper(langid[1]);
+
+  l->dict = malloc(dict_cap * sizeof(dict_entry_t));
+  if (!l->dict) {
+    return NULL;
+  }
+  l->dict_cap = dict_cap;
+
+  l->num_strings = 0;
+  l->strings = l->strings_end = malloc(strings_cap);
+  if (!l->strings) {
+    free(l->dict);
+    return NULL;
+  }
+  l->strings_cap = strings_cap;
+  return l;
+}
+
+
+/* compacts the dict and string buffer and sorts dict by id */
+static void svl_compact_lang(svl_lang_t *l)
+{
+  size_t bytes;
+  bytes = l->strings_end - l->strings;
+  if (bytes < l->strings_cap) {
+    l->strings = l->strings_end = realloc(l->strings, bytes);
+    l->strings_end += bytes;
+    l->strings_cap = bytes;
+  }
+  l->dict_cap = sizeof(dict_entry_t) * l->num_strings;
+  l->dict = realloc(l->dict, l->dict_cap);
+}
+
+
+static void svl_lang_free(svl_lang_t *l)
+{
+  l->num_strings = 0;
+  if (l->dict) {
+    free(l->dict);
+    l->dict = NULL;
+  }
+  if (l->strings) {
+    free(l->strings);
+    l->strings = l->strings_end = NULL;
+  }
+  l->dict_cap = 0;
+  l->strings_cap = 0;
+}
+
+
+static size_t svl_strings_bytes(svl_lang_t *l)
+{
+  return l->strings_end - l->strings;
+}
+
+
+static size_t svl_dict_bytes(svl_lang_t *l)
+{
+  return l->num_strings * sizeof(dict_entry_t);
+}
+
+
+static int svl_add_str(svl_lang_t *l, unsigned short id, const char *s)
+{
+  size_t len = strlen(s) + 1;
+  size_t cursor;
+
+  if (l->strings_cap < svl_strings_bytes(l) + len ||
+      l->dict_cap < (l->num_strings + 1) * sizeof(dict_entry_t)) {
+    return 0;
+  }
+  
+  /* find dictionary insert position, search backwards in assumption
+     that in translation files, strings are generally ordered ascending */
+  for (cursor = l->num_strings; cursor > 0 && l->dict[cursor-1].id > id; cursor--);
+
+  memmove(&(l->dict[cursor+1]), &(l->dict[cursor]), sizeof(dict_entry_t)*(l->num_strings - cursor));
+  l->dict[cursor].id = id;
+  l->dict[cursor].offset = l->strings_end - l->strings;
+
+  memcpy(l->strings_end, s, len);
+  l->strings_end += len;
+  l->num_strings++;
+
+  return 1;
+}
+
+
+static int svl_find(svl_lang_t *l, unsigned short id)
+{
+   size_t left = 0, right = l->num_strings - 1, x;
+   unsigned short v;
+
+   if (l->num_strings == 0) return 0;
+
+   while (left <= right ) {
+      x = left + ( (right - left ) >> 2 );
+      v = l->dict[x].id;
+      if ( id == v ) return 1;
+      else if ( id > v ) left = x + 1;
+      else right = x - 1;
+   }
+   return 0;
+}
 
 /* opens a CATS-style file and compiles it into a ressources lang block
  * returns 0 on error, or the size of the generated data block otherwise */
-static unsigned short gen_langstrings(unsigned char *buff, const char *langid, struct bitmap *b, const struct bitmap *refb, const unsigned char *refblock) {
-  unsigned short len = 0, linelen;
+static unsigned short svl_gen_strings_for_lang(svl_lang_t *l, svl_lang_t *refl) {
+  unsigned short linelen;
   FILE *fd;
   char fname[] = "xx.txt";
   static char linebuf[8192];
   const char *ptr;
   unsigned short id, linecount;
+  int i;
 
-  bitmap_init(b);
-
-  fname[strlen(fname) - 6] = tolower( langid[0] );
-  fname[strlen(fname) - 5] = tolower( langid[1] );
+  fname[strlen(fname) - 6] = (char)tolower( l->id[0] );
+  fname[strlen(fname) - 5] = (char)tolower( l->id[1] );
 
   fd = fopen(fname, "rb");
   if (fd == NULL) {
@@ -182,71 +283,115 @@ static unsigned short gen_langstrings(unsigned char *buff, const char *langid, s
       printf("WARNING: %s[#%u] string id %u.%u is flagged as 'dirty'\r\n", fname, linecount, id >> 8, id & 0xff);
     }
 
-    /* write string into block (II LL S) */
-    memcpy(buff + len, &id, 2);
-    len += 2;
-    {
-      unsigned short slen = strlen(ptr) + 1;
-      memcpy(buff + len, &slen, 2);
-      len += 2;
-      memcpy(buff + len, ptr, slen);
-      len += slen;
+    
+    /* add the string contained in current line, if conditions are met */
+    if (!svl_find(l, id)) {
+      if (refl == NULL || svl_find(refl, id)) {
+        svl_add_str(l, id, ptr);
+      }
+      else {
+        printf("WARNING: %s[#%u] has an invalid id (%u.%u not present in ref lang)\r\n", fname, linecount, id >> 8, id & 0xff);
+      }
     }
-
-    /* if reference bitmap provided: check that the id is valid */
-    if ((refb != NULL) && (bitmap_get(refb, id) == 0)) {
-      printf("WARNING: %s[#%u] has an invalid id (%u.%u not present in ref lang)\r\n", fname, linecount, id >> 8, id & 0xff);
-    }
-
-    /* make sure this id is not already present */
-    if (bitmap_get(b, id) == 0) {
-      /* set bit in bitmap to remember I have this string */
-      bitmap_set(b, id);
-    } else {
-      printf("WARNING: %s[#%u] has a duplicated id (%u.%u)\r\n", fname, linecount, id >> 8, id & 0xff);
+    else {
+      printf("WARNING: %s[#%u] has a duplicated id (%u.%u)\r\n", fname, linecount, id >> 8, id & 0xff);      
     }
   }
 
   fclose(fd);
 
-  /* if refblock provided, pull missing strings from it */
-  if (refblock != NULL) {
-    for (;;) {
-      unsigned short slen;
-      id = ((unsigned short *)refblock)[0];
-      slen = ((unsigned short *)refblock)[1];
-      if ((id == 0) && (slen == 0)) break;
-      if (bitmap_get(b, id) == 0) {
+  /* if reflang provided, pull missing strings from it */
+  if (refl != NULL) {
+    for (i = 0; i < refl->num_strings; i++) {
+      id = refl->dict[i].id;
+      if (!svl_find(l, id)) {
+        svl_add_str(l, id, refl->strings + refl->dict[i].offset);
         printf("WARNING: %s is missing string %u.%u (pulled from ref lang)\r\n", fname, id >> 8, id & 0xff);
-        /* copy missing string from refblock */
-        memcpy(buff + len, refblock, slen + 4);
-        len += slen + 4;
       }
-      refblock += slen + 4;
     }
   }
 
-  /* write the block terminator (0-long string) */
-  buff[len++] = 0; /* id */
-  buff[len++] = 0; /* id */
-  buff[len++] = 0; /* len */
-  buff[len++] = 0; /* len */
-  buff[len++] = 0; /* empty string */
-
-  return(len);
+  return(svl_strings_bytes(l));
 }
 
 
-#define MEMBLOCKSZ 65000
+static int svl_write_header(unsigned short num_strings, FILE *fd)
+{
+  return (fwrite("SvL1\x1a", 1, 5, fd) == 5) &&
+          (fwrite(&num_strings, 1, 2, fd) == 2);
+}
+
+
+static int svl_write_strings(svl_lang_t *l, FILE *fd)
+{
+  unsigned short strings_bytes = svl_strings_bytes(l);
+
+  return (fwrite(&l->id, 1, 2, fd) == 2) &&
+         (fwrite(&strings_bytes, 1, 2, fd) == 2) &&
+         (fwrite(l->dict, 1, svl_dict_bytes(l), fd) == svl_dict_bytes(l)) &&
+         (fwrite(l->strings, 1, svl_strings_bytes(l), fd) == svl_strings_bytes(l));
+}
+
+
+static int svl_write_c_source(svl_lang_t *l, const char *fn, unsigned short biggest_langsz)
+{
+  FILE *fd;
+  int i;
+  unsigned short strings_bytes = svl_strings_bytes(l);
+  unsigned short nextnlat = 0;
+
+  fd = fopen("deflang.c", "wb");
+  if (fd == NULL) {
+    puts("ERROR: FAILED TO OPEN OR CREATE DEFLANG.C");
+    return 0;
+  } else {
+    unsigned short allocsz = biggest_langsz + (biggest_langsz / 20);
+    printf("biggest lang block is %u bytes -> allocating a %u bytes buffer (5%% safety margin)\n", biggest_langsz,
+           allocsz);
+    fprintf(fd, "/* THIS FILE HAS BEEN GENERATED BY TLUMACZ (PART OF THE SVARLANG LIBRARY) */\r\n");
+    fprintf(fd, "const unsigned short svarlang_memsz = %uu;\r\n", allocsz);
+    fprintf(fd, "const unsigned short svarlang_string_count = %uu;\r\n\r\n", l->num_strings);
+    fprintf(fd, "char svarlang_mem[%u] = {\r\n", allocsz);
+    for (i = 0; i < strings_bytes; i++) {
+      if (!fprintf(fd, "0x%02x", l->strings[i])) {
+        fclose(fd);
+        return 0;
+      }
+
+      if (i + 1 < strings_bytes) fprintf(fd, ",");
+      nextnlat++;
+      if (l->strings[i] == '\0' || nextnlat == 16) {
+        fprintf(fd, "\r\n");
+        nextnlat = 0;
+      }
+    }
+    fprintf(fd, "};\r\n\r\n");
+
+    fprintf(fd, "unsigned short svarlang_dict[%u] = {\r\n", l->num_strings * 2);
+    nextnlat = 0;
+    for (i = 0; i < l->num_strings; i++) {
+      if (!fprintf(fd, "0x%04x,0x%04x", l->dict[i].id, l->dict[i].offset)) {
+        fclose(fd);
+        return 0;
+      }
+      if (i + 1 < l->num_strings) fprintf(fd, ",");
+      fprintf(fd, "\r\n");
+    }
+    fprintf(fd, "};\r\n");
+
+    fclose(fd);
+  }
+
+  return 1;
+}
+
 
 int main(int argc, char **argv) {
   FILE *fd;
   int ecode = 0;
-  unsigned char *buff, *refblock;
-  unsigned short refblocksz = 0;
-  static struct bitmap bufbitmap;
-  static struct bitmap refbitmap;
-  unsigned short i;
+  svl_lang_t *lang, *reflang = NULL;
+
+  int i;
   unsigned short biggest_langsz = 0;
 
   if (argc < 2) {
@@ -258,40 +403,33 @@ int main(int argc, char **argv) {
     return(1);
   }
 
-  buff = malloc(MEMBLOCKSZ);
-  refblock = malloc(MEMBLOCKSZ);
-  if ((buff == NULL) || (refblock == NULL)) {
-    puts("out of memory");
-    return(1);
-  }
-
   fd = fopen("out.lng", "wb");
   if (fd == NULL) {
     puts("ERR: failed to open or create OUT.LNG");
     return(1);
   }
 
-  /* write sig */
-  fwrite("SvL\x1b", 1, 4, fd);
-
   /* write lang blocks */
   for (i = 1; i < argc; i++) {
     unsigned short sz;
     char id[3];
+    unsigned short strings_sz;
 
     if (strlen(argv[i]) != 2) {
       printf("INVALID LANG SPECIFIED: %s\r\n", argv[i]);
       ecode = 1;
       break;
     }
-
     id[0] = argv[i][0];
     id[1] = argv[i][1];
     id[2] = 0;
-    if (id[0] >= 'a') id[0] -= 'a' - 'A';
-    if (id[1] >= 'a') id[1] -= 'a' - 'A';
 
-    sz = gen_langstrings(buff, id, &bufbitmap, (i != 1)?&refbitmap:NULL, (i != 1)?refblock:NULL);
+    if ((lang = svl_lang_new(id, MEMBLOCKSZ, MEMBLOCKSZ)) == NULL) {
+      printf("OUT OF MEMORY\r\n");
+      return(1);
+    }
+
+    sz = svl_gen_strings_for_lang(lang, reflang);
     if (sz == 0) {
       printf("ERROR COMPUTING LANG '%s'\r\n", id);
       ecode = 1;
@@ -300,54 +438,47 @@ int main(int argc, char **argv) {
       printf("computed %s lang block of %u bytes\r\n", id, sz);
       if (sz > biggest_langsz) biggest_langsz = sz;
     }
-    /* write lang ID to file, followed by block size and then the actual block */
-    if ((fwrite(id, 1, 2, fd) != 2) ||
-        (fwrite(&sz, 1, 2, fd) != 2) ||
-        (fwrite(buff, 1, sz, fd) != sz)) {
+    strings_sz = svl_strings_bytes(lang);
+
+    /* write header if first (reference) language */
+    if (i == 1) {
+      if (!svl_write_header(lang->num_strings, fd)) {
+        printf("ERROR WRITING TO OUTPUT FILE\r\n");
+        ecode = 1;
+        break;
+      }
+    }
+    
+    /* write lang ID to file, followed string table size, and then
+       the dictionary and string table for current language */
+    if (!svl_write_strings(lang, fd)) {
       printf("ERROR WRITING TO OUTPUT FILE\r\n");
       ecode = 1;
       break;
     }
+
+    svl_compact_lang(lang);
+
     /* remember reference data for other languages */
     if (i == 1) {
-      refblocksz = sz;
-      memcpy(refblock, buff, MEMBLOCKSZ);
-      memcpy(&refbitmap, &bufbitmap, sizeof(struct bitmap));
+      reflang = lang;
+    }
+    else {
+      svl_lang_free(lang);
+      lang = NULL;
     }
   }
 
-  fclose(fd);
-
   /* compute the deflang.c file containing a dump of the reference block */
-  fd = fopen("deflang.c", "wb");
-  if (fd == NULL) {
+  if (!svl_write_c_source(reflang, "deflang.c", biggest_langsz)) {
     puts("ERROR: FAILED TO OPEN OR CREATE DEFLANG.C");
     ecode = 1;
-  } else {
-    unsigned short allocsz = biggest_langsz + (biggest_langsz / 20);
-    unsigned short nextstringin = 0, nextnlat = 40;
-    printf("biggest lang block is %u bytes -> allocating a %u bytes buffer (5%% safety margin)\n", biggest_langsz, allocsz);
-    fprintf(fd, "/* THIS FILE HAS BEEN GENERATED BY TLUMACZ (PART OF THE SVARLANG LIBRARY) */\r\n");
-    fprintf(fd, "const unsigned short svarlang_memsz = %uu;\r\n", allocsz);
-    fprintf(fd, "char svarlang_mem[%u] = {", allocsz);
-    for (i = 0; i < refblocksz; i++) {
-      if (nextstringin == 0) {
-        fprintf(fd, "\r\n");
-        nextnlat = i + 40;
-        nextstringin = 4 + (refblock[i + 3] << 8) + refblock[i + 2];
-        if (nextstringin == 4) nextstringin = 20000; /* last string in block */
-      }
-      if (i == nextnlat) {
-        nextnlat += 40;
-        fprintf(fd, "\r\n");
-      }
-      nextnlat--;
-      nextstringin--;
-      fprintf(fd, "%u", refblock[i]);
-      if (i + 1 < refblocksz) fprintf(fd, ",");
-    }
-    fprintf(fd, "};\r\n");
-    fclose(fd);
+  }
+
+  /* clean up */
+  if (reflang) {
+    svl_lang_free(reflang);
+    reflang = NULL;
   }
 
   return(ecode);

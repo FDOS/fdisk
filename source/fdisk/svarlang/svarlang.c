@@ -31,17 +31,28 @@
 
 /* supplied through DEFLANG.C */
 extern char svarlang_mem[];
+extern unsigned short svarlang_dict[];
 extern const unsigned short svarlang_memsz;
+extern const unsigned short svarlang_string_count;
+
 
 
 const char *svarlang_strid(unsigned short id) {
-  const char *ptr = svarlang_mem;
-  /* find the string id in langblock memory */
-  for (;;) {
-    if (((unsigned short *)ptr)[0] == id) return(ptr + 4);
-    if (((unsigned short *)ptr)[1] == 0) return(ptr + 2); /* end of strings - return an empty string */
-    ptr += ((unsigned short *)ptr)[1] + 4;
-  }
+   size_t left = 0, right = svarlang_string_count - 1, x;
+   unsigned short v;
+
+   if (svarlang_string_count == 0) return "";
+
+   while (left <= right ) {
+      x = left + ( (right - left ) >> 2 );
+      v = svarlang_dict[x * 2];
+      if ( id == v )  {
+        return svarlang_mem + svarlang_dict[x * 2 + 1];
+      }
+      else if ( id > v ) left = x + 1;
+      else right = x - 1;
+   }
+   return "";
 }
 
 
@@ -50,6 +61,7 @@ int svarlang_load(const char *progname, const char *lang, const char *nlspath) {
   FILE *fd;
   char buff[128];
   unsigned short buff16[2];
+  unsigned short string_count;
   unsigned short i;
 
   if (lang == NULL) return(-1);
@@ -79,32 +91,40 @@ int svarlang_load(const char *progname, const char *lang, const char *nlspath) {
     goto TRYNEXTPATH;
   }
 
-  /* read hdr, should be "SvL\33" */
-  if ((fread(buff, 1, 4, fd) != 4) || (memcmp(buff, "SvL\33", 4) != 0)) {
+  /* read hdr, should be "SvL1\0x1a" */
+  if ((fread(buff, 1, 5, fd) != 5) || (memcmp(buff, "SvL1\x1a", 5) != 0)) {
     fclose(fd);
     return(-3);
   }
 
-  /* read next lang id in file */
+  /* read string count */
+  if ((fread(&string_count, 1, 2, fd) != 2) || (string_count != svarlang_string_count)) {
+    fclose(fd);
+    return(-4);
+  }
+
+  /* read next lang id, strings size in file */
   while (fread(buff16, 1, 4, fd) == 4) {
     /* is it the lang I am looking for? */
-    if (buff16[0] != langid) { /* skip to next lang */
-      fseek(fd, buff16[1], SEEK_CUR);
+    if (buff16[0] != langid) { /* skip dict and strings to next lang */
+      fseek(fd, svarlang_string_count * 4 + buff16[1], SEEK_CUR);
       continue;
     }
 
     /* found - but do I have enough memory space? */
     if (buff16[1] >= svarlang_memsz) {
       fclose(fd);
-      return(-4);
+      return(-5);
     }
 
     /* load strings */
-    if (fread(svarlang_mem, 1, buff16[1], fd) != buff16[1]) break;
-    fclose(fd);
-    return(0);
+    if ((fread(svarlang_dict, 1, svarlang_string_count * 4, fd) != svarlang_string_count * 4) ||
+       (fread(svarlang_mem, 1, buff16[1], fd) != buff16[1])) {
+      fclose(fd);
+      return -6;
+    }
   }
 
   fclose(fd);
-  return(-5);
+  return(0);
 }
