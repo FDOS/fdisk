@@ -240,7 +240,7 @@ static unsigned short svl_lang_from_cats_file(svl_lang_t *l, svl_lang_t *refl) {
   char fname[] = "xx.txt";
   static char linebuf[8192];
   const char *ptr;
-  unsigned short id, linecount;
+  unsigned short id, maxid=0, maxid_line, linecount;
   int i;
 
   fname[strlen(fname) - 6] = (char)tolower( l->id[0] );
@@ -253,7 +253,6 @@ static unsigned short svl_lang_from_cats_file(svl_lang_t *l, svl_lang_t *refl) {
   }
 
   for (linecount = 1;; linecount++) {
-
     linelen = readl(linebuf, sizeof(linebuf), fd);
     if (linelen == 0xffff) break; /* EOF */
     if ((linelen == 0) || (linebuf[0] == '#')) continue;
@@ -289,6 +288,13 @@ static unsigned short svl_lang_from_cats_file(svl_lang_t *l, svl_lang_t *refl) {
           printf("ERROR: %s[#%u] output size limit exceeded\r\n", fname, linecount);
           fclose(fd);
           return 0;
+        }
+        if (id >= maxid) {
+          maxid = id;
+          maxid_line = linecount;
+        }
+        else {
+          printf("WARNING:%s[#%u] file unsorted - line %u has higher id %u.%u\r\n", fname, linecount, maxid_line, maxid >> 8, maxid & 0xff);          
         }
       }
       else {
