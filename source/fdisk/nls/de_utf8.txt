@@ -224,7 +224,7 @@
 # The following are table headers, must stay adjusted as is
 9.10:\n\nPartition   Status   Mbytes   Beschreibung   Nutzung    CHS Start      CHS Ende\n
 9.11: LW Bezeichnung   Mbytes  System Nutzung    CHS Start      CHS Ende\n
-9.12:  #     LW   Mbytes    frei   bel.
+9.12:Disk    LW   Mbytes    frei   bel.
 
 
 9.13:Kein freier Speicher zum Erstellen einer DOS Partition vorhanden.

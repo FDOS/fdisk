@@ -283,7 +283,7 @@
 10.50:Etkin yapılacak bölüntü yok.
 10.51:Etkin yapmak istediğiniz bölüntünün numarasını girin:
 10.52:%d bir seçenek değil. Lütfen geçerli bir seçenek girin.
-10.53:Sürücü %d sürücüsündeki tek başlatılabilir bölüntü halihazırda etkin yapılmış.
+10.53:Sürücü %d sürücüsündeki tek başlatılabilir bölüntü halihazırda etkin\n    yapılmış.
 10.54:Bölüntü %d etkinleştirildi.
 
 # Create partition
@@ -297,7 +297,7 @@
 10.67:Genişletilmiş DOS Bölüntüsü oluşturuldu
 
 # Create logical partition
-10.70:Mantıksal DOS Sürücüsü oluşturuldu, sürücü harfleri değiştirildi veya eklendi
+10.70:Mantıksal DOS Sürücüsü oluşturuldu, sürücü harfleri değiştirildi\n    veya eklendi
 10.71:Olabilecek en çok sayıda Mantıksal DOS Sürücüsü kuruldu
 10.72:Mantıksal sürücü boyutunu MB olarak veya genişletilmiş\n    bölüntü boyutu yüzdesi (%%) olarak girin:
 10.73:Genişletilmiş DOS Bölüntüsü'ndeki tüm kullanılabilir alan\n    mantıksal sürücülere atanmıştır.
