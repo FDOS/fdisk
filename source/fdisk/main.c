@@ -507,7 +507,11 @@ int main( int argc, char *argv[] )
    con_init( 1 );
 
    /* initialize the SvarLANG library (loads translation strings) */
-   svarlang_result = svarlang_autoload( "FDISK" );
+   svarlang_result = svarlang_autoload_exepath( argv[0], getenv("LANG") );
+   if ( svarlang_result == -1 ) {
+      /* revert to NLSPATH, if not found */
+      svarlang_result = svarlang_autoload_nlspath( "FDISK" );
+   }   
    if ( svarlang_result == -4 ) {
       con_print("\nTranslations in FDISK.LNG too big. Binary must be updated!\n");
       exit( 1 );

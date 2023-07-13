@@ -22,7 +22,24 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdio.h>
+/* if WITHSTDIO is enabled, then remap file operations to use the standard
+ * stdio amenities */
+#ifdef WITHSTDIO
+
+#include <stdio.h>   /* FILE, fopen(), fseek(), etc */
+typedef FILE* FHANDLE;
+#define FOPEN(x) fopen(x, "rb")
+#define FCLOSE(x) fclose(x)
+#define FSEEK(f,b) fseek(f,b,SEEK_CUR)
+#define FREAD(f,t,b) fread(t, 1, b, f)
+
+#else
+
+#include <i86.h>
+typedef unsigned short FHANDLE;
+
+#endif
+
 #include <stdlib.h>  /* NULL */
 #include <string.h>  /* memcmp(), strcpy() */
 
@@ -34,8 +51,6 @@ extern char svarlang_mem[];
 extern unsigned short svarlang_dict[];
 extern const unsigned short svarlang_memsz;
 extern const unsigned short svarlang_string_count;
-
-
 
 const char *svarlang_strid(unsigned short id) {
    size_t left = 0, right = svarlang_string_count - 1, x;
@@ -55,77 +70,151 @@ const char *svarlang_strid(unsigned short id) {
    return "";
 }
 
+/* routines below are simplified (dos-based) versions of the libc FILE-related
+ * functions. Using them avoids a dependency on FILE, hence makes the binary
+ * smaller if the application does not need to pull fopen() and friends */
+#ifndef WITHSTDIO
+static unsigned short FOPEN(const char *s) {
+  unsigned short fname_seg = FP_SEG(s);
+  unsigned short fname_off = FP_OFF(s);
+  unsigned short res = 0; /* fd 0 is already used by stdout so it's a good error value */
+  _asm {
+    push dx
+    push ds
 
-int svarlang_load(const char *progname, const char *lang, const char *nlspath) {
+    mov ax, fname_seg
+    mov dx, fname_off
+    mov ds, ax
+    mov ax, 0x3d00  /* open file, read-only (fname at DS:DX) */
+    int 0x21
+    pop ds
+    jc ERR
+    mov res, ax
+
+    ERR:
+    pop dx
+  }
+
+  return(res);
+}
+
+
+static void FCLOSE(unsigned short handle) {
+  _asm {
+    push bx
+
+    mov ah, 0x3e
+    mov bx, handle
+    int 0x21
+
+    pop bx
+  }
+}
+
+
+static unsigned short FREAD(unsigned short handle, void *buff, unsigned short bytes) {
+  unsigned short buff_seg = FP_SEG(buff);
+  unsigned short buff_off = FP_OFF(buff);
+  unsigned short res = 0;
+
+  _asm {
+    push bx
+    push cx
+    push dx
+
+    mov bx, handle
+    mov cx, bytes
+    mov dx, buff_off
+    mov ax, buff_seg
+    push ds
+    mov ds, ax
+    mov ah, 0x3f    /* read cx bytes from file handle bx to DS:DX */
+    int 0x21
+    pop ds
+    jc ERR
+
+    mov res, ax
+    ERR:
+
+    pop dx
+    pop cx
+    pop bx
+  }
+
+  return(res);
+}
+
+
+static void FSEEK(unsigned short handle, unsigned short bytes) {
+  _asm {
+    push bx
+    push cx
+    push dx
+
+    mov ax, 0x4201  /* move file pointer from cur pos + CX:DX */
+    mov bx, handle
+    xor cx, cx
+    mov dx, bytes
+    int 0x21
+
+    pop dx
+    pop cx
+    pop bx
+  }
+}
+#endif
+
+int svarlang_load(const char *fname, const char *lang) {
   unsigned short langid;
-  FILE *fd;
-  char buff[128];
+  char hdr[5];
   unsigned short buff16[2];
+  FHANDLE fd;
   unsigned short string_count;
-  unsigned short i;
-
-  if (lang == NULL) return(-1);
-  if (nlspath == NULL) nlspath = ""; /* nlspath can be NULL, treat is as empty */
 
   langid = *((unsigned short *)lang);
   langid &= 0xDFDF; /* make sure lang is upcase */
 
-  TRYNEXTPATH:
+  fd = FOPEN(fname);
+  if (!fd) return(-1);
 
-  /* skip any leading ';' separators */
-  while (*nlspath == ';') nlspath++;
-
-  /* copy nlspath to buff and remember len */
-  for (i = 0; (nlspath[i] != 0) && (nlspath[i] != ';'); i++) buff[i] = nlspath[i];
-  nlspath += i;
-
-  /* add a trailing backslash if there is none (non-empty paths empty) */
-  if ((i > 0) && (buff[i - 1] != '\\')) buff[i++] = '\\';
-
-  strcpy(buff + i, progname);
-  strcat(buff + i, ".lng");
-
-  fd = fopen(buff, "rb");
-  if (!fd) { /* failed to open file - either abort or try next path */
-    if (*nlspath == 0) return(-2);
-    goto TRYNEXTPATH;
-  }
-
-  /* read hdr, should be "SvL1\0x1a" */
-  if ((fread(buff, 1, 5, fd) != 5) || (memcmp(buff, "SvL1\x1a", 5) != 0)) {
-    fclose(fd);
+  /* read hdr, should be "SvL1\x1a" */
+  if ((FREAD(fd, hdr, 5) != 5) || (memcmp(hdr, "SvL1\x1a", 5) != 0)) {
+    FCLOSE(fd);
     return(-3);
   }
 
   /* read string count */
-  if ((fread(&string_count, 1, 2, fd) != 2) || (string_count != svarlang_string_count)) {
-    fclose(fd);
-    return(-4);
+  if ((FREAD(fd, &string_count, 2) != 2) || (string_count != svarlang_string_count)) {
+    FCLOSE(fd);
+    return(-6);
   }
 
-  /* read next lang id, strings size in file */
-  while (fread(buff16, 1, 4, fd) == 4) {
+  /* read next lang id and string table size in file */
+  while (FREAD(fd, buff16, 4) == 4) {
+
     /* is it the lang I am looking for? */
-    if (buff16[0] != langid) { /* skip dict and strings to next lang */
-      fseek(fd, svarlang_string_count * 4, SEEK_CUR);
-      fseek(fd, buff16[1], SEEK_CUR);
+    if (buff16[0] != langid) { /* skip to next lang */
+      FSEEK(fd, svarlang_string_count * 4);
+      FSEEK(fd, buff16[1]);
       continue;
     }
 
     /* found - but do I have enough memory space? */
     if (buff16[1] >= svarlang_memsz) {
-      fclose(fd);
-      return(-5);
+      FCLOSE(fd);
+      return(-4);
     }
 
-    /* load strings */
-    if ((fread(svarlang_dict, 1, svarlang_string_count * 4, fd) != svarlang_string_count * 4) ||
-       (fread(svarlang_mem, 1, buff16[1], fd) != buff16[1])) {
-      fclose(fd);
-      return -6;
+    /* load dictionary & strings */
+    if ((FREAD(fd, svarlang_dict, svarlang_string_count * 4) != svarlang_string_count * 4) ||
+       (FREAD(fd, svarlang_mem, buff16[1]) != buff16[1])) {
+      FCLOSE(fd);
+      return -7;
     }
+    FCLOSE(fd);
+    return(0);
   }
 
-  fclose(fd);
-  return(0);
+  FCLOSE(fd);
+  return(-5);
 }

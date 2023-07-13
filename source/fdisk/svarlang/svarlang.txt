@@ -37,7 +37,7 @@ TLUMACZ computes two files:
 Then, DEFLANG.C must be compiled and linked to your program along with
 SVARLNGx.LIB. From there you will be able to use SvarLANG calls, typically:
 
-  svarlang_load("myprogram", "pl", "."); /* load .\myprogram.lng */
+  svarlang_load("myprogram.lng", "pl");  /* load PL lang from myprogram.lng */
   puts(svarlang_str(2, 0));              /* display the string with id 2.0 */
 
 Read svarlang.h for more information about available functions.
@@ -84,6 +84,33 @@ way at compile time.
 There is also a licensing issue: CATS/Kitten libraries are published under the
 terms of a viral, corrosive license. SvarLANG, on the other hand, is published
 under a truly free, liberal license (MIT).
+
+
+### FILE FORMAT ###
+
+File =
+    magic         : Char[4] := "SvL1"
+    guard         : Char := "\0x1a"
+                  ; end-of-file char to prevent TYPE garbage
+    num_strings   : U16
+    languages     : array[num_languages] of Language
+
+Language =
+    lang_id       : Char[2]
+    len_strings   : U16 := SizeOf(strings)
+    dictionary    : StringDict
+    strings       : array[File.num_strings] of StringZ
+
+StringDict =
+    elements : array[File.num_strings] of DictEntry
+             ; sorted by DictEntry.Id
+
+DictEntry =
+    id     : U16
+    offset : U16
+           ; relative to Language.strings[0]
+
+StringZ = array[?] of Char ; zero-terminated string
 
 
 ======================================================================= EOF ===
