@@ -1,3 +1,10 @@
+xxxxxxxx
+- dropped svarlang_autoload() (replaced by more specialized functions below)
+- added svarlang_autoload_exepath() and svarlang_autoload_nlspath()
+- svarlang_load() simplified so it takes the target filename as an argument
+- file access relies on fopen() when svarlang is compiled with -DWITHSTDIO
+- file format refinement: use sorted dictionary to speed up lookup
+  breaking change! See svarlang.txt for file format specification.
 
 20230630
 - tlumacz.exe warns about empty strings (patch by Bernd Boeckmann)
