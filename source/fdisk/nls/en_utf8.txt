@@ -333,6 +333,21 @@
 
 
 ##############################################################################
+# KBDINPUT.C                                                                 #
+##############################################################################
+
+20.5:Press \e[1mESC\e[22m to return to FDISK options
+20.6:Press \e[1mESC\e[22m to exit FDISK
+20.7:Press \e[1mESC\e[22m to continue
+20.8:Requested partition size exceeds the maximum available space
+20.9:Input entered by user:  %d
+20.10:Input:  %d
+20.11:Invalid entry, please enter
+20.12:is not a choice, please enter
+20.13:Invalid entry.
+
+
+##############################################################################
 # WARNING SCREENS                                                            #
 ##############################################################################
 30.1:You have at least one disk larger than 2,097,152 MB. FDISK can\n    NOT handle partitions exceeding this barrier!\n\n
@@ -351,21 +366,6 @@
 30.23:      - deleting logical drives\n\n
 30.24:    You may re-create the extended partition to enable editing or\n
 30.25:    use another disk utility to partition this disk.\n
-
-
-##############################################################################
-# KBDINPUT.C                                                                 #
-##############################################################################
-
-20.5:Press \e[1mESC\e[22m to return to FDISK options
-20.6:Press \e[1mESC\e[22m to exit FDISK
-20.7:Press \e[1mESC\e[22m to continue
-20.8:Requested partition size exceeds the maximum available space
-20.9:Input entered by user:  %d
-20.10:Input:  %d
-20.11:Invalid entry, please enter
-20.12:is not a choice, please enter
-20.13:Invalid entry.
 
 
 ##############################################################################

@@ -256,7 +256,7 @@
 
 # Display primary partitions
 10.7:Aucune partition n'a été définie.
-10.8:La taille totale de l'espace disque est de %lu Mo (1 Mo=1048576 octets)
+10.8:La taille totale de l'espace disque est de %lu Mo\n    (1 Mo=1048576 octets)
 
 # Table headers
 10.10:Partition  État    Type     Étiquette volume Mo      Système  Utilisation
@@ -336,6 +336,21 @@
 
 
 ##############################################################################
+# KBDINPUT.C                                                                 #
+##############################################################################
+
+20.5:Appuyez sur \e[1mÉchap\e[22m pour revenir aux options de FDISK
+20.6:Appuyez sur \e[1mÉchap\e[22m pour quitter FDISK
+20.7:Appuyez sur \e[1mÉchap\e[22m pour continuer
+20.8:La taille de partition requise dépasse la taille maximale disponible
+20.9:Entrée de l'utilisateur :  %d
+20.10:Entrée :  %d
+20.11:Entrée invalide, veuillez entrer
+20.12:n'est pas un choix, veuillez entrer
+20.13:Entrée invalide.
+
+
+##############################################################################
 # WARNING SCREENS                                                            #
 ##############################################################################
 30.1:Vous avez au moins un disque de taille supérieure à 2,097,152 Mo. FDISK ne\n    peut PAS gérer les partitions dépassant cette limite !\n\n
@@ -354,21 +369,6 @@
 30.23:      - l'effacement de lecteurs logiques\n\n
 30.24:    Vous pouvez recréer la partition étendue pour activer l'édition ou\n
 30.25:    utiliser un autre utilitaire de disque pour partitionner ce disque.\n
-
-
-#############################p#################################################
-# KBDINPUT.C                                                                 #
-##############################################################################
-
-20.5:Appuyez sur \e[1mÉchap\e[22m pour revenir aux options de FDISK
-20.6:Appuyez sur \e[1mÉchap\e[22m pour quitter FDISK
-20.7:Appuyez sur \e[1mÉchap\e[22m pour continuer
-20.8:La taille de partition requise dépasse la taille maximale disponible
-20.9:Entrée de l'utilisateur :  %d
-20.10:Entrée :  %d
-20.11:Entrée invalide, veuillez entrer
-20.12:n'est pas un choix, veuillez entrer
-20.13:Entrée invalide.
 
 
 ##############################################################################

@@ -334,6 +334,21 @@
 
 
 ##############################################################################
+# KBDINPUT.C                                                                 #
+##############################################################################
+
+20.5:FDISK seçeneklerine geri dönmek için \e[1mESC\e[22m'ye basın
+20.6:FDISK'ten çıkmak için \e[1mESC\e[22m'ye basın
+20.7:Sürdürmek için \e[1mESC\e[22m'ye basın
+20.8:İstenen bölüntü boyutu kullanılabilir alan boyutunu aşıyor
+20.9:Kullanıcı girdisi: %d
+20.10:Girdi: %d
+20.11:Geçersiz girdi, lütfen şunu girin:
+20.12:bir seçenek değil, lütfen şunu girin:
+20.13:Geçersiz girdi.
+
+
+##############################################################################
 # WARNING SCREENS (UYARI EKRANLARI)                                          #
 ##############################################################################
 30.1:En az bir diskiniz 2.097.152 MB'den büyük.\n    FDISK bu boyutu aşan diskleri işleyemez!\n\n
@@ -352,21 +367,6 @@
 30.23:      - Mantıksal sürücüleri silmek\n\n
 30.24:    Düzenlemeyi etkinleştirmek için genişletilmiş bölüntüyü yeniden\n
 30.25:    oluşturabilir/diski bölüntülemede başka bir izlence kullanabilirsiniz.\n
-
-
-##############################################################################
-# KBDINPUT.C                                                                 #
-##############################################################################
-
-20.5:FDISK seçeneklerine geri dönmek için \e[1mESC\e[22m'ye basın
-20.6:FDISK'ten çıkmak için \e[1mESC\e[22m'ye basın
-20.7:Sürdürmek için \e[1mESC\e[22m'ye basın
-20.8:İstenen bölüntü boyutu kullanılabilir alan boyutunu aşıyor
-20.9:Kullanıcı girdisi: %d
-20.10:Girdi: %d
-20.11:Geçersiz girdi, lütfen şunu girin:
-20.12:bir seçenek değil, lütfen şunu girin:
-20.13:Geçersiz girdi.
 
 
 ##############################################################################

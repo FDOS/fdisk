@@ -333,6 +333,22 @@
 11.2:MBR wurde in Datei "BOOT.MGR" gespeichert.
 11.3:Boot code wurde aus MBR entfernt.
 
+
+##############################################################################
+# KBDINPUT.C                                                                 #
+##############################################################################
+
+20.5:Drücken Sie \e[1mESC\e[22m, um zu den FDISK Optionen zurückzukehren
+20.6:Drücken Sie \e[1mESC\e[22m, um FDISK zu beenden
+20.7:Drücken Sie \e[1mESC\e[22m um fortzufahren
+20.8:Gewünschte Partitionsgröße überschreitet die Größe des freien Speichers.
+20.9:Ausgewählte Eingabe:  %d
+20.10:Eingabe:  %d
+20.11:Ungültige Eingabe. Akzeptierte Zeichen
+20.12:ist keine gültige Eingabe. Akzeptierte Eingabe
+20.13:Ungültige Eingabe.
+
+
 ##############################################################################
 # WARNING SCREENS                                                            #
 ##############################################################################
@@ -353,20 +369,6 @@
 30.23:      - Löschen logischer Partitionen\n\n
 30.24:    Um das Bearbeiten zu aktivieren, erstellen Sie die erweiterte\n
 30.25:    Partition neu, oder verwenden Sie ein anderes Partitionierungstool.\n
-
-##############################################################################
-# KBDINPUT.C                                                                 #
-##############################################################################
-
-20.5:Drücken Sie \e[1mESC\e[22m, um zu den FDISK Optionen zurückzukehren
-20.6:Drücken Sie \e[1mESC\e[22m, um FDISK zu beenden
-20.7:Drücken Sie \e[1mESC\e[22m um fortzufahren
-20.8:Gewünschte Partitionsgröße überschreitet die Größe des freien Speichers.
-20.9:Ausgewählte Eingabe:  %d
-20.10:Eingabe:  %d
-20.11:Ungültige Eingabe. Akzeptierte Zeichen
-20.12:ist keine gültige Eingabe. Akzeptierte Eingabe
-20.13:Ungültige Eingabe.
 
 
 ##############################################################################
