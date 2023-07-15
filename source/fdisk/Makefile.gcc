@@ -1,6 +1,7 @@
 # This Makefile is for Free FDISK and I16-GCC, Mac (probably Linux as well)
 
 HOST_CC=cc
+HOST_CFLAGS=-Wall -pedantic -O2
 
 CC=ia16-elf-gcc
 LD=ia16-elf-gcc
@@ -56,13 +57,13 @@ nls/tr.txt : nls/tr_utf8.txt utf8tocp/utf8tocp
 # --- build tools -----------------------------------------------------------
 
 bintoc/bintoc : bintoc/bintoc.c
-	$(HOST_CC) -o $@ $<
+	$(HOST_CC) $(HOST_CFLAGS) -o $@ $<
 
 svarlang/tlumacz : svarlang/tlumacz.c
-	$(HOST_CC) -o $@ $<
+	$(HOST_CC) $(HOST_CFLAGS) -o $@ $<
 
 utf8tocp/utf8tocp : utf8tocp/utf8tocp.c
-	$(HOST_CC) -o $@ $<
+	$(HOST_CC) $(HOST_CFLAGS) -o $@ $<
 
 
 # --- clean up --------------------------------------------------------------
