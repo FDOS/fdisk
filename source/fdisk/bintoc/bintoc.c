@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define LINE_ENDING "\r\n"
 
 unsigned char *
 read_file( const char *filename, long *filesize )
@@ -61,7 +62,7 @@ write_data_to_c_file( const unsigned char *data, long size,
    f = fopen( filename, "w" );
    if ( !f ) return 0;
 
-   fprintf( f, "const unsigned char %s[%ld] = {\n", ident, size );
+   fprintf( f, "const unsigned char %s[%ld] = {" LINE_ENDING, ident, size );
 
    for ( i = 0; i < size; i++ ) {
       fprintf( f, "%d", data[i] );
@@ -70,10 +71,10 @@ write_data_to_c_file( const unsigned char *data, long size,
          fputs( ",", f );
       }
       if ( i % 16 == 15 ) {
-         fputs( "\n", f );
+         fputs( LINE_ENDING, f );
       }
    }
-   fprintf( f, "};\n" );
+   fprintf( f, "};" LINE_ENDING );
    fclose( f );
 
    return 1;
