@@ -237,7 +237,7 @@
 9.20:est inutilisable !
 9.21:Aucune partition à effacer.
 9.22:\e[1mAVERTISSEMENT !\e[22m Aucune partition n'est définie comme active - \n   le disque 1 n'est pas démarrable sauf si une partition est définie comme active
-9.23:  %lu Mo
+9.23:  \e[1m%lu\e[22m Mo
 
 
 ##############################################################################

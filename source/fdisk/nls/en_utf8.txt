@@ -234,7 +234,7 @@
 9.20:is unusable!
 9.21:No partitions to delete.
 9.22:\e[1mWARNING!\e[22m No partitions are set active - disk 1 is not startable unless\n    a partition is set active
-9.23:  %lu Mbytes
+9.23:  \e[1m%lu\e[22m Mbytes
 
 
 ##############################################################################

@@ -237,7 +237,7 @@
 9.20:ist unbenutzbar!
 9.21:Keine Partition zum Löschen vorhanden.
 9.22:\e[1mWARNUNG!\e[22m Vom Datenträger kann nicht gestartet werden, bis\n             eine primäre Partition als aktiv markiert wurde.
-9.23:  %lu MBytes
+9.23:  \e[1m%lu\e[22m MBytes
 
 
 ##############################################################################
