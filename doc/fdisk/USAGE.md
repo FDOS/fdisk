@@ -60,7 +60,7 @@ Compatibility options:
   /X            Disables ext. INT 13 and LBA for the following commands
 
 This program is Copyright 1998 - 2023 by Brian E. Reifsnyder and
-The FreeDOS Community under the terms of the GNU General Public License,
+The FreeDOS Project under the terms of the GNU General Public License,
 version 2.
 
 This program comes as-is and without warranty of any kind.  The author of

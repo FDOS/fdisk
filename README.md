@@ -22,7 +22,7 @@ systems.
 ## Copyright
 
 This program is Copyright 1998 - 2023 by Brian E. Reifsnyder and The FreeDOS
-Community under the terms of the GNU General Public License, version 2.
+Project under the terms of the GNU General Public License, version 2.
 
 This program comes as-is and without warranty of any kind.  The author of
 this software assumes no responsibility pertaining to the use or mis-use of

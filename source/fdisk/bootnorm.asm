@@ -32,10 +32,6 @@ cont:           mov     ds, ax
                 xor     ax,ax
                 mov     es,ax
 
-;               call    print
-;               db      "FreeDOS MBR...",0
-
-
 										 ; search for active partition
                 lea di, [bp+0x1be] ; start of partition table
 test_next_for_active:				

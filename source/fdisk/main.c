@@ -1,6 +1,6 @@
 /*
 // Program:  Free FDISK
-// Written by: Brian E. Reifsnyder and The FreeDOS Community
+// Written by: Brian E. Reifsnyder and The FreeDOS Project
 // Copyright:  1998-2023 under the terms of the GNU GPL, Version 2
 */
 

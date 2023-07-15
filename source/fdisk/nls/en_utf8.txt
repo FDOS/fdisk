@@ -66,7 +66,7 @@
 0.101:  /X            Disables ext. INT 13 and LBA for the following commands
 0.102:\t
 0.200:This program is Copyright %s by Brian E. Reifsnyder and
-0.201:The FreeDOS Community under the terms of the GNU General Public License,
+0.201:The FreeDOS Project under the terms of the GNU General Public License,
 0.202:version 2.
 0.203:\t
 0.204:This program comes as-is and without warranty of any kind. The author of

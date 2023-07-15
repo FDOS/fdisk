@@ -1,7 +1,7 @@
 Free FDISK Change Log
 =====================
 
-Version 1.?.? (2023-??-??)
+Version 1.3.8 (2023-??-??)
 --------------------------
 Bugfixes:
  - MEDIUM: Fix FDISK not reporting an error if partition table can not be
@@ -19,10 +19,10 @@ Bugfixes:
      in some situations.
 
 Changes:
+ - FDISK is translated to the following languages:
+     German, French, Turkish, and partially to Polish
  - Prohibit deletion of DOS partitions from the Non-DOS partition removal
      menu.
- - Program is now translatable, with german being the first non-english
-     language supported.
  - Program can be build with I16-GCC.
  - Support for Borland / Turbo C was dropped.
 
