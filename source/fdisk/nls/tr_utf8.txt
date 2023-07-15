@@ -237,6 +237,7 @@
 9.20:kullanılamıyor!
 9.21:Silinecek bölüntü yok.
 9.22:\e[1mUYARI!\e[22m Hiçbir bölüntü etkin yapılmamış - bir bölüntü etkin yapılana değin\n    disk 1 başlatılamaz
+9.23:  %lu Mbayt
 
 
 ##############################################################################

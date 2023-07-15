@@ -575,9 +575,7 @@ int Standard_Menu( int menu )
       Color_Printf( " %d", ( flags.drive_number - 127 ) );
 
       if ( part_table[flags.drive_number - 128].usable ) {
-         Color_Printf( "   %lu",
-                       part_table[flags.drive_number - 128].disk_size_mb );
-         con_print( " Mbytes" );
+         con_printf( svarlang_str( 9, 23 ), part_table[flags.drive_number - 128].disk_size_mb);
       }
       else {
          con_putc( ' ' );
