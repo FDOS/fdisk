@@ -314,7 +314,7 @@ static unsigned short svl_lang_from_cats_file(svl_lang_t *l, svl_lang_t *refl) {
       id = refl->dict[i].id;
       if (!svl_find(l, id)) {
         printf("WARNING: %s is missing string %u.%u (pulled from ref lang)\r\n", fname, id >> 8, id & 0xff);
-        if (!svl_add_str(l, id, ptr)) {
+        if (!svl_add_str(l, id, refl->strings + refl->dict[i].offset)) {
           printf("ERROR: %s[#%u] output size limit exceeded\r\n", fname, linecount);
           return 0;
         }
