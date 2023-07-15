@@ -433,7 +433,6 @@ void Process_Fdiskini_File( void )
    debug.command_line_arguments = UNCHANGED;
    debug.create_partition = UNCHANGED;
    debug.determine_free_space = UNCHANGED;
-   debug.emulate_disk = UNCHANGED;
    debug.input_routine = UNCHANGED;
    debug.lba = UNCHANGED;
    debug.path = UNCHANGED;
@@ -826,44 +825,6 @@ void Process_Fdiskini_File( void )
                }
             }
 
-#ifdef DEBUG
-            /* Check for the EMULATE_DISK statement */
-            if ( 0 == stricmp( command_buffer, "EMULATE_DISK" ) ) {
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  debug.emulate_disk = 0;
-               }
-               if ( 0 == stricmp( setting_buffer, "1" ) ) {
-                  debug.emulate_disk = 1;
-               }
-               if ( 0 == stricmp( setting_buffer, "2" ) ) {
-                  debug.emulate_disk = 2;
-               }
-               if ( 0 == stricmp( setting_buffer, "3" ) ) {
-                  debug.emulate_disk = 3;
-               }
-               if ( 0 == stricmp( setting_buffer, "4" ) ) {
-                  debug.emulate_disk = 4;
-               }
-               if ( 0 == stricmp( setting_buffer, "5" ) ) {
-                  debug.emulate_disk = 5;
-               }
-               if ( 0 == stricmp( setting_buffer, "6" ) ) {
-                  debug.emulate_disk = 6;
-               }
-               if ( 0 == stricmp( setting_buffer, "7" ) ) {
-                  debug.emulate_disk = 7;
-               }
-               if ( 0 == stricmp( setting_buffer, "8" ) ) {
-                  debug.emulate_disk = 8;
-               }
-               if ( debug.emulate_disk == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
-               command_ok = TRUE;
-            }
-#endif
-
             /* Check for the FLAG_SECTOR statement */
             if ( 0 == stricmp( command_buffer, "FLAG_SECTOR" ) ) {
                number = atoi( setting_buffer );
@@ -1045,9 +1006,6 @@ void Process_Fdiskini_File( void )
    if ( debug.determine_free_space == UNCHANGED ) {
       debug.determine_free_space = FALSE;
    }
-   if ( debug.emulate_disk == UNCHANGED ) {
-      debug.emulate_disk = 0;
-   }
    if ( debug.lba == UNCHANGED ) {
       debug.lba = FALSE;
    }
@@ -1123,11 +1081,6 @@ void Process_Fdiskini_File( void )
       debug.lba = TRUE;
       debug.path = TRUE;
       debug.read_sector = TRUE;
-      debug.write = FALSE;
-   }
-
-   /* If an emulated disk is specified, do not write anything to the disk. */
-   if ( debug.emulate_disk != 0 ) {
       debug.write = FALSE;
    }
 #endif

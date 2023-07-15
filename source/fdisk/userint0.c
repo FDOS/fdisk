@@ -98,11 +98,6 @@ void Display_Information( void )
    con_set_cursor_xy( 61, 1 );
    con_print( "DEBUG" );
 
-   if ( debug.emulate_disk > 0 ) {
-      con_set_cursor_xy( 67, 1 );
-      con_printf( "E%1d", debug.emulate_disk );
-   }
-
    if ( debug.write == FALSE ) {
       con_set_cursor_xy(70, 1);
       con_print( "RO" );
