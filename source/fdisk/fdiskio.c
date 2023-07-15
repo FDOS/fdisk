@@ -449,15 +449,12 @@ void Process_Fdiskini_File( void )
    flags.extended_options_flag = UNCHANGED;
    flags.flag_sector = UNCHANGED;
    flags.monochrome = UNCHANGED;
-   flags.label = UNCHANGED;
    flags.lba_marker = UNCHANGED;
    flags.reboot = UNCHANGED;
    flags.screen_color = UNCHANGED;
    flags.set_any_pri_part_active = UNCHANGED;
    flags.use_ambr = UNCHANGED;
    flags.version = UNCHANGED;
-
-   flags.use_freedos_label = FALSE;
 
    strcpy( home_path, path );
    strcat( home_path, "fdisk.ini" );
@@ -886,18 +883,8 @@ void Process_Fdiskini_File( void )
                command_ok = TRUE;
             }
 
-            /* Check for the LABEL statement */
+            /* Check for the LABEL statement: removed 2023/07/15*/
             if ( 0 == stricmp( command_buffer, "LABEL" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  flags.label = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  flags.label = FALSE;
-               }
-               if ( flags.label == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
                command_ok = TRUE;
             }
 
@@ -985,7 +972,6 @@ void Process_Fdiskini_File( void )
                   flags.version = W98;
                }
                if ( 0 == stricmp( setting_buffer, "FD" ) ) {
-                  flags.use_freedos_label = TRUE;
                   flags.version = FREEDOS_VERSION;
                }
                if ( flags.version == UNCHANGED ) {
@@ -1100,9 +1086,6 @@ void Process_Fdiskini_File( void )
    if ( flags.flag_sector == UNCHANGED ) {
       flags.flag_sector = 2;
    }
-   if ( flags.label == UNCHANGED ) {
-      flags.label = FALSE;
-   }
    if ( flags.lba_marker == UNCHANGED ) {
       flags.lba_marker = TRUE;
    }
@@ -1126,7 +1109,6 @@ void Process_Fdiskini_File( void )
          flags.version = DEFAULT_VERSION;
       }
       else {
-         flags.use_freedos_label = TRUE;
          flags.version = FREEDOS_VERSION;
       }
    }

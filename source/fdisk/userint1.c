@@ -557,12 +557,6 @@ int Standard_Menu( int menu )
          Print_Centered( 0, FD_NAME " V" VERSION, STANDARD );
          /* NLS: Fixed Disk Setup Program */
          Print_Centered( 1, svarlang_str( 250, 250 ), STANDARD );
-
-         if ( flags.use_freedos_label == TRUE ) {
-            unsigned short verlen = strlen("Version:  ") + strlen(VERSION);
-            Position_Cursor((76 - verlen), 24);
-            con_printf( "Version:  %s", VERSION );
-         }
       }
 
       flags.display_name_description_copyright = FALSE;

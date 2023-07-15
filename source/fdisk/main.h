@@ -200,7 +200,6 @@ typedef struct flags_structure {
    ulong flag_sector;
    int fprmt;
    int fat32;
-   int label;
    int lba_marker; // write LBA marker 1023/254/63 if cylinder >1023
    int monochrome;
    int maximum_drive_number;
@@ -214,7 +213,6 @@ typedef struct flags_structure {
    int version;
    int use_ambr;
    int use_extended_int_13;
-   int use_freedos_label;
    int use_iui;
 
    int verbose; // more output

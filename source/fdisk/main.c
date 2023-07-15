@@ -211,16 +211,6 @@ static int Get_Environment_Settings( char *environment[] )
          }
       }
 
-      /* Check for the LABEL statement */
-      if ( 0 == strcmp( command_buffer, "FFD_LABEL" ) ) {
-         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
-            flags.label = TRUE;
-         }
-         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
-            flags.label = FALSE;
-         }
-      }
-
       /* Check for the LBA_MARKER statement */
       if ( 0 == strcmp( command_buffer, "FFD_LBA_MARKER" ) ) {
          if ( 0 == strcmp( setting_buffer, "ON" ) ) {
@@ -283,7 +273,6 @@ static int Get_Environment_Settings( char *environment[] )
          }
          if ( 0 == strcmp( setting_buffer, "FD" ) ) {
             flags.version = FREEDOS_VERSION;
-            flags.use_freedos_label = TRUE;
          }
       }
 
@@ -537,7 +526,6 @@ int main( int argc, char *argv[] )
    if ( ( argv[1][1] == '?' ) && ( ( argc == 2 ) || ( argc == 3 ) ) ) {
       flags.do_not_pause_help_information = FALSE;
       flags.screen_color = 7;
-      flags.use_freedos_label = FALSE;
 
       if ( ( argv[2][1] == 'N' ) || ( argv[2][1] == 'n' ) ) {
          flags.do_not_pause_help_information = TRUE;
