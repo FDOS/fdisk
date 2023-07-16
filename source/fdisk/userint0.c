@@ -454,8 +454,8 @@ void Display_All_Drives( void )
 
 static struct {
    int id;
-   const char *descr;
-   const char *descr_short;
+   const char *descr;         /* 17 characters max. */
+   const char *descr_short;   /*  9 characters max. */
 } pt_descr[] = {
    { 0x00, "Unused"},
    { 0x01, "FAT-12", "FAT12"},
@@ -478,8 +478,8 @@ static struct {
    { 0x1e, "Hid. FAT-16 LBA", "H FAT16 L"},
    { 0x1f, "Hid. Ext. LBA", "H Ext L"},
 
-   { 0x82, "Linux Swap", "Lin Swap"},
-   { 0x03, "Linux"},
+   { 0x82, "Linux Swap", "LinuxSwap"},
+   { 0x83, "Linux"},
 
    { 0xa5, "BSD"},
    { 0xa6, "OpenBSD"},
