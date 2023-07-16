@@ -223,8 +223,8 @@
 9.9:(1 MB = 1048576 bayt)
 
 # The following are table headers, must stay adjusted as is
-9.10:\n\nBölüntü     Durum     Mbayt   Açıklama      Kullanım     CHS Başı      CHS Sonu\n
-9.11:Src Bölüm  Etiket  Mbayt  Sistem  Kullanım   CHS Başı      CHS Sonu\n
+9.10:\n\nBölüntü     Durum     Mbayt   Sistem        Kullanım     CHS Başı      CHS Sonu\n
+9.11:Src Bölüm  Etiket  Mbayt  Sistem       Kullanım     CHS Başı      CHS Sonu\n
 9.12:Disk   Src   Mbayt     Boş   Kullanım
 
 9.13:Bir DOS bölüntüsü oluşturmak için yeterli alan yok.
@@ -260,9 +260,9 @@
 10.8:Toplam disk alanı %lu MB (1 MB = 1048576 bayt)
 
 # Table headers
-10.10:Bölüntü    Durum   Tür      Bölüm  Etiket   Mbayt  Sistem    Kullanım
+10.10:Bölüntü    Durum   Tür      Bölüm  Etiket   Mbayt  Sistem       Kullanım
 10.11:Bölüntü     Durum    Mbayt   Açıklama      Kullanım   Sil Başı Sil Sonu
-10.12:Src Bölüm  Etiket  Mbayt Sistem  Kullanım
+10.12:Src Bölüm  Etiket  Mbayt Sistem Kullanım
 
 # Delete extended partition
 10.20:\e[1;5mUYARI!\e[22;25m Genişletilmiş DOS Bölüntüsü'ndeki ve onun Mantıksal\n    Bölüntüleri'ndeki veri kaybolacak. Sürdürülsün mü (E/H)?

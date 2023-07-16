@@ -223,9 +223,9 @@
 9.9:(1 Mo=1048576 octets)
 
 # The following are table headers, must stay adjusted as is
-9.10:\n\nPartition   État       Mo     Description     Emploi   Début CHS     Fin CHS\n
-9.11:Étiquette volume    Mo    Système  Emploi  Début CHS     Fin CHS\n
-9.12:Disque  Lect   Mo      Libre  Utilisation
+9.10:\n\nPartition   État         Mo   Système        Utilisé    Début CHS       Fin CHS\n
+9.11:Étiquette volume      Mo  Système       Utilisé    Début CHS       Fin CHS\n
+9.12:Disque  Lect     Mo   Libre  Utilisé
 
 9.13:Pas d'espace pour créer une partition DOS.
 9.14:La partition DOS étendue existe déjà.
@@ -260,9 +260,9 @@
 10.8:La taille totale de l'espace disque est de %lu Mo\n    (1 Mo=1048576 octets)
 
 # Table headers
-10.10:Partition  État    Type     Étiquette volume Mo    Système    Utilisation
-10.11:Partition   État   Mo       Description      Emploi   Cyl début  Cyl fin
-10.12:Étiquette Volume    Mo   Système   Utilisation
+10.10:Partition  État    Type     Étiquette volume   Mo  Système       Utilisé
+10.11:Partition   État         Mo  Description    Utilisé  Cyl début  Cyl fin
+10.12:Étiquette Volume     Mo Système Utilisé
 
 # Delete extended partition
 10.20:\e[1;5mAVERTISSEMENT !\e[22;25m Les données dans la partition DOS étendue effacée et ses\n    partition logiques seront perdues. Continuer (O/N)...?
@@ -316,7 +316,7 @@
 
 # Display / modify partition
 10.100:Afficher/Modifier les informations du lecteur logique
-10.101:Partition            Mo       Type             Emploi  Cyl début  Cyl fin
+10.101:Partition            Mo       Type            Utilisé  Cyl début  Cyl fin
 10.102:Modifier le type de partition
 10.104:Cacher / Révéler la partition
 10.105:Entrez le type de la nouvelle partition (1-255) :

@@ -1,19 +1,10 @@
-
 #ifdef FDISKLITE
-#define FD_NAME "FDISK LITE"
+  #define FD_NAME "FDISK LITE"
 #else
-
-#ifdef FD_FREEDOS
-#define FD_NAME "FreeDOS FDISK"
+  #define FD_NAME "Free FDISK"
 #endif
 
-#ifndef FD_NAME
-#define FD_NAME "Free FDISK"
-#endif
-
-#endif /* FDISKLITE */
-
-#define VERSION  "1.?.?"
+#define VERSION  "1.3.8"
 #define COPYLEFT "1998 - 2023"
 
 #define DEFAULT_VERSION 8
@@ -163,10 +154,6 @@ MEXTERN char filename[256];
 MEXTERN char path[256];
 
 MEXTERN int number_of_command_line_options;
-
-/* Buffers */
-MEXTERN char partition_lookup_table_buffer_short[256][9];
-MEXTERN char partition_lookup_table_buffer_long[256][17];
 
 /*
 /////////////////////////////////////////////////////////////////////////////

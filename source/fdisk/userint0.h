@@ -12,4 +12,7 @@ void Print_Centered( int y, const char *text, int style );
 void Display_All_Drives( void );
 void Pause( void );
 
+const char *part_type_descr(int id);
+const char *part_type_descr_short(int id);
+
 #endif

@@ -154,6 +154,7 @@ void Display_CL_Partition_Table( void )
 
    unsigned long usage = 0;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+   Partition *p;
 
    Determine_Drive_Letters();
 
@@ -177,9 +178,10 @@ void Display_CL_Partition_Table( void )
 
    index = 0;
    do {
-      if ( pDrive->pri_part[index].num_type > 0 ) {
+      p = &pDrive->pri_part[index];
+      if ( p->num_type > 0 ) {
          /* Drive Letter of Partition */
-         if ( IsRecognizedFatPartition( pDrive->pri_part[index].num_type ) ) {
+         if ( IsRecognizedFatPartition( p->num_type ) ) {
             con_printf(
                " %1c:",
                drive_lettering_buffer[( flags.drive_number - 128 )][index] );
@@ -192,10 +194,10 @@ void Display_CL_Partition_Table( void )
          con_printf( " %1d", ( index + 1 ) );
 
          /* Partition Type */
-         con_printf( " %3d", ( pDrive->pri_part[index].num_type ) );
+         con_printf( " %3d", ( p->num_type ) );
 
          /* Status */
-         if ( pDrive->pri_part[index].active_status > 0 ) {
+         if ( p->active_status > 0 ) {
             con_print( "      A" );
          }
          else {
@@ -204,28 +206,26 @@ void Display_CL_Partition_Table( void )
 
          /* Mbytes */
          con_print( "    " );
-         Print_UL( pDrive->pri_part[index].size_in_MB );
+         Print_UL( p->size_in_MB );
 
          /* Description */
-         con_printf( "   %-15s",
-                 partition_lookup_table_buffer_long[pDrive->pri_part[index]
-                                                       .num_type] );
+         con_printf( "   %-15s", part_type_descr( p->num_type ));
 
          /* Usage */
-         usage = Convert_To_Percentage( pDrive->pri_part[index].size_in_MB,
+         usage = Convert_To_Percentage( p->size_in_MB,
                                         pDrive->disk_size_mb );
 
          con_printf( "   %3lu%%", usage );
 
          /* Starting Cylinder */
-         con_printf( "%6lu/%03lu/%02lu", pDrive->pri_part[index].start_cyl,
-                 pDrive->pri_part[index].start_head,
-                 pDrive->pri_part[index].start_sect );
+         con_printf( "%6lu/%03lu/%02lu", p->start_cyl,
+                 p->start_head,
+                 p->start_sect );
 
          /* Ending Cylinder */
-         con_printf( " %6lu/%03lu/%02lu", pDrive->pri_part[index].end_cyl,
-                 pDrive->pri_part[index].end_head,
-                 pDrive->pri_part[index].end_sect );
+         con_printf( " %6lu/%03lu/%02lu", p->end_cyl,
+                 p->end_head,
+                 p->end_sect );
          con_putc('\n');
       }
 
@@ -247,6 +247,7 @@ void Display_CL_Partition_Table( void )
       /* Display information for each Logical DOS Drive */
       index = 4;
       do {
+         p = &pDrive->log_drive[index - 4];
          if ( brief_partition_table[( flags.drive_number - 128 )][index] >
               0 ) {
             if ( IsRecognizedFatPartition( brief_partition_table[(
@@ -256,7 +257,7 @@ void Display_CL_Partition_Table( void )
                                                          128 )][index] );
 
                /* Display volume label */
-               con_printf( " %11s", pDrive->log_drive[index - 4].vol_label );
+               con_printf( " %11s", p->vol_label );
             }
             else {
                con_printf( "               " );
@@ -264,29 +265,29 @@ void Display_CL_Partition_Table( void )
 
             /* Display size in MB */
             con_print( "  " );
-            Print_UL( pDrive->log_drive[( index - 4 )].size_in_MB );
+            Print_UL( p->size_in_MB );
 
             /* Display file system type */
-            con_printf( "  %-8s",
-                    partition_lookup_table_buffer_short
-                       [pDrive->log_drive[( index - 4 )].num_type] );
+            con_printf( "  %-15s",
+                    part_type_descr(
+                       p->num_type ));
 
             /* Display usage in % */
             usage = Convert_To_Percentage(
-               pDrive->log_drive[index - 4].num_sect, pDrive->ext_num_sect );
+               p->num_sect, pDrive->ext_num_sect );
 
             con_printf( "  %3lu%%", usage );
 
             /* Starting Cylinder */
             con_printf( "%6lu/%03lu/%02lu",
-                    pDrive->log_drive[index - 4].start_cyl,
-                    pDrive->log_drive[index - 4].start_head,
-                    pDrive->log_drive[index - 4].start_sect );
+                    p->start_cyl,
+                    p->start_head,
+                    p->start_sect );
 
             /* Ending Cylinder */
-            con_printf( " %6lu/%03lu/%02lu", pDrive->log_drive[index - 4].end_cyl,
-                    pDrive->log_drive[index - 4].end_head,
-                    pDrive->log_drive[index - 4].end_sect );
+            con_printf( " %6lu/%03lu/%02lu", p->end_cyl,
+                    p->end_head,
+                    p->end_sect );
             con_putc('\n');
          }
 
@@ -449,4 +450,59 @@ void Display_All_Drives( void )
    con_set_cursor_xy( 5, 21 );
    /*NLS:(1 Mbyte = 1048576 bytes) */
    con_print( svarlang_str( 9, 9 ) );
+}
+
+static struct {
+   int id;
+   const char *descr;
+   const char *descr_short;
+} pt_descr[] = {
+   { 0x00, "Unused"},
+   { 0x01, "FAT-12", "FAT12"},
+   { 0x04, "FAT-16 <32M", "FAT16"},
+   { 0x05, "Extended", "Ext"},
+   { 0x06, "FAT-16", "FAT16"},
+   { 0x07, "NTFS / HPFS", "NTFS"},
+   { 0x0b, "FAT-32", "FAT32"},
+   { 0x0c, "FAT-32 LBA", "FAT32 LBA"},
+   { 0x0e, "FAT-16 LBA", "FAT32 LBA"},
+   { 0x0f, "Extended LBA", "Ext LBA"},
+
+   { 0x11, "Hid. FAT-12", "H FAT12"},
+   { 0x14, "Hid. FAT-16<32M", "H FAT16"},
+   { 0x15, "Hid. Extended", "H Ext"},
+   { 0x16, "Hid. FAT-16", "H FAT16"},
+   { 0x17, "Hid. NTFS/HPFS", "H NTFS"},
+   { 0x1b, "Hid. FAT-32", "H FAT32"},
+   { 0x1c, "Hid. FAT-32 LBA", "H FAT32 L"},
+   { 0x1e, "Hid. FAT-16 LBA", "H FAT16 L"},
+   { 0x1f, "Hid. Ext. LBA", "H Ext L"},
+
+   { 0x82, "Linux Swap", "Lin Swap"},
+   { 0x03, "Linux"},
+
+   { 0xa5, "BSD"},
+   { 0xa6, "OpenBSD"},
+   { 0xa9, "NetBSD"},
+
+   { 0xee, "GPT protective", "GPTprot"},
+   { 0xeb, "EFI"},
+
+   { -1, "Unknown" }
+};
+
+const char *part_type_descr(int id)
+{
+   int i;
+
+   for ( i = 0; pt_descr[i].id != id && pt_descr[i].id >= 0; i++);
+   return pt_descr[i].descr;
+}
+
+const char *part_type_descr_short(int id)
+{
+   int i;
+
+   for ( i = 0; pt_descr[i].id != id && pt_descr[i].id >= 0; i++);
+   return (pt_descr[i].descr_short) ? pt_descr[i].descr_short : pt_descr[i].descr;
 }

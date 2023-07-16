@@ -220,8 +220,8 @@
 9.9:(1 Mbyte = 1048576 bytes)
 
 # The following are table headers, must stay adjusted as is
-9.10:\n\nPartition   Status   Mbytes   Description      Usage    Start CHS       End CHS\n
-9.11:Drv Volume Label  Mbytes  System   Usage    Start CHS       End CHS\n
+9.10:\n\nPartition   Status   Mbytes   System           Usage    Start CHS       End CHS\n
+9.11:Drv Volume Label  Mbytes  System          Usage    Start CHS       End CHS\n
 9.12:Disk   Drv   Mbytes    Free  Usage
 
 9.13:No space to create a DOS partition.
@@ -257,7 +257,7 @@
 10.8:Total disk space is %lu Mbytes (1 Mbyte = 1048576 bytes)
 
 # Table headers
-10.10:Partition  Status  Type     Volume Label   Mbytes  System    Usage
+10.10:Partition  Status  Type     Volume Label   Mbytes  System          Usage
 10.11:Partition   Status   Mbytes  Description      Usage  Start Cyl  End Cyl
 10.12:Drv Volume Label  Mbytes System   Usage
 

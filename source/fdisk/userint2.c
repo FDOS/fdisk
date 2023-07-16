@@ -746,6 +746,7 @@ void Display_Extended_Partition_Information_SS( void )
 
    unsigned long usage;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+   Partition *p;
 
    Determine_Drive_Letters();
 
@@ -759,6 +760,8 @@ void Display_Extended_Partition_Information_SS( void )
       index = 4;
       print_index = 4;
       do {
+         p = &pDrive->log_drive[index - 4];
+
          if ( print_index > 15 ) {
             column_index = 41;
             print_index = 4;
@@ -778,7 +781,7 @@ void Display_Extended_Partition_Information_SS( void )
 
                /* Display volume label */
                Print_At( column_index + 4, print_index, "%11s",
-                         pDrive->log_drive[index - 4].vol_label );
+                         p->vol_label );
             }
             else {
                if ( flags.del_non_dos_log_drives == TRUE ) {
@@ -791,16 +794,15 @@ void Display_Extended_Partition_Information_SS( void )
 
             /* Display size in MB */
             Position_Cursor( ( column_index + 17 ), print_index );
-            Print_UL( pDrive->log_drive[( index - 4 )].size_in_MB );
+            Print_UL( p->size_in_MB );
 
             /* Display file system type */
-            Print_At( column_index + 25, print_index, "%s",
-                      partition_lookup_table_buffer_short
-                         [pDrive->log_drive[( index - 4 )].num_type] );
+            Print_At( column_index + 25, print_index, "%-9s",
+                      part_type_descr_short(p->num_type) );
 
             /* Display usage in % */
             usage = Convert_To_Percentage(
-               pDrive->log_drive[index - 4].num_sect, pDrive->ext_num_sect );
+               p->num_sect, pDrive->ext_num_sect );
 
             Print_At( column_index + 35, print_index, "%3lu%%", usage );
             print_index++;
@@ -813,7 +815,7 @@ void Display_Extended_Partition_Information_SS( void )
       Color_Print_At( 4, 10, svarlang_str( 10, 5 ) );
    }
 
-   con_set_cursor_xy( 5, 18 );
+   con_set_cursor_xy( 5, 22 );
    con_clreol();
    /* NLS:Total Extended Partition size is [...] */
    con_printf( svarlang_str( 10, 6 ), part_table[flags.drive_number - 128].ext_size_mb );
@@ -980,6 +982,7 @@ void Display_Primary_Partition_Information_SS( void )
 
    unsigned long usage = 0;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+   Partition *p;
 
    Determine_Drive_Letters();
 
@@ -996,11 +999,12 @@ void Display_Primary_Partition_Information_SS( void )
          Print_At( 4, 8, svarlang_str( 10, 10 ) );
 
          for ( index = 0; index < 4; index++ ) {
-            if ( pDrive->pri_part[index].num_type > 0 ) {
+            p = &pDrive->pri_part[index];
+            if ( p->num_type > 0 ) {
                /* Drive Letter of Partition */
 
                if ( IsRecognizedFatPartition(
-                       pDrive->pri_part[index].num_type ) ) {
+                       p->num_type ) ) {
                   Print_At( 5, ( cursor_offset + 9 ), "%c:",
                             drive_lettering_buffer[( flags.drive_number -
                                                      128 )][index] );
@@ -1011,20 +1015,20 @@ void Display_Primary_Partition_Information_SS( void )
                                ( index + 1 ) );
 
                /* Status */
-               if ( pDrive->pri_part[index].active_status > 0 ) {
+               if ( p->active_status > 0 ) {
                   Print_At( 15, ( cursor_offset + 9 ), svarlang_str( 250, 6 ) );
                }
 
                /* Type */
                type = "Non-DOS";
                if ( IsRecognizedFatPartition(
-                       pDrive->pri_part[index].num_type ) ) {
+                       p->num_type ) ) {
                   type = "PRI DOS";
                }
-               else if ( pDrive->pri_part[index].num_type == 5 ) {
+               else if ( p->num_type == 5 ) {
                   type = "EXT DOS";
                }
-               else if ( ( pDrive->pri_part[index].num_type == 0x0f ) &&
+               else if ( ( p->num_type == 0x0f ) &&
                          ( flags.version == W95 || flags.version == W95B ||
                            flags.version == W98 ) ) {
                   type = "EXT DOS";
@@ -1032,24 +1036,22 @@ void Display_Primary_Partition_Information_SS( void )
                Print_At( 23, ( cursor_offset + 9 ), type );
 
                /* Volume Label */
-               Print_At( 32, ( cursor_offset + 9 ), "%-11s",
-                         pDrive->pri_part[index].vol_label );
+               Print_At( 32, ( cursor_offset + 9 ), "%-11s   ",
+                         p->vol_label );
 
                /* Mbytes */
-               Position_Cursor( 46, ( cursor_offset + 9 ) );
-               Print_UL( pDrive->pri_part[index].size_in_MB );
+               Print_UL( p->size_in_MB );
 
                /* System */
                Print_At(
-                  55, ( cursor_offset + 9 ), "%s",
-                  partition_lookup_table_buffer_short[pDrive->pri_part[index]
-                                                         .num_type] );
+                  55, ( cursor_offset + 9 ), "%-15s  ",
+                  part_type_descr(p->num_type) );
 
                /* Usage */
                usage = Convert_To_Percentage(
-                  pDrive->pri_part[index].size_in_MB, pDrive->disk_size_mb );
+                  p->size_in_MB, pDrive->disk_size_mb );
 
-               Print_At( 66, ( cursor_offset + 9 ), "%3d%%", usage );
+               con_printf( "%3d%%", usage );
 
                cursor_offset++;
             }
@@ -1060,10 +1062,11 @@ void Display_Primary_Partition_Information_SS( void )
          Print_At(4, 8, svarlang_str( 10, 11 ) );
 
          for ( index = 0; index < 4; index++ ) {
-            if ( pDrive->pri_part[index].num_type > 0 ) {
+            p = &pDrive->pri_part[index];
+            if ( p->num_type > 0 ) {
                /* Drive Letter of Partition */
                if ( IsRecognizedFatPartition(
-                       pDrive->pri_part[index].num_type ) ) {
+                       p->num_type ) ) {
                   Print_At( 5, ( cursor_offset + 9 ), "%c:",
                             drive_lettering_buffer[flags.drive_number - 128]
                                                   [index] );
@@ -1074,36 +1077,35 @@ void Display_Primary_Partition_Information_SS( void )
 
                /* Partition Type */
                Print_At( 10, ( cursor_offset + 9 ), "%3d",
-                         pDrive->pri_part[index].num_type );
+                         p->num_type );
 
                /* Status */
-               if ( pDrive->pri_part[index].active_status > 0 ) {
+               if ( p->active_status > 0 ) {
                   Print_At( 19, ( cursor_offset + 9 ), "A" );
                }
 
                /* Mbytes */
                Position_Cursor( 24, ( cursor_offset + 9 ) );
-               Print_UL( pDrive->pri_part[index].size_in_MB );
+               Print_UL( p->size_in_MB );
 
                /* Description */
                Print_At(
                   33, ( cursor_offset + 9 ), "%-15s",
-                  partition_lookup_table_buffer_long[pDrive->pri_part[index]
-                                                        .num_type] );
+                  part_type_descr( p->num_type ) );
 
                /* Usage */
                usage = Convert_To_Percentage(
-                  pDrive->pri_part[index].size_in_MB, pDrive->disk_size_mb );
+                  p->size_in_MB, pDrive->disk_size_mb );
 
                Print_At( 51, ( cursor_offset + 9 ), "%3d%%", usage );
 
                /* Starting Cylinder */
                Print_At( 60, ( cursor_offset + 9 ), "%6lu",
-                         pDrive->pri_part[index].start_cyl );
+                         p->start_cyl );
 
                /* Ending Cylinder */
                Print_At( 69, ( cursor_offset + 9 ), "%6lu",
-                         pDrive->pri_part[index].end_cyl );
+                         p->end_cyl );
 
                cursor_offset++;
             }
@@ -1144,7 +1146,7 @@ void List_Partition_Types( void )
       }
 
       Color_Print_At( column, row, "%3d ", index );
-      con_printf( "%s", partition_lookup_table_buffer_long[index] );
+      con_printf( "%s", part_type_descr(index) );
 
       if ( ( index == 63 ) || ( index == 127 ) || ( index == 191 ) ||
            ( index == 255 ) ) {
@@ -1167,6 +1169,7 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
 
    unsigned long usage;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+   Partition *p = &pDrive->log_drive[logical_drive_number];
 
    do {
       Clear_Screen( 0 );
@@ -1184,7 +1187,7 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
 
       /* Drive Letter of Partition */
       if ( IsRecognizedFatPartition(
-              pDrive->log_drive[logical_drive_number].num_type ) ) {
+              p->num_type ) ) {
          Color_Print_At(
             5, 9, "%c:",
             drive_lettering_buffer[( flags.drive_number - 128 )]
@@ -1196,31 +1199,29 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
 
       /* Partition Type */
       Print_At( 10, 9, "%3d",
-                ( pDrive->log_drive[logical_drive_number].num_type ) );
+                ( p->num_type ) );
 
       /* Mbytes */
       Position_Cursor( 24, 9 );
-      Print_UL( pDrive->log_drive[logical_drive_number].size_in_MB );
+      Print_UL( p->size_in_MB );
 
       /* Description */
-      Print_At( 33, 9, "%-15s",
-                partition_lookup_table_buffer_long
-                   [pDrive->log_drive[logical_drive_number].num_type] );
+      Print_At( 33, 9, "%-15s", part_type_descr(p->num_type) );
 
       /* Usage */
       usage = Convert_To_Percentage(
-         pDrive->log_drive[logical_drive_number].size_in_MB,
+         p->size_in_MB,
          pDrive->ext_size_mb );
 
       Print_At( 51, 9, "%3d%%", usage );
 
       /* Starting Cylinder */
       Print_At( 60, 9, "%6lu",
-                pDrive->log_drive[logical_drive_number].start_cyl );
+                p->start_cyl );
 
       /* Ending Cylinder */
       Print_At( 69, 9, "%6lu",
-                pDrive->log_drive[logical_drive_number].end_cyl );
+                p->end_cyl );
 
       /* NLS:"Choose one of the following: */
       Print_At( 4, 12, svarlang_str( 9, 2 ) );
@@ -1257,7 +1258,7 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
          input =
             (int)Input( 3, -1, -1, NUM, 1, 255, ESCC, -1, 0, '\0', '\0' );
          if ( flags.esc == FALSE ) {
-            pDrive->log_drive[logical_drive_number].num_type = input;
+            p->num_type = input;
 
             pDrive->part_values_changed = TRUE;
             flags.partitions_have_changed = TRUE;
@@ -1275,8 +1276,8 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
       if ( input == 3 ) {
          /* Hide/Unhide partition */
 
-         if ( pDrive->log_drive[logical_drive_number].num_type <= 31 ) {
-            pDrive->log_drive[logical_drive_number].num_type ^= 16;
+         if ( p->num_type <= 31 ) {
+            p->num_type ^= 16;
 
             pDrive->part_values_changed = TRUE;
             flags.partitions_have_changed = TRUE;
@@ -1299,6 +1300,7 @@ void Modify_Primary_Partition_Information( int partition_number )
 
    unsigned long usage;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
+   Partition *p = &pDrive->pri_part[partition_number];
 
    partition_number--; /* Adjust partition number to start with 0. */
 
@@ -1318,7 +1320,7 @@ void Modify_Primary_Partition_Information( int partition_number )
 
       /* Drive Letter of Partition */
       if ( IsRecognizedFatPartition(
-              pDrive->pri_part[partition_number].num_type == 1 ) ) {
+              p->num_type == 1 ) ) {
          Print_At( 5, 9, "%c:",
                    drive_lettering_buffer[( flags.drive_number - 128 )]
                                          [partition_number] );
@@ -1329,35 +1331,34 @@ void Modify_Primary_Partition_Information( int partition_number )
 
       /* Partition Type */
       Print_At( 10, 9, "%3d",
-                ( pDrive->pri_part[partition_number].num_type ) );
+                ( p->num_type ) );
 
       /* Status */
-      if ( pDrive->pri_part[partition_number].active_status > 0 ) {
+      if ( p->active_status > 0 ) {
          Print_At( 19, 9, "A" );
       }
 
       /* Mbytes */
       Position_Cursor( 24, 9 );
-      Print_UL( pDrive->pri_part[partition_number].size_in_MB );
+      Print_UL( p->size_in_MB );
 
       /* Description */
       Print_At(
          33, 9, "%-15s",
-         partition_lookup_table_buffer_long[pDrive->pri_part[partition_number]
-                                               .num_type] );
+         part_type_descr(p->num_type) );
 
       /* Usage */
       usage =
-         Convert_To_Percentage( pDrive->pri_part[partition_number].size_in_MB,
+         Convert_To_Percentage( p->size_in_MB,
                                 pDrive->disk_size_mb );
 
       Print_At( 51, 9, "%3d%%", usage );
 
       /* Starting Cylinder */
-      Print_At( 60, 9, "%6lu", pDrive->pri_part[partition_number].start_cyl );
+      Print_At( 60, 9, "%6lu", p->start_cyl );
 
       /* Ending Cylinder */
-      Print_At( 69, 9, "%6lu", pDrive->pri_part[partition_number].end_cyl );
+      Print_At( 69, 9, "%6lu", p->end_cyl );
 
       /* NLS:"Choose one of the following: */
       Print_At( 4, 12, svarlang_str( 9, 2 ) );
@@ -1407,8 +1408,8 @@ void Modify_Primary_Partition_Information( int partition_number )
       if ( input == 3 ) {
          /* Hide/Unhide partition */
 
-         if ( pDrive->pri_part[partition_number].num_type <= 31 ) {
-            pDrive->pri_part[partition_number].num_type ^= 16;
+         if ( p->num_type <= 31 ) {
+            p->num_type ^= 16;
 
             pDrive->part_values_changed = TRUE;
             flags.partitions_have_changed = TRUE;

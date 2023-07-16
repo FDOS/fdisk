@@ -111,7 +111,7 @@ typedef struct part_table_structure {
    int size_truncated; /* true if disk size > 32-bit unsigned long */
 } Partition_Table;
 
-extern Partition_Table part_table[8];
+extern Partition_Table part_table[MAX_DISKS];
 
 void Determine_DOS_Version( void );
 int Lock_Unlock_Drive( int drive_num, int lock );

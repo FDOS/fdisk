@@ -328,42 +328,6 @@ static void Initialization( char *environment[] )
       index++;
    } while ( index < MAX_DISKS );
 
-   Load_External_Lookup_Table();
-
-   /* If the part.ini file is not found, load the internal lookup table. */
-   if ( flags.partition_type_lookup_table == INTERNAL ) {
-      index = 1;
-      do {
-         if ( ( index != 5 ) && ( index != 15 ) ) {
-            strcpy( partition_lookup_table_buffer_short[index], "Unknown " );
-            strcpy( partition_lookup_table_buffer_long[index],
-                    "Unknown        " );
-         }
-         index++;
-      } while ( index <= 255 );
-
-      strcpy( partition_lookup_table_buffer_short[1], "FAT12" );
-      strcpy( partition_lookup_table_buffer_short[4], "FAT16" );
-      strcpy( partition_lookup_table_buffer_short[5], "Extended" );
-      strcpy( partition_lookup_table_buffer_short[6], "FAT16" );
-      strcpy( partition_lookup_table_buffer_short[7], "NTFS" );
-      strcpy( partition_lookup_table_buffer_short[11], "FAT32" );
-      strcpy( partition_lookup_table_buffer_short[12], "FAT32LBA" );
-      /* */
-      strcpy( partition_lookup_table_buffer_short[14], "FAT16LBA" );
-      strcpy( partition_lookup_table_buffer_short[15], "Ext. LBA" );
-
-      strcpy( partition_lookup_table_buffer_long[1], "FAT12" );
-      strcpy( partition_lookup_table_buffer_long[4], "FAT16" );
-      strcpy( partition_lookup_table_buffer_long[5], "Extended" );
-      strcpy( partition_lookup_table_buffer_long[6], "FAT16" );
-      strcpy( partition_lookup_table_buffer_long[7], "NTFS" );
-      strcpy( partition_lookup_table_buffer_long[11], "FAT32" );
-      strcpy( partition_lookup_table_buffer_long[12], "FAT32 LBA Int13" );
-      strcpy( partition_lookup_table_buffer_long[14], "FAT16 LBA Int13" );
-      strcpy( partition_lookup_table_buffer_long[15], "Extended LBA" );
-   }
-
    Process_Fdiskini_File();
 
    Get_Environment_Settings( &*environment );

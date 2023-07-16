@@ -222,8 +222,8 @@
 9.9:(1 Mbyte = 1048576 Bytes)
 
 # The following are table headers, must stay adjusted as is
-9.10:\n\nPartition   Status   Mbytes   Beschreibung   Nutzung    CHS Start      CHS Ende\n
-9.11: LW Bezeichnung   Mbytes  System Nutzung    CHS Start      CHS Ende\n
+9.10:\n\nPartition   Status   Mbytes   System         Nutzung    CHS Start      CHS Ende\n
+9.11: LW Bezeichnung   Mbytes  System        Nutzung    CHS Start      CHS Ende\n
 9.12:Disk    LW   Mbytes    frei   bel.
 
 
@@ -259,7 +259,7 @@
 10.8:Datenträgergröße beträgt \e[1m%lu\e[22m Mbytes (1 Mbyte = 1048576 Bytes)
 
 # Table headers
-10.10:Partition  Status  Typ      Bezeichnung    Mbytes  System  Nutzung
+10.10:Partition  Status  Typ      Bezeichnung    Mbytes  System        Nutzung
 10.11:Partition   Status   Mbytes  Beschreibung   Nutzung  Startzyl.  Endzyl.
 10.12:LW Bezeichnung    Mbytes System Nutzung
 
