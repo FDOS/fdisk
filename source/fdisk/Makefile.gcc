@@ -46,13 +46,13 @@ nls/en.txt : nls/en_utf8.txt utf8tocp/utf8tocp
 	utf8tocp/utf8tocp 437 $< >$@
 
 nls/de.txt : nls/de_utf8.txt utf8tocp/utf8tocp
-	utf8tocp/utf8tocp 850 $< >$@
+	utf8tocp/utf8tocp 858 $< >$@
 
 nls/fr.txt : nls/fr_utf8.txt utf8tocp/utf8tocp
-	utf8tocp/utf8tocp 850 $< >$@
+	utf8tocp/utf8tocp 858 $< >$@
 
 nls/tr.txt : nls/tr_utf8.txt utf8tocp/utf8tocp
-	utf8tocp/utf8tocp 850 $< >$@
+	utf8tocp/utf8tocp 857 $< >$@
 
 # --- build tools -----------------------------------------------------------
 
