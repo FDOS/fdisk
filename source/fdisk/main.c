@@ -463,12 +463,8 @@ int main( int argc, char *argv[] )
    svarlang_result = svarlang_autoload_exepath( argv[0], getenv("LANG") );
    if ( svarlang_result == -1 ) {
       /* revert to NLSPATH, if not found */
-      svarlang_result = svarlang_autoload_nlspath( "FDISK" );
+      svarlang_autoload_nlspath( "FDISK" );
    }   
-   if ( svarlang_result == -4 ) {
-      con_print("\nTranslations in FDISK.LNG too big. Binary must be updated!\n");
-      exit( 1 );
-   }
 
    Determine_DOS_Version();
    if ( os_version > OS_WIN_ME ) {
