@@ -117,19 +117,16 @@ void Check_For_INT13_Extensions( void )
       intr( 0x13, &r );
 
       pDrive->ext_int_13 = FALSE;
+      pDrive->ext_int_13_version = 0;
 
       if ( ( ( r.w.flags & INTR_CF ) == 0 ) && ( r.w.bx == 0xaa55 ) ) {
          flags.use_extended_int_13 = TRUE;
-         pDrive->ext_int_13 = TRUE;
-
-         if ( ( r.w.cx & 0x0001 ) == 1 ) {
-            pDrive->use_access_packet = TRUE;
-         }
-         else {
-            pDrive->use_access_packet = FALSE;
-         }
-
          pDrive->ext_int_13_version = r.h.ah;
+
+         if ( ( r.w.cx & 1 ) == 1 ) {
+            /* ext INT 13 functions 42, 43 and 48 actually usable? */
+            pDrive->ext_int_13 = TRUE;
+         }
       }
    }
 }
@@ -830,6 +827,9 @@ int Read_Partition_Tables( void )
          Convert_Cyl_To_MB( ( pDrive->total_cyl + 1 ), pDrive->total_head + 1,
                             pDrive->total_sect );
 
+      pDrive->part_values_changed = FALSE;
+      flags.maximum_drive_number = drive + 0x80;
+
       error_code = Read_Primary_Table( drive, pDrive, &num_ext );
       if ( error_code != 0 ) {
          continue;
@@ -849,9 +849,6 @@ int Read_Partition_Tables( void )
 
       /* remove link-only EMBRs with no logical partition in it */
       Normalize_Log_Table( pDrive );
-
-      pDrive->part_values_changed = FALSE;
-      flags.maximum_drive_number = drive + 0x80;
    }
 
    flags.more_than_one_drive = flags.maximum_drive_number > 0x80;
@@ -1118,16 +1115,24 @@ static int Read_Physical_Sectors_CHS( int drive, long cylinder, long head,
 {
    int error_code;
    int try = 0;
+   union REGPACK r;
 
    if ( cylinder > 1023 ) {
       return ( 0xff );
    }
    if ( number_of_sectors == 1 ) {
       do {
-      error_code = biosdisk( 2, drive, (int)head, (int)cylinder, (int)sector,
-                             number_of_sectors, sector_buffer );         
-   } while ( error_code && ++try <= MAX_RETRIES );
-
+         r.w.ax = 0x0201;
+         r.h.dh = head;
+         r.h.dl = drive;
+         r.h.ch = cylinder;
+         r.h.cl = sector | ((cylinder >> 2) & 0xC0);
+         r.w.bx = FP_OFF( sector_buffer );
+         r.w.es = FP_SEG( sector_buffer );
+         intr( 0x13, &r );
+         error_code = ( r.w.flags & INTR_CF ) ? r.h.ah : 0; 
+   
+      } while ( error_code && ++try < MAX_RETRIES );
    }
    else {
       con_print( "sector != 1\n" );
@@ -1172,7 +1177,7 @@ static int Read_Physical_Sectors_LBA_only( int drive, ulong LBA_address,
       else {
          error_code = 0;
       }
-   } while ( error_code && ++try <= MAX_RETRIES );
+   } while ( error_code && ++try < MAX_RETRIES );
 
    return ( error_code );
 }
@@ -1363,12 +1368,24 @@ static int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
 {
    int error_code;
    int try = 0;
+   union REGPACK r;
+
+   if ( cylinder > 1023 ) {
+      return ( 0xff );
+   }
 
    if ( number_of_sectors == 1 ) {
       do {
-         error_code = biosdisk( 3, drive, (int)head, (int)cylinder, (int)sector,
-                             number_of_sectors, sector_buffer );
-      } while (error_code && ++try <= MAX_RETRIES);
+         r.w.ax = 0x0301;
+         r.h.dh = head;
+         r.h.dl = drive;
+         r.h.ch = cylinder;
+         r.h.cl = sector | ((cylinder >> 2) & 0xC0);
+         r.w.bx = FP_OFF( sector_buffer );
+         r.w.es = FP_SEG( sector_buffer );
+         intr( 0x13, &r );
+         error_code = ( r.w.flags & INTR_CF ) ? r.h.ah : 0;
+      } while (error_code && ++try < MAX_RETRIES);
    }
    else {
       con_print( "sector != 1\n" );
@@ -1420,7 +1437,7 @@ static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
       else {
          error_code = 0;
       }
-   } while ( error_code && ++try <= MAX_RETRIES );
+   } while ( error_code && ++try < MAX_RETRIES );
 
    return ( error_code );
 }

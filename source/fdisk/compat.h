@@ -3,9 +3,6 @@
 
 #if defined( __WATCOMC__ ) || defined( __GNUC__ )
 
-int biosdisk( unsigned function, unsigned drive, unsigned head,
-              unsigned cylinder, unsigned sector, unsigned number_of_sectors,
-              void __far *sector_buffer );
 #endif
 
 #if defined( __WATCOMC__ )

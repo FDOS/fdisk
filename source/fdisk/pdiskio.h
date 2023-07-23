@@ -58,9 +58,8 @@ typedef struct part_table_structure {
    unsigned long total_head;
    unsigned long total_sect;
 
-   int ext_int_13;
+   int ext_int_13;         /* general ext. INT 13 availability */
    int ext_int_13_version;
-   int use_access_packet;
 
    /* Pre-computed hard disk sizes */
    unsigned long disk_size_sect;
