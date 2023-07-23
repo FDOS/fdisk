@@ -1122,6 +1122,7 @@ static int Read_Physical_Sectors_CHS( int drive, long cylinder, long head,
    }
    if ( number_of_sectors == 1 ) {
       do {
+         memset( &r, 0, sizeof(union REGPACK) );
          r.w.ax = 0x0201;
          r.h.dh = head;
          r.h.dl = drive;
@@ -1376,6 +1377,7 @@ static int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
 
    if ( number_of_sectors == 1 ) {
       do {
+         memset( &r, 0, sizeof(union REGPACK) );
          r.w.ax = 0x0301;
          r.h.dh = head;
          r.h.dl = drive;
