@@ -420,7 +420,7 @@ int Create_Logical_Drive_Interface( void )
             Print_At(
                4, 21,
                svarlang_str( 10, 62 ) );
-               con_print( " " );
+            con_print( " " );
             flags.fat32 =
                !Input( 1, -1, -1, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
          }
@@ -815,7 +815,7 @@ void Display_Extended_Partition_Information_SS( void )
       Color_Print_At( 4, 10, svarlang_str( 10, 5 ) );
    }
 
-   con_set_cursor_xy( 5, 22 );
+   con_set_cursor_xy( 5, 18 );
    con_clreol();
    /* NLS:Total Extended Partition size is [...] */
    con_printf( svarlang_str( 10, 6 ), part_table[flags.drive_number - 128].ext_size_mb );
