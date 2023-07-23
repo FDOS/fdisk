@@ -58,7 +58,7 @@
 0.83:\t
 0.90:Interaktiver Benutzermodus:
 0.91:  /UI           Erzwingt Start von Benutzerinterface, wenn letztes Argument
-0.92:  /MONO         Erzwingt monochromen Bildschirmmodus
+0.92:  /MONO         Deaktiviert Textattribute (heller, blinkender Text)
 0.93:  /FPRMT        Fragt nach FAT32/FAT16 im Interaktiven Modus
 0.94:  /XO           Aktiviert erweiterte Programmfunktionen
 0.95:\t

@@ -58,7 +58,7 @@
 0.83:\t
 0.90:Interactive user interface switches:
 0.91:  /UI           Always starts UI if given as last argument
-0.92:  /MONO         Forces the user interface to run in monochrome mode
+0.92:  /MONO         Disables text attributes (bright, blinking text)
 0.93:  /FPRMT        Prompts for FAT32/FAT16 in interactive mode
 0.94:  /XO           Enables extended options
 0.95:\t
