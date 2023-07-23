@@ -448,6 +448,7 @@ void Command_Line_Set_Flag( void )
 void Command_Line_Status( void )
 {
    flags.monochrome = TRUE;
+   con_enable_attr( !flags.monochrome );
    con_clrscr();
    /* NLS:Fixed Disk Drive Status */
    Print_Centered( 1, svarlang_str( 8, 29 ), 0 );

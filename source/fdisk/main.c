@@ -340,9 +340,7 @@ static void Initialization( char *environment[] )
    }
 
    /* Set the colors. monochrome mode, if it is desired. */
-   if ( flags.monochrome == TRUE ) {
-      /* TODO: reimplement if ansicon supports monochrome */
-   }
+   con_enable_attr( !flags.monochrome );
 
    /* Check for interrupt 0x13 extensions (If the proper version is set.) */
    if ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
@@ -770,7 +768,7 @@ int main( int argc, char *argv[] )
 
          if ( 0 == strcmp( arg[0].choice, "MONO" ) ) {
             flags.monochrome = TRUE;
-            
+            con_enable_attr( !flags.monochrome );
             command_ok = TRUE;
 
             Shift_Command_Line_Options( 1 );

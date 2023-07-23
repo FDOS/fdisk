@@ -199,6 +199,10 @@ void con_enable_cursor_sync( void );
 void con_sync_from_hw_cursor( void );
 
 /* Text attribute function */
+
+/* enables / disables use of text attributes. If disabled, following
+   functions have no effect */
+void con_enable_attr( int flag );
 void con_reset_attr( void );
 void con_set_textcolor( int color );
 void con_set_backcolor( int color );

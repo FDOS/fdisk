@@ -39,6 +39,7 @@ int con_error;
 static unsigned con_width;
 static unsigned con_height;
 static unsigned con_size;
+static char con_attributes_enabled = 1;
 
 static int con_curx;
 static int con_cury;
@@ -377,6 +378,11 @@ void con_clreol( void )
 	}
 }
 
+void con_enable_attr( int flag )
+{
+	con_attributes_enabled = (char)flag;
+}
+
 void con_reset_attr( void )
 {
 	con_textattr = 7;
@@ -384,6 +390,8 @@ void con_reset_attr( void )
 
 void con_set_bold( int flag )
 {
+	if ( !con_attributes_enabled ) return;
+
 	if ( flag ) {
 		con_textattr |= 0x08;
 	}
@@ -399,16 +407,19 @@ int con_get_bold( void )
 
 void con_set_textcolor( int color )
 {
+	if ( !con_attributes_enabled ) return;
 	con_textattr = ( con_textattr & 0xf8 ) | ( color & 7 );
 }
 
 void con_set_backcolor( int color )
 {
+	if ( !con_attributes_enabled ) return;
 	con_textattr = ( con_textattr & 0x8f ) | ( (color & 7) << 4 );
 }
 
 void con_set_blinking( int flag )
 {
+	if ( !con_attributes_enabled ) return;
 	con_textattr = ( con_textattr & 0x7f ) | ( (flag & 1) << 7 );	
 }
 
