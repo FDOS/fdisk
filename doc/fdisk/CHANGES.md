@@ -1,16 +1,29 @@
 Free FDISK Change Log
 =====================
 
+Bug classification:
+ - CRITICAL: Serve errors potentially leading to data loss.
+ - HIGH: Errors preventing the program to work.
+ - MEDIUM: Bugs regarding non-essential features or with work-arounds.
+ - LOW: Cosmetic bugs, like display issues etc.
+
+
 Version 1.3.8 (2023-??-??)
 --------------------------
 Bugfixes:
- - MEDIUM: Fix FDISK not reporting an error if partition table can not be
+ - HIGH: Fix a bug preventing FDISK to work if ext. INT 13 support is
+     reported by the BIOS, but actual support for functions 42, 43 and 48
+     is non-existant (mainly 486 and early LBA support era).
+ - HIGH: Fix a bug preventing FDISK from working correctly, if BIOS returns
+     garbage in AH for INT 13, function 2 and 3, if carry flag is cleared
+     (mainly some buggy XT/AT era INT 13 implementations).
+ - HIGH: Fix FDISK not reporting an error if partition table can not be
      written. (since <= v1.2.1)
  - MEDIUM: Fix FDISK not letting the user delete the last existing logical
     drive until program is restarted, if the first logical drive in EMBR
     chain is not the last to be deleted. (since v1.3.5)
  - MEDIUM: Fix FDISK wrongly informing the user that no space in the extended
-     partition is left after deleting the last logical drive until program is
+     partition is left after deleting the last logical drive, until program is
      restarted. (since v1.3.5)
  - LOW: Fix a display bug showing the extended partition a few MB smaller
      than it actually is while creating logical partitions.
