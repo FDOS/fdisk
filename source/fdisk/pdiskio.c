@@ -15,6 +15,8 @@
 #include "ansicon.h"
 #include "printf.h"
 
+#define MAX_RETRIES 3
+
 unsigned char sector_buffer[SECT_SIZE];
 int brief_partition_table[MAX_DISKS][27];
 char drive_lettering_buffer[MAX_DISKS][27];
@@ -243,27 +245,6 @@ static unsigned long combine_cs( unsigned long cylinder,
 {
    unsigned short c = cylinder;
    unsigned short s = sector;
-
-#if 0
-   asm {
-    mov ax,WORD PTR cylinder
-    mov bx,WORD PTR sector
-
-    mov dl,ah
-    shl dl,1
-    shl dl,1
-    shl dl,1
-    shl dl,1
-    shl dl,1
-    shl dl,1
-
-    mov dh,al
-
-    add dx,bx
-
-    mov WORD PTR value,dx
-   }
-#endif
 
    return (s & 0x3f) | ((c & 0x0300) >> 2) | ((c & 0xff) << 8);
 }
@@ -1136,13 +1117,17 @@ static int Read_Physical_Sectors_CHS( int drive, long cylinder, long head,
                                       long sector, int number_of_sectors )
 {
    int error_code;
+   int try = 0;
 
    if ( cylinder > 1023 ) {
       return ( 0xff );
    }
    if ( number_of_sectors == 1 ) {
+      do {
       error_code = biosdisk( 2, drive, (int)head, (int)cylinder, (int)sector,
-                             number_of_sectors, sector_buffer );
+                             number_of_sectors, sector_buffer );         
+   } while ( error_code && ++try <= MAX_RETRIES );
+
    }
    else {
       con_print( "sector != 1\n" );
@@ -1158,9 +1143,7 @@ static int Read_Physical_Sectors_LBA_only( int drive, ulong LBA_address,
 {
    union REGPACK r;
    unsigned int error_code = 0;
-
-   /* Add number_of_sectors to disk_address_packet */
-   disk_address_packet[2] = number_of_sectors;
+   int try = 0;
 
    if ( number_of_sectors == 1 ) {
       *(void __far **)( disk_address_packet + 4 ) = sector_buffer;
@@ -1170,21 +1153,26 @@ static int Read_Physical_Sectors_LBA_only( int drive, ulong LBA_address,
       exit( 1 );
    }
 
-   /* Transfer LBA_address to disk_address_packet */
-   *(_u32 *)( disk_address_packet + 8 ) = LBA_address;
+   do {
+      /* Add number_of_sectors to disk_address_packet */
+      disk_address_packet[2] = number_of_sectors;
 
-   r.w.ax = 0x4200;
-   r.h.dl = drive;
-   r.w.si = FP_OFF( disk_address_packet );
-   r.w.ds = FP_SEG( disk_address_packet );
-   intr( 0x13, &r );
-
-   if ( r.w.flags & INTR_CF ) {
-      error_code = ( r.h.ah ) ? r.h.ah : 1;
-   }
-   else {
-      error_code = 0;
-   }
+      /* Transfer LBA_address to disk_address_packet */
+      *(_u32 *)( disk_address_packet + 8 ) = LBA_address;
+   
+      r.w.ax = 0x4200;
+      r.h.dl = drive;
+      r.w.si = FP_OFF( disk_address_packet );
+      r.w.ds = FP_SEG( disk_address_packet );
+      intr( 0x13, &r );
+   
+      if ( r.w.flags & INTR_CF ) {
+         error_code = ( r.h.ah ) ? r.h.ah : 1;
+      }
+      else {
+         error_code = 0;
+      }
+   } while ( error_code && ++try <= MAX_RETRIES );
 
    return ( error_code );
 }
@@ -1374,10 +1362,13 @@ static int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
                                        long sector, int number_of_sectors )
 {
    int error_code;
+   int try = 0;
 
    if ( number_of_sectors == 1 ) {
-      error_code = biosdisk( 3, drive, (int)head, (int)cylinder, (int)sector,
+      do {
+         error_code = biosdisk( 3, drive, (int)head, (int)cylinder, (int)sector,
                              number_of_sectors, sector_buffer );
+      } while (error_code && ++try <= MAX_RETRIES);
    }
    else {
       con_print( "sector != 1\n" );
@@ -1393,6 +1384,7 @@ static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
 {
    union REGPACK r;
    unsigned int error_code = 0;
+   int try = 0;
 
    /* Translate CHS values to LBA values. */
    unsigned long LBA_address =
@@ -1400,9 +1392,6 @@ static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
 
    /* Determine the location of sector_buffer[512]             */
    /* and place the address of sector_buffer[512] into the DAP */
-
-   /* Add number_of_sectors to disk_address_packet */
-   disk_address_packet[2] = number_of_sectors;
 
    if ( number_of_sectors == 1 ) {
       *(void __far **)( disk_address_packet + 4 ) = sector_buffer;
@@ -1412,21 +1401,26 @@ static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
       exit( 1 );
    }
 
-   /* Transfer LBA_address to disk_address_packet */
-   *(_u32 *)( disk_address_packet + 8 ) = LBA_address;
-
-   r.w.ax = 0x4300;
-   r.h.dl = drive;
-   r.w.si = FP_OFF( disk_address_packet );
-   r.w.ds = FP_SEG( disk_address_packet );
-   intr( 0x13, &r );
-
-   if ( r.w.flags & INTR_CF ) {
-      error_code = ( r.h.ah ) ? r.h.ah : 1;
-   }
-   else {
-      error_code = 0;
-   }
+   do {
+      /* Add number_of_sectors to disk_address_packet */
+      disk_address_packet[2] = number_of_sectors;
+   
+      /* Transfer LBA_address to disk_address_packet */
+      *(_u32 *)( disk_address_packet + 8 ) = LBA_address;
+   
+      r.w.ax = 0x4300;
+      r.h.dl = drive;
+      r.w.si = FP_OFF( disk_address_packet );
+      r.w.ds = FP_SEG( disk_address_packet );
+      intr( 0x13, &r );
+   
+      if ( r.w.flags & INTR_CF ) {
+         error_code = ( r.h.ah ) ? r.h.ah : 1;
+      }
+      else {
+         error_code = 0;
+      }
+   } while ( error_code && ++try <= MAX_RETRIES );
 
    return ( error_code );
 }
