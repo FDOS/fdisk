@@ -8,15 +8,15 @@ Bug classification:
  - LOW: Cosmetic bugs, like display issues etc.
 
 
-Version 1.3.8 (2023-??-??)
+Version 1.3.8 (2023-07-24)
 --------------------------
 Bugfixes:
  - HIGH: Fix a bug preventing FDISK to work if ext. INT 13 support is
      reported by the BIOS, but actual support for functions 42, 43 and 48
-     is non-existant (mainly 486 and early LBA support era).
+     is non-existant (mainly 486 systems and early LBA support era).
  - HIGH: Fix a bug preventing FDISK from working correctly, if BIOS returns
-     garbage in AH for INT 13, function 2 and 3, if carry flag is cleared
-     (mainly some buggy XT/AT era INT 13 implementations).
+     garbage in AH for INT 13 function 2 or 3 and CF is zero (mainly some
+     buggy XT/AT era INT 13 implementations).
  - HIGH: Fix FDISK not returning an error code if partition table can not be
      written. (since <= v1.2.1)
  - MEDIUM: Fix FDISK not letting the user delete the last existing logical

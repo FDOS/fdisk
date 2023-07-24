@@ -15,7 +15,7 @@ systems.
  - Monochrome (MDA, Hercules...) or color graphics adapter (CGA, EGA, VGA...)
 
 ## Running FDISK
-A binary packages for FDISK are provided via the Github releases page. These
+Binary packages for FDISK are provided via the Github releases page. These
 packages contain the executable file _FDISK.EXE_ under the _BIN_ directory.
 FDISK is further shipped as part of the base software collection of the
 FreeDOS operating system.
@@ -36,7 +36,7 @@ Further, the display language has to be specified via the _LANG_ environment
 variable, like `SET LANG=DE` to set the display language to German.
 
 If one or more of the above conditions are not met, FDISK is displayed in
-english.
+English.
 
 When running FDISK under FreeDOS using the FreeDOS provided FDISK
 package, the above should have been setup automatically by the FreeDOS
