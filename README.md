@@ -10,13 +10,41 @@ GUID Partition Table (GPT), which is the default on modern UEFI enabled
 systems.
 
 ## Minimum Requirements
- - 8086 compatible CPU
- - MS-DOS 3.3 compatible operating system
- - IBM-XT compatible PC with 256k RAM and disk controller
+ - IBM-PC (8088) compatible computer with 256k RAM and disk controller
+ - MS-DOS 3.0 compatible operating system
+ - Monochrome (MDA, Hercules...) or color graphics adapter (CGA, EGA, VGA...)
 
-## Documentation
- - [Build Instructions](doc/fdisk/INSTALL.md)
+## Running FDISK
+A binary packages for FDISK are provided via the Github releases page. These
+packages contain the executable file _FDISK.EXE_ under the _BIN_ directory.
+FDISK is further shipped as part of the base software collection of the
+FreeDOS operating system.
+
+Invoking `FDISK.EXE /?` shows a help screen with available options.
+
+The program behaviour may be further customized by editing the _FDISK.INI_
+file inside the _BIN_ directory. The available options are commented in the
+file.
+
+FDISK is translated to multiple languages. The translations are stored in the
+file _FDISK.LNG_ inside the _NLS_ directory. To make FDISK find its
+translation file, either the environment variable _NLSPATH_ must contain
+the FDISK.LNG path, or the LNG file has to be copied to the directory
+containing FDISK.EXE.
+
+Further, the display language has to be specified via the _LANG_ environment
+variable, like `SET LANG=DE` to set the display language to German.
+
+If one or more of the above conditions are not met, FDISK is displayed in
+english.
+
+When running FDISK under FreeDOS using the FreeDOS provided FDISK
+package, the above should have been setup automatically by the FreeDOS
+installer.
+
+## Further Documentation
  - [Change Log](doc/fdisk/CHANGES.md)
+ - [Build Instructions](doc/fdisk/INSTALL.md)
  - [Command Line Syntax](doc/fdisk/USAGE.md)
 
 ## Copyright
