@@ -64,7 +64,8 @@ static void con_advance_cursor( void );
 
 static int detect_ega( void )
 {
-	union REGPACK r; 
+	union REGPACK r;
+	memset( &r, 0, sizeof(union REGPACK) );
 	r.h.ah = 0x12;
 	r.h.bl = 0x10;
 	intr( 0x10, &r );
@@ -74,10 +75,12 @@ static int detect_ega( void )
 void con_init( int interpret_esc )
 {
 	union REGPACK r; 
+	unsigned char blinking_enabled;
 
 	flag_interpret_esc = interpret_esc;
 
 	/* detect video mode */
+	memset( &r, 0, sizeof(union REGPACK) );
 	r.h.ah = 0xf;
 	intr( 0x10, &r );
 	con_is_monochrome = ( r.h.al == 7 );
@@ -87,10 +90,14 @@ void con_init( int interpret_esc )
 	con_width = r.h.ah;
 	if ( detect_ega() ) {
 		con_height = (*(unsigned char __far *) MK_FP(0x40, 0x84)) + 1;
-		/* set >=ega blinking bit */
-		r.w.ax = 0x1003;
-		r.w.bx = 1;
-		intr( 0x10, &r );
+		blinking_enabled = (*(unsigned char __far *) MK_FP(0x40, 0x65)) & 0x20;
+		if ( !blinking_enabled ) {
+			/* set >=ega blinking bit */
+			memset( &r, 0, sizeof(union REGPACK) );
+			r.w.ax = 0x1003;
+			r.w.bx = 1;
+			intr( 0x10, &r );			
+		}
 	}
 	else {
 		con_height = 25;
@@ -98,6 +105,7 @@ void con_init( int interpret_esc )
 	con_size = con_width * con_height;
 
 	/* are we writing to screen or file? */
+	memset( &r, 0, sizeof(union REGPACK) );
 	r.w.ax = 0x4400;
 	r.w.bx = 1;	/* stdout handle */
 	intr( 0x21, &r );
@@ -214,6 +222,7 @@ static void con_set_hw_cursor( int x, int y )
 
 	if ( !con_is_device ) return;
 	
+	memset( &r, 0, sizeof(union REGPACK) );
 	r.w.ax = 0x0200;
 	r.w.bx = 0;
 	r.h.dl = x - 1;
@@ -255,10 +264,12 @@ int con_readkey( void )
 {
 	union REGPACK r;
 
+	memset( &r, 0, sizeof(union REGPACK) );
 	r.h.ah = 7;
 	intr( 0x21, &r );
 	if ( r.h.al > 0 ) return r.h.al;
 
+	memset( &r, 0, sizeof(union REGPACK) );
 	r.h.ah = 7;
 	intr( 0x21, &r );
 	return 0x100 | r.h.al;
@@ -315,6 +326,7 @@ static void _con_putc_plain( char c )
 	}
 	else {
 		/* writing to file, use DOS calls */
+		memset( &r, 0, sizeof(union REGPACK) );
 		if ( c == '\n' ) {
 			/* hack in a CR befor NL when writing to a file */
 			r.h.ah = 2;
