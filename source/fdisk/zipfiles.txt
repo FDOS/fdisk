@@ -1,6 +1,6 @@
 LICENSE
 README.md
-bin/FDISK.EXE
+bin/fdisk.exe
 bin/fdisk.ini
 nls/fdisk.lng
 appinfo/fdisk.sv
