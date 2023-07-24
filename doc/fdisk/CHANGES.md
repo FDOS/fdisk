@@ -17,7 +17,7 @@ Bugfixes:
  - HIGH: Fix a bug preventing FDISK from working correctly, if BIOS returns
      garbage in AH for INT 13, function 2 and 3, if carry flag is cleared
      (mainly some buggy XT/AT era INT 13 implementations).
- - HIGH: Fix FDISK not reporting an error if partition table can not be
+ - HIGH: Fix FDISK not returning an error code if partition table can not be
      written. (since <= v1.2.1)
  - MEDIUM: Fix FDISK not letting the user delete the last existing logical
     drive until program is restarted, if the first logical drive in EMBR
@@ -36,6 +36,7 @@ Changes:
      German, French, Turkish, and partially to Polish
  - Prohibit deletion of DOS partitions from the Non-DOS partition removal
      menu.
+ - FDISK terminates with an error message if run from OS/2 or Windows NT.
  - Program can be build with I16-GCC.
  - Support for Borland / Turbo C was dropped.
 

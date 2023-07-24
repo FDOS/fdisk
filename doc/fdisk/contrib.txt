@@ -22,4 +22,4 @@ Bernd Boeckmann         Open Watcom C and I16-GCC ports, critical bug fixes,
 Mateusz Viste           svarlang lib, FDISK lite, code improvements,
                           polish translation
 Emir SARI               turkish translation
-Berki Yenigün           turkish translation
+Berki Yenigün           french, turkish translation

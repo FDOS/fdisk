@@ -3,7 +3,7 @@ Free FDISK is a tool to manage the partitions on disks of up to
 2 TiB in size using a Master Boot Record (MBR) partition table.
 
 Please note that the software is targeted at IBM-PC compatible systems running
-a MS-DOS like operating system and that it has some limitations
+a MS-DOS like operating system, and that it has some limitations
 especially when dealing with newer computers.
 The most significant is that it can not handle disks partitioned by a
 GUID Partition Table (GPT), which is the default on modern UEFI enabled
@@ -22,11 +22,11 @@ systems.
 ## Copyright
 
 This program is Copyright 1998 - 2023 by Brian E. Reifsnyder and The FreeDOS
-Project under the terms of the GNU General Public License, version 2.
+Project under the terms of the GNU General Public License, version 2 or later.
 
-This program comes as-is and without warranty of any kind.  The author of
+This program comes as-is and without warranty of any kind. The author of
 this software assumes no responsibility pertaining to the use or mis-use of
-this software.  By using this software, the operator is understood to be
+this software. By using this software, the operator is understood to be
 agreeing to the terms of the above.
 
 ## Third party credits
