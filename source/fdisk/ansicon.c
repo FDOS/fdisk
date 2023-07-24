@@ -414,19 +414,23 @@ void con_set_bold( int flag )
 
 int con_get_bold( void )
 {
-	return (con_textattr & 0x08) != 0;
+	return ( con_textattr & 0x08 ) != 0;
 }
 
 void con_set_textcolor( int color )
 {
+	color &= 7;
 	if ( !con_attributes_enabled ) return;
-	con_textattr = ( con_textattr & 0xf8 ) | ( color & 7 );
+	if ( con_is_monochrome && color != 0 ) color = 7;
+	con_textattr = ( con_textattr & 0xf8 ) | color;
 }
 
 void con_set_backcolor( int color )
 {
+	color &= 7;
 	if ( !con_attributes_enabled ) return;
-	con_textattr = ( con_textattr & 0x8f ) | ( (color & 7) << 4 );
+	if ( con_is_monochrome && color != 0 ) color = 7;
+	con_textattr = ( con_textattr & 0x8f ) | ( color << 4 );
 }
 
 void con_set_blinking( int flag )

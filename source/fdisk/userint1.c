@@ -169,6 +169,8 @@ void Interactive_User_Interface( void )
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
    flags.verbose = flags.quiet = 0;
+   con_set_textcolor( flags.screen_color );
+   con_set_backcolor( flags.screen_color >> 4 );
 
    /* abort if user decides so after beeing informed of FDISK not able
       to correctly handle disks too large */
@@ -470,6 +472,7 @@ void Interactive_User_Interface( void )
 ret:
    /* clear screen with "normal" black background and position cursor at the
       top left */
+   con_reset_attr();
    Clear_Screen( NOEXTRAS );
    Position_Cursor( 0, 0 );
 }
@@ -685,6 +688,7 @@ int Standard_Menu( int menu )
       if ( input == 'A' ) {
          /* Abort any changes and exit the program immediately. */
          flags.screen_color = 7; /* Set screen colors back to default. */
+         con_reset_attr();
          Clear_Screen( NOEXTRAS );
          exit( 0 );
       }

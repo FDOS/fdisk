@@ -339,7 +339,7 @@ static void Initialization( char *environment[] )
       flags.set_any_pri_part_active = TRUE;
    }
 
-   /* Set the colors. monochrome mode, if it is desired. */
+   /* monochrome mode, if it is desired. */
    con_enable_attr( !flags.monochrome );
 
    /* Check for interrupt 0x13 extensions (If the proper version is set.) */
