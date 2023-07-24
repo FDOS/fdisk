@@ -103,14 +103,14 @@ fdisk.lnk : Makefile
 
 ../../fdisk.zip : fdisk.exe
 	-rm -f ../../bin/fdisk.exe
+	-rm -f ../../fdisk.zip
 	$(CP) fdisk.exe ..$(SEP)..$(SEP)bin
 	-rm -f ../../nls/fdisk.lng
 	-mkdir ..$(SEP)..$(SEP)nls
 	$(CP) fdisk.lng ..$(SEP)..$(SEP)nls
 	$(PACKER) $(PACKERFLAGS) ../../bin/fdisk.exe
 	cd ../..
-	zip -9rkDX fdisk.zip appinfo bin doc help nls source/fdisk/*.[ch] &
-	source/fdisk/*.asm source/fdisk/Makefile* LICENSE README.md
+	zip -9rkDX fdisk.zip -@ < source/fdisk/zipfiles.txt
 	cd source/fdisk
 
 ..\..\fdisk.svp : fdisk.exe
