@@ -209,17 +209,28 @@ clobber : .SYMBOLIC
 	rm -f *.tmp
 	rm -f *.zip
 	rm -f *.map
+	rm -f *.o
+	rm -f bintoc/bintoc
 	rm -f bintoc/*.exe
 	rm -f bintoc/*.obj
+	rm -f bintoc/*.o
+	rm -f svarlang/tlumacz
 	rm -f svarlang/*.exe
 	rm -f svarlang/*.obj
+	rm -f svarlang/*.obj
+	rm -f utf8tocp/utf8tocp
 	rm -f utf8tocp/*.exe
 	rm -f utf8tocp/*.obj
+	rm -f utf8tocp/*.o
 
 # language files
 	rm -f deflang.c
 	rm -f fdisk.lng
 	rm -f nls/en.txt
+	rm -f nls/es.txt
 	rm -f nls/de.txt
+	rm -f nls/fr.txt
+	rm -f nls/pl.txt
+	rm -f nls/tr.txt
 	rm -f nls/deflang.c
 	rm -f nls/out.lng
