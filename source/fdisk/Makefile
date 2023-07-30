@@ -23,7 +23,7 @@ TOOL_CC     = wcc386
 CC       = wcc
 CFLAGS   = -q -0 -bt=dos -wx -we
 !ifdef __LINUX__
-CFLAGS   += -i=$(%WATCOM)/h 
+CFLAGS   += -i=$(%WATCOM)/h
 !endif
 
 AS       = nasm
@@ -64,14 +64,14 @@ CFLAGS += -DFD_FREEDOS=$(FREEDOS)
 
 objs  = main.obj cmd.obj fdiskio.obj pdiskio.obj pcompute.obj compat.obj
 objs += helpscr.obj userint0.obj
-objs +=  
+objs +=
 !ifdef LITE
 CFLAGS += -DFDISKLITE=1
 !else
 objs += userint1.obj userint2.obj
 !endif
 objs += kbdinput.obj ansicon.obj printf.obj bootnorm.obj
-objs += svarlang.obj auto_exe.obj auto_nls.obj deflang.obj 
+objs += svarlang.obj auto_exe.obj auto_nls.obj deflang.obj
 
 !ifdef SMART_MBR
 CFLAGS += -DSMART_MBR=1
@@ -147,9 +147,9 @@ bootnorm.c : bintoc/bintoc.exe bootnorm.bin
 
 # --- NLS -------------------------------------------------------------------
 
-nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/de.txt nls/fr.txt nls/tr.txt
+nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/de.txt nls/fr.txt nls/pl.txt nls/tr.txt
 	@cd nls
-	$(TLUMACZ) en de fr tr
+	$(TLUMACZ) en de fr pl tr
 	@cd ..
 
 fdisk.lng : nls/out.lng
@@ -158,16 +158,19 @@ fdisk.lng : nls/out.lng
 deflang.c : nls/out.lng
 	$(CP) nls$(SEP)deflang.c deflang.c
 
-nls/en.txt : nls/en_utf8.txt utf8tocp/utf8tocp.exe 
+nls/en.txt : nls/en_utf8.txt utf8tocp/utf8tocp.exe
 	$(UTF8TOCP) 437 $[@ >$^@
 
-nls/de.txt : nls/de_utf8.txt utf8tocp/utf8tocp.exe 
+nls/de.txt : nls/de_utf8.txt utf8tocp/utf8tocp.exe
 	$(UTF8TOCP) 850 $[@ >$^@
 
-nls/fr.txt : nls/fr_utf8.txt utf8tocp/utf8tocp.exe 
+nls/fr.txt : nls/fr_utf8.txt utf8tocp/utf8tocp.exe
 	$(UTF8TOCP) 850 $[@ >$^@
 
-nls/tr.txt : nls/tr_utf8.txt utf8tocp/utf8tocp.exe 
+nls/pl.txt : nls/pl_utf8.txt utf8tocp/utf8tocp.exe
+	$(UTF8TOCP) maz $[@ >$^@
+
+nls/tr.txt : nls/tr_utf8.txt utf8tocp/utf8tocp.exe
 	$(UTF8TOCP) 857 $[@ >$^@
 
 

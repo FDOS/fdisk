@@ -37,8 +37,8 @@ fdisk.lng : nls/out.lng
 deflang.c : nls/deflang.c
 	$(CP) $< $@
 
-nls/deflang.c nls/out.lng : svarlang/tlumacz nls/en.txt nls/de.txt nls/fr.txt nls/tr.txt
-	cd nls; ../svarlang/tlumacz en de fr tr
+nls/deflang.c nls/out.lng : svarlang/tlumacz nls/en.txt nls/de.txt nls/fr.txt nls/pl.txt nls/tr.txt
+	cd nls; ../svarlang/tlumacz en de fr pl tr
 
 nls/out.lng : nls/deflang.c
 
@@ -50,6 +50,9 @@ nls/de.txt : nls/de_utf8.txt utf8tocp/utf8tocp
 
 nls/fr.txt : nls/fr_utf8.txt utf8tocp/utf8tocp
 	utf8tocp/utf8tocp 858 $< >$@
+
+nls/pl.txt : nls/pl_utf8.txt utf8tocp/utf8tocp
+	utf8tocp/utf8tocp maz $< >$@
 
 nls/tr.txt : nls/tr_utf8.txt utf8tocp/utf8tocp
 	utf8tocp/utf8tocp 857 $< >$@
