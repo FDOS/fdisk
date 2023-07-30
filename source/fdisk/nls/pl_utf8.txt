@@ -157,6 +157,51 @@
 
 
 ##############################################################################
+# CMD.C                                                                      #
+##############################################################################
+
+8.0:\nBłąd składni\n\nProgram Zatrzymany\n
+8.1:\nBłąd podczas usuwania flagi.\n
+8.2:\nFlaga %d została usunięta.\n
+8.3:\nPodano nieprawidłowy rozmiar partycji.\n
+8.4:\nPartycja rozszerzona już istnieje.\n
+8.5:\nBłąd podczas tworzenia partycji rozszerzonej.\n
+8.7:\nNie znaleziono stosownej partycji rozszerzonej.\n
+8.8:\nBłąd podczas tworzenia dysku logicznego.\n
+8.10:\nBłąd podczas tworzenia partycji podstawowej.\n
+8.11:\nnumer # partycji podstawowej (%ld) musi zawierać się w 1..4.\n
+8.12:\nNie znaleziono partycji do usunięcia.\n
+8.13:\nZnaleziono %d partycji podstawowych, należy podać numer do usunięcia.\n
+8.14:\nBłąd podczas usuwania partycji podstawowej.\n
+8.15:\nBłąd podczas usuwania partycji rozszerzonej.\n
+8.16:\nNumer dysku logicznego %d jest poza zakresem.\n
+8.17:\nNumer partycji jest poza zakresem.\n
+8.18:\nNieprawidłowy argument do usuwania.\n
+8.19:\nBłąd podczas usuwania dysku logicznego.\n
+8.20:\nTyp nowej partycji jest poza zakresem.\n
+8.21:\nBłąd podczas zmiany typu partycji.\n
+8.22:\nNumer partycji źródłowej jest poza zakresem.\n
+8.23:\nNumer partycji docelowej jest poza zakresem.\n
+8.24:\nBłąd podczas zmiany slotu dla partycji.\n
+8.25:\nNieprawidłowy numer flagi.\n
+8.26:\nWartość flagi jest poza zakresem.\n
+8.27:\nBłąd podczas ustawiania flagi.\n
+8.28:\nFlaga %d została ustawiona na %d.\n
+8.29:Status dysku stałego
+8.30:\nBłąd podczas zamiany partycji miejscami.\n
+8.31:\nFlaga %d jest ustawiona na %d.\n
+8.32:\nFlaga %d nie jest ustawiona na %d.\n
+8.34:\n<%s> powinno byc cyfrą; program zatrzymany\n
+8.35:\npodano więcej niż jeden napęd; program zatrzymany\n
+8.36:\n<%s> powinno zaczynać się na '-' lub '/'; program zatrzymany\n
+8.37:\n<%s> oczekiwano ':' ; program zatrzymany\n
+8.38:\n<%s> oczekiwano ',' ; program zatrzymany\n
+8.39:\n<%s> oczekiwano koniec ciągu; program zatrzymany\n
+8.40:\nNieprawidłowy napęd.\n
+8.41:\nWszystkie flagi zostały usunięte.\n
+
+
+##############################################################################
 # GLOBAL STRINGS                                                             #
 ##############################################################################
 
