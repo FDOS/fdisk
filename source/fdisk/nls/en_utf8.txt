@@ -213,9 +213,9 @@
 9.2:Choose one of the following:
 9.3:sectors, geometry
 9.4:No partitions defined.
-9.5:\nLargest continious free space for primary partition = %lu MBytes\n
+9.5:\nLargest continuous free space for primary partition = %lu MBytes\n
 9.6:\nContents of Extended DOS Partition:\n
-9.7:\nLargest continious free space in extended partition = %lu MBytes\n
+9.7:\nLargest continuous free space in extended partition = %lu MBytes\n
 9.8:    -------- unusable ---------
 9.9:(1 Mbyte = 1048576 bytes)
 
