@@ -12,7 +12,7 @@ support multiple languages. It is part of the SvarDOS project.
 Homepage: http://svardos.org/svarlang/
 
 
-### PREPARING TRANSLATION FILES ###
+### PREPARING TRANSLATION FILES ###############################################
 
 The translation files must be CATS-style text files in the usual format:
 
@@ -35,21 +35,27 @@ TLUMACZ computes two files:
  * DEFLANG.C - the default translations that will be embedded into the program
 
 Then, DEFLANG.C must be compiled and linked to your program along with
-SVARLNGx.LIB. From there you will be able to use SvarLANG calls, typically:
+SVARLNGx.LIB. From there you will be able to use SvarLANG calls, like this
+very basic example:
 
   svarlang_load("myprogram.lng", "pl");  /* load PL lang from myprogram.lng */
   puts(svarlang_str(2, 0));              /* display the string with id 2.0 */
 
+A more practical, real-world example would probably be this one:
+
+  svarlang_autoload_exepath(argv[0], getenv("LANG"));
+  puts(svarlang_str(2, 0));
+
 Read svarlang.h for more information about available functions.
 
 
-### ESCAPED CHARACTERS ###
+### ESCAPED CHARACTERS ########################################################
 
 Translation strings may contain some escaped characters. At this time only the
 following escaped characters are supported: \e \r \n \t and \\
 
 
-### DIRTY STRINGS ###
+### DIRTY STRINGS #############################################################
 
 In the CATS-style source translation, lines may be prefixed with a '?' sign:
 
@@ -60,19 +66,18 @@ command-line with a warning about the line being "dirty" (that is, requiring
 to be reviewed by a translator).
 
 
-### ENVIRONMENT ###
+### ENVIRONMENT ###############################################################
 
 The program translation file should be named "PROGNAME.LNG", where PROGNAME
 is the program's name. This file should be placed in a well-known location,
-typically the program's own directory. An exception are SvarDOS "CORE" programs
-that store their translation files in a directory pointed out by %NLSPATH%.
+typically the program's own directory.
 
 The %LANG% environment variable usually defines what language should be loaded,
 albeit the program can just as well provide its own controls for language
 selection and pass this information to svarlang_load() accordingly.
 
 
-### WHY IS IT BETTER THAN CATS? ###
+### WHY IS IT BETTER THAN CATS? ###############################################
 
 The CATS library is heavier and slower, as it embeds a text-file parser.
 Translations also take more disk space since each language is stored in a
@@ -83,15 +88,14 @@ way at compile time.
 
 There is also a licensing issue: CATS/Kitten libraries are published under the
 terms of a viral, corrosive license. SvarLANG, on the other hand, is published
-under a truly free, liberal license (MIT).
+under a truly free, liberal MIT license.
 
 
-### FILE FORMAT ###
+### FILE FORMAT ###############################################################
 
 File =
-    magic         : Char[4] := "SvL1"
-    guard         : Char := "\0x1a"
-                  ; end-of-file char to prevent TYPE garbage
+    magic         : Char[4] := "SvL\x1a" (ie. "SvL" followed with a 0x1a char)
+                  ; 0x1a is an end-of-file marker that prevents TYPE garbage
     num_strings   : U16
     languages     : array[num_languages] of Language
 
@@ -113,4 +117,7 @@ DictEntry =
 StringZ = array[?] of Char ; zero-terminated string
 
 
-======================================================================= EOF ===
+NOTE: All numeric values are stored in x86 (little endian) order.
+
+
+####################################################################### EOF ###

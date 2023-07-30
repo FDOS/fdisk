@@ -22,41 +22,32 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <stdlib.h> /* NULL */
-#include <stdio.h>
-
 #include "svarlang.h"
 
 int svarlang_autoload_exepath(const char *selfexe, const char *lang) {
   unsigned short selflen;
-  char self_ext_backup[3];
-  char *self_ext_ptr;
+  unsigned long self_ext_backup;
+  unsigned long *self_ext_ptr;
   int res;
 
   /* validate selfexe: must be at least 5 bytes long and 4th char from end must
    * be a dot (like "a.exe" or "c:\b.com" or "..\..\test\run.exe") */
-  if (selfexe == NULL) return(-1);
+  if (!selfexe) return(-200);
   for (selflen = 0; selfexe[selflen] != 0; selflen++);
-  if ((selflen < 5) || (selfexe[selflen - 4] != '.')) return(-2);
+  if ((selflen < 5) || (selfexe[selflen - 4] != '.')) return(-200);
 
-  self_ext_ptr = (char *)selfexe + selflen - 3; /* disregard CONST (I revert original content later, so the caller won't notice */
+  self_ext_ptr = (void *)(selfexe + selflen - 3); /* disregard CONST (I revert original content later, so the caller won't notice */
 
   /* copy extension to buffer and replace it with "lng" */
-  self_ext_backup[0] = self_ext_ptr[0];
-  self_ext_backup[1] = self_ext_ptr[1];
-  self_ext_backup[2] = self_ext_ptr[2];
+  self_ext_backup = *self_ext_ptr;
 
-  self_ext_ptr[0] = 'L';
-  self_ext_ptr[1] = 'N';
-  self_ext_ptr[2] = 'G';
+  *self_ext_ptr = 0x00474E4Cl; /* "LNG\0" */
 
   /* try loading it now */
   res = svarlang_load(selfexe, lang);
 
   /* restore the original filename and quit */
-  self_ext_ptr[0] = self_ext_backup[0];
-  self_ext_ptr[1] = self_ext_backup[1];
-  self_ext_ptr[2] = self_ext_backup[2];
+  *self_ext_ptr = self_ext_backup;
 
   return(res);
 }

@@ -448,7 +448,6 @@ int main( int argc, char *argv[] )
    int location;
    int fat32_temp;
    int result;
-   int svarlang_result;
 
 #ifdef SMART_MBR
    extern void __cdecl __far smart_mbr( void );
@@ -457,12 +456,15 @@ int main( int argc, char *argv[] )
    /* initialize console io with interpretation of esc seq enabled */
    con_init( 1 );
 
-   /* initialize the SvarLANG library (loads translation strings) */
-   svarlang_result = svarlang_autoload_exepath( argv[0], getenv("LANG") );
-   if ( svarlang_result == -1 ) {
-      /* revert to NLSPATH, if not found */
-      svarlang_autoload_nlspath( "FDISK" );
-   }   
+   /* initialize the SvarLANG library (loads translation strings)
+    * first try to load strings from the same directory where FDISK.EXE
+    * resides, and if this fails then try to load them from within the
+    * FreeDOS-style %NLSPATH% directory. */
+   if (svarlang_autoload_exepath( argv[0], getenv("LANG") ) != 0) {
+      /* if this fails as well it is no big deal, svarlang is still
+       * operational and will fall back to its default strings */
+      svarlang_autoload_pathlist( "FDISK", getenv("NLSPATH"), getenv("LANG") );
+   }
 
    Determine_DOS_Version();
    if ( os_version > OS_WIN_ME ) {

@@ -26,7 +26,7 @@
 #define SVARLANG_H
 
 /* library version */
-#define SVARLANGVER "20230713"
+#define SVARLANGVER "20230730"
 
 /* returns a pointer to a string with the SvarLANG's library version,
  * independently of the SVARLANGVER string above. */
@@ -47,14 +47,21 @@ int svarlang_load(const char *fname, const char *lang);
 
 /* tries loading lang strings from a file located in the executable's
  * directory that is named like the executable but with an *.LNG extension.
+ * this is certainly the most practical way of loading svarlang.
  * selfexe should point to the executable's full filename path (either relative
- * or absolute). You may want to pass argv[0] or __argv[0] there. */
+ * or absolute). You may want to pass argv[0] or __argv[0] there. example:
+ *
+ * svarlang_autoload_exepath(argv[0], getenv("LANG"));
+ */
 int svarlang_autoload_exepath(const char *selfexe, const char *lang);
 
-/* this relies on getenv() to pull LANG and NLSPATH variables and looks
- * for a translation file named "%NLSPATH%\progname.lng".
- * this call should be used only by "CORE" SvarDOS / FreeDOS programs. */
-int svarlang_autoload_nlspath(const char *progname);
+/* this looks in a list of paths separated by ';' to locate a translation file
+ * for progname. this might be called by some FreeDOS programs that rely on the
+ * NLSPATH environment variable for locating strings. example:
+ *
+ * svarlang_autoload_pathlist("myprog", getenv("NLSPATH"), getenv("LANG"));
+ */
+int svarlang_autoload_pathlist(const char *progname, const char *pathlist, const char *lang);
 
 /* Returns a pointer to the string "id". Does not require svalang_load() to be
  * executed, but then it will only return the reference language strings.

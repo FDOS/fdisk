@@ -1,9 +1,11 @@
 /*
  * Copyright (C) 2021-2023 Mateusz Viste
  *
+ * Dictionary-based lookups contributed by Bernd Boeckmann, 2023
+ *
  * usage: tlumacz en fr pl etc
  *
- * computes an out.lng file that contains all language ressources.
+ * computes an out.lng file that contains all language resources.
  *
  */
 
@@ -16,7 +18,7 @@
 #include "svarlang.h"
 
 #define STRINGS_CAP 65000   /* string storage size in characters */
-#define DICT_CAP    10000   /* dictionary size in elements */ 
+#define DICT_CAP    10000   /* dictionary size in elements */
 
 /* read a single line from fd and fills it into dst, returns line length
  * ending CR/LF is trimmed, as well as any trailing spaces */
@@ -99,56 +101,54 @@ static unsigned short unesc_string(char *linebuff) {
 }
 
 #pragma pack(1)
-typedef struct dict_entry {
-    unsigned short id;
-    unsigned short offset;
-} dict_entry_t;
+struct dict_entry {
+  unsigned short id;
+  unsigned short offset;
+};
 #pragma pack()
 
-typedef struct svl_lang {
+struct svl_lang {
   char id[2];
   unsigned short num_strings;
 
-  dict_entry_t *dict;
+  struct dict_entry *dict;
   size_t dict_cap;
 
   char *strings;
   char *strings_end;
   size_t strings_cap;
 
-} svl_lang_t;
+};
 
 
-static svl_lang_t * svl_lang_new(char langid[2], size_t dict_cap, size_t strings_cap)
-{
-  svl_lang_t *l;
+static struct svl_lang *svl_lang_new(const char langid[2], size_t dict_cap, size_t strings_cap) {
+  struct svl_lang *l;
 
-  l = malloc(sizeof(svl_lang_t));
-  if (!l) return NULL;
+  l = malloc(sizeof(struct svl_lang));
+  if (!l) return(NULL);
 
   l->id[0] = (char)toupper(langid[0]);
   l->id[1] = (char)toupper(langid[1]);
 
-  l->dict = malloc(dict_cap * sizeof(dict_entry_t));
-  if (!l->dict) {
-    return NULL;
-  }
+  l->dict = malloc(dict_cap * sizeof(struct dict_entry));
+  if (!l->dict) return(NULL);
+
   l->dict_cap = dict_cap;
 
   l->num_strings = 0;
   l->strings = l->strings_end = malloc(strings_cap);
   if (!l->strings) {
     free(l->dict);
-    return NULL;
+    return(NULL);
   }
   l->strings_cap = strings_cap;
-  return l;
+
+  return(l);
 }
 
 
 /* compacts the dict and string buffer */
-static void svl_compact_lang(svl_lang_t *l)
-{
+static void svl_compact_lang(struct svl_lang *l) {
   size_t bytes;
   bytes = l->strings_end - l->strings;
   if (bytes < l->strings_cap) {
@@ -157,12 +157,11 @@ static void svl_compact_lang(svl_lang_t *l)
     l->strings_cap = bytes;
   }
   l->dict_cap = l->num_strings;
-  l->dict = realloc(l->dict, l->dict_cap * sizeof(dict_entry_t));
+  l->dict = realloc(l->dict, l->dict_cap * sizeof(struct dict_entry));
 }
 
 
-static void svl_lang_free(svl_lang_t *l)
-{
+static void svl_lang_free(struct svl_lang *l) {
   l->num_strings = 0;
   if (l->dict) {
     free(l->dict);
@@ -177,33 +176,29 @@ static void svl_lang_free(svl_lang_t *l)
 }
 
 
-static size_t svl_strings_bytes(svl_lang_t *l)
-{
-  return l->strings_end - l->strings;
+static size_t svl_strings_bytes(const struct svl_lang *l) {
+  return(l->strings_end - l->strings);
 }
 
 
-static size_t svl_dict_bytes(svl_lang_t *l)
-{
-  return l->num_strings * sizeof(dict_entry_t);
+static size_t svl_dict_bytes(const struct svl_lang *l) {
+  return(l->num_strings * sizeof(struct dict_entry));
 }
 
 
-static int svl_add_str(svl_lang_t *l, unsigned short id, const char *s)
-{
+static int svl_add_str(struct svl_lang *l, unsigned short id, const char *s) {
   size_t len = strlen(s) + 1;
   size_t cursor;
 
-  if (l->strings_cap < svl_strings_bytes(l) + len ||
-      l->dict_cap < (l->num_strings + 1) * sizeof(dict_entry_t)) {
-    return 0;
+  if ((l->strings_cap < svl_strings_bytes(l) + len) || (l->dict_cap < (l->num_strings + 1) * sizeof(struct dict_entry))) {
+    return(0);
   }
-  
+
   /* find dictionary insert position, search backwards in assumption
      that in translation files, strings are generally ordered ascending */
   for (cursor = l->num_strings; cursor > 0 && l->dict[cursor-1].id > id; cursor--);
 
-  memmove(&(l->dict[cursor+1]), &(l->dict[cursor]), sizeof(dict_entry_t)*(l->num_strings - cursor));
+  memmove(&(l->dict[cursor+1]), &(l->dict[cursor]), sizeof(struct dict_entry) * (l->num_strings - cursor));
   l->dict[cursor].id = id;
   l->dict[cursor].offset = l->strings_end - l->strings;
 
@@ -211,30 +206,34 @@ static int svl_add_str(svl_lang_t *l, unsigned short id, const char *s)
   l->strings_end += len;
   l->num_strings++;
 
-  return 1;
+  return(1);
 }
 
 
-static int svl_find(svl_lang_t *l, unsigned short id)
-{
-   size_t left = 0, right = l->num_strings - 1, x;
-   unsigned short v;
+static int svl_find(const struct svl_lang *l, unsigned short id) {
+  size_t left = 0, right = l->num_strings - 1, x;
+  unsigned short v;
 
-   if (l->num_strings == 0) return 0;
+  if (l->num_strings == 0) return(0);
 
-   while (left <= right ) {
-      x = left + ( (right - left ) >> 2 );
-      v = l->dict[x].id;
-      if ( id == v ) return 1;
-      else if ( id > v ) left = x + 1;
-      else right = x - 1;
-   }
-   return 0;
+  while (left <= right ) {
+    x = left + ( (right - left ) >> 2 );
+    v = l->dict[x].id;
+    if ( id == v ) return(1); /* found! */
+
+    if (id > v) {
+      left = x + 1;
+    } else {
+      right = x - 1;
+    }
+  }
+  return(0);
 }
+
 
 /* opens a CATS-style file and compiles it into a ressources lang block
  * returns 0 on error, or the size of the generated data block otherwise */
-static unsigned short svl_lang_from_cats_file(svl_lang_t *l, svl_lang_t *refl) {
+static unsigned short svl_lang_from_cats_file(struct svl_lang *l, struct svl_lang *refl) {
   unsigned short linelen;
   FILE *fd;
   char fname[] = "xx.txt";
@@ -283,26 +282,23 @@ static unsigned short svl_lang_from_cats_file(svl_lang_t *l, svl_lang_t *refl) {
 
     /* add the string contained in current line, if conditions are met */
     if (!svl_find(l, id)) {
-      if (refl == NULL || svl_find(refl, id)) {
+      if ((refl == NULL) || (svl_find(refl, id))) {
         if (!svl_add_str(l, id, ptr)) {
           printf("ERROR: %s[#%u] output size limit exceeded\r\n", fname, linecount);
           fclose(fd);
-          return 0;
+          return(0);
         }
         if (id >= maxid) {
           maxid = id;
           maxid_line = linecount;
+        } else {
+          printf("WARNING:%s[#%u] file unsorted - line %u has higher id %u.%u\r\n", fname, linecount, maxid_line, maxid >> 8, maxid & 0xff);
         }
-        else {
-          printf("WARNING:%s[#%u] file unsorted - line %u has higher id %u.%u\r\n", fname, linecount, maxid_line, maxid >> 8, maxid & 0xff);          
-        }
-      }
-      else {
+      } else {
         printf("WARNING: %s[#%u] has an invalid id (%u.%u not present in ref lang)\r\n", fname, linecount, id >> 8, id & 0xff);
       }
-    }
-    else {
-      printf("WARNING: %s[#%u] has a duplicated id (%u.%u)\r\n", fname, linecount, id >> 8, id & 0xff);      
+    } else {
+      printf("WARNING: %s[#%u] has a duplicated id (%u.%u)\r\n", fname, linecount, id >> 8, id & 0xff);
     }
   }
 
@@ -316,7 +312,7 @@ static unsigned short svl_lang_from_cats_file(svl_lang_t *l, svl_lang_t *refl) {
         printf("WARNING: %s is missing string %u.%u (pulled from ref lang)\r\n", fname, id >> 8, id & 0xff);
         if (!svl_add_str(l, id, refl->strings + refl->dict[i].offset)) {
           printf("ERROR: %s[#%u] output size limit exceeded\r\n", fname, linecount);
-          return 0;
+          return(0);
         }
       }
     }
@@ -326,83 +322,79 @@ static unsigned short svl_lang_from_cats_file(svl_lang_t *l, svl_lang_t *refl) {
 }
 
 
-static int svl_write_header(unsigned short num_strings, FILE *fd)
-{
-  return (fwrite("SvL1\x1a", 1, 5, fd) == 5) &&
-          (fwrite(&num_strings, 1, 2, fd) == 2);
+static int svl_write_header(unsigned short num_strings, FILE *fd) {
+  return((fwrite("SvL\x1a", 1, 4, fd) == 4) && (fwrite(&num_strings, 1, 2, fd) == 2));
 }
 
 
-static int svl_write_lang(svl_lang_t *l, FILE *fd)
-{
+static int svl_write_lang(const struct svl_lang *l, FILE *fd) {
   unsigned short strings_bytes = svl_strings_bytes(l);
 
-  return (fwrite(&l->id, 1, 2, fd) == 2) &&
+  return((fwrite(&l->id, 1, 2, fd) == 2) &&
          (fwrite(&strings_bytes, 1, 2, fd) == 2) &&
          (fwrite(l->dict, 1, svl_dict_bytes(l), fd) == svl_dict_bytes(l)) &&
-         (fwrite(l->strings, 1, svl_strings_bytes(l), fd) == svl_strings_bytes(l));
+         (fwrite(l->strings, 1, svl_strings_bytes(l), fd) == svl_strings_bytes(l)));
 }
 
 
-static int svl_write_c_source(svl_lang_t *l, const char *fn, unsigned short biggest_langsz)
-{
+static int svl_write_c_source(const struct svl_lang *l, const char *fn, unsigned short biggest_langsz) {
   FILE *fd;
   int i;
   unsigned short strings_bytes = svl_strings_bytes(l);
   unsigned short nextnlat = 0;
+  unsigned short allocsz;
 
   fd = fopen(fn, "wb");
   if (fd == NULL) {
     puts("ERROR: FAILED TO OPEN OR CREATE DEFLANG.C");
-    return 0;
-  } else {
-    unsigned short allocsz = biggest_langsz + (biggest_langsz / 20);
-    printf("biggest lang block is %u bytes -> allocating a %u bytes buffer (5%% safety margin)\n", biggest_langsz,
-           allocsz);
-    fprintf(fd, "/* THIS FILE HAS BEEN GENERATED BY TLUMACZ (PART OF THE SVARLANG LIBRARY) */\r\n");
-    fprintf(fd, "const unsigned short svarlang_memsz = %uu;\r\n", allocsz);
-    fprintf(fd, "const unsigned short svarlang_string_count = %uu;\r\n\r\n", l->num_strings);
-    fprintf(fd, "char svarlang_mem[%u] = {\r\n", allocsz);
-    for (i = 0; i < strings_bytes; i++) {
-      if (!fprintf(fd, "0x%02x", l->strings[i])) {
-        fclose(fd);
-        return 0;
-      }
-
-      if (i + 1 < strings_bytes) fprintf(fd, ",");
-      nextnlat++;
-      if (l->strings[i] == '\0' || nextnlat == 16) {
-        fprintf(fd, "\r\n");
-        nextnlat = 0;
-      }
-    }
-    fprintf(fd, "};\r\n\r\n");
-
-    fprintf(fd, "unsigned short svarlang_dict[%u] = {\r\n", l->num_strings * 2);
-    for (i = 0; i < l->num_strings; i++) {
-      if (!fprintf(fd, "0x%04x,0x%04x", l->dict[i].id, l->dict[i].offset)) {
-        fclose(fd);
-        return 0;
-      }
-      if (i + 1 < l->num_strings) fprintf(fd, ",");
-      fprintf(fd, "\r\n");
-    }
-    fprintf(fd, "};\r\n");
-
-    fclose(fd);
+    return(0);
   }
 
-  return 1;
+  allocsz = biggest_langsz + (biggest_langsz / 20);
+  printf("biggest lang block is %u bytes -> allocating a %u bytes buffer (5%% safety margin)\n", biggest_langsz, allocsz);
+  fprintf(fd, "/* THIS FILE HAS BEEN GENERATED BY TLUMACZ (PART OF THE SVARLANG LIBRARY) */\r\n");
+  fprintf(fd, "const unsigned short svarlang_memsz = %uu;\r\n", allocsz);
+  fprintf(fd, "const unsigned short svarlang_string_count = %uu;\r\n\r\n", l->num_strings);
+  fprintf(fd, "char svarlang_mem[%u] = {\r\n", allocsz);
+
+  for (i = 0; i < strings_bytes; i++) {
+    if (!fprintf(fd, "0x%02x", l->strings[i])) {
+      fclose(fd);
+      return(0);
+    }
+
+    if (i + 1 < strings_bytes) fprintf(fd, ",");
+    nextnlat++;
+    if (l->strings[i] == '\0' || nextnlat == 16) {
+      fprintf(fd, "\r\n");
+      nextnlat = 0;
+    }
+  }
+  fprintf(fd, "};\r\n\r\n");
+
+  fprintf(fd, "unsigned short svarlang_dict[%u] = {\r\n", l->num_strings * 2);
+  for (i = 0; i < l->num_strings; i++) {
+    if (!fprintf(fd, "0x%04x,0x%04x", l->dict[i].id, l->dict[i].offset)) {
+      fclose(fd);
+      return(0);
+    }
+    if (i + 1 < l->num_strings) fprintf(fd, ",");
+    fprintf(fd, "\r\n");
+  }
+  fprintf(fd, "};\r\n");
+
+  fclose(fd);
+
+  return(1);
 }
 
 
 int main(int argc, char **argv) {
   FILE *fd;
   int ecode = 0;
-  svl_lang_t *lang, *reflang = NULL;
-
   int i;
   unsigned short biggest_langsz = 0;
+  struct svl_lang *lang, *reflang = NULL;
 
   if (argc < 2) {
     puts("tlumacz ver " SVARLANGVER " - this tool is part of the SvarLANG project.");
@@ -457,7 +449,7 @@ int main(int argc, char **argv) {
         break;
       }
     }
-    
+
     /* write lang ID to file, followed string table size, and then
        the dictionary and string table for current language */
     if (!svl_write_lang(lang, fd)) {
@@ -469,8 +461,7 @@ int main(int argc, char **argv) {
     /* remember reference data for other languages */
     if (i == 1) {
       reflang = lang;
-    }
-    else {
+    } else {
       svl_lang_free(lang);
       lang = NULL;
     }
