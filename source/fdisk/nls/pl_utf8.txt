@@ -149,8 +149,7 @@
 
 7.0:\nDysk twardy został już wcześniej spartycjonowany.\n
 7.1:\nNie znaleziono pliku "boot.mbr".\n
-7.2:\nTyp partycji w linii %d pliku "fdiskpt.ini" jest poza zakresem.\n
-7.3:Napotkano błąd w linii %d pliku "fdiskpt.ini".\n
+7.3:Napotkano błąd w linii %d pliku "fdisk.ini".\n
 7.4:\nBłąd odczytu sektora.\n
 7.5:\nFunkcja flagowania sektora została wyłączona.\n
 7.6:Tworzenie MBR typu Drive Smart dla dysku %d\n
