@@ -5,7 +5,7 @@
 # ### POMOC ##################################################################
 
 0.0:Składnia: FDISK [<dysk#> [polecenia]...
-0.1:  brak argumentów   Uruchamia tryb interaktywny
+0.1:  bez argumentów    Uruchamia się w trybie interaktywnym
 0.2:  /INFO             Wyświetla informacje dot. partycji na <dysk#>
 0.3:  /REBOOT           Uruchamia ponownie komputer
 0.4:\t
@@ -119,6 +119,41 @@
 4.1:Utwórz partycję podstawową
 4.2:Utwórz partycję rozszerzoną
 4.3:Utwórz jeden logiczny napęd lub więcej wewnątrz partycji rozszerzonej
+
+
+##############################################################################
+# DELETE PARTITION MENU                                                      #
+##############################################################################
+
+5.0:Usuwa partycję DOS lub logiczny dysk DOS
+5.1:Usuwa podstawową partycję DOS
+5.2:Usuwa rozszerzoną partycję DOS
+5.3:usuwa logiczny dysk DOS znajdujący się w rozszerzonej partycji
+5.4:Usuwa nie-DOSową partycję
+
+
+##############################################################################
+# MBR MAINTENANCE MENU (EXTENDED OPTION)                                     #
+##############################################################################
+
+6.0:Zarządzanie MBRem
+6.1:Twowrzy MBR typu BootEasy (wyłączony)
+6.2:Przywraca MBR (partycje i kod) z zapisanego pliku
+6.3:Zapisuje MBR (partycje i kod) do pliku
+6.4:Usuwa kod startowy z MBR
+
+
+##############################################################################
+# FDISKIO.C                                                                  #
+##############################################################################
+
+7.0:\nDysk twardy został już wcześniej spartycjonowany.\n
+7.1:\nNie znaleziono pliku "boot.mbr".\n
+7.2:\nTyp partycji w linii %d pliku "fdiskpt.ini" jest poza zakresem.\n
+7.3:Napotkano błąd w linii %d pliku "fdiskpt.ini".\n
+7.4:\nBłąd odczytu sektora.\n
+7.5:\nFunkcja flagowania sektora została wyłączona.\n
+7.6:Tworzenie MBR typu Drive Smart dla dysku %d\n
 
 
 ##############################################################################
