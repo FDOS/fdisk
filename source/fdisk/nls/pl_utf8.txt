@@ -202,6 +202,39 @@
 
 
 ##############################################################################
+# USERINT0.C, USERINT1.C                                                     #
+##############################################################################
+
+9.0:Bieżący dysk stały:
+9.1:Wprowadź wybór:
+9.2:Wybierz jeden z poniższych:
+9.3:sektory, geometria
+9.4:Brak zdefiniowanych partycji.
+9.5:\nNajwiększy ciągły obszar dostępny dla partycji podstawowej = %lu MBajtów\n
+9.6:\nZawartość rozszerzonej partycji DOS:\n
+9.7:\nNajwiększy ciągły obszar w rozszerzonej partycji = %lu MBajtów\n
+9.8:    -------- nieużyteczne ---------
+9.9:(1 Mbajt = 1048576 bajtów)
+
+# The following are table headers, must stay adjusted as is
+9.10:\n\nPartycja    Status   Mbajtów  System           Zajęt.   Start CHS       Koniec CHS\n
+9.11:Nap Etykieta      Mbajtów System          Zajęt.   Start CHS       Koniec CHS\n
+9.12:Dysk   Nap   Mbajtów   Wolne Zajęt.
+
+9.13:Brak miejsca na utworzenie partycji DOS.
+9.14:Rozszerzona partycja już istnieje.
+9.15:Nie można utworzyć logicznego dysku DOS bez\n    partycji rozszerzonej na bieżącym dysku.
+9.16:Brak partycji podstawowej do usunięcia.
+9.17:Brak partycji rozszerzonej do usunięcia.
+9.18:Brak logicznego dysku do usunięcia.
+9.19:Brak partycji nieDOSowej do usunięcia.
+9.20:jest nieużyteczny!
+9.21:Brak partycji do usunięcia.
+9.22:\e[1mUWAGA!\e[22m Żadna partycja nie jest aktywna - dysk 1 jest niebootowalny \n    bez żadnej aktywnej partycji
+9.23:  \e[1m%lu\e[22m Mbajtów
+
+
+##############################################################################
 # GLOBAL STRINGS                                                             #
 ##############################################################################
 
@@ -209,8 +242,33 @@
 250.0:TN
 250.1:tn
 250.2:Nieprawidłowa odpowiedź, wprowadź T lub N
-250.3:Naciśnij dowolny klawisz aby kontynuować
+250.3:Wciśnij dowolny klawisz aby kontynuować
 250.4:BŁĄD
 250.5:UWAGA!
 250.6:AKTYWNA
 250.250:Program Konfiguracyjny Dysków Stałych
+
+
+##############################################################################
+# ERROR MESSAGES                                                             #
+##############################################################################
+
+255.0:\n    Błąd odczytu tablicy partycji.
+255.1:\n    Nie znaleziono żadnego dysku stałego.
+255.2:\nNie wprowadzono żadnego numeru napędu.
+255.3:\nNumer partycji jest poza zakresem (1-4).
+255.4:\nNie można aktywować partycji.
+255.5:\nBłąd podczas autopartycjonowania dysku twardego.
+255.6:\nBłąd podczas zerowania sektora MBR.
+255.7:\nBłąd podczas usuwania IPL.
+255.9:\nBłąd podczas wyłączania partycji.
+255.10:\nBłąd podczas zerowania tablicy partycji.
+255.11:\nBłąd podczas zapisu IPL.
+255.12:\nBłąd podczas instalacji IPL z pliku.
+255.13:\nBłąd podczas instalacji MBR z pliku.
+255.14:\nBłąd zapisu MBR.
+255.15:\nBłąd zapisu tablicy partycji.
+255.16:\nBłąd podczas kopiowania MBR.
+255.17:\nBłąd zapisu Smart IPL.
+255.18:\nNieprawidłowe polecenie lub błąd składni. Uruchom FDISK /? po pomoc.
+255.19:\nNieobsługiwany system operacyjny.\n
