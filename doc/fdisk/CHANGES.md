@@ -8,6 +8,12 @@ Bug classification:
  - LOW: Cosmetic bugs, like display issues etc.
 
 
+Version 1.3.9 (unreleased):
+--------------------------
+Changes:
+ - Reintroduce /SMBR command line argument as alias for /SAVEMBR.
+
+
 Version 1.3.8 (2023-07-24)
 --------------------------
 Bugfixes:
