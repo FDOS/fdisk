@@ -234,6 +234,49 @@
 
 
 ##############################################################################
+# USERINT2.C                                                                 #
+##############################################################################
+
+# Delete logical partition
+10.0:Dane w usuwanej nie-DOSowej partycji zostaną utracone.\n    Którą nie-DOSową partycję chcesz usunąć?
+10.1:To nie partycja!
+10.2:To nie jest nie-DOSowa partycja!
+10.3:Nie-DOSowa partycja usunięta.
+10.4:Błąd podczas usuwania nie-DOSowej partycji!
+
+# Display extended partition
+10.5:Brak utworzonych dysków logicznych.
+10.6:Całkowity rozmiar partycji rozszerzonej to %lu Mbajtów (1 Mbajt = 1048576 bajtów)
+
+# Display primary partitions
+10.7:Brak utworzonych partycji.
+10.8:Całkowity rozmiar dysku to %lu Mbajtów (1 Mbajt = 1048576 bajtów)
+
+# Table headers
+10.10:Partycja   Status  Typ      Etykieta       Mbajtów System          Użycie
+10.11:Partycja    Status   Mbajtów Opis             Użycie 1szy Cyl.  Ost. Cyl
+10.12:Dsk Etykieta      Mbajt. System   Użycie
+
+# Delete extended partition
+10.20:\e[1;5mUWAGA!\e[22;25m Dane w usuwanej partycji rozszerzonej i wszystkie jej\n    partycje logiczne zostaną utracone. Kontynuować (T/N)...?
+10.21:Partycja rozszerzona została usunięta
+
+# Delete logical drives
+10.30:\e[1;5mUWAGA!\e[22;25m Dane w usuwanym dysku logicznym zostaną utracone.\n    Który dysk logiczny chcesz usunąć..............................?
+10.31:Dysk logiczny usunięty
+10.32:Błąd podczas usuwania dysku logicznego!
+
+# Delete primary partition
+10.40:\e[1;5mUWAGA!\e[22;25m Dane w usuwanej partycji podstawowej zostaną utracone.\n    Którą partycję podstawową chcesz usunąć........?
+10.41:Partycja podstawowa usunięta
+10.42:Błąd podczas usuwania partycji podstawowej!
+10.43:To jest partycja rozszerzona!
+10.44:To nie jest partycja typu DOS!
+
+# category 10.x to be continued!
+
+
+##############################################################################
 # GLOBAL STRINGS                                                             #
 ##############################################################################
 
