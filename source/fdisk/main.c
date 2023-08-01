@@ -822,7 +822,8 @@ int main( int argc, char *argv[] )
             command_ok = TRUE;
          }
 
-         if ( 0 == strcmp( arg[0].choice, "SAVEMBR" ) ) {
+         if ( 0 == strcmp( arg[0].choice, "SAVEMBR" ) 
+                || strcmp( arg[0].choice, "SMBR" ) ) {
             flags.use_iui = FALSE;
             Ensure_Drive_Number();
 
