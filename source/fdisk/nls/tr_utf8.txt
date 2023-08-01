@@ -155,7 +155,6 @@
 
 7.0:\nSabit sürücü halihazırda bölüntülenmiş.\n
 7.1:\n"boot.mbr" dosyası bulunamadı.\n
-7.2:\n"fdiskpt.ini" içinde bölüntü türü %d. satırda erim dışında.\n
 7.3:"fdisk.ini" dosyasının %d. satırında hataya denk gelindi.\n
 7.4:\nDilim okunurken hata.\n
 7.5:\nDilim bayraklama işlevleri devre dışı.\n

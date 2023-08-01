@@ -154,7 +154,6 @@
 
 7.0:\nDer Datenträger ist bereits partitioniert.\n
 7.1:\nDie Datei "boot.mbr" wurde nicht gefunden.\n
-7.2:\nPartitionstyp außerhalb des gültigen Bereichs in Zeile %d von "fdiskpt.ini".\n
 7.3:Fehler gefunden in Zeile %d der Datei "fdisk.ini".\n
 7.4:\nFehler beim Lesen von Sektor.\n
 7.5:\nSektor-Flag Funktionen sind deaktiviert.\n
@@ -268,7 +267,7 @@
 10.21:Erweiterte Partition wurde gelöscht.
 
 # Delete logical drives
-10.30:\e[1;5mWARNUNG!\e[22;25m Alle Daten der logischen Partition gehen verloren.\n    Welche Partition möchten Sie löschen...............................? 
+10.30:\e[1;5mWARNUNG!\e[22;25m Alle Daten der logischen Partition gehen verloren.\n    Welche Partition möchten Sie löschen...............................?
 10.31:Logische Partition wurde gelöscht.
 10.32:Fehler beim Löschen der logischen Partition!
 

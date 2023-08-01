@@ -152,7 +152,6 @@
 
 7.0:\nThe hard drive has already been partitioned.\n
 7.1:\nThe "boot.mbr" file has not been found.\n
-7.2:\nPartition type out of range in line %d of "fdiskpt.ini".\n
 7.3:Error encountered on line %d of the "fdisk.ini" file.\n
 7.4:\nError reading sector.\n
 7.5:\nSector flagging functions have been disabled.\n

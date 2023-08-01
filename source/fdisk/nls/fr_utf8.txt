@@ -155,7 +155,6 @@
 
 7.0:\nLe disque dur a déjà été partitionné.\n
 7.1:\nLe fichier "boot.mbr" n'a pu être trouvé.\n
-7.2:\nType de partition hors de la plage sur la ligne %d de "fdiskpt.ini".\n
 7.3:Erreur survenue sur la ligne %d du fichier "fdisk.ini".\n
 7.4:\nErreur lors de la lecture du secteur.\n
 7.5:\nLes fonctions de marquage des secteurs ont été désactivées.\n
