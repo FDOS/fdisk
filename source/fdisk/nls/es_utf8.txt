@@ -1,0 +1,408 @@
+#
+# FDISK IN SPANISH                  Alex de G rate Ver. 0.64      Ago-2023
+#
+
+
+##############################################################################
+# HELP SCREEN                                                                #
+##############################################################################
+
+0.0:Sintaxis: FDISK [<unidad#>] [comandos]...
+0.1:  sin argumentos    Ejecuta FDISK en modo interactivo
+0.2:  /INFO             Muestra información de partición de <unidad#>
+0.3:  /REBOOT           Reinicia la computadora
+0.4:\t
+0.10:Comandos para crear y borrar particiones:
+0.11:    <tamaño> es un número para megabytes ó "MAX" para el tamaño máximo
+0.12:             ó "<número>,100", para que el <número> sea en porcentaje
+0.13:    <tipo#> tipo de partición numérica ó FAT-12/16/32 si /SPEC no es provista
+0.14:\t
+0.20:  /PRI:<tamaño> [/SPEC:<tipo#>]            Crea una partición Primaria
+0.21:  /EXT:<tamaño>                            Crea una partición Extendida DOS
+0.22:  /LOG:<tamaño> [/SPEC:<tipo#>]            Crea una Unidad Lógica
+0.23:  /PRIO,/EXTO,/LOGO                        igual que arriba, pero evita FAT32
+0.24:  /AUTO                                    Automáticamente particiona el disco
+0.26:  /DELETE {/PRI[:#] | /EXT | /LOG:<part#>  Borra una partición unidades
+0.27:         | /NUM:<part#>}                   ... lógicas comienzan en /NUM=5
+0.29:  /DELETEALL                               Borra todas particiones de <unidad#>
+0.30:\t
+0.31:Estableciendo particiones activas:
+0.32:  /ACTIVATE:<partición#>                   Establece <partición#> como activa
+0.33:  /DEACTIVATE                              Desactiva todas las particiones
+0.34:\t
+0.40:Manejo del MBR (Master Boot Record):
+0.41:  /CLEARMBR            Borra todas las particiones y el código de arranque
+0.42:  /LOADMBR             Carga tabla partición y código desde "boot.mbr" al MBR
+0.43:  /SAVEMBR             Guarda la tabla partición y código en archivo "boot.mbr"
+0.44:\t
+0.50:Modificaciones al código MBR dejando las particiones intactas:
+0.51:  /IPL                 Instala el código arranque estandar dentro MBR <unidad#>
+0.52:                       ...igual que /MBR y /CMBR por compatibilidad
+0.53:  /SMARTIPL            Instala DriveSmart IPL dentro MBR <unidad#>
+0.54:  /LOADIPL             Escribe 440 bytecodes desde archivo "boot.mbr" al MBR
+0.55:\t
+0.60:Modificaciones Avanzadas de la tabla de partición:
+0.61:  /MODIFY:<part#>,<tipo#>                 Cambia el tipo partición a <tipo#>
+0.62:                                          ...unidades lógicas comienzan en "5"
+0.63:  /MOVE:<oripart#>,<destpart#>            Mueve particiones primarias
+0.64:  /SWAP:<1a_part#>,<2a_part#>             Intercambia particiones primarias
+0.65:\t
+0.70:Para manejo de flags (banderas) en el disco duro:
+0.71:  /CLEARFLAG[{:<flag#>} | /ALL}]        Restablece <flag#>,ó todas en <unidad#>
+0.72:  /SETFLAG:<flag#>[,<valor>]            Establece <flag#> a 1, ó <valor>
+0.73:  /TESTFLAG:<flag#>[,<valor>]           Testea <flag#> para 1, ó <valor>
+0.74:\t
+0.80:Para obtener información acerca del disco(s) rígido(s):
+0.81:  /STATUS       Muestra la disposición de la partición actual
+0.82:  /DUMP         Vuelca información de la partición(es) de todos los discos\n                duros (depuración)
+0.83:\t
+0.90:Interruptores interactivos de interfaz de usuario:
+0.91:  /UI           Siempre inicia Interfaz Usuario si está como último argumento
+0.92:  /MONO         Deshabilita atributos de texto (brillo, texto parpadeante)
+0.93:  /FPRMT        Pide por FAT32/FAT16 en modo interactivo
+0.94:  /XO           Habilita opciones extendidas
+0.95:\t
+0.100:Opciones de Compatibilidad:
+0.101:  /X            Desabilita ext. INT 13 y LBA para los siguientes commandos
+0.102:\t
+0.200:Este programa es Copyright %s by Brian E. Reifsnyder y
+0.201:El Proyecto FreeDOS, bajo los términos de la GNU General Public License
+0.202:(GPL), versión 2.
+0.203:\t
+0.204:Este programa se entrega como está y sin garantía de ningún tipo.
+0.205:El autor de este software no asume ninguna responsibilidad relativa al
+0.206:uso, ó mal uso de este software. Al usar este software, el operador entiende
+0.207:que acepta los términos arriba mencionados.
+
+
+##############################################################################
+# FAT32 SUPPORT SCREEN                                                       #
+##############################################################################
+
+1.0:\e[5;5HFDISK es capaz de usar soporte de discos grandes para permitirle
+1.1:    a ud. crear particiones mayores que 2.048 MB al usar particiones
+1.2:    FAT32. Si ud. habilita soporte de discos grandes, particiones ó
+1.3:    unidades lógicas mayores que 512 MB serán creados usando FAT32.
+1.4:    IMPORTANTE:  Si ud. habilita soporte de discos grandes, algunos
+1.5:    sistemas operativos serán incapaces de acceder a particiones y
+1.6:    unidades lógicas que estan sobre los 512 MB de tamaño.
+1.7:\e[5;18H Desea Ud. usar soporte de discos grandes (FAT32) (S/N)?
+
+
+##############################################################################
+# EXIT SCREEN                                                                #
+##############################################################################
+
+2.0:Ud. \e[1mDEBE\e[22m reiniciar su sistema para que sus cambios tengan efecto.
+2.1:Cualquier unidad que haya creado o cambiada debe ser formateada\n    \e[1mDESPUÉS\e[22m que ud. reinicie.
+2.2:El Sistema se reiniciará ahora
+2.3:Presione cualquier tecla cuando esté listo . . .
+
+
+##############################################################################
+# MAIN MENU                                                                  #
+##############################################################################
+
+3.0:Opciones de FDISK
+3.1:Crea partición DOS ó Unidad Lógica DOS
+3.2:Establece partición Activa
+3.3:Borra partición ó Unidad Lógica DOS
+3.4:Muestra información de partición
+3.5:Muestra / Modifica información de partición
+3.6:Cambia la unidad de disco fijo actual
+3.7:Mantenimiento del MBR
+3.8:Aborta los cambios y Sale
+
+
+##############################################################################
+# CREATE PARTITION MENU                                                      #
+##############################################################################
+
+4.0:Crea una Partición DOS ó Unidad Lógica DOS
+4.1:Crea una Partición Primaria DOS
+4.2:Crea una Partición Extendida DOS
+4.3:Crea Unidad(es) Lógica(s) DOS en la Partición Extendida DOS
+
+
+##############################################################################
+# DELETE PARTITION MENU                                                      #
+##############################################################################
+
+5.0:Borra una Partición DOS ó Unidad Lógica DOS
+5.1:Borra una Partición Primaria DOS
+5.2:Borra una Partición Extendida DOS
+5.3:Borra Unidad(es) Lógica(s) DOS en la Partición Extendida DOS
+5.4:Borra una Partición No-DOS
+
+
+##############################################################################
+# MBR MAINTENANCE MENU (EXTENDED OPTION)                                     #
+##############################################################################
+
+6.0:Mantenimiento del MBR
+6.1:Crea BootEasy MBR (deshabilitado)
+6.2:Carga el MBR (particiones y código) desde un archivo guardado
+6.3:Guarda el MBR (particiones y código) a un archivo
+6.4:Remueve el código de arranque del MBR
+
+
+##############################################################################
+# FDISKIO.C                                                                  #
+##############################################################################
+
+7.0:\nEl disco duro ya ha sido particionado.\n
+7.1:\nEl archivo "boot.mbr" no ha sido encontrado.\n
+7.2:\nTipo de Partición fuera de rango en la línea %d de "fdiskpt.ini".\n
+7.3:Error encontrado en la línea %d del archivo "fdisk.ini".\n
+7.4:\nError leyendo sector.\n
+7.5:\nFunciones de señalización de Sector, han sido deshabilitadas.\n
+7.6:Creando DriveSmart MBR para el disco %d\n
+
+
+##############################################################################
+# CMD.C                                                                      #
+##############################################################################
+
+8.0:\nError de Sintaxis\n\nPrograma Terminado\n
+8.1:\nError al borrar flag.\n
+8.2:\nFlag %d ha sido borrada.\n
+8.3:\nSe especificó un tamaño de partición no válido.\n
+8.4:\nLa partición Extendida ya existe.\n
+8.5:\nError creando la partición Extendida.\n
+8.7:\nSe encontró una partición Extendida No usable.\n
+8.8:\nError creando una Unidad Lógica.\n
+8.10:\nError creando la partición Primaria.\n
+8.11:\nLa partición Primaria # (%ld) debe ser de 1..4.\n
+8.12:\nNo se encontró una partición para borrar.\n
+8.13:\n%d particion(es) Primaria(s) encontrada(s), ud. debe especificar \n   el número a borrar.
+8.14:\nError borrando partición Primaria.\n
+8.15:\nError borrando partición Extendida.\n
+8.16:\nLa Unidad Lógica número %d, está fuera de rango.\n
+8.17:\nEl número de partición está fuera de rango.\n
+8.18:\nArgumento de borrado No válido.\n
+8.19:\nError borrando la Unidad Lógica.\n
+8.20:\nEl Nuevo tipo de partición está fuera de rango.\n
+8.21:\nError modificando el tipo de partición.\n
+8.22:\nEl número de partición de Origen, está fuera de rango.\n
+8.23:\nEl número de partición de Destino, está fuera de rango.\n
+8.24:\nError Moviendo la entrada de partición en el MBR.\n
+8.25:\nNúmero de flag No válido.\n
+8.26:\nEl valor de Flag está fuera de rango.\n
+8.27:\nError estableciendo flag.\n
+8.28:\nFlag %d ha sido establecida a %d.\n
+8.29:Estado de la unidad de Disco Fija
+8.30:\nError intercambiando particiones.\n
+8.31:\nFlag %d se establece en %d.\n
+8.32:\nFlag %d no está puesta en %d.\n
+8.34:\n<%s> debería ser un dígito; Programa terminado\n
+8.35:\nMás de un disco especificado; Programa terminado\n
+8.36:\n<%s> debería comenzar con '-' ó con '/'; Programa terminado\n
+8.37:\n<%s> ':' esperado; Programa terminado\n
+8.38:\n<%s> ',' esperado; Programa terminado\n
+8.39:\n<%s> se esperaba fin de cadena; Programa terminado\n
+8.40:\nDesignación de unidad No válida.\n
+8.41:\nTodas las flags han sido borradas.\n
+
+
+##############################################################################
+# USERINT0.C, USERINT1.C                                                     #
+##############################################################################
+
+9.0:Unidad de Disco Fija Actual:
+9.1:Ingrese opción:
+9.2:Elija una de las siguientes:
+9.3:sectores, geometria
+9.4:No hay particiones definidas.
+9.5:\nEl Mayor espacio libre contiguo para partición Primaria = %lu MBytes\n
+9.6:\nContenido de la Partición Extendida DOS:\n
+9.7:\nEl Mayor espacio libre contiguo en Partición Extendida = %lu MBytes\n
+9.8:    -------- unusable ---------
+9.9:(1 Mbyte = 1048576 bytes)
+
+# The following are table headers, must stay adjusted as is
+9.10:\n\nPartición   Estado   Mbytes   Sistema          Uso      Inicio-CHS      Fin-CHS\n
+9.11:Drv Etiqueta-Vol  Mbytes  Sistema         Uso      Inicio-CHS      Fin-CHS\n
+9.12:Disco   Drv   Mbytes   Libre Uso
+
+9.13:No hay espacio para crear una partición DOS.
+9.14:La partición Extendida DOS ya existe.
+9.15:No se puede crear Unidad Lógica DOS sin\n    una Partición Extendida DOS en la unidad actual.
+9.16:No hay una Partición Primaria DOS para borrar.
+9.17:No hay una Partición Extendida DOS para borrar.
+9.18:No hay Unidad(es) Lógica(s) DOS para borrar.
+9.19:No hay Particiones No-DOS para borrar.
+9.20:es inutilizable!
+9.21:No hay particiones para borrar.
+9.22:\e[1mADVERTENCIA !\e[22m\n Ninguna partición esta configurada como activa - Disco 1 No\n    es iniciable a menos que una partición esté activa
+9.23:  \e[1m%lu\e[22m Mbytes
+
+
+##############################################################################
+# USERINT2.C                                                                 #
+##############################################################################
+
+# Delete logical partition
+10.0:Los Datos en Partición No-DOS borrada se perderán.\n    Qué Partición No-DOS quiere ud. borrar ?
+10.1:No es una partición!
+10.2:Negándose a borrar Partición DOS!
+10.3:Partición No-DOS borrada.
+10.4:Error borrando Partición No-DOS!
+
+# Display extended partition
+10.5:No hay Unidades Lógicas definidas.
+10.6:Tamaño Total de Partición Extendida es \e[1m%lu\e[22m Mbytes.
+
+# Display primary partitions
+10.7:No hay particiones definidas.
+10.8:Espacio Total en Disco es \e[1m%lu\e[22m Mbytes (1 Mbyte = 1048576 bytes)
+
+# Table headers
+10.10:Partitión  Estado  Tipo     Etiqueta-Vol   Mbytes  Sistema         Uso
+10.11:Partición   Estado   Mbytes  Descripción      Uso   Inicio-Cyl  Fin-Cyl
+10.12:Drv Etiqueta-Vol  Mbytes Sistema  Uso
+
+# Delete extended partition
+10.20:\e[1;5mADVERTENCIA !\e[22;25m Datos en Partición Extendida DOS borrada y en sus\n    Particiones Lógicas se perderán. Continúa (S/N)..?
+10.21:Partición Extendida DOS borrada
+
+# Delete logical drives
+10.30:\e[1;5mADVERTENCIA !\e[22;25m Los Datos en la Unidad Lógica borrada se perderán.\n    Qué unidad desea ud. borrar....................................?
+10.31:Unidad Lógica borrada
+10.32:Error borrando la Unidad Lógica!
+
+# Delete primary partition
+10.40:\e[1;5mADVERTENCIA !\e[22;25m Los Datos en la Partición Primaria DOS borrada se perderán.\n    Que Partición Primaria quiere ud. borrar.......?
+10.41:Partición Primaria DOS borrada
+10.42:Error borrando Partición Primaria DOS!
+10.43:Refusing to delete Partición Extendida!
+10.44:No es una partición DOS!
+
+# Set active partition
+10.50:No hay particiones para hacer activas.
+10.51:Ingrese el número de partición que ud. desea hacer activa...........:
+10.52:%d no es una opción. Por favor ingrese una opción válida.
+10.53:La única partición iniciable en la unidad %d ya está activada.
+10.54:La Partición %d fué activada.
+
+# Create partition
+10.60:Desea usar el maximo tamaño disponible para la Partición Primaria DOS\n    y hacer la partición activa (S/N).......................?
+10.61:Desea usar el maximo tamaño disponible para una Partición Primaria DOS\n    (S/N)...................................................?
+10.62:Esta unidad es FAT32 por defecto, cambiar a FAT16 (S/N)?
+10.63:El Espacio Máximo disponible para partición es \e[1m%lu\e[22m Mbytes
+10.64:Ingrese tamaño partición en Mbytes ó porcentaje (%%) espacio en disco \n    para crear una Partic. Primaria DOS:
+10.65:Ingrese tamaño partición en Mbytes ó porcentaje (%%) espacio en disco \n    para crear una Partic. Extendida DOS :
+10.66:Partición Primaria DOS creada
+10.67:Partición Extendida DOS creada
+
+# Create logical partition
+10.70:Unidad Lógica DOS creada, letras de unidad cambiada ó agregada
+10.71:Número Maximo de Unidades Lógicas DOS instalada
+10.72:Ingrese tamaño Unidad Lógica en Mbytes ó porcentaje (%%) del\n    tamaño Partición Extendida:
+10.73:Todo el espacio disponible en Partición Extendida DOS\n    es asignado a Unidades Lógicas.
+
+# Display partition info
+10.80:La Partición Extendida DOS contiene Unidades Lógicas DOS.\n    Desea Ud. mostrar la información de Unidades Lógicas (S/N)......?
+10.81:Opcional:  Ingrese el número de la partición a modificar.
+10.82:Ingrese el número de partición que Ud. desea modificar (1-4).?
+10.83:Muestra información de la Unidad Lógica DOS
+10.84:Ingrese el carácter de Unidad Lógica que Ud. desea modificar..?
+
+# List partition types
+10.90:Lista Tipos de Particiones
+10.91:Pulse una tecla para continuar . . .
+
+# Display / modify partition
+10.100:Muestra / Modifica Información de la Unidad Lógica
+10.101:Partición            Mbytes  Tipo             Uso    Inicio-Cil Fin-Cil
+10.102:Cambiar tipo de partición
+10.104:Ocultar / Mostrar partición
+10.105:Ingrese nuevo tipo partición(1-255):
+10.106:Remover estado de activa
+
+
+10.190:Ingrese Número Unidad Disco Fijo(1-%d).:
+10.200:Está Ud. seguro (S/N)?
+
+# Error strings
+10.250:Letra de Unidad No permitida
+
+11.0:\nNo se pudo encontrar el archivo \"boot.mbr\" ...el MBR no ha sido cargado.\n
+11.1:El MBR ha sido escrito usando \"boot.mbr\"
+11.2:El MBR ha sido guardado a \"boot.mbr\"
+11.3:El código de arranque ha sido removido del MBR.
+
+
+##############################################################################
+# KBDINPUT.C                                                                 #
+##############################################################################
+
+20.5:Pulse \e[1mESC\e[22m para volver a opciones de FDISK
+20.6:Pulse \e[1mESC\e[22m para Salir de FDISK
+20.7:Pulse \e[1mESC\e[22m para Continuar
+20.8:El tamaño de partición solicitado excede el espacio máximo disponible.
+20.9:Entrada ingresada por el usuario:  %d
+20.10:Entrada:  %d
+20.11:Entrada Inválida, por favor ingrese
+20.12:no es una opción, por favor ingrese
+20.13:Entrada Inválida.
+
+
+##############################################################################
+# WARNING SCREENS                                                            #
+##############################################################################
+30.1:Usted tiene al menos un disco mayor de 2,097,152 MB. \n    FDISK NO puede manejar particiones que excedan esta barrera !\n\n
+30.2:    Usted puede proceder pero está en riesgo de pérdida de datos, especialmente\n    si ya hay particiones creadas con otras herramientas excediendo la barrera.\n\n
+30.3:    Debería esta bien, si Free FDISK es la única herramienta de particionado\n    que ud. está usando, pero recomendamos usar otra utilidad de disco para\n    manejar este tipo de disco.
+30.4:Está ud. seguro que quiere continuar (S/N)?
+
+30.10:FDISK está actualmente en modo alineamiento de cilindros, pero la\n    partición Extendida no comienza en el límite del cilindro!\n\n
+30.11:    Aunque poco probable, esto PUEDE resultar en problemas de compatibilidad.\n\n
+30.12:Si su sistema depende del adecuado alineamiento de los cilindros, ud. debería\n    considerar recrear la partición Extendida.
+30.13:Crear Unidad Lógica en partición Extendida  no-alineada..?
+
+30.20:    Una disposición de Partición Extendida no-compatible fué detectada en\n
+30.21:    este disco. Las siguientes acciones estan deshabilitadas:\n\n
+30.22:      - Creación de Unidades Lógicas\n
+30.23:      - Borrado de Unidades Lógicas\n\n
+30.24:    Ud. puede recrear la Partición Extendida para habilitar la edición ó\n
+30.25:    usar otra utilidad de disco para particionar este disco.\n
+
+
+##############################################################################
+# GLOBAL STRINGS                                                             #
+##############################################################################
+
+# Yes-No letters, as used to answer "Yes/No" questions (upper- and lower-case)
+250.0:SN
+250.1:sn
+250.2:Entrada Inválida, por favor ingrese S-N
+250.3:Pulse una tecla para continuar
+250.4:ERROR
+250.5:ADVERTENCIA!
+250.6:ACTIVA
+250.250:Programa de Instalación de Disco Fijo
+
+
+##############################################################################
+# ERROR MESSAGES                                                             #
+##############################################################################
+
+255.0:\n    Error leyendo las tablas de partición.
+255.1:\n    No hay disco Fijo presente.
+255.2:\nNingún número de unidad ha sido ingresado.
+255.3:\nEl Número de partición está fuera de rango (1-4).
+255.4:\nNo se puede activar la partición.
+255.5:\nError auto-particionando el disco duro.
+255.6:\nError borrando el sector MBR.
+255.7:\nError removiendo IPL.
+255.9:\nError desactivando la partición.
+255.10:\nError borrando la tabla de partición.
+255.11:\nError escribiendo IPL.
+255.12:\nError instalando IPL desde archivo.
+255.13:\nError instalando el MBR desde archivo.
+255.14:\nError escribiendo el MBR.
+255.15:\nError escribiendo tablas de partición.
+255.16:\nError grabando el MBR.
+255.17:\nError escribiendo Smart IPL.
+255.18:\nComando No Válido ó error de sintaxis. Invocar FDISK /? por ayuda.
+255.19:\nSistema Operativo NO soportado.\n
