@@ -152,7 +152,6 @@
 
 7.0:\nEl disco duro ya ha sido particionado.\n
 7.1:\nEl archivo "boot.mbr" no ha sido encontrado.\n
-7.2:\nTipo de Partición fuera de rango en la línea %d de "fdiskpt.ini".\n
 7.3:Error encontrado en la línea %d del archivo "fdisk.ini".\n
 7.4:\nError leyendo sector.\n
 7.5:\nFunciones de señalización de Sector, han sido deshabilitadas.\n
