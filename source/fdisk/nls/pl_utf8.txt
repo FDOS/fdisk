@@ -330,6 +330,42 @@
 
 
 ##############################################################################
+# KBDINPUT.C                                                                 #
+##############################################################################
+
+20.5:Naciśnij \e[1mESC\e[22m by wrócić do opcji FDISK
+20.6:Naciśnij \e[1mESC\e[22m by wyjść z FDISK
+20.7:Naciśnij \e[1mESC\e[22m by kontynuować
+20.8:Podany rozmiar partycji przekracza ilość dostępnego miejsca
+20.9:Wybór użytkownika:  %d
+20.10:Wprowadzono:  %d
+20.11:Nieprawidłowy wpis, wprowadź
+20.12:nie jest możliwą opcją, wprowadź
+20.13:Nieprawidłowy wpis.
+
+
+##############################################################################
+# WARNING SCREENS                                                            #
+##############################################################################
+30.1:Masz co najmniej jeden dysk większy niż 2,097,152 MB. FDISK NIE\n    WSPIERA tak dużych partycji!\n\n
+30.2:    Możesz kontynuować, ale z ryzykiem utraty danych, szczególnie jeśli\n    już istnieją partycje ponad ten limit.\n\n
+30.3:    Powinno być dobrze jeśli FDISK jest jedynym narzędziem do partycji\n    którego używasz, lecz zalecamy użycie innego narzędzie dla tego typu\n    dysków.
+30.4:Czy na pewno chcesz kontynuować (T/N).....?
+
+30.10:FDISK is currently in cylinder alignment mode, but the\n    extended partition does not start on a cylinder boundary!\n\n
+30.11:    While unlikely, this MAY result in compatibility problems.\n\n
+30.12:If your system depends on proper cylinder alignment you should\n    consider re-creating the extended partition.
+30.13:Create logical drive in non-aligned extended partition...?
+
+30.20:    Wykryto niekompatybilny układ partycji rozszerzonej na tym\n
+30.21:    dysku. Poniższe operacje są niemożliwe:\n\n
+30.22:      - tworzenie dysków logicznych\n
+30.23:      - usuwanie dysków logicznych\n\n
+30.24:    Możesz stworzyć partycję rozszerzoną na nowo aby umożliwić edycję\n
+30.25:    lub użyj innego narzędzie do spartycjonowania tego dysku.\n
+
+
+##############################################################################
 # GLOBAL STRINGS                                                             #
 ##############################################################################
 
