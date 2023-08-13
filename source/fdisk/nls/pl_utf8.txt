@@ -273,7 +273,60 @@
 10.43:To jest partycja rozszerzona!
 10.44:To nie jest partycja typu DOS!
 
-# category 10.x to be continued!
+# Set active partition
+10.50:Nie ma partycji do aktywacji.
+10.51:Wprowadź numer partycji którą chcesz aktywować......................:
+10.52:%d nie jest możliwą opcją. Dokonaj wyboru spośród dostępnych opcji.
+10.53:Jedyna startowalna partycja Dysku %d już jest aktywna.
+10.54:Partycja %d została aktywowana.
+
+# Create partition
+10.60:Czy chcesz użyć maksymalnego roziaru dla podstawowej partycji DOS i\n    aktywować tę partycję (T/N).............................?
+10.61:Czy chcesz użyć maksymalnego rozmiaru dla partycji DOS\n    (T/N)...................................................?
+10.62:Ten napęd jest domyślnie FAT32, zmienić na FAT16 (T/N)?
+10.63:Maksymalna ilość dostępnego miejsca dla partycji to \e[1m%lu\e[22m Mbajtów
+10.64:Podaj rozmiar partycji w Mbajtach lub procentach (%%) rozmiaru dysku\n    aby utworzyć podstawową partycję...:
+10.65:Podaj rozmiar partycji w Mbajtach lub procentach (%%) romiaru dysku\n    by utworzyć rozszerzoną partycję DOS.:
+10.66:Partycja podstawowa została utworzona
+10.67:Partycja rozszerzona została utworzona
+
+# Create logical partition
+10.70:Dysk logiczny utworzony, litery napędów zostały zmienione lub dodane
+10.71:Maksymalna ilość zainstalowanych logicznych dysków DOS
+10.72:Podaj rozmiar logicznego dysku w Mbajtach lub procentach\n    rozmiaru rozsz. partycji..:
+10.73:Całe dostępne miejsce w rozszerzonej partycji\n    jest nadane dyskom logicznym.
+
+# Display partition info
+10.80:Rozszerzona partycja DOS zawiera dyski logiczne.\n    Czy chcesz wyświetlić informacje o dyskach logicznych (T/N).....?
+10.81:Opcjonalnie:  Podaj numer partycji do zmiany.
+10.82:Podaj numer partycji którą chcesz zmienić (1-4)...?
+10.83:Wyświetl informacje o dyskach logicznych
+10.84:Wprowadź literę dysku logicznego do zmiany...?
+
+# List partition types
+10.90:Lista typów partycji
+10.91:Naciśnij dowolny klawisz by kontynuować . . .
+
+# Display / modify partition
+10.100:Wyświetl/Zmień informacje o logicznych dyskach
+10.101:Partycja             Mbajtów Typ              Użycie Cyl pocz.  Cyl końc.
+10.102:Zmień typ partycji
+10.104:Ukryj / odkryj partycję
+10.105:Wprowadź nowy typ partycji (1-255).:
+10.106:Usuń aktywny status
+
+
+10.190:Podaj numer dysku stałego (1-%d).......:
+10.200:Czy jesteś pewny(T/N)?
+
+# Error strings
+10.250:Nieprawidłowa litera dysku
+
+
+11.0:\nNie mogę znaleźć pliku \"boot.mbr\"...MBR nie został nadpisany.\n
+11.1:MBR został nadpisany na podstawie \"boot.mbr\"
+11.2:MBR został zapisany do \"boot.mbr\"
+11.3:Kod startowy został usunięty z MBR.
 
 
 ##############################################################################
