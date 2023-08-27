@@ -58,10 +58,6 @@ CFLAGS += -os -s -ms
 CFLAGS += -DRELEASE=$(RELEASE)
 !endif
 
-!ifdef FREEDOS
-CFLAGS += -DFD_FREEDOS=$(FREEDOS)
-!endif
-
 objs  = main.obj cmd.obj fdiskio.obj pdiskio.obj pcompute.obj compat.obj
 objs += helpscr.obj userint0.obj
 objs +=

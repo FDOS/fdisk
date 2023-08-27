@@ -49,11 +49,6 @@ This builds _fdisk.exe_ and the translation file _fdisk.lng_ in the
 wmake RELEASE=1
 ```
 
-To build a FreeDOS FDISK branded release:
-```
-wmake RELEASE=1 FREEDOS=1
-```
-
 To build a LITE release (without UI):
 ```
 wmake RELEASE=1 LITE=1
