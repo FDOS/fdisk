@@ -219,9 +219,9 @@
 9.9:(1 Mbyte = 1048576 bytes)
 
 # The following are table headers, must stay adjusted as is
-9.10:\n\nPartición   Estado   Mbytes   Sistema          Uso      Inicio-CHS      Fin-CHS\n
-9.11:Drv Etiqueta-Vol  Mbytes  Sistema         Uso      Inicio-CHS      Fin-CHS\n
-9.12:Disco   Drv   Mbytes   Libre Uso
+9.10:\n\nPartición   Estado   Mbytes   Sistema            Uso   Inicio-CHS       Fin-CHS\n
+9.11:Drv Etiqueta-Vol  Mbytes  Sistema           Uso   Inicio-CHS       Fin-CHS\n
+9.12:Disco  Drv   Mbytes   Libre    Uso
 
 9.13:No hay espacio para crear una partición DOS.
 9.14:La partición Extendida DOS ya existe.
@@ -256,9 +256,9 @@
 10.8:Espacio Total en Disco es \e[1m%lu\e[22m Mbytes (1 Mbyte = 1048576 bytes)
 
 # Table headers
-10.10:Partitión  Estado  Tipo     Etiqueta-Vol   Mbytes  Sistema         Uso
-10.11:Partición   Estado   Mbytes  Descripción      Uso   Inicio-Cyl  Fin-Cyl
-10.12:Drv Etiqueta-Vol  Mbytes Sistema  Uso
+10.10:Partitión  Estado  Tipo     Etiqueta-Vol   Mbytes  Sistema           Uso
+10.11:Partición   Estado   Mbytes  Descripción       Uso  Inicio-Cyl  Fin-Cyl
+10.12:Drv Etiqueta-Vol  Mbytes Sistema    Uso
 
 # Delete extended partition
 10.20:\e[1;5mADVERTENCIA !\e[22;25m Datos en Partición Extendida DOS borrada y en sus\n    Particiones Lógicas se perderán. Continúa (S/N)..?
