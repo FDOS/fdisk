@@ -18,8 +18,9 @@ Tom Ehlert              program size reduction, code simplifications,
                           new bootloader, bug fixes
 Wilhelm Spiegl          extensive testing
 Bernd Boeckmann         Open Watcom C and I16-GCC ports, critical bug fixes,
-                          code cleanup, german translation
+                          code cleanup, German translation
 Mateusz Viste           svarlang lib, FDISK lite, code improvements,
-                          polish translation
-Emir SARI               turkish translation
-Berki Yenigün           french, turkish translation
+                          Polish translation
+Emir SARI               Turkish translation
+Berki Yenigün           French, Turkish translation
+Alejandro de Garate     Spanish translation
