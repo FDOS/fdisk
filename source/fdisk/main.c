@@ -822,8 +822,8 @@ int main( int argc, char *argv[] )
             command_ok = TRUE;
          }
 
-         if ( 0 == strcmp( arg[0].choice, "SAVEMBR" ) 
-                || strcmp( arg[0].choice, "SMBR" ) ) {
+         if ( 0 == strcmp( arg[0].choice, "SAVEMBR" ) || 
+              0 == strcmp( arg[0].choice, "SMBR" ) ) {
             flags.use_iui = FALSE;
             Ensure_Drive_Number();
 
@@ -882,7 +882,6 @@ int main( int argc, char *argv[] )
             Command_Line_X();
             Shift_Command_Line_Options( 1 );
             command_ok = TRUE;
-            /*exit( 0 );*/
          }
 
          if ( 0 == strcmp( arg[0].choice, "XO" ) ) {
@@ -891,7 +890,6 @@ int main( int argc, char *argv[] )
             flags.del_non_dos_log_drives = TRUE;
             flags.set_any_pri_part_active = TRUE;
             command_ok = TRUE;
-
             Shift_Command_Line_Options( 1 );
          }
 
@@ -906,6 +904,7 @@ int main( int argc, char *argv[] )
 
             exit( 0 );
          }
+
          if ( command_ok == FALSE ) {
             con_puts(svarlang_str(255, 18) );
             exit( 1 );
