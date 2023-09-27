@@ -10,6 +10,8 @@ IF NOT ERRORLEVEL 1 GOTO ERR_MISSINGUTF
 
 utf8tocp 437 en_utf8.txt > EN.TXT
 utf8tocp 850 de_utf8.txt > DE.TXT
+utf8tocp 850 it_utf8.txt > IT.TXT
+utf8tocp 850 es_utf8.txt > ES.TXT
 utf8tocp 850 fr_utf8.txt > FR.TXT
 utf8tocp maz pl_utf8.txt > PL.TXT
 utf8tocp 857 tr_utf8.txt > TR.TXT
@@ -17,7 +19,7 @@ utf8tocp 857 tr_utf8.txt > TR.TXT
 :: ***************************************************************************
 
 :: "en" must come first here! first item is the reference language.
-tlumacz en de fr pl tr > TLUMACZ.LOG
+tlumacz en de it es fr pl tr > TLUMACZ.LOG
 
 :: CLEAN UP CONVERTED FILES
 DEL ??.TXT
