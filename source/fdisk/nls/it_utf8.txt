@@ -1,0 +1,409 @@
+#
+# FDISK IN ITALIANO
+#
+
+
+##############################################################################
+# SCHERMATA DI AIUTO #
+##############################################################################
+
+0.0:Sintassi: FDISK [<unità#>] [comandi]...
+0.1:nessun argomento Esegue in modalità interattiva
+0.2: /INFO Visualizza le informazioni sulla partizione di <unità#>.
+0.3: /REBOOT Riavvia il computer
+0.4:\t
+0.10:Comandi per creare ed eliminare partizioni:
+0.11: <dimensione> è un numero per i megabyte o MAX per la dimensione
+0.12: massima o <numero>,100 per <numero> in percentuale
+0.13: <tipo#> è un tipo di partizione numerica o FAT-12/16/32 se\n	non viene fornito /SPEC
+0.14:\t
+0.20: /PRI:<dimensione> [/SPEC:<tipo#>] Crea una partizione primaria
+0.21: /EXT:<dimensione> Crea una partizione DOS estesa
+0.22: /LOG:<dimensioni> [/SPEC:<tipo#>] Crea un'unità logica
+0.23: /PRIO,/EXTO,/LOGO Come sopra, ma evita FAT32
+0.24: /AUTO Partiziona automaticamente il disco
+0.26: /DELETE {/PRI[:#] | /EXT | /LOG:<part#> Elimina una partizione
+0.27:         | /NUM:<part#>}           ...le unità logiche iniziano da /NUM=5
+0.29: /DELETEALL Cancella tutte le partizioni da <unità#>.
+0.30:\t
+0.31:Impostazione delle partizioni attive:
+0.32: /ACTIVATE:<partizione#> Attiva <partizione#>.
+0.33: /DEACTIVATE Disattiva tutte le partizioni
+0.34:\t
+0.40:Gestione del MBR (Master Boot Record):
+0.41: /CLEARMBR Cancella tutte le partizioni e il codice di avvio.
+0.42: /LOADMBR Carica la tabella delle partizioni e il codice da "boot.mbr" nel MBR
+0.43: /SAVEMBR Salva la tabella delle partizioni e il codice nel file "boot.mbr".
+0.44:\t
+0.50:Modifica il codice dell'MBR lasciando intatte le partizioni:
+0.51: /IPL Installa il codice di avvio standard nell'MBR <unità#>.
+0.52: ...uguale a /MBR e /CMBR per compatibilità
+0.53: /SMARTIPL Installa l'IPL di unitàSmart in MBR <unità#>.
+0.54: /LOADIPL Scrive 440 byte di codice da "boot.mbr" in MBR
+0.55:\t
+0.60:Modifica avanzata della tabella delle partizioni:
+0.61: /MODIFY:<part#>,<tipo#> Cambia il tipo di partizione in <tipo#>.
+0.62: ...le unità logiche iniziano da "5".
+0.63: /MOVE:<srcpart#>,<destpart#> Sposta le partizioni primarie
+0.64: /SWAP:<1°part#>,<2°part#> Scambia le partizioni primarie
+0.65:\t
+0.70:Per gestire i flag su un disco rigido:
+0.71: /CLEARFLAG[{:<flag#>} | /ALL}] Azzera <flag#> o tutti su <unità#>.
+0.72: /SETFLAG:<flag#>[,<valore>] Imposta <flag#> su 1 o <valore>.
+0.73: /TESTFLAG:<flag#>[,<valore>] Verifica che <flag#> sia 1 o <valore>.
+0.74:\t
+0.80:Per ottenere informazioni sui dischi rigidi:
+0.81: /STATUS Visualizza il layout della partizione corrente.
+0.82: /DUMP Scarica le informazioni sulle partizioni da tutti i dischi rigidi (per il debug).
+0.83:\t
+0.90:Interruttori dell'interfaccia utente interattiva:
+0.91: /UI Avvia sempre l'interfaccia utente se viene data come ultimo argomento
+0.92: /MONO Disabilita gli attributi di testo (testo luminoso, lampeggiante)
+0.93: /FPRMT Richiede FAT32/FAT16 in modalità interattiva.
+0.94: /XO Abilita le opzioni estese
+0.95:\t
+0.100:Opzioni di compatibilità:
+0.101: /X Disabilita l'est. INT 13 e LBA per i seguenti comandi
+0.102:\t
+0.200:Questo programma è Copyright %s di Brian E. Reifsnyder e il
+0.201:Progetto FreeDOS secondo i termini della GNU General Public License,
+0.202:versione 2.
+0.203:\t
+0.204:Questo programma viene fornito così com'è e senza garanzie di alcun tipo.
+0.205:L'autore di questo software non si assume alcuna responsabilità per l'uso
+0.206:o l'abuso di questo software. Utilizzando questo software, l'operatore
+0.207:intende accettare i termini di quanto sopra.
+
+
+##############################################################################
+# SCHERMATA DI SUPPORTO FAT32
+##############################################################################
+
+1.0:\e[5;5HFDISK è in grado di utilizzare il supporto per dischi di grandi dimensioni
+1.1:    per consentire di creare partizioni superiori a 2.048 MB utilizzando le  
+1.2:    partizioni FAT32. Se si abilita il supporto per i dischi di grandi 
+1.3:    dimensioni, qualsiasi partizione o unità logiche superiori a 512 MB verranno    create con il formato FAT32.
+1.4:    IMPORTANTE: se si abilita il supporto per i dischi di grandi dimensioni,  
+1.5:		alcuni sistemi operativi non potranno accedere alle partizioni 
+1.6:		e alle unità logiche che superano i 512 MB.
+1.7:\e[5;18HUsare il supporto per dischi di grandi dimensioni (FAT32) (S/N)....?
+
+
+##############################################################################
+# USCITA DALLA SCHERMATA
+##############################################################################
+
+2.0:\e[1mÈ necessario\e[22m riavviare il sistema per rendere effettive le modifiche.
+2.1:Le unità create o modificate devono essere formattate \e[1mDOPO\e[22m il riavvio.
+2.2: Il sistema si riavvia
+2.3: Premere un tasto qualsiasi quando si è pronti. . .
+
+
+##############################################################################
+# MENU PRINCIPALE
+##############################################################################
+
+3.0:Opzioni FDISK
+3.1:Creare partizione DOS o unità DOS logica
+3.2:Impostare la partizione attiva
+3.3:Eliminare la partizione o l'unità DOS logica
+3.4:Visualizzare le informazioni sulla partizione
+3.5: Visualizzare/modificare le informazioni sulla partizione
+3.6: Cambiare l'unità disco fissa corrente
+3.7: Manutenzione del MBR
+3.8:Interrompere le modifiche e uscire
+
+
+##############################################################################
+# MENU CREARE PARTIZIONE
+##############################################################################
+
+4.0:Creare partizione DOS o unità DOS logica
+4.1:Creare la partizione DOS primaria
+4.2:Creare una partizione DOS estesa
+4.3:Creare unità logiche DOS nella partizione DOS estesa
+
+
+##############################################################################
+# MENU DI CANCELLAZIONE DELLA PARTIZIONE
+##############################################################################
+
+5.0:Eliminare la partizione DOS o l'unità logica DOS
+5.1:Eliminare la partizione DOS primaria
+5.2:Eliminare la partizione DOS estesa
+5.3:Eliminazione delle unità logiche DOS nella partizione DOS estesa
+5.4:Eliminare la partizione non DOS
+
+
+##############################################################################
+# MENU DI MANUTENZIONE MBR (OPZIONE ESTESA)
+##############################################################################
+
+6.0:Manutenzione MBR
+6.1:Creare MBR BootEasy (disabilitato)
+6.2:Caricare l'MBR (partizioni e codice) da un file salvato
+6.3:Salvare l'MBR (partizioni e codice) in un file
+6.4:Rimuovere il codice di avvio dall'MBR
+
+
+##############################################################################
+# FDISKIO.C
+##############################################################################
+
+7.0:\nIl disco rigido è già stato partizionato.\n
+7.1:\nIl file "boot.mbr" non è stato trovato.\n
+7.2:\nTipo di partizione fuori dall'intervallo nella riga %d di "fdiskpt.ini".\n
+7.3:Errore riscontrato alla riga %d del file "fdisk.ini".\n
+7.4:\nErrore nella lettura del settore.\n
+7.5:Le funzioni di flagging dei settori sono state disabilitate.\n
+7.6:Creazione dell'MBR di unità Smart per il disco %d\n
+
+
+##############################################################################
+# CMD.C
+##############################################################################
+
+8.0:´Errore di sintassi´´Programma terminato´´.
+8.1:\nErrore di cancellazione del flag.\n
+8.2:\nIl flag %d è stato cancellato.\n
+8.3:\nDimensione partizione non valida specificata.\n
+8.4:\nLa partizione estesa esiste già.\n
+8.5:\nErrore nella creazione della partizione estesa.\n
+8.7:\nNessuna partizione estesa utilizzabile trovata.\n
+8.8:\nErrore nella creazione di un'unità logica.\n
+8.10:\nErrore nella creazione della partizione primaria.\n
+8.11:\nPrima partizione # (%ld) deve essere 1..4.\n
+8.12:\nNessuna partizione da cancellare trovata.\n
+8.13:\n%d partizioni primarie trovate, è necessario specificare il numero da eliminare.\n
+8.14:\nErrore nell'eliminazione della partizione primaria.\n
+8.15:\nErrore nell'eliminazione della partizione estesa.\n
+8.16:\nIl numero di unità logica %d è fuori dall'intervallo.\n
+8.17:\nIl numero della partizione non rientra nell'intervallo.\n
+8.18:\nInvalido argomento di cancellazione.\n
+8.19:\nErrore di cancellazione dell'unità logica.\n
+8.20:\nNuovo tipo di partizione non rientra nell'intervallo.\n
+8.21:\nErrore nella modifica del tipo di partizione.\n
+8.22:\nNumero di partizione sorgente non compreso nell'intervallo.\n
+8.23:\nNumero di partizione di destinazione non compreso nell'intervallo.\n
+8.24:\nErrore nello spostamento dello slot della partizione.\n
+8.25:\nNumero flag non valido.\n
+8.26:\nIl valore del flag è fuori dall'intervallo.\n
+8.27:\nErrore nell'impostazione del flag.\n
+8.28:\nIl flag %d è stato impostato su %d.\n
+8.29:Stato del disco fisso
+8.30:\nErrore nello scambio di partizioni.\n
+8.31:\nFlag %d è impostato su %d.\n
+8.32:\nFlag %d non è impostato su %d.\n
+8.34:\n<%s> dovrebbe essere una cifra; terminato\n
+8.35:´più di un'unità specificata; terminato
+8.36:\n<%s> deve iniziare con "-" o "/"; terminato
+8.37:\n<%s> ':' atteso; terminato
+8.38:\n<%s> ',' atteso; terminato
+8.39:\n<%s> prevista fine della stringa; terminato\n
+8.40:\nDesignazione unità non valida.\n
+8.41:\nTutti i flag sono stati cancellati.\n
+
+
+##############################################################################
+# USERINT0.C, USERINT1.C #
+##############################################################################
+
+9.0:Unità disco fissa corrente:
+9.1:Inserire la scelta:
+9.2:Scegliere una delle seguenti opzioni:
+9.3:settori, geometria
+9.4:Nessuna partizione definita.
+9.5:\nIl più grande spazio libero continuo per la partizione primaria = %lu MBytes\n
+9.6:\nContenuti della partizione DOS estesa:\n
+9.7:\nLo spazio libero continuo più grande nella partizione estesa = %lu MBytes\n
+9.8: -------- inutilizzabile ---------
+9.9:(1 Mbyte = 1048576 byte)
+
+# Le seguenti sono intestazioni di tabelle, devono rimanere così come sono
+9.10:\n\nPartizione   Stato    Mbytes   Sistema           Usato     Inizio CHS       Fine CHS\n
+9.11:Drv Volume Etichetta  Mbytes  Sistema          Usato    Inizio CHS       Fine CHS\n
+9.12:Disco   Drv   Mbyte    Liberi  Usato
+
+9.13:Non c'è spazio per creare una partizione DOS.
+9.14:La partizione DOS estesa esiste già.
+9.15:Impossibile creare un'unità DOS logica senza\n    una partizione DOS estesa sull'unità corrente.
+9.16:Nessuna partizione DOS primaria da eliminare.
+9.17:Nessuna partizione DOS estesa da eliminare.
+9.18:Nessuna unità logica DOS da eliminare.
+9.19:Nessuna partizione non DOS da eliminare.
+9.20:è inutilizzabile!
+9.21:Nessuna partizione da eliminare.
+9.22:\e[1mAttenzione!\e[22m Non ci sono partizioni attive - il disco 1 non è avviabile\n    se non è attiva una partizione.
+9.23:  \e[1m%lu\e[22m Mbytes
+
+
+##############################################################################
+# USERINT2.C
+##############################################################################
+
+# Eliminare la partizione logica
+10.0:I dati contenuti nella partizione Non-DOS eliminata andranno persi.\n    Quale partizione Non-DOS si desidera eliminare?
+10.1:Non è una partizione!
+10.2:Rifiuto di eliminare la partizione DOS!
+10.3:Partizione Non-DOS eliminata.
+10.4:Errore nell'eliminazione della partizione Non-DOS!
+
+# Visualizzazione della partizione estesa
+10.5:Nessuna unità logica definita.
+10.6:La dimensione totale della partizione estesa è %lu Mbyte (1 Mbyte = 1048576 byte).
+
+# Visualizzare le partizioni primarie
+10.7:Non sono state definite partizioni.
+10.8:Lo spazio totale su disco è %lu Mbyte (1 Mbyte = 1048576 byte)
+
+# Intestazioni della tabella
+10.10:Stato  Partizione  Tipo     Etich. Vol.     Mbyte  Sistema          Usato
+10.11:Stato   Partizione   Mbyte  Descrizione      Usato  Cil Iniz.  Cil Fin.
+10.12:Drv Volume Etichetta Mbyte Sistema Usato
+
+# Elimina partizione estesa
+10.20:\e[1;5mATTENZIONE!\e[22;25m I dati della partizione DOS estesa cancellata e delle sue partizioni logiche andranno persi. Continuare (S/N)...?
+10.21:Partizione DOS estesa cancellata
+
+# Cancellare le unità logiche
+10.30:\e[1;5mATTENZIONE!\e[22;25m I dati di un'unità logica DOS cancellata andranno persi.\n    Quale unità si vuole cancellare...............................?
+10.31:Unità logica cancellata
+10.32:Errore nell'eliminazione dell'unità logica!
+
+# Eliminare la partizione primaria
+10.40:\e[1;5mATTENZIONE!\e[22;25m I dati nella partizione DOS primaria cancellata andranno persi.\n    Quale partizione primaria si vuole cancellare...?
+10.41:Partizione DOS primaria eliminata
+10.42:Errore nell'eliminazione della partizione DOS primaria!
+10.43:Rifiuto di eliminare la partizione estesa!
+10.44:Non è una partizione DOS!
+
+# Imposta partizione attiva
+10.50:Nessuna partizione da rendere attiva.
+10.51:Inserire il numero della partizione che si vuole rendere attiva...........:
+10.52:%d non è una scelta. Inserire una scelta valida.
+10.53:L'unica partizione avviabile sull'unità %d è già attiva.
+10.54:La partizione %d è stata attivata.
+
+# Crea partizione
+10.60:Si desidera utilizzare la dimensione massima disponibile per una partizione DOS primaria\n    e rendere la partizione attiva (S/N).....................?
+10.61:Si desidera utilizzare la dimensione massima disponibile per una partizione DOS primaria\n    (S/N)....................................................?
+10.62:Questa unità è FAT32 per impostazione predefinita, passare a FAT16 (S/N)?
+10.63:Lo spazio massimo disponibile per la partizione è \e[1m%lu\e[22m Mbytes
+10.64:Inserire la dimensione della partizione in Mbyte o la percentuale (%%) di spazio su disco\n    per creare una partizione DOS primaria.....:
+10.65:Inserire la dimensione della partizione in Mbyte o la percentuale (%%) di spazio su disco\n    per creare una partizione DOS estesa.....:
+10.66:Creata partizione DOS primaria
+10.67:Creata partizione DOS estesa
+
+# Creare partizione logica
+10.70:Unità DOS logica creata, lettere di unità modificate o aggiunte
+10.71:Numero massimo di unità logiche DOS installate
+10.72:Inserire la dimensione dell'unità logica in Mbyte o in percentuale (%%) della\n    dimensione della partizione estesa...:
+10.73:Tutto lo spazio disponibile nella partizione DOS estesa\n    è assegnato alle unità logiche.
+
+# Visualizza informazioni sulla partizione
+10.80:La partizione DOS estesa contiene unità logiche DOS..\n    Si desidera visualizzare le informazioni sulle unità logiche (S/N)......?
+10.81:Opzionale:  Digitare il numero della partizione da modificare.
+10.82:Digitare il numero della partizione da modificare (1-4)...?
+10.83:Visualizza informazioni sull'unità logica DOS
+10.84:Digitare il carattere dell'unità logica che si desidera modificare...?
+
+# Elenco dei tipi di partizione
+10.90:Elencare i tipi di partizione
+10.91:Premere un tasto qualsiasi per continuare . . .
+
+# Visualizzare/modificare la partizione
+10.100:Visualizzare/modificare le informazioni sull'unità logica
+10.101:Partizione            Mbyte  Tipo             Uso  Inizio Cil  Fine Cil
+10.102:Cambiare il tipo di partizione
+10.104:Nascondere / togliere la partizione
+10.105:Inserire un nuovo tipo di partizione (1-255)...:
+10.106:Rimuovere lo stato attivo
+
+
+10.190:Inserire il numero di unità disco fissa (1-%d)...:
+10.200:Sei sicuro (S/N)...?
+
+# Stringhe di errore
+10.250:Lettera di unità illegale
+
+
+11.0:Impossibile trovare il file "boot.mbr"... L'MBR non è stato caricato.\n
+11.1:L'MBR è stato scritto utilizzando "boot.mbr".
+11.2:L'MBR è stato salvato in \"boot.mbr\".
+11.3:Il codice di avvio è stato rimosso dall'MBR.
+
+
+##############################################################################
+# KBDINPUT.C
+##############################################################################
+
+20.5:Premere \e[1mESC\e[22m per tornare alle opzioni FDISK
+20.6:Premere \e[1mESC\e[22m per uscire da FDISK
+20.7:Premere \e[1mESC\e[22m per continuare
+20.8:La dimensione della partizione richiesta supera lo spazio massimo disponibile
+20.9:Input inserito dall'utente:    %d
+20.10:Inserimento:    %d
+20.11:Inserimento non valido, prego inserire
+20.12:non è una scelta, inserire
+20.13:Inserimento non valido.
+
+
+##############################################################################
+# SCHERMI DI AVVERTIMENTO
+##############################################################################
+30.1:Avete almeno un disco più grande di 2.097.152 MB. FDISK NON\n    può gestire partizioni che superano questa barriera!\n\n
+30.2:    Si può procedere ma si rischia la perdita di dati, soprattutto se\n    ci sono già partizioni create con altri strumenti che superano la barriera.\n\n
+30.3:    Dovrebbe essere tutto a posto se Free FDISK è l'unico strumento di\n     partizionamento che si sta utilizzando, ma si consiglia di utilizzare un'altra\n    utility disco per gestire questo tipo di disco.
+30.4: Siete sicuri di voler continuare (S/N)...?
+
+30.10:FDISK è attualmente in modalità allineamento cilindri, ma la\n    partizione estesa non inizia su un confine di cilindro!\n\n
+30.11:    Anche se è improbabile, questo potrebbe causare problemi di compatibilità.\n\n
+30.12:Se il sistema dipende dal corretto allineamento dei cilindri, si dovrebbe\n    considerare la possibilità di ricreare la partizione estesa.
+30.13:Creare un'unità logica in una partizione estesa non allineata...?
+
+30.20:    È stato rilevato un layout di partizione estesa non compatibile\n
+30.21:    questo disco. Le seguenti azioni sono disattivate:\n\n
+30.22:        - creazione di unità logiche
+30.23:        - Eliminazione di unità logiche
+30.24:    È possibile ricreare la partizione estesa per consentirne la modifica oppure
+30.25:    utilizzare un'altra utility disco per partizionare il disco.
+
+
+##############################################################################
+# STRINGHE GLOBALI #
+##############################################################################
+
+# Lettere Sì-No, utilizzate per rispondere alle domande "Sì/No" (maiuscole e minuscole)
+250.0:SN
+250.1:sn
+250.2:Inserimento non valido, inserire S-N
+250.3:Premere un tasto qualsiasi per continuare
+250.4:ERRORE
+250.5:ATTENZIONE!
+250.6:ATTIVO
+250.250:Programma di impostazione del disco fisso
+
+
+##############################################################################
+# MESSAGGI DI ERRORE
+##############################################################################
+
+255.0:\n    Errore nella lettura delle tabelle di partizione.
+255.1:\n    Nessun disco fisso presente.
+255.2:\nNon è stato inserito alcun numero di unità.
+255.3:\nIl numero di partizione non rientra nell'intervallo (1-4).
+255.4:\nNon è possibile attivare la partizione.
+255.5:\nErrore di autopartizione del disco rigido.
+255.6:\nErrore di cancellazione del settore MBR.
+255.7:\nErrore nella rimozione dell'IPL.
+255.9:\nErrore di disattivazione della partizione.
+255.10:\nErrore di cancellazione della tabella delle partizioni.
+255.11:\nErrore di scrittura dell'IPL.
+255.12:\nErrore di installazione dell'IPL da file.
+255.13:\nErrore nell'installazione del MBR da file.
+255.14:\nErrore nella scrittura del MBR.
+255.15:\nErrore nella scrittura delle tabelle di partizione.
+255.16:\nErrore nel salvataggio del MBR.
+255.17:\nErrore nella scrittura di Smart IPL.
+255.18:\nErrore di comando non valido o di sintassi. Richiamare FDISK /? per ottenere aiuto.
+255.19:\nSistema operativo non supportato.\n
