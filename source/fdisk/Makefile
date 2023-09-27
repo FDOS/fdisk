@@ -45,7 +45,7 @@ TLUMACZ = ..\svarlang\tlumacz.exe
 !endif
 
 PACKER      = upx
-PACKERFLAGS = -qq --best --8086
+PACKERFLAGS = -qq --best --8086 --lzma
 
 
 !ifdef DEBUG
@@ -143,9 +143,9 @@ bootnorm.c : bintoc/bintoc.exe bootnorm.bin
 
 # --- NLS -------------------------------------------------------------------
 
-nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/es.txt nls/de.txt nls/fr.txt nls/pl.txt nls/tr.txt
+nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/de.txt nls/it.txt nls/es.txt nls/fr.txt nls/pl.txt nls/tr.txt
 	@cd nls
-	$(TLUMACZ) en es de fr pl tr
+	$(TLUMACZ) en de it es fr pl tr
 	@cd ..
 
 fdisk.lng : nls/out.lng
@@ -157,10 +157,13 @@ deflang.c : nls/out.lng
 nls/en.txt : nls/en_utf8.txt utf8tocp/utf8tocp.exe
 	$(UTF8TOCP) 437 $[@ >$^@
 
-nls/es.txt : nls/es_utf8.txt utf8tocp/utf8tocp.exe
+nls/de.txt : nls/de_utf8.txt utf8tocp/utf8tocp.exe
 	$(UTF8TOCP) 850 $[@ >$^@
 
-nls/de.txt : nls/de_utf8.txt utf8tocp/utf8tocp.exe
+nls/it.txt : nls/it_utf8.txt utf8tocp/utf8tocp.exe
+	$(UTF8TOCP) 850 $[@ >$^@
+
+nls/es.txt : nls/es_utf8.txt utf8tocp/utf8tocp.exe
 	$(UTF8TOCP) 850 $[@ >$^@
 
 nls/fr.txt : nls/fr_utf8.txt utf8tocp/utf8tocp.exe
@@ -229,6 +232,7 @@ clobber : .SYMBOLIC
 	rm -f deflang.c
 	rm -f fdisk.lng
 	rm -f nls/en.txt
+	rm -f nls/it.txt
 	rm -f nls/es.txt
 	rm -f nls/de.txt
 	rm -f nls/fr.txt

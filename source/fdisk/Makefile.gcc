@@ -37,8 +37,8 @@ fdisk.lng : nls/out.lng
 deflang.c : nls/deflang.c
 	$(CP) $< $@
 
-nls/deflang.c nls/out.lng : svarlang/tlumacz nls/en.txt nls/de.txt nls/fr.txt nls/pl.txt nls/tr.txt
-	cd nls; ../svarlang/tlumacz en de fr pl tr
+nls/deflang.c nls/out.lng : svarlang/tlumacz nls/en.txt nls/de.txt nls/it.txt nls/es.txt nls/fr.txt nls/pl.txt nls/tr.txt
+	cd nls; ../svarlang/tlumacz en de it fr pl tr
 
 nls/out.lng : nls/deflang.c
 
@@ -48,6 +48,12 @@ nls/en.txt : nls/en_utf8.txt utf8tocp/utf8tocp
 nls/de.txt : nls/de_utf8.txt utf8tocp/utf8tocp
 	utf8tocp/utf8tocp 858 $< >$@
 
+nls/it.txt : nls/it_utf8.txt utf8tocp/utf8tocp
+	utf8tocp/utf8tocp 858 $< >$@
+
+nls/es.txt : nls/es_utf8.txt utf8tocp/utf8tocp
+	utf8tocp/utf8tocp 858 $< >$@
+	
 nls/fr.txt : nls/fr_utf8.txt utf8tocp/utf8tocp
 	utf8tocp/utf8tocp 858 $< >$@
 
@@ -76,7 +82,7 @@ clean:
 	rm -f *.exe
 	rm -f *.map *.MAP
 	rm -f fdisk.lng out.lng
-	rm -f nls/en.txt nls/de.txt nls/out.lng nls/DEFLANG.C
+	rm -f nls/en.txt nls/de.txt nls/it.txt nls/es.txt nls/fr.txt nls/pl.txt nls/tr.txt nls/out.lng nls/DEFLANG.C
 	rm -f bintoc/bintoc bintoc/*.o
 	rm -f bintoc/*.exe bintoc/*.obj
 	rm -f bintoc/*.EXE bintoc/*.OBJ
