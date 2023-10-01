@@ -143,9 +143,9 @@ bootnorm.c : bintoc/bintoc.exe bootnorm.bin
 
 # --- NLS -------------------------------------------------------------------
 
-nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/es.txt nls/de.txt nls/fr.txt nls/pl.txt nls/tr.txt
+nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/es.txt nls/de.txt nls/fr.txt nls/it.txt nls/pl.txt nls/tr.txt
 	@cd nls
-	$(TLUMACZ) en es de fr pl tr
+	$(TLUMACZ) en es de fr it pl tr
 	@cd ..
 
 fdisk.lng : nls/out.lng
@@ -164,6 +164,9 @@ nls/de.txt : nls/de_utf8.txt utf8tocp/utf8tocp.exe
 	$(UTF8TOCP) 850 $[@ >$^@
 
 nls/fr.txt : nls/fr_utf8.txt utf8tocp/utf8tocp.exe
+	$(UTF8TOCP) 850 $[@ >$^@
+
+nls/it.txt : nls/it_utf8.txt utf8tocp/utf8tocp.exe
 	$(UTF8TOCP) 850 $[@ >$^@
 
 nls/pl.txt : nls/pl_utf8.txt utf8tocp/utf8tocp.exe
@@ -228,11 +231,6 @@ clobber : .SYMBOLIC
 # language files
 	rm -f deflang.c
 	rm -f fdisk.lng
-	rm -f nls/en.txt
-	rm -f nls/es.txt
-	rm -f nls/de.txt
-	rm -f nls/fr.txt
-	rm -f nls/pl.txt
-	rm -f nls/tr.txt
+	rm -f nls/??.txt
 	rm -f nls/deflang.c
 	rm -f nls/out.lng
