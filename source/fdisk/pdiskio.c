@@ -51,7 +51,7 @@ static int Read_Primary_Table( int drive, Partition_Table *pDrive,
                                int *num_ext );
 static int Read_Extended_Table( int drive, Partition_Table *pDrive );
 static void Clear_Partition_Tables( Partition_Table *pDrive );
-static void Clear_Boot_Sector( int drive, unsigned long cylinder,
+static int Clear_Boot_Sector( int drive, unsigned long cylinder,
                                unsigned long head, unsigned long sector );
 static unsigned long combine_cs( unsigned long cylinder,
                                  unsigned long sector );
@@ -207,11 +207,12 @@ int Lock_Unlock_Drive( int drive_num, int lock )
 
 
 /* Clear the Boot Sector of a partition */
-void Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head,
+int Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head,
                         unsigned long sector )
 {
    unsigned char stored_sector_buffer[SECT_SIZE];
    long index;
+   int error_code;
 
    /* Save sector_buffer[512] into stored_sector_buffer[512] */
    memcpy( stored_sector_buffer, sector_buffer, SECT_SIZE );
@@ -220,11 +221,17 @@ void Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head,
    memset( sector_buffer, 0xf6, SECT_SIZE );
 
    for ( index = 0; index < 16; index++ ) {
-      Write_Physical_Sectors( drive, cylinder, head, ( sector + index ), 1 );
+      error_code = Write_Physical_Sectors( drive, cylinder, head, ( sector + index ), 1 );
+
+      if ( error_code != 0 ) {
+         return error_code;
+      }
    }
 
    /* Restore sector_buffer[512] to its original contents */
    memcpy( sector_buffer, stored_sector_buffer, SECT_SIZE );
+
+   return 0;
 }
 
 /* Clear The Partition Table Area Of sector_buffer only. */
@@ -1088,6 +1095,15 @@ void Clear_Extended_Partition_Table( Partition_Table *pDrive )
    }
 }
 
+/* Reset the drive, used if read or write errors occur */
+static void Reset_Drive( int drive )
+{
+   union REGPACK r;
+   memset( &r, 0, sizeof(union REGPACK) );
+   r.h.dl = drive;
+   intr( 0x13, &r );   
+}
+
 /* Read_Physical_Sector */
 int Read_Physical_Sectors( int drive, long cylinder, long head, long sector,
                            int number_of_sectors )
@@ -1132,7 +1148,7 @@ static int Read_Physical_Sectors_CHS( int drive, long cylinder, long head,
          r.w.es = FP_SEG( sector_buffer );
          intr( 0x13, &r );
          error_code = ( r.w.flags & INTR_CF ) ? r.h.ah : 0; 
-   
+         if ( error_code ) Reset_Drive( drive );
       } while ( error_code && ++try < MAX_RETRIES );
    }
    else {
@@ -1166,6 +1182,7 @@ static int Read_Physical_Sectors_LBA_only( int drive, ulong LBA_address,
       /* Transfer LBA_address to disk_address_packet */
       *(_u32 *)( disk_address_packet + 8 ) = LBA_address;
    
+      memset( &r, 0, sizeof(union REGPACK) );
       r.w.ax = 0x4200;
       r.h.dl = drive;
       r.w.si = FP_OFF( disk_address_packet );
@@ -1174,6 +1191,7 @@ static int Read_Physical_Sectors_LBA_only( int drive, ulong LBA_address,
    
       if ( r.w.flags & INTR_CF ) {
          error_code = ( r.h.ah ) ? r.h.ah : 1;
+         Reset_Drive( drive );
       }
       else {
          error_code = 0;
@@ -1255,10 +1273,13 @@ int Write_Partition_Tables( void )
       for ( index = 0; index < 4; index++ ) {
          /* If this partition was just created, clear its boot sector. */
          if ( pDrive->pri_part_created[index] == TRUE ) {
-            Clear_Boot_Sector( ( drive_index + 128 ),
+            error_code = Clear_Boot_Sector( ( drive_index + 128 ),
                                pDrive->pri_part[index].start_cyl,
                                pDrive->pri_part[index].start_head,
                                pDrive->pri_part[index].start_sect );
+            if ( error_code != 0 ) {
+               goto drive_error;
+            }
          }
 
          if ( ( pDrive->pri_part[index].num_type == 0x05 ) ||
@@ -1296,10 +1317,13 @@ int Write_Partition_Tables( void )
                   Pause();
                }
 
-               Clear_Boot_Sector( ( drive_index + 0x80 ),
+               error_code = Clear_Boot_Sector( ( drive_index + 0x80 ),
                                   pDrive->log_drive[index].start_cyl,
                                   pDrive->log_drive[index].start_head,
                                   pDrive->log_drive[index].start_sect );
+               if ( error_code != 0 ) {
+                  goto drive_error;
+               }
             }
 
             Clear_Sector_Buffer();
@@ -1387,6 +1411,7 @@ static int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
          r.w.es = FP_SEG( sector_buffer );
          intr( 0x13, &r );
          error_code = ( r.w.flags & INTR_CF ) ? r.h.ah : 0;
+         if ( error_code ) Reset_Drive( drive );
       } while (error_code && ++try < MAX_RETRIES);
    }
    else {
@@ -1409,6 +1434,7 @@ static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
    unsigned long LBA_address =
       chs_to_lba( &part_table[drive - 128], cylinder, head, sector );
 
+
    /* Determine the location of sector_buffer[512]             */
    /* and place the address of sector_buffer[512] into the DAP */
 
@@ -1427,6 +1453,7 @@ static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
       /* Transfer LBA_address to disk_address_packet */
       *(_u32 *)( disk_address_packet + 8 ) = LBA_address;
    
+      memset( &r, 0, sizeof(union REGPACK) );
       r.w.ax = 0x4300;
       r.h.dl = drive;
       r.w.si = FP_OFF( disk_address_packet );
@@ -1435,6 +1462,7 @@ static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
    
       if ( r.w.flags & INTR_CF ) {
          error_code = ( r.h.ah ) ? r.h.ah : 1;
+         Reset_Drive( drive );
       }
       else {
          error_code = 0;
