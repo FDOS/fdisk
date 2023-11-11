@@ -239,7 +239,7 @@ static unsigned short svl_lang_from_cats_file(struct svl_lang *l, struct svl_lan
   char fname[] = "xx.txt";
   static char linebuf[8192];
   const char *ptr;
-  unsigned short id, maxid=0, maxid_line, linecount;
+  unsigned short id, maxid=0, maxid_line=0, linecount;
   int i;
 
   fname[strlen(fname) - 6] = (char)tolower( l->id[0] );
