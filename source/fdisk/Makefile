@@ -33,12 +33,14 @@ LDFLAGS  =
 !ifdef __LINUX__
 SEP=/
 CP = cp
+MV = mv
 BINTOC = bintoc/bintoc.exe
 UTF8TOCP = utf8tocp/utf8tocp.exe
 TLUMACZ = ../svarlang/tlumacz.exe
 !else
 SEP=\
 CP = copy
+MV = rename
 BINTOC = bintoc\bintoc.exe
 UTF8TOCP = utf8tocp\utf8tocp.exe
 TLUMACZ = ..\svarlang\tlumacz.exe
@@ -109,17 +111,16 @@ fdisk.lnk : Makefile
 	zip -9rkDX fdisk.zip -@ < source/fdisk/zipfiles.txt
 	cd source/fdisk
 
-..\..\fdisk.svp : fdisk.exe
-	cd ..\..
-	rename appinfo appinfo.tmp
+../../fdisk.svp : fdisk.exe
+	cd ../..
+	$(MV) appinfo appinfo.tmp
 	mkdir appinfo
-	copy appinfo.tmp\fdisk.lsm appinfo\
+	$(CP) appinfo.tmp$(SEP)fdisk.lsm appinfo
 	zip -9rkDX fdisk.svp appinfo bin doc nls
-	rm -f appinfo\fdisk.lsm
+	rm -f appinfo/fdisk.lsm
 	rmdir appinfo
-	rename appinfo.tmp appinfo
-	cd source\fdisk
-
+	$(MV) appinfo.tmp appinfo
+	cd source/fdisk
 
 # --- SVARLANG --------------------------------------------------------------
 
@@ -213,6 +214,7 @@ clobber : .SYMBOLIC
 	rm -f *.obj
 	rm -f *.tmp
 	rm -f *.zip
+	rm -f *.svp
 	rm -f *.map
 	rm -f *.o
 	rm -f bintoc/bintoc
