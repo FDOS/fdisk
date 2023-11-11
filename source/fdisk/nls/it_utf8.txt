@@ -257,7 +257,7 @@
 
 # Intestazioni della tabella
 10.10:Stato  Partizione  Tipo     Etich. Vol.     Mbyte  Sistema         Usato
-10.11:Stato   Partizione   Mbyte  Descrizione      Usato  Cil Iniz.  Cil Fin.
+10.11:Stato  Partizione     Mbyte  Descrizione      Usato  Cil Iniz. Cil Fin.
 10.12:Drv Vol. Etichetta Mbyte Sistema  Usato
 
 # Elimina partizione estesa
