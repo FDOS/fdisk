@@ -28,11 +28,13 @@ jobs:
     - name: Upload distribution files
       uses: actions/upload-artifact@v3
       with:
+        name: fdisk.zip
         path: fdisk.zip
 
     - name: Upload SvarDOS package
       uses: actions/upload-artifact@v3
       with:
+        name: fdisk.svp
         path: fdisk.svp
 
   build-ia16-gcc:
