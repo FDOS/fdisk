@@ -1,4 +1,4 @@
-name: Build master with Open Watcom v2 (Linux)
+name: Build master (Linux)
 
 on:
   push:
@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-watcom:
 
-    runs-on: self-hosted
+    runs-on: [self-hosted, watcom]
 
     steps:
     - uses: actions/checkout@v3
@@ -31,3 +31,14 @@ jobs:
         name: fdisk.zip
         path: fdisk.zip
 
+  build-ia16-gcc:
+
+    runs-on: [self-hosted, ia16-gcc]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Build with IA16-GCC and GNU Make
+      run: |
+        cd source/fdisk
+        make -f Makefile.gcc
