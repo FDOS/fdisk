@@ -26,11 +26,13 @@ jobs:
         wmake dist dist-svardos
 
     - name: Upload files
-      uses: actions/upload-artifact@v3
-      with:
-        - name: fdisk.zip
+      - uses: actions/upload-artifact@v3
+        with:
+          name: fdisk.zip
           path: fdisk.zip
-        - name: fdisk.svp
+      - uses: action/upload-artifact@v3
+        with:
+          name: fdisk.svp
           path: fdisk.svp
 
   build-ia16-gcc:
