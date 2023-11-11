@@ -66,6 +66,8 @@ source/fdisk/utf8tocp/utf8tocp.c
 source/fdisk/nls/regen.bat
 source/fdisk/nls/de_utf8.txt
 source/fdisk/nls/en_utf8.txt
+source/fdisk/nls/es_utf8.txt
 source/fdisk/nls/fr_utf8.txt
+source/fdisk/nls/it_utf8.txt
 source/fdisk/nls/pl_utf8.txt
 source/fdisk/nls/tr_utf8.txt
