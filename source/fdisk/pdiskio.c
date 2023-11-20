@@ -1239,7 +1239,7 @@ int Write_Partition_Tables( void )
    unsigned long extended_head = 0;
    unsigned long extended_sector = 0;
 
-   for ( drive_index = 0; drive_index < 7; drive_index++ ) {
+   for ( drive_index = 0; drive_index < MAX_DISKS; drive_index++ ) {
       Partition_Table *pDrive = &part_table[drive_index];
 
       error_code = 0;

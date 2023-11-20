@@ -20,10 +20,10 @@ extern int os_gui_running;
 extern unsigned char sector_buffer[SECT_SIZE];
 
 /* Brief partition type table buffer for computing drive letters. */
-extern int brief_partition_table[8][27];
+extern int brief_partition_table[MAX_DISKS][27];
 
 /* Buffer containing drive letters. */
-extern char drive_lettering_buffer[8][27];
+extern char drive_lettering_buffer[MAX_DISKS][27];
 
 #define REL_END_SECT( p ) ( ( p ).rel_sect + ( p ).num_sect - 1 )
 typedef struct Partition {
