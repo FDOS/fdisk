@@ -7,6 +7,13 @@ Bug classification:
  - MEDIUM: Bugs regarding non-essential features or with work-arounds.
  - LOW: Cosmetic bugs, like display issues etc.
 
+
+Version 1.3.11 (2023-11-20):
+--------------------------
+Fixes:
+ - HIGH: Fix FDISK not writing the partition table of the 8th disk.
+
+
 Version 1.3.10 (2023-11-11):
 --------------------------
 Changes:
@@ -15,11 +22,13 @@ Changes:
  - Add Italian translation.
  - Provide SvarDOS packages as part of new releases.
 
+
 Version 1.3.9 (2023-08-27):
 --------------------------
 Changes:
  - Reintroduce /SMBR command line argument as alias for /SAVEMBR.
  - Add Spanish and Polish translations.
+
 
 Version 1.3.8 (2023-07-24)
 --------------------------

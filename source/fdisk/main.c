@@ -916,6 +916,10 @@ int main( int argc, char *argv[] )
       if ( flags.use_iui == TRUE ) {
          Interactive_User_Interface();
       }
+#else
+      if ( argc == 1 ) {
+         Display_Help_Screen();
+      }
 #endif
 
       result = Write_Partition_Tables();

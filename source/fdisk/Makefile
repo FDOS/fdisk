@@ -66,9 +66,9 @@ objs +=
 !ifdef LITE
 CFLAGS += -DFDISKLITE=1
 !else
-objs += userint1.obj userint2.obj
+objs += userint1.obj userint2.obj kbdinput.obj 
 !endif
-objs += kbdinput.obj ansicon.obj printf.obj bootnorm.obj
+objs += ansicon.obj printf.obj bootnorm.obj
 objs += svarlang.obj auto_exe.obj auto_nls.obj deflang.obj
 
 !ifdef SMART_MBR
@@ -125,13 +125,13 @@ fdisk.lnk : Makefile
 # --- SVARLANG --------------------------------------------------------------
 
 svarlang.obj : svarlang/svarlang.c
-	$(CC) $(CFLAGS) -DWITHSTDIO -fo=$^@ $[@
+	*$(CC) $(CFLAGS) -DWITHSTDIO -fo=$^@ $[@
 
 auto_exe.obj : svarlang/auto_exe.c
-	$(CC) $(CFLAGS) -fo=$^@ $[@
+	*$(CC) $(CFLAGS) -fo=$^@ $[@
 
 auto_nls.obj : svarlang/auto_nls.c
-	$(CC) $(CFLAGS) -fo=$^@ $[@
+	*$(CC) $(CFLAGS) -fo=$^@ $[@
 
 # --- BOOTLOADER ------------------------------------------------------------
 

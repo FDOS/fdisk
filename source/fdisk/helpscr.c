@@ -36,7 +36,7 @@
 void Display_Help_Screen( void )
 {
    char version[40];
-   char name[20];
+   char name[40];
    unsigned char i;
    unsigned char linestopause;
    unsigned char screenh = con_get_height();
@@ -50,7 +50,7 @@ void Display_Help_Screen( void )
    strcpy( version, " V" );
    strcat( version, VERSION );
 
-   con_printf( "%-20s                   %40s\n", name, version );
+   con_printf( "%-30s                   %30s\n", name, version );
 
    /* dump the entire help on screen */
    linestopause = screenh - 1;    /* number of lines before screen is full */

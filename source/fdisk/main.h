@@ -1,10 +1,10 @@
 #ifdef FDISKLITE
-  #define FD_NAME "FDISK LITE"
+  #define FD_NAME "Free FDISK (command line only)"
 #else
   #define FD_NAME "Free FDISK"
 #endif
 
-#define VERSION  "1.3.10"
+#define VERSION  "1.3.11"
 #define COPYLEFT "1998 - 2023"
 
 #define DEFAULT_VERSION 8
