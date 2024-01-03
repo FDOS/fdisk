@@ -287,18 +287,17 @@ int Determine_Drive_Letters( void )
    /* Set all active_part_found[] values to 0. */
    memset( active_part_found, 0, sizeof( active_part_found ) );
 
-   /* Begin placement of drive letters */
 
-   /* First, look for and assign drive letters to all active */
-   /* primary partitions. */
+   /* assign up to one drive letter to an active or non-active partition
+      per disk */      
    for ( index = 0; index < MAX_DISKS; index++ ) {
       Partition_Table *pDrive = &part_table[index];
       if ( !pDrive->usable ) {
          continue;
       }
 
-      sub_index = 0;
-      do {
+      /* find active partition for drive */
+      for ( sub_index = 0; sub_index < 4; sub_index++ ) {
          if ( ( IsRecognizedFatPartition(
                  brief_partition_table[index][sub_index] ) ) &&
               ( pDrive->pri_part[sub_index].active_status == 0x80 ) ) {
@@ -307,31 +306,19 @@ int Determine_Drive_Letters( void )
             current_letter++;
             break;
          }
-
-         sub_index++;
-      } while ( sub_index < 4 );
-   }
-
-   /* Next, assign one drive letter for one existing primary partition   */
-   /* if an active partition does not exist on that hard disk.           */
-   for ( index = 0; index < MAX_DISKS; index++ ) {
-      Partition_Table *pDrive = &part_table[index];
-      if ( !pDrive->usable ) {
-         continue;
       }
 
-      if ( active_part_found[index] == 0 ) {
-         sub_index = 0;
-         do {
-            if ( IsRecognizedFatPartition(
-                    brief_partition_table[index][sub_index] ) ) {
+      /* no active partition, try to find one non-active primary */
+      if ( !active_part_found[index] ) {
+         for ( sub_index = 0; sub_index < 4; sub_index++ ) {
+            if ( drive_lettering_buffer[index][sub_index] == 0 &&
+               ( IsRecognizedFatPartition(
+                    brief_partition_table[index][sub_index] ) ) ) {
                drive_lettering_buffer[index][sub_index] = current_letter;
                current_letter++;
                break;
             }
-
-            sub_index++;
-         } while ( sub_index < 4 );
+         }        
       }
    }
 
@@ -342,28 +329,24 @@ int Determine_Drive_Letters( void )
          continue;
       }
 
-      sub_index = 4;
-      do {
+      for ( sub_index = 4; sub_index < 27; sub_index++ ) {
          if ( IsRecognizedFatPartition(
                  brief_partition_table[index][sub_index] ) ) {
             drive_lettering_buffer[index][sub_index] = current_letter;
             current_letter++;
          }
-
-         sub_index++;
-      } while ( sub_index < 27 );
+      }
    }
 
-   /* Return to the primary partitions... */
+   /* Return to the primary partitions to assign drive letters to the
+      remaining primary partitions */
    for ( index = 0; index < MAX_DISKS; index++ ) {
       Partition_Table *pDrive = &part_table[index];
       if ( !pDrive->usable ) {
          continue;
       }
 
-      sub_index = 0;
-
-      do {
+      for ( sub_index = 0; sub_index < 4; sub_index++ ) {
          if ( drive_lettering_buffer[index][sub_index] == 0 ) {
             if ( IsRecognizedFatPartition(
                     brief_partition_table[index][sub_index] ) ) {
@@ -371,8 +354,7 @@ int Determine_Drive_Letters( void )
                current_letter++;
             }
          }
-         sub_index++;
-      } while ( sub_index < 4 );
+      }
    }
 
    /* Find the Non-DOS Logical Drives in the Extended Partition Table */
@@ -384,9 +366,8 @@ int Determine_Drive_Letters( void )
 
       pDrive->num_of_non_dos_log_drives = 0;
       non_dos_partition_counter = '1';
-      sub_index = 4;
 
-      do {
+      for  (sub_index = 4; sub_index < 27; sub_index++ ) {
          if ( brief_partition_table[index][sub_index] > 0 ) {
             non_dos_partition = TRUE;
 
@@ -403,8 +384,7 @@ int Determine_Drive_Letters( void )
                non_dos_partition_counter++;
             }
          }
-         sub_index++;
-      } while ( sub_index < 27 );
+      }
    }
 
    return ( current_letter - 1 );
