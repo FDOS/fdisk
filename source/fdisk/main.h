@@ -4,8 +4,8 @@
   #define FD_NAME "Free FDISK"
 #endif
 
-#define VERSION  "1.3.11"
-#define COPYLEFT "1998 - 2023"
+#define VERSION  "1.3.12"
+#define COPYLEFT "1998 - 2024"
 
 #define DEFAULT_VERSION 8
 /* ***** Set the above definition to the     */

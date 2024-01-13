@@ -8,6 +8,14 @@ Bug classification:
  - LOW: Cosmetic bugs, like display issues etc.
 
 
+Version 1.3.12 (2024-01-13):
+--------------------------
+Fixes:
+ - CRITICAL: Fix a drive letter disagree between DOS and FDISK in cases
+     involving multiple disks and a mix of active and non-active
+     primary partitions.
+
+
 Version 1.3.11 (2023-11-20):
 --------------------------
 Fixes:
