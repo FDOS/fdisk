@@ -7,18 +7,18 @@
 # HELP SCREEN                                                                #
 ##############################################################################
 
-0.0:Syntax: FDISK [<Datenträger#>] [Kommandos]...
+0.0:Syntax: FDISK [<Datenträger#>] [Befehle]...
 0.1:  kein Argument     Interaktiver Modus
 0.2:  /INFO             Zeigt Partitionen von <Datenträger#> an
 0.3:  /REBOOT           Startet den Computer neu
 0.4:\t
-0.10:Kommandos zum Anlegen und Löschen von Partitionen:
+0.10:Befehle zum Anlegen und Löschen von Partitionen:
 0.11:    <Größe> ist eine Zahl in Megabyte, oder MAX für maximale Größe,
 0.12:            oder <Zahl>,100 für Angabe in Prozent
-0.13:    <Typ#>  numerischer Paritionstyp, standardmäßig FAT-12/16/32
+0.13:    <Typ#>  numerischer Partitionstyp, standardmäßig FAT12/16/32
 0.14:\t
 0.20:  /PRI:<Größe> [/SPEC:<Typ#>]              Erzeugt primäre Partition
-0.21:  /EXT:<Größe>                             Erzeugt erweiterte DOS Partition
+0.21:  /EXT:<Größe>                             Erzeugt erweiterte DOS-Partition
 0.22:  /LOG:<Größe> [/SPEC:<Typ#>]              Erzeugt logisches Laufwerk
 0.23:  /PRIO,/EXTO,/LOGO                        wie oben, beschränkt auf FAT12/16
 0.24:  /AUTO                                    Automatische Partitionierung
@@ -30,19 +30,19 @@
 0.32:  /ACTIVATE:<Partition#>                   Markiert <Partition#> als aktiv
 0.33:  /DEACTIVATE                              Deaktiviert alle Partitionen
 0.34:\t
-0.40:MBR (Master Boot Record) Verwaltung:
-0.41:  /CLEARMBR                Löscht alle Partitionen und Boot Code aus MBR
+0.40:Verwaltung des MBR (Master Boot Record):
+0.41:  /CLEARMBR                Löscht alle Partitionen und Bootcode aus MBR
 0.42:  /LOADMBR                 Lädt Partitionstabelle und Code aus Datei "boot.mbr"
 0.43:  /SAVEMBR                 Speichert Part.tabelle und Code in Datei "boot.mbr"
 0.44:\t
-0.50:MBR Startprogrammmodifikationen ohne Änderung der Partitionstabelle:
-0.51:  /IPL                     Installiert neuen Boot Code in MBR
+0.50:MBR-Startprogrammmodifikationen ohne Änderung der Partitionstabelle:
+0.51:  /IPL                     Installiert neuen Bootcode in MBR
 0.52:                           ...auch als /MBR und /CMBR zwecks Kompatibilität
-0.53:  /SMARTIPL                Installiert DriveSmart Boot Code in MBR
-0.54:  /LOADIPL                 Schreibt 440 Code Bytes von \"boot.mbr\" in MBR
+0.53:  /SMARTIPL                Installiert DriveSmart-Bootcode in MBR
+0.54:  /LOADIPL                 Schreibt 440 Code-Bytes von \"boot.mbr\" in MBR
 0.55:\t
 0.60:Fortgeschrittene Partitionstabellenmodifikation:
-0.61:  /MODIFY:<Part#>,<Typ#>                   Ändert Paritionstyp zu <Typ#>
+0.61:  /MODIFY:<Part#>,<Typ#>                   Ändert Partitionstyp zu <Typ#>
 0.62:                                           ...logische Laufw. starten bei "5"
 0.63:  /MOVE:<Q.Part#>,<Z.Part#>                Verschiebt primäre Partition
 0.64:  /SWAP:<1.Part#>,<2.Part#>                Vertauscht primäre Partitionen
@@ -59,14 +59,14 @@
 0.90:Interaktiver Benutzermodus:
 0.91:  /UI           Erzwingt Start von Benutzerinterface, wenn letztes Argument
 0.92:  /MONO         Deaktiviert Textattribute (heller, blinkender Text)
-0.93:  /FPRMT        Fragt nach FAT32/FAT16 im Interaktiven Modus
+0.93:  /FPRMT        Fragt nach FAT32/FAT16 im interaktiven Modus
 0.94:  /XO           Aktiviert erweiterte Programmfunktionen
 0.95:\t
 0.100:Kompatibilitätsoptionen:
-0.101:  /X            Deaktiviert erweiterte INT 13 Funktionen und LBA
+0.101:  /X            Deaktiviert erweiterte "INT 13"-Funktionen und LBA
 0.102:\t
 0.200:\t
-0.201:Dieses Programm ist lizensiert unter den Bedingungen der
+0.201:Dieses Programm ist lizenziert unter den Bedingungen der
 0.202:GNU General Public License, Version 2.
 0.203:\t
 0.204:Dieses Programm wird so geliefert, wie es ist, und ohne jegliche Garantie.
@@ -79,14 +79,14 @@
 # FAT32 SUPPORT SCREEN                                                       #
 ##############################################################################
 
-1.0:\e[5;5HFDISK erlaubt das Anlegen von Partitionen größer als 2,048 MB
-1.1:    unter Verwendung des FAT-32 Dateisystems. Wenn Sie das Anlegen
+1.0:\e[5;5HFDISK erlaubt das Anlegen von Partitionen größer als 2.048 MB
+1.1:    unter Verwendung des FAT32-Dateisystems. Wenn Sie das Anlegen
 1.2:    großer Partitionen erlauben, wird jede Partition größer als
-1.3:    512 MB mit dem FAT-32 Dateisystem angelegt.
-1.4:    WICHTIG: Manche Betriebsysteme unterstützen keinen Zugriff auf
-1.5:    DOS Partitionen, die größer als 512 MB sind.
+1.3:    512 MB mit dem FAT32-Dateisystem angelegt.
+1.4:    WICHTIG: Manche Betriebssysteme unterstützen keinen Zugriff auf
+1.5:    DOS-Partitionen, die größer als 512 MB sind.
 1.6:\t
-1.7:\e[5;18HSupport für große Partitionen (FAT-32) aktivieren (J/N)....?
+1.7:\e[5;18HSupport für große Partitionen (FAT32) aktivieren (J/N)....?
 
 
 ##############################################################################
@@ -98,21 +98,21 @@
 2.1:Alle neu angelegten Partitionen müssen \e[1mNACH\e[22m Neustart formatiert werden.
 
 2.2:System wird neugestartet
-2.3:Drücken Sie eine belibige Taste zum Fortfahren . . .
+2.3:Drücken Sie eine beliebige Taste zum Fortfahren . . .
 
 
 ##############################################################################
 # MAIN MENU                                                                  #
 ##############################################################################
 
-3.0:FDISK Optionen
+3.0:FDISK-Optionen
 3.1:Partition anlegen
 3.2:Aktive Partition setzen
 3.3:Partition löschen
 3.4:Eingerichtete Partitionen anzeigen
 3.5:Partitionen anzeigen / modifizieren
 3.6:Datenträger auswählen
-3.7:MBR Wartung
+3.7:MBR-Wartung
 3.8:Änderungen verwerfen und beenden
 
 
@@ -121,9 +121,9 @@
 ##############################################################################
 
 4.0:Partition anlegen
-4.1:Primäre DOS Partition anlegen
-4.2:Erweiterte DOS Partition anlegen
-4.3:Logische DOS Partition in erweiterter Partition anlegen
+4.1:Primäre DOS-Partition anlegen
+4.2:Erweiterte DOS-Partition anlegen
+4.3:Logische DOS-Partition in erweiterter Partition anlegen
 
 
 ##############################################################################
@@ -131,18 +131,18 @@
 ##############################################################################
 
 5.0:Partition löschen
-5.1:Primäre DOS Partition löschen
-5.2:Erweiterte DOS Partition löschen
-5.3:Logische DOS Partition aus erweiterter Partition löschen
-5.4:Nicht-DOS Partition löschen
+5.1:Primäre DOS-Partition löschen
+5.2:Erweiterte DOS-Partition löschen
+5.3:Logische DOS-Partition aus erweiterter Partition löschen
+5.4:Nicht-DOS-Partition löschen
 
 
 ##############################################################################
 # MBR MAINTENANCE MENU (EXTENDED OPTION)                                     #
 ##############################################################################
 
-6.0:MBR Wartung
-6.1:BootEasy MBR anlegen (deaktiviert)
+6.0:MBR-Wartung
+6.1:BootEasy-MBR anlegen (deaktiviert)
 6.2:MBR (Partitionen und Startprogramm) aus Datei BOOT.MGR laden
 6.3:MBR (Partitionen und Startprogramm) in Datei BOOT.MGR schreiben
 6.4:Startprogramm aus MBR löschen
@@ -156,8 +156,8 @@
 7.1:\nDie Datei "boot.mbr" wurde nicht gefunden.\n
 7.3:Fehler gefunden in Zeile %d der Datei "fdisk.ini".\n
 7.4:\nFehler beim Lesen von Sektor.\n
-7.5:\nSektor-Flag Funktionen sind deaktiviert.\n
-7.6:Erstelle Drive Smart MBR für Datenträger %d\n
+7.5:\n"Sektor-Flag"-Funktionen sind deaktiviert.\n
+7.6:Erstelle DriveSmart-MBR für Datenträger %d\n
 
 
 ##############################################################################
@@ -180,15 +180,15 @@
 8.15:\nFehler beim Löschen der erweiterten Partition.\n
 8.16:\nNummer der logischen Partition %d ist ungültig.\n
 8.17:\nPartitionsnummer ist ungültig.\n
-8.18:\nUngültiges Argument für Löschkommando.\n
+8.18:\nUngültiges Argument für Löschbefehl.\n
 8.19:\nFehler beim Löschen der logischen Partition.\n
 8.20:\nPartitionstyp der neu anzulegenden Partition ist ungültig.\n
 8.21:\nFehler beim Ändern des Partitionstyps.\n
 8.22:\nPartitionsnummer der Quellpartition ist ungültig.\n
 8.23:\nPartitionsnummer der Zielpartition ist ungültig.\n
 8.24:\nFehler beim Verschieben des Partitionsslots.\n
-8.25:\nUngültige Flag Nummer.\n
-8.26:\nFlag Wert ist ungültig.\n
+8.25:\nUngültige Flag-Nummer.\n
+8.26:\nFlag-Wert ist ungültig.\n
 8.27:\nFehler beim Setzen von Flag.\n
 8.28:\nFlag %d wurde gesetzt auf %d.\n
 8.29:Datenträgerstatus
@@ -215,24 +215,24 @@
 9.3:Sektoren, Geometrie
 9.4:Keine Partitionen vorhanden.
 9.5:\nGrößter zusammenhängender Speicher für primäre Partition = %lu MBytes\n
-9.6:\nInhalt der erweiterten DOS Partition:\n
+9.6:\nInhalt der erweiterten DOS-Partition:\n
 9.7:\nGrößter zusammenhängender Speicher für erweiterte Partition = %lu MBytes\n
 9.8:    ------- unbenutzbar -------
-9.9:(1 Mbyte = 1048576 Bytes)
+9.9:(1 MByte = 1.048.576 Bytes)
 
 # The following are table headers, must stay adjusted as is
-9.10:\n\nPartition   Status   Mbytes   System         Nutzung    CHS Start      CHS Ende\n
-9.11: LW Bezeichnung   Mbytes  System        Nutzung    CHS Start      CHS Ende\n
-9.12:Disk    LW   Mbytes    frei   bel.
+9.10:\n\nPartition   Status   MBytes   System         Nutzung    CHS Start      CHS Ende\n
+9.11: LW Bezeichnung   MBytes  System        Nutzung    CHS Start      CHS Ende\n
+9.12:Disk    LW   MBytes    frei   bel.
 
 
-9.13:Kein freier Speicher zum Erstellen einer DOS Partition vorhanden.
-9.14:Erweiterte DOS Partition existiert bereits.
+9.13:Kein freier Speicher zum Erstellen einer DOS-Partition vorhanden.
+9.14:Erweiterte DOS-Partition existiert bereits.
 9.15:Kann keine logische Partition erstellen ohne eine\n    erweiterte Partition auf dem Datenträger.
 9.16:Keine primäre Partition zum Löschen vorhanden.
 9.17:Keine erweiterte Partition zum Löschen vorhanden.
 9.18:Keine logische Partition zum Löschen vorhanden.
-9.19:Keine Nicht-DOS Partition zum Löschen vorhanden.
+9.19:Keine Nicht-DOS-Partition zum Löschen vorhanden.
 9.20:ist unbenutzbar!
 9.21:Keine Partition zum Löschen vorhanden.
 9.22:\e[1mWARNUNG!\e[22m Vom Datenträger kann nicht gestartet werden, bis\n             eine primäre Partition als aktiv markiert wurde.
@@ -243,24 +243,24 @@
 # USERINT2.C                                                                 #
 ##############################################################################
 
-10.0:Daten in der zu löschenden Nicht-DOS Partition gehen verloren.\n    Welche Nicht-DOS Partition möchten Sie löschen?
+10.0:Daten in der zu löschenden Nicht-DOS-Partition gehen verloren.\n    Welche Nicht-DOS-Partition möchten Sie löschen?
 10.1:Keine Partition!
-10.2:Löschen von DOS Partition verweigert!
-10.3:Nicht-DOS Partition gelöscht.
-10.4:Fehler beim Löschen von Nicht-DOS Partition!
+10.2:Löschen von DOS-Partition verweigert!
+10.3:Nicht-DOS-Partition gelöscht.
+10.4:Fehler beim Löschen von Nicht-DOS-Partition!
 
 # Display extended partition
 10.5:Keine logischen Partitionen definiert.
-10.6:Größe der erw. Partition ist \e[1m%lu\e[22m Mbytes (1 Mbyte = 1048576 Bytes)
+10.6:Größe der erw. Partition ist \e[1m%lu\e[22m MBytes (1 MByte = 1.048.576 Bytes)
 
 # Display primary partitions
 10.7:Keine Partitionen definiert.
-10.8:Datenträgergröße beträgt \e[1m%lu\e[22m Mbytes (1 Mbyte = 1048576 Bytes)
+10.8:Datenträgergröße beträgt \e[1m%lu\e[22m MBytes (1 MByte = 1.048.576 Bytes)
 
 # Table headers
-10.10:Partition  Status  Typ      Bezeichnung    Mbytes  System        Nutzung
-10.11:Partition   Status   Mbytes  Beschreibung   Nutzung  Startzyl.  Endzyl.
-10.12:LW Bezeichnung    Mbytes System Nutzung
+10.10:Partition  Status  Typ      Bezeichnung    MBytes  System        Nutzung
+10.11:Partition   Status   MBytes  Beschreibung   Nutzung  Startzyl.  Endzyl.
+10.12:LW Bezeichnung    MBytes System Nutzung
 
 # Delete extended partition
 10.20:\e[1;5mWARNUNG!\e[22;25m Alle Daten der erweiterten Partition und ihrer\n    logischen Partitionen gehen verloren. Sind Sie sicher (J/N)...?
@@ -272,11 +272,11 @@
 10.32:Fehler beim Löschen der logischen Partition!
 
 # Delete primary Partition
-10.40:\e[1;5mWARNING!\e[22;25m Alle Daten der primären DOS Partition gehen verloren.\n    Welche Partition möchten Sie löschen...?
-10.41:Primäre DOS Parition wurde gelöscht.
-10.42:Fehler beim Löschen der primären DOS Partition!
+10.40:\e[1;5mWARNUNG!\e[22;25m Alle Daten der primären DOS-Partition gehen verloren.\n    Welche Partition möchten Sie löschen...?
+10.41:Primäre DOS-Partition wurde gelöscht.
+10.42:Fehler beim Löschen der primären DOS-Partition!
 10.43:Löschen von erweiterter Partition verweigert!
-10.44:Keine primäre DOS Partition!
+10.44:Keine primäre DOS-Partition!
 
 # Set active partition
 10.50:Keine Partitionen vorhanden.
@@ -286,20 +286,20 @@
 10.54:Partition %d wurde aktiviert.
 
 # Create partition
-10.60:Soll der ganze vorhandene Speicherplatz für die primäre DOS Partition\n    verwendet und diese aktiviert werden...(J/N)?
-10.61:Soll der ganze vorhandene Speicherplatz für die primäre DOS Partition\n    verwendet werden...(J/N)?
-10.62:Dieses Laufwerk ist standardmäßig FAT-32. Stattdessen FAT-16 verwenden (J/N)?
-10.63:Die maximale Partitionsgröße beträgt \e[1m%lu\e[22m Mbytes
-10.64:Geben Sie die gewünschte Größe in Mbyte oder in Prozent (%%) der\n    Lauferksgröße an...:
-10.65:Geben Sie die gewünschte Größe in Mbyte oder in Prozent (%%) der\n    Lauferksgröße an...:
-10.66:Primäre DOS Partition wurde erstellt.
-10.67:Erweiterte DOS Partition wurde erstellt.
+10.60:Soll der ganze vorhandene Speicherplatz für die primäre DOS-Partition\n    verwendet und diese aktiviert werden...(J/N)?
+10.61:Soll der ganze vorhandene Speicherplatz für die primäre DOS-Partition\n    verwendet werden...(J/N)?
+10.62:Dieses Laufwerk ist standardmäßig FAT32. Stattdessen FAT16 verwenden (J/N)?
+10.63:Die maximale Partitionsgröße beträgt \e[1m%lu\e[22m MBytes
+10.64:Geben Sie die gewünschte Größe in MByte oder in Prozent (%%) der\n    Laufwerksgröße an...:
+10.65:Geben Sie die gewünschte Größe in MByte oder in Prozent (%%) der\n    Laufwerksgröße an...:
+10.66:Primäre DOS-Partition wurde erstellt.
+10.67:Erweiterte DOS-Partition wurde erstellt.
 
 # Create logical partition
-10.70:Logische DOS Partition wurde erstellt. Laufwerksbuchstaben aktualisiert!
-10.71:Maximale Anzahl logischer DOS Partitionen erstellt!
+10.70:Logische DOS-Partition wurde erstellt. Laufwerksbuchstaben aktualisiert!
+10.71:Maximale Anzahl logischer DOS-Partitionen erstellt!
 10.72:Geben Sie die Größe der logischen Partition in MByte oder in (%%) der\n    erweiterten Partition an...:
-10.73:Der gesammte verfügbare Speicher der erweiterten Partition\n    wurde zugewiesen.
+10.73:Der gesamte verfügbare Speicher der erweiterten Partition\n    wurde zugewiesen.
 
 # Display partition info
 10.80:Die erweiterte Partition beinhaltet logische Partitionen.\n    Sollen die logischen Partitionen angezeigt werden...?
@@ -314,8 +314,8 @@
 
 # Display / modify partition
 10.100:Logische Partitionen anzeigen / modifizieren
-10.101:Partition            Mbytes  Typ            Nutzung  Startzyl.  Endzyl.
-10.102:Paritionstyp ändern
+10.101:Partition            MBytes  Typ            Nutzung  Startzyl.  Endzyl.
+10.102:Partitionstyp ändern
 10.104:Partition sichtbar machen / verstecken
 10.105:Neuen Partitionstyp eingeben (1-255)...:
 10.106:Partition deaktivieren
@@ -331,14 +331,14 @@
 11.0:\nKann "boot.mbr" nicht finden...MBR nicht geladen!\n
 11.1:MBR wurde aus Datei "BOOT.MGR" geschrieben.
 11.2:MBR wurde in Datei "BOOT.MGR" gespeichert.
-11.3:Boot code wurde aus MBR entfernt.
+11.3:Bootcode wurde aus MBR entfernt.
 
 
 ##############################################################################
 # KBDINPUT.C                                                                 #
 ##############################################################################
 
-20.5:Drücken Sie \e[1mESC\e[22m, um zu den FDISK Optionen zurückzukehren
+20.5:Drücken Sie \e[1mESC\e[22m, um zu den FDISK-Optionen zurückzukehren
 20.6:Drücken Sie \e[1mESC\e[22m, um FDISK zu beenden
 20.7:Drücken Sie \e[1mESC\e[22m um fortzufahren
 20.8:Gewünschte Partitionsgröße überschreitet die Größe des freien Speichers.
@@ -353,8 +353,8 @@
 # WARNING SCREENS                                                            #
 ##############################################################################
 
-30.1:Sie haben mindestens einen Datenträger größer als 2,097,152 MB. FDISK\n    kann keine Partitionen verwalten, die diese Grenze überschreiten!\n\n
-30.2:    Sie können fortfahren aber riskieren Datenverlust, insbesondere\n    wenn bereits Partitionen angelegt sind.\n\n
+30.1:Sie haben mindestens einen Datenträger größer als 2.097.152 MB. FDISK\n    kann keine Partitionen verwalten, die diese Grenze überschreiten!\n\n
+30.2:    Sie können fortfahren, aber riskieren Datenverlust, insbesondere\n    wenn bereits Partitionen angelegt sind.\n\n
 30.3:    Sollte FDISK das einzige Partitionierungsprogramm sein, welches\n    Sie benutzen, sollte es keine Probleme geben.
 30.4:Möchten Sie fortfahren (J/N)...?
 
@@ -396,16 +396,16 @@
 255.3:\nPartitionsnummer ist ungültig (1-4).
 255.4:\nPartition kann nicht aktiviert werden.
 255.5:\nFehler beim automatischen Partitionieren des Datenträgers.
-255.6:\nFehler beim Säubern des MBR Sektors.
-255.7:\nFehler beim Löschen des MBR Startprogramms.
+255.6:\nFehler beim Säubern des MBR-Sektors.
+255.7:\nFehler beim Löschen des MBR-Startprogramms.
 255.9:\nFehler beim Deaktivieren der Partition.
 255.10:\nFehler beim Säubern der Partitionstabelle.
-255.11:\nFehler beim Schreiben des MBR Startprogramms.
-255.12:\nFehler beim Installieren des MBR Startprogramms aus Datei.
+255.11:\nFehler beim Schreiben des MBR-Startprogramms.
+255.12:\nFehler beim Installieren des MBR-Startprogramms aus Datei.
 255.13:\nFehler beim Installieren des MBR aus Datei.
 255.14:\nFehler beim Schreiben des MBR.
 255.15:\nFehler beim Schreiben der Partitionstabellen.
 255.16:\nFehler beim Speichern des MBR.
-255.17:\nFehler beim Schreiben des Smart IPL.
-255.18:\nFalsches Kommando oder Syntaxfehler. Aufruf mit FDISK /? für Hilfe.
-255.19:\nBetriebsystem wird nicht unterstützt.\n
+255.17:\nFehler beim Schreiben des Smart-IPL.
+255.18:\nFalscher Befehl oder Syntaxfehler. Aufruf mit FDISK /? für Hilfe.
+255.19:\nBetriebssystem wird nicht unterstützt.\n
