@@ -8,22 +8,30 @@ Bug classification:
  - LOW: Cosmetic bugs, like display issues etc.
 
 
-Version 1.3.12 (2024-01-13):
---------------------------
+Version 1.3.13 (2024-01-16)
+---------------------------
+Changes:
+ - Do not check for extra cylinders by default. DR-DOS refuses to use
+   partitions exceeding the BIOS reported disk size, despite being valid.
+ - Update German translation.
+
+
+Version 1.3.12 (2024-01-13)
+---------------------------
 Fixes:
  - CRITICAL: Fix a drive letter disagree between DOS and FDISK in cases
      involving multiple disks and a mix of active and non-active
      primary partitions.
 
 
-Version 1.3.11 (2023-11-20):
---------------------------
+Version 1.3.11 (2023-11-20)
+---------------------------
 Fixes:
  - HIGH: Fix FDISK not writing the partition table of the 8th disk.
 
 
-Version 1.3.10 (2023-11-11):
---------------------------
+Version 1.3.10 (2023-11-11)
+---------------------------
 Changes:
  - Increase compatibility with some older quirky IDE controllers by resetting
    the disk system via INT13,0 after failed IO operations.
@@ -31,7 +39,7 @@ Changes:
  - Provide SvarDOS packages as part of new releases.
 
 
-Version 1.3.9 (2023-08-27):
+Version 1.3.9 (2023-08-27)
 --------------------------
 Changes:
  - Reintroduce /SMBR command line argument as alias for /SAVEMBR.
