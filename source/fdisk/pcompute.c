@@ -744,19 +744,10 @@ unsigned long Max_Log_Part_Size_In_MB( void )
    stored_max_size_mb = max_size_mb;
 
    /* Adjust max_size_mb depending upon version */
-   if ( ( flags.version == FOUR ) && ( max_size_mb > MAXFAT16NORM ) ) {
+   if ( ( flags.version <= COMP_W95 ) && ( max_size_mb > MAXFAT16NORM ) ) {
       max_size_mb = MAXFAT16NORM;
    }
-   if ( ( flags.version == FIVE ) && ( max_size_mb > MAXFAT16NORM ) ) {
-      max_size_mb = MAXFAT16NORM;
-   }
-   if ( ( flags.version == SIX ) && ( max_size_mb > MAXFAT16NORM ) ) {
-      max_size_mb = MAXFAT16NORM;
-   }
-   if ( ( flags.version == W95 ) && ( max_size_mb > MAXFAT16NORM ) ) {
-      max_size_mb = MAXFAT16NORM;
-   }
-   if ( ( ( flags.version == W95B ) || ( flags.version == W98 ) ) &&
+   if ( ( flags.version >= COMP_W95B ) &&
         ( flags.fat32 == FALSE ) && ( max_size_mb > MAXFAT16NORM ) ) {
       max_size_mb = MAXFAT16NORM;
    }
@@ -789,28 +780,13 @@ unsigned long Max_Pri_Part_Size_In_MB( int type )
    stored_max_size_mb = max_size_mb;
 
    /* Adjust max_size_mb depending upon version */
-   if ( ( type != EXTENDED ) && ( flags.version == FOUR ) &&
-        ( max_size_mb > MAXFAT16NORM ) ) {
-      max_size_mb = MAXFAT16NORM;
-   }
-
-   if ( ( type != EXTENDED ) && ( flags.version == FIVE ) &&
-        ( max_size_mb > MAXFAT16NORM ) ) {
-      max_size_mb = MAXFAT16NORM;
-   }
-
-   if ( ( type != EXTENDED ) && ( flags.version == SIX ) &&
-        ( max_size_mb > MAXFAT16NORM ) ) {
-      max_size_mb = MAXFAT16NORM;
-   }
-
-   if ( ( type != EXTENDED ) && ( flags.version == W95 ) &&
+   if ( ( type != EXTENDED ) && ( flags.version <= COMP_W95 ) &&
         ( max_size_mb > MAXFAT16NORM ) ) {
       max_size_mb = MAXFAT16NORM;
    }
 
    if ( ( type != EXTENDED ) &&
-        ( ( flags.version == W95B ) || ( flags.version == W98 ) ) &&
+        ( flags.version >= COMP_W95B ) &&
         ( flags.fat32 == FALSE ) && ( max_size_mb > MAXFAT16NORM ) ) {
       max_size_mb = MAXFAT16NORM;
    }
@@ -950,13 +926,13 @@ int Partition_Type_To_Create( unsigned long size_in_mb,
 
    /* FAT 32 */
    if ( ( size_in_mb > 128 ) &&
-        ( ( flags.version == W95B ) || ( flags.version == W98 ) ) &&
+        ( flags.version >= COMP_W95B ) &&
         ( flags.fat32 == TRUE ) && ( flags.fprmt == TRUE ) ) {
       numeric_type = 0x0b;
    }
 
    if ( ( size_in_mb > 512 ) &&
-        ( ( flags.version == W95B ) || ( flags.version == W98 ) ) &&
+        ( flags.version >= COMP_W95B ) &&
         ( flags.fat32 == TRUE ) ) {
       numeric_type = 0x0b;
    }

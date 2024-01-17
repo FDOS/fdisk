@@ -24,3 +24,4 @@ Mateusz Viste           svarlang lib, FDISK lite, code improvements,
 Emir SARI               Turkish translation
 Berki Yenigün           French, Turkish translation
 Alejandro de Garate     Spanish translation
+Robert Riebisch         German translation fixes

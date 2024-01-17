@@ -7,13 +7,11 @@
 #define VERSION  "1.3.12"
 #define COPYLEFT "1998 - 2024"
 
-#define DEFAULT_VERSION 8
 /* ***** Set the above definition to the     */
 /* ***** version to be emulated if the       */
 /* ***** fdisk.ini file does not exist or if */
 /* ***** the fdisk.ini file does not have a  */
 /* ***** VERSION statement.                  */
-#define FREEDOS_VERSION 7
 /* ***** Set the above definition to the     */
 /* ***** version to be emulated if the       */
 /* ***** VERSION statement in the fdisk.ini  */
@@ -76,13 +74,13 @@ typedef unsigned char _u8;
 #define UNCHANGED 220
 #define UNUSED    99
 
-#define FD   100
-#define FOUR 4
-#define FIVE 5
-#define SIX  6
-#define W95  7
-#define W95B 72
-#define W98  8
+#define COMP_FOUR 4
+#define COMP_FIVE 5
+#define COMP_SIX  6
+#define COMP_W95  7
+#define COMP_W95B 8
+#define COMP_W98  9
+#define COMP_FD   10
 
 #define MEG 1048576
 

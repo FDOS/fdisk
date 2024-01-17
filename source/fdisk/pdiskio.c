@@ -143,8 +143,7 @@ int Is_Supp_Ext_Part( int num_type )
 {
    return ( num_type == 5 ) ||
           ( num_type == 0x0f &&
-            ( flags.version == W95 || flags.version == W95B ||
-              flags.version == W98 ) );
+            ( flags.version >= COMP_W95 ) );
 }
 
 int Is_Pri_Tbl_Empty( void )
@@ -169,18 +168,17 @@ int IsRecognizedFatPartition( unsigned partitiontype )
    case 6:
       return TRUE;
    case 0x0e:
-      if ( flags.version == W95 || flags.version == W95B ||
-           flags.version == W98 ) {
+      if ( flags.version >= COMP_W95 ) {
          return TRUE;
       }
       break;
    case 0x0b:
-      if ( flags.version == W95B || flags.version == W98 ) {
+      if ( flags.version >= COMP_W95B ) {
          return TRUE;
       }
       break;
    case 0x0c:
-      if ( flags.version == W95B || flags.version == W98 ) {
+      if ( flags.version >= COMP_W95B ) {
          return TRUE;
       }
       break;

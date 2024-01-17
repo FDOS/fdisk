@@ -183,7 +183,7 @@ void Interactive_User_Interface( void )
    }
 
    /* Ask the user if FAT32 is desired. */
-   if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
+   if ( flags.version >= COMP_W95B ) {
       Ask_User_About_FAT32_Support();
    }
 
@@ -534,7 +534,7 @@ int Standard_Menu( int menu )
          option_2 = svarlang_str(5, 2); /* Delete Extended DOS Partition */
          option_3 = svarlang_str(5, 3); /* Del Log DOS Drive in Ext DOS Part */
          option_4 = svarlang_str(5, 4); /* Delete Non-DOS Partition */
-         if ( flags.version == FOUR ) {
+         if ( flags.version == COMP_FOUR ) {
             maximum_number_of_options = 3;
          }
       }

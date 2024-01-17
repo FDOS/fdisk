@@ -33,22 +33,22 @@ void Display_Information( void )
 {
    if ( flags.extended_options_flag == TRUE ) {
       con_set_cursor_xy( 1, 1 );
-      if ( flags.version == FOUR ) {
+      if ( flags.version == COMP_FOUR ) {
          con_print( "4" );
       }
-      if ( flags.version == FIVE ) {
+      if ( flags.version == COMP_FIVE ) {
          con_print( "5" );
       }
-      if ( flags.version == SIX ) {
+      if ( flags.version == COMP_SIX ) {
          con_print( "6" );
       }
-      if ( flags.version == W95 ) {
+      if ( flags.version == COMP_W95 ) {
          con_print( "W95" );
       }
-      if ( flags.version == W95B ) {
+      if ( flags.version == COMP_W95B ) {
          con_print( "W95B" );
       }
-      if ( flags.version == W98 ) {
+      if ( flags.version == COMP_W98 ) {
          con_print( "W98" );
       }
 

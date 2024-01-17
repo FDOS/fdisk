@@ -1029,8 +1029,7 @@ void Display_Primary_Partition_Information_SS( void )
                   type = "EXT DOS";
                }
                else if ( ( p->num_type == 0x0f ) &&
-                         ( flags.version == W95 || flags.version == W95B ||
-                           flags.version == W98 ) ) {
+                         ( flags.version >= COMP_W95 ) ) {
                   type = "EXT DOS";
                }
                Print_At( 23, ( cursor_offset + 9 ), type );

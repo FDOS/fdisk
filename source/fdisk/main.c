@@ -254,25 +254,25 @@ static int Get_Environment_Settings( char *environment[] )
       /* Check for the VERSION statement */
       if ( 0 == strcmp( command_buffer, "FFD_VERSION" ) ) {
          if ( 0 == strcmp( setting_buffer, "4" ) ) {
-            flags.version = FOUR;
+            flags.version = COMP_FOUR;
          }
          if ( 0 == strcmp( setting_buffer, "5" ) ) {
-            flags.version = FIVE;
+            flags.version = COMP_FIVE;
          }
          if ( 0 == strcmp( setting_buffer, "6" ) ) {
-            flags.version = SIX;
+            flags.version = COMP_SIX;
          }
          if ( 0 == strcmp( setting_buffer, "W95" ) ) {
-            flags.version = W95;
+            flags.version = COMP_W95;
          }
          if ( 0 == strcmp( setting_buffer, "W95B" ) ) {
-            flags.version = W95B;
+            flags.version = COMP_W95B;
          }
          if ( 0 == strcmp( setting_buffer, "W98" ) ) {
-            flags.version = W98;
+            flags.version = COMP_W98;
          }
          if ( 0 == strcmp( setting_buffer, "FD" ) ) {
-            flags.version = FREEDOS_VERSION;
+            flags.version = COMP_FD;
          }
       }
 
@@ -302,7 +302,8 @@ static void Initialization( char *environment[] )
 {
    int index;
 
-   /* Set some flags */
+   /* initialize base flags */
+   flags.version = COMP_W95B;
    flags.display_name_description_copyright = TRUE;
    flags.do_not_pause_help_information = FALSE;
    flags.fprmt = FALSE;
@@ -340,13 +341,12 @@ static void Initialization( char *environment[] )
    con_enable_attr( !flags.monochrome );
 
    /* Check for interrupt 0x13 extensions (If the proper version is set.) */
-   if ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
-        ( flags.version == W98 ) ) {
+   if ( flags.version >= COMP_W95 ) {
       Check_For_INT13_Extensions();
    }
 
    /* If the version is W95B or W98 then default to FAT32 support.  */
-   if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
+   if ( flags.version >= COMP_W95B ) {
       flags.fat32 = TRUE;
    }
 
@@ -375,30 +375,6 @@ void Reboot_PC( void )
    (*fp)();
 }
 
-/* Re-Initialize LBA related functions. */
-/* UNUSED */
-#if 0
-void Re_Initialization( void )
-{
-   /* Check for interrupt 0x13 extensions (If the proper version is set.) */
-   if ( ( flags.version == W95 ) || ( flags.version == W95B ) ||
-        ( flags.version == W98 ) ) {
-      Check_For_INT13_Extensions();
-   }
-
-   /* If the version is W95B or W98 then default to FAT32 support.  */
-   if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
-      flags.fat32 = TRUE;
-   }
-
-   /* Initialize LBA structures, if necessary. */
-   if ( flags.use_extended_int_13 == TRUE ) {
-      Initialize_LBA_Structures();
-   }
-
-   Read_Partition_Tables();
-}
-#endif
 
 /*
 	if the C: drive has not been formatted, and fdisk
@@ -676,7 +652,7 @@ int main( int argc, char *argv[] )
          }
 
          if ( 0 == strcmp( arg[0].choice, "FPRMT" ) ) {
-            if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
+            if ( flags.version >= COMP_W95B ) {
                flags.fprmt = TRUE;
             }
          }
@@ -798,7 +774,7 @@ int main( int argc, char *argv[] )
          if ( 0 == strcmp( arg[0].choice, "Q" ) ) {
             flags.reboot = FALSE;
 
-            if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
+            if ( flags.version >= COMP_W95B ) {
                Ask_User_About_FAT32_Support();
             }
          }

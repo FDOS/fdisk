@@ -812,25 +812,23 @@ void Process_Fdiskini_File( void )
             /* Check for the VERSION statement */
             if ( 0 == stricmp( command_buffer, "VERSION" ) ) {
                if ( 0 == stricmp( setting_buffer, "4" ) ) {
-                  flags.version = FOUR;
+                  flags.version = COMP_FOUR;
                }
                if ( 0 == stricmp( setting_buffer, "5" ) ) {
-                  flags.version = FIVE;
+                  flags.version = COMP_FIVE;
                }
                if ( 0 == stricmp( setting_buffer, "6" ) ) {
-                  flags.version = SIX;
+                  flags.version = COMP_SIX;
                }
                if ( 0 == stricmp( setting_buffer, "W95" ) ) {
-                  flags.version = W95;
+                  flags.version = COMP_W95;
                }
                if ( 0 == stricmp( setting_buffer, "W95B" ) ) {
-                  flags.version = W95B;
+                  flags.version = COMP_W95B;
                }
-               if ( 0 == stricmp( setting_buffer, "W98" ) ) {
-                  flags.version = W98;
-               }
-               if ( 0 == stricmp( setting_buffer, "FD" ) ) {
-                  flags.version = FREEDOS_VERSION;
+               if ( 0 == stricmp( setting_buffer, "W98" ) 
+                    || 0 == stricmp( setting_buffer, "FD" ) ) {
+                  flags.version = COMP_FD;
                }
                if ( flags.version == UNCHANGED ) {
                   con_printf( error_str, line_counter );
@@ -958,14 +956,6 @@ void Process_Fdiskini_File( void )
    }
    if ( flags.use_ambr == UNCHANGED ) {
       flags.use_ambr = FALSE;
-   }
-   if ( flags.version == UNCHANGED ) {
-      if ( DEFAULT_VERSION != FD ) {
-         flags.version = DEFAULT_VERSION;
-      }
-      else {
-         flags.version = FREEDOS_VERSION;
-      }
    }
 
 #ifdef DEBUG
