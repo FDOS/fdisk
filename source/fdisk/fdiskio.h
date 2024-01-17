@@ -18,6 +18,7 @@ void Load_External_Lookup_Table( void );
 void Process_Fdiskini_File( void );
 int Remove_IPL( void );
 int Save_MBR( void );
+int bool_string_to_int( int *var, const char *bool_text );
 int Set_Flag( int flag_number, int flag_value );
 
 #ifdef SMART_MBR

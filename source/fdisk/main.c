@@ -1,7 +1,7 @@
 /*
 // Program:  Free FDISK
 // Written by: Brian E. Reifsnyder and The FreeDOS Project
-// Copyright:  1998-2023 under the terms of the GNU GPL, Version 2
+// Copyright:  1998-2024 under the terms of the GNU GPL, Version 2
 */
 
 #define MAIN
@@ -130,52 +130,27 @@ static int Get_Environment_Settings( char *environment[] )
 
       /* Align partitions to 4K */
       if ( 0 == strcmp( command_buffer, "FFD_ALIGN_4K" ) ) {
-         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
-            flags.align_4k = TRUE;
-         }
-         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
-            flags.align_4k = FALSE;
-         }
+         bool_string_to_int( &flags.align_4k, setting_buffer );
       }
 
       /* Check for the ALLOW_4GB_FAT16 statement */
       if ( 0 == strcmp( command_buffer, "FFD_ALLOW_4GB_FAT16" ) ) {
-         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
-            flags.allow_4gb_fat16 = TRUE;
-         }
-         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
-            flags.allow_4gb_fat16 = FALSE;
-         }
+         bool_string_to_int( &flags.allow_4gb_fat16, setting_buffer );
       }
 
       /* Check for the ALLOW_ABORT statement */
       if ( 0 == strcmp( command_buffer, "FFD_ALLOW_ABORT" ) ) {
-         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
-            flags.allow_abort = TRUE;
-         }
-         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
-            flags.allow_abort = FALSE;
-         }
+         bool_string_to_int( &flags.allow_abort, setting_buffer );
       }
 
       /* Check for the AMBR statement */
       if ( 0 == strcmp( command_buffer, "FFD_AMBR" ) ) {
-         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
-            flags.use_ambr = TRUE;
-         }
-         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
-            flags.use_ambr = FALSE;
-         }
+         bool_string_to_int( &flags.use_ambr, setting_buffer );
       }
 
       /* Check for the CHECKEXTRA statement */
       if ( 0 == strcmp( command_buffer, "FFD_CHECKEXTRA" ) ) {
-         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
-            flags.check_for_extra_cylinder = TRUE;
-         }
-         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
-            flags.check_for_extra_cylinder = FALSE;
-         }
+         bool_string_to_int( &flags.check_for_extra_cylinder, setting_buffer );
       }
 
       /* Check for the COLORS statement */
@@ -189,12 +164,7 @@ static int Get_Environment_Settings( char *environment[] )
 
       /* Check for the DEL_ND_LOG statement */
       if ( 0 == strcmp( command_buffer, "FFD_DEL_ND_LOG" ) ) {
-         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
-            flags.del_non_dos_log_drives = TRUE;
-         }
-         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
-            flags.del_non_dos_log_drives = FALSE;
-         }
+         bool_string_to_int( &flags.del_non_dos_log_drives, setting_buffer );
       }
 
       /* Check for the FLAG_SECTOR statement */
@@ -213,42 +183,22 @@ static int Get_Environment_Settings( char *environment[] )
 
       /* Check for the LBA_MARKER statement */
       if ( 0 == strcmp( command_buffer, "FFD_LBA_MARKER" ) ) {
-         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
-            flags.lba_marker = TRUE;
-         }
-         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
-            flags.lba_marker = FALSE;
-         }
+         bool_string_to_int( &flags.lba_marker, setting_buffer );
       }
 
       /* Check for the MONO statement */
       if ( 0 == strcmp( command_buffer, "FFD_MONO" ) ) {
-         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
-            flags.monochrome = TRUE;
-         }
-         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
-            flags.monochrome = FALSE;
-         }
+         bool_string_to_int( &flags.monochrome, setting_buffer );
       }
 
       /* Check for the REBOOT statement */
       if ( 0 == strcmp( command_buffer, "FFD_REBOOT" ) ) {
-         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
-            flags.reboot = TRUE;
-         }
-         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
-            flags.reboot = FALSE;
-         }
+         bool_string_to_int( &flags.reboot, setting_buffer );
       }
 
       /* Check for the SET_ANY_ACT statement */
       if ( 0 == strcmp( command_buffer, "FFD_SET_ANY_ACT" ) ) {
-         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
-            flags.set_any_pri_part_active = TRUE;
-         }
-         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
-            flags.set_any_pri_part_active = FALSE;
-         }
+         bool_string_to_int( &flags.set_any_pri_part_active, setting_buffer );
       }
 
       /* Check for the VERSION statement */
@@ -278,12 +228,7 @@ static int Get_Environment_Settings( char *environment[] )
 
       /* Check for the XO statement */
       if ( 0 == strcmp( command_buffer, "FFD_XO" ) ) {
-         if ( 0 == strcmp( setting_buffer, "ON" ) ) {
-            flags.extended_options_flag = TRUE;
-         }
-         if ( 0 == strcmp( setting_buffer, "OFF" ) ) {
-            flags.extended_options_flag = FALSE;
-         }
+         bool_string_to_int( &flags.extended_options_flag, setting_buffer );
       }
 
       /* Check for the LANG statement */
@@ -302,18 +247,17 @@ static void Initialization( char *environment[] )
 {
    int index;
 
-   /* initialize base flags */
-   flags.version = COMP_W95B;
+   /* initialize flags, the ones not set here default to FALSE */
    flags.display_name_description_copyright = TRUE;
-   flags.do_not_pause_help_information = FALSE;
-   flags.fprmt = FALSE;
-   flags.return_from_iui = FALSE;
-   flags.partitions_have_changed = FALSE;
+   flags.drive_number = 128;
+   flags.flag_sector = 2;
+   flags.lba_marker = TRUE;
+   flags.screen_color = 0x07; /* light grey on black */
+   flags.set_any_pri_part_active = TRUE;
    flags.total_number_hard_disks = 255;
    flags.use_iui = TRUE;
    flags.using_default_drive_number = TRUE;
-
-   flags.drive_number = 128;
+   flags.version = COMP_W95B;
 
    /* Clear the user_defined_chs_settings structure */
    index = 0;
@@ -345,7 +289,7 @@ static void Initialization( char *environment[] )
       Check_For_INT13_Extensions();
    }
 
-   /* If the version is W95B or W98 then default to FAT32 support.  */
+   /* If the version is W95B or later then default to FAT32 support.  */
    if ( flags.version >= COMP_W95B ) {
       flags.fat32 = TRUE;
    }

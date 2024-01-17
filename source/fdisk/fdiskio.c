@@ -300,6 +300,22 @@ int Create_MBR_If_Not_Present( void )
 */
 
 
+/* parse bool_text for "ON" or "OFF" and set integer var accordingly */
+int bool_string_to_int( int *var, const char *bool_text )
+{
+   if ( 0 == stricmp( bool_text, "ON" ) ) {
+      *var = TRUE;
+      return 1;
+   }
+   if ( 0 == stricmp( bool_text, "OFF" ) ) {
+      *var = FALSE;
+      return 1;
+   }
+
+   return 0;
+}
+
+
 /* Read and process the fdisk.ini file */
 void Process_Fdiskini_File( void )
 {
@@ -323,34 +339,6 @@ void Process_Fdiskini_File( void )
    //  long setting;
 
    FILE *file;
-
-   /* Set values to UNCHANGED */
-#ifdef DEBUG
-   debug.all = UNCHANGED;
-   debug.command_line_arguments = UNCHANGED;
-   debug.create_partition = UNCHANGED;
-   debug.determine_free_space = UNCHANGED;
-   debug.input_routine = UNCHANGED;
-   debug.lba = UNCHANGED;
-   debug.path = UNCHANGED;
-   debug.read_sector = UNCHANGED;
-   debug.write = UNCHANGED;
-#endif
-
-   flags.align_4k = UNCHANGED;
-   flags.allow_4gb_fat16 = UNCHANGED;
-   flags.allow_abort = UNCHANGED;
-   flags.check_for_extra_cylinder = UNCHANGED;
-   flags.del_non_dos_log_drives = UNCHANGED;
-   flags.extended_options_flag = UNCHANGED;
-   flags.flag_sector = UNCHANGED;
-   flags.monochrome = UNCHANGED;
-   flags.lba_marker = UNCHANGED;
-   flags.reboot = UNCHANGED;
-   flags.screen_color = UNCHANGED;
-   flags.set_any_pri_part_active = UNCHANGED;
-   flags.use_ambr = UNCHANGED;
-   flags.version = UNCHANGED;
 
    strcpy( home_path, path );
    strcat( home_path, "fdisk.ini" );
@@ -454,76 +442,36 @@ void Process_Fdiskini_File( void )
 
             /* Align partitions to 4k */
             if ( 0 == stricmp( command_buffer, "ALIGN_4K" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  flags.align_4k = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  flags.align_4k = FALSE;
-               }
-               if ( flags.align_4k == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
+               if ( !bool_string_to_int( &flags.align_4k, setting_buffer) )
+                  goto parse_error;
                command_ok = TRUE;
             }
 
             /* Check for the ALLOW_4GB_FAT16 statement */
             if ( 0 == stricmp( command_buffer, "ALLOW_4GB_FAT16" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  flags.allow_4gb_fat16 = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  flags.allow_4gb_fat16 = FALSE;
-               }
-               if ( flags.allow_4gb_fat16 == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
+               if ( !bool_string_to_int( &flags.allow_4gb_fat16, setting_buffer) )
+                  goto parse_error;
                command_ok = TRUE;
             }
 
             /* Check for the ALLOW_ABORT statement */
             if ( 0 == stricmp( command_buffer, "ALLOW_ABORT" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  flags.allow_abort = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  flags.allow_abort = FALSE;
-               }
-               if ( flags.allow_abort == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
+               if ( !bool_string_to_int( &flags.allow_abort, setting_buffer) )
+                  goto parse_error;
                command_ok = TRUE;
             }
 
             /* Check for the AMBR statement */
             if ( 0 == stricmp( command_buffer, "AMBR" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  flags.use_ambr = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  flags.use_ambr = FALSE;
-               }
-               if ( flags.use_ambr == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
+               if ( !bool_string_to_int( &flags.use_ambr, setting_buffer) )
+                  goto parse_error;
                command_ok = TRUE;
             }
 
             /* Check for the CHECKEXTRA statement */
             if ( 0 == stricmp( command_buffer, "CHECKEXTRA" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  flags.check_for_extra_cylinder = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  flags.check_for_extra_cylinder = FALSE;
-               }
-               if ( flags.check_for_extra_cylinder == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
+               if ( !bool_string_to_int( &flags.check_for_extra_cylinder, setting_buffer) )
+                  goto parse_error;
                command_ok = TRUE;
             }
 
@@ -534,148 +482,14 @@ void Process_Fdiskini_File( void )
                if ( ( number >= 0 ) && ( number <= 127 ) ) {
                   flags.screen_color = number;
                }
-
-               if ( flags.screen_color == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
+               else goto parse_error;
                command_ok = TRUE;
             }
-
-#ifdef DEBUG
-            /* Check for the D_ALL statement */
-            if ( 0 == stricmp( command_buffer, "D_ALL" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  debug.all = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  debug.all = FALSE;
-               }
-               if ( debug.all == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
-               command_ok = TRUE;
-            }
-
-            /* Check for the D_CMD_ARG statement */
-            if ( 0 == stricmp( command_buffer, "D_CMD_ARG" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  debug.command_line_arguments = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  debug.command_line_arguments = FALSE;
-               }
-               if ( debug.command_line_arguments == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
-               command_ok = TRUE;
-            }
-
-            /* Check for the D_CR_PART statement */
-            if ( 0 == stricmp( command_buffer, "D_CR_PART" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  debug.create_partition = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  debug.create_partition = FALSE;
-               }
-               if ( debug.create_partition == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
-               command_ok = TRUE;
-            }
-
-            /* Check for the D_DET_FR_SPC statement */
-            if ( 0 == stricmp( command_buffer, "D_DET_FR_SPC" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  debug.determine_free_space = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  debug.determine_free_space = FALSE;
-               }
-               if ( debug.determine_free_space == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
-               command_ok = TRUE;
-            }
-
-            /* Check for the D_INPUT statement */
-            if ( 0 == stricmp( command_buffer, "D_INPUT" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  debug.input_routine = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  debug.input_routine = FALSE;
-               }
-               if ( debug.input_routine == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
-               command_ok = TRUE;
-            }
-
-            /* Check for the D_LBA statement */
-            if ( 0 == stricmp( command_buffer, "D_LBA" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  debug.lba = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  debug.lba = FALSE;
-               }
-               if ( debug.lba == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
-               command_ok = TRUE;
-            }
-
-            /* Check for the D_PATH statement */
-            if ( 0 == stricmp( command_buffer, "D_PATH" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  debug.path = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  debug.path = FALSE;
-               }
-               if ( debug.path == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
-               command_ok = TRUE;
-            }
-
-            /* Check for the D_READ_S statement */
-            if ( 0 == stricmp( command_buffer, "D_READ_S" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  debug.read_sector = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  debug.read_sector = FALSE;
-               }
-               if ( debug.read_sector == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
-               command_ok = TRUE;
-            }
-#endif
 
             /* Check for the DEL_ND_LOG statement */
             if ( 0 == stricmp( command_buffer, "DEL_ND_LOG" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  flags.del_non_dos_log_drives = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  flags.del_non_dos_log_drives = FALSE;
-               }
-               if ( flags.del_non_dos_log_drives == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
+               if ( !bool_string_to_int( &flags.del_non_dos_log_drives, setting_buffer) )
+                  goto parse_error;
                command_ok = TRUE;
             }
 
@@ -728,16 +542,13 @@ void Process_Fdiskini_File( void )
                if ( number == 0 ) {
                   flags.flag_sector = 0;
                }
-               if ( ( number >= 2 ) && ( number <= 64 ) ) {
+               else if ( ( number >= 2 ) && ( number <= 64 ) ) {
                   flags.flag_sector = number;
                }
-               if ( number == 256 ) {
+               else if ( number == 256 ) {
                   flags.flag_sector = part_table[0].total_sect;
                }
-               if ( flags.flag_sector == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
+               else goto parse_error;
                command_ok = TRUE;
             }
 
@@ -748,64 +559,29 @@ void Process_Fdiskini_File( void )
 
             /* Check for the LBA_MARKER statement */
             if ( 0 == stricmp( command_buffer, "LBA_MARKER" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  flags.lba_marker = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  flags.lba_marker = FALSE;
-               }
-               if ( flags.lba_marker == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
+               if ( !bool_string_to_int( &flags.lba_marker, setting_buffer) )
+                  goto parse_error;
                command_ok = TRUE;
             }
 
             /* Check for the MONO statement */
             if ( 0 == stricmp( command_buffer, "MONO" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  flags.monochrome = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  flags.monochrome = FALSE;
-               }
-
-               if ( flags.monochrome == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
+               if ( !bool_string_to_int( &flags.monochrome, setting_buffer) )
+                  goto parse_error;
                command_ok = TRUE;
             }
 
             /* Check for the REBOOT statement */
             if ( 0 == stricmp( command_buffer, "REBOOT" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  flags.reboot = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  flags.reboot = FALSE;
-               }
-
-               if ( flags.reboot == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
+               if ( !bool_string_to_int( &flags.reboot, setting_buffer) )
+                  goto parse_error;
                command_ok = TRUE;
             }
 
             /* Check for the SET_ANY_ACT statement */
             if ( 0 == stricmp( command_buffer, "SET_ANY_ACT" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  flags.set_any_pri_part_active = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  flags.set_any_pri_part_active = FALSE;
-               }
-
-               if ( flags.set_any_pri_part_active == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
+               if ( !bool_string_to_int( &flags.set_any_pri_part_active, setting_buffer) )
+                  goto parse_error;
                command_ok = TRUE;
             }
 
@@ -814,65 +590,36 @@ void Process_Fdiskini_File( void )
                if ( 0 == stricmp( setting_buffer, "4" ) ) {
                   flags.version = COMP_FOUR;
                }
-               if ( 0 == stricmp( setting_buffer, "5" ) ) {
+               else if ( 0 == stricmp( setting_buffer, "5" ) ) {
                   flags.version = COMP_FIVE;
                }
-               if ( 0 == stricmp( setting_buffer, "6" ) ) {
+               else if ( 0 == stricmp( setting_buffer, "6" ) ) {
                   flags.version = COMP_SIX;
                }
-               if ( 0 == stricmp( setting_buffer, "W95" ) ) {
+               else if ( 0 == stricmp( setting_buffer, "W95" ) ) {
                   flags.version = COMP_W95;
                }
-               if ( 0 == stricmp( setting_buffer, "W95B" ) ) {
+               else if ( 0 == stricmp( setting_buffer, "W95B" ) ) {
                   flags.version = COMP_W95B;
                }
-               if ( 0 == stricmp( setting_buffer, "W98" ) 
-                    || 0 == stricmp( setting_buffer, "FD" ) ) {
+               else if ( 0 == stricmp( setting_buffer, "W98" ) ) {
+                  flags.version = COMP_W98;
+               }
+               else if ( 0 == stricmp( setting_buffer, "FD" ) ) {
                   flags.version = COMP_FD;
                }
-               if ( flags.version == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
+               else goto parse_error;
                command_ok = TRUE;
             }
 
             /* Check for the XO statement */
             if ( 0 == stricmp( command_buffer, "XO" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  flags.extended_options_flag = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  flags.extended_options_flag = FALSE;
-               }
-               if ( flags.extended_options_flag == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
+               if ( !bool_string_to_int( &flags.extended_options_flag, setting_buffer) )
+                  goto parse_error;
                command_ok = TRUE;
             }
 
-#ifdef DEBUG
-            /* Check for the WRITE statement */
-            if ( 0 == stricmp( command_buffer, "WRITE" ) ) {
-               if ( 0 == stricmp( setting_buffer, "ON" ) ) {
-                  debug.write = TRUE;
-               }
-               if ( 0 == stricmp( setting_buffer, "OFF" ) ) {
-                  debug.write = FALSE;
-               }
-               if ( debug.write == UNCHANGED ) {
-                  con_printf( error_str, line_counter );
-                  exit( 3 );
-               }
-               command_ok = TRUE;
-            }
-#endif
-
-            if ( command_ok == FALSE ) {
-               con_printf( error_str, line_counter );
-               exit( 3 );
-            }
+            if ( command_ok == FALSE ) goto parse_error;
          }
 
          if ( ( 0 == strncmp( line_buffer, "999", 3 ) ) &&
@@ -887,90 +634,12 @@ void Process_Fdiskini_File( void )
       fclose( file );
    }
 
-   /* Set options to defaults, if not already set */
-#ifdef DEBUG
-   if ( debug.all == UNCHANGED ) {
-      debug.all = FALSE;
-   }
-   if ( debug.command_line_arguments == UNCHANGED ) {
-      debug.command_line_arguments = FALSE;
-   }
-   if ( debug.create_partition == UNCHANGED ) {
-      debug.create_partition = FALSE;
-   }
-   if ( debug.determine_free_space == UNCHANGED ) {
-      debug.determine_free_space = FALSE;
-   }
-   if ( debug.lba == UNCHANGED ) {
-      debug.lba = FALSE;
-   }
-   if ( debug.input_routine == UNCHANGED ) {
-      debug.input_routine = FALSE;
-   }
-   if ( debug.path == UNCHANGED ) {
-      debug.path = FALSE;
-   }
-   if ( debug.read_sector == UNCHANGED ) {
-      debug.read_sector = FALSE;
-   }
-   if ( debug.write == UNCHANGED ) {
-      debug.write = TRUE;
-   }
-#endif
+   return;
 
-   if ( flags.align_4k == UNCHANGED ) {
-      flags.align_4k = FALSE;
-   }
-   if ( flags.allow_4gb_fat16 == UNCHANGED ) {
-      flags.allow_4gb_fat16 = FALSE;
-   }
-   if ( flags.allow_abort == UNCHANGED ) {
-      flags.allow_abort = FALSE;
-   }
-   if ( flags.check_for_extra_cylinder == UNCHANGED ) {
-      flags.check_for_extra_cylinder = FALSE;
-   }
-   if ( flags.del_non_dos_log_drives == UNCHANGED ) {
-      flags.del_non_dos_log_drives = FALSE;
-   }
-   if ( flags.extended_options_flag == UNCHANGED ) {
-      flags.extended_options_flag = FALSE;
-   }
-   if ( flags.flag_sector == UNCHANGED ) {
-      flags.flag_sector = 2;
-   }
-   if ( flags.lba_marker == UNCHANGED ) {
-      flags.lba_marker = TRUE;
-   }
-   if ( flags.monochrome == UNCHANGED ) {
-      flags.monochrome = FALSE;
-   }
-   if ( flags.reboot == UNCHANGED ) {
-      flags.reboot = FALSE;
-   }
-   if ( flags.screen_color == UNCHANGED ) {
-      flags.screen_color = 0x07; /* light grey on black */
-   }
-   if ( flags.set_any_pri_part_active == UNCHANGED ) {
-      flags.set_any_pri_part_active = TRUE;
-   }
-   if ( flags.use_ambr == UNCHANGED ) {
-      flags.use_ambr = FALSE;
-   }
-
-#ifdef DEBUG
-   /* If debug.all==TRUE then set all debugging options to true */
-   if ( debug.all == TRUE ) {
-      debug.command_line_arguments = TRUE;
-      debug.create_partition = TRUE;
-      debug.determine_free_space = TRUE;
-      debug.input_routine = TRUE;
-      debug.lba = TRUE;
-      debug.path = TRUE;
-      debug.read_sector = TRUE;
-      debug.write = FALSE;
-   }
-#endif
+parse_error:
+   con_printf( error_str, line_counter );
+   exit( 3 );
+   return;
 }
 
 /* Remove MBR */

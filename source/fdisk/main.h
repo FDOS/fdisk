@@ -7,33 +7,6 @@
 #define VERSION  "1.3.12"
 #define COPYLEFT "1998 - 2024"
 
-/* ***** Set the above definition to the     */
-/* ***** version to be emulated if the       */
-/* ***** fdisk.ini file does not exist or if */
-/* ***** the fdisk.ini file does not have a  */
-/* ***** VERSION statement.                  */
-/* ***** Set the above definition to the     */
-/* ***** version to be emulated if the       */
-/* ***** VERSION statement in the fdisk.ini  */
-/* ***** file is set to "FD."  Note:  Do not */
-/* ***** enter "100" in the above line.      */
-
-/* ***** Version Codes:                      */
-/* *****   Version 4:      4                 */
-/* *****   Version 5:      5                 */
-/* *****   Version 6:      6                 */
-/* *****   Win 95/Win 95A: 7                 */
-/* *****   Win 95B:        72                */
-/* *****   Win 98          8                 */
-/* *****   FreeDOS:        100               */
-
-//#define SIZE_OF_IPL 445
-/* ***** This is the number of bytes for the */
-/* ***** boot code in the partition table.   */
-/* ***** If the boot code in the partition   */
-/* ***** table changes, this WILL need       */
-/* ***** changed.  (Start the count at 0.)   */
-// sectorsize - 4 tables - '55aa' - signature
 #define SIZE_OF_IPL ( 512 - 4 * 16 - 2 - 6 )
 
 #define EMULATED_CYLINDERS 15000
