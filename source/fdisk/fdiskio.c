@@ -930,7 +930,7 @@ void Process_Fdiskini_File( void )
       flags.allow_abort = FALSE;
    }
    if ( flags.check_for_extra_cylinder == UNCHANGED ) {
-      flags.check_for_extra_cylinder = TRUE;
+      flags.check_for_extra_cylinder = FALSE;
    }
    if ( flags.del_non_dos_log_drives == UNCHANGED ) {
       flags.del_non_dos_log_drives = FALSE;

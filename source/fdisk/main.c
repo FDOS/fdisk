@@ -303,15 +303,12 @@ static void Initialization( char *environment[] )
    int index;
 
    /* Set some flags */
-   flags.check_for_extra_cylinder = FALSE;
    flags.display_name_description_copyright = TRUE;
    flags.do_not_pause_help_information = FALSE;
    flags.fprmt = FALSE;
-   flags.monochrome = FALSE;
    flags.return_from_iui = FALSE;
    flags.partitions_have_changed = FALSE;
    flags.total_number_hard_disks = 255;
-   flags.use_ambr = FALSE;
    flags.use_iui = TRUE;
    flags.using_default_drive_number = TRUE;
 
