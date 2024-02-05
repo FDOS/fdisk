@@ -3,7 +3,6 @@
 #include "main.h"
 
 #include <bios.h>
-#include <conio.h>
 #include <dos.h>
 #include <i86.h>
 #include <stdio.h>

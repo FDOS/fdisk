@@ -6,7 +6,6 @@
 
 #define MAIN
 
-#include <conio.h>
 #include <ctype.h>
 #include <dos.h>
 #include <stdarg.h>
@@ -457,9 +456,8 @@ int main( int argc, char *argv[] )
    
    InitOptions( environ );
  
-   /* Check if LBA is forbidden by the user before querying BIOS
-      capabilities, because some BIOS INT13,41h is broken, like
-      XT-IDE 2.03 beta without LBA support */
+   /* Check if LBA is forbidden by the user before trying to query LBA BIOS
+      capabilities. Some 8088 BIOSes crash otherwise. */
    argp = argv+1;
    while ( *argp ) {
       if ( !strcmp( *argp, "/x" ) || !strcmp( *argp, "/X" ) ) {

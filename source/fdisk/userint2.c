@@ -1,6 +1,5 @@
 #define USERINT
 
-#include <conio.h>
 #include <ctype.h>
 #ifndef __WATCOMC__
 #include <dir.h>

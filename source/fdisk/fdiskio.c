@@ -1,6 +1,5 @@
 #define FDISKIO
 
-#include <conio.h>
 #include <dos.h>
 #include <stdio.h>
 #include <stdlib.h>
