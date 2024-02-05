@@ -8,6 +8,14 @@ Bug classification:
  - LOW: Cosmetic bugs, like display issues etc.
 
 
+Version 1.3.14 (2024-02-04)
+---------------------------
+Fixes:
+ - HIGH: Prevent querying LBA capabilities via INT13,41 if LBA is disabled
+     by the user via command line argument /X. This caused some broken
+     BIOS to crash the system, like BIOS version 0.9.4 of Book8088 and Xi8088.
+
+
 Version 1.3.13 (2024-01-16)
 ---------------------------
 Changes:

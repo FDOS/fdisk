@@ -110,22 +110,24 @@ void Check_For_INT13_Extensions( void )
 
    pDrive = part_table;
 
+   memset( &r, 0, sizeof(r) );
    for ( drive = 0x80; drive < 0x88; drive++, pDrive++ ) {
-      r.h.ah = 0x41;
-      r.w.bx = 0x55aa;
-      r.h.dl = drive;
-      intr( 0x13, &r );
-
       pDrive->ext_int_13 = FALSE;
       pDrive->ext_int_13_version = 0;
 
-      if ( ( ( r.w.flags & INTR_CF ) == 0 ) && ( r.w.bx == 0xaa55 ) ) {
-         flags.use_extended_int_13 = TRUE;
-         pDrive->ext_int_13_version = r.h.ah;
-
-         if ( ( r.w.cx & 1 ) == 1 ) {
-            /* ext INT 13 functions 42, 43 and 48 actually usable? */
-            pDrive->ext_int_13 = TRUE;
+      if ( flags.use_extended_int_13 ) {
+         r.h.ah = 0x41;
+         r.w.bx = 0x55aa;
+         r.h.dl = drive;
+         intr( 0x13, &r );
+   
+         if ( ( ( r.w.flags & INTR_CF ) == 0 ) && ( r.w.bx == 0xaa55 ) ) {
+            pDrive->ext_int_13_version = r.h.ah;
+   
+            if ( ( r.w.cx & 1 ) == 1 ) {
+               /* ext INT 13 functions 42, 43 and 48 actually usable? */
+               pDrive->ext_int_13 = TRUE;
+            }
          }
       }
    }

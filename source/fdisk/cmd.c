@@ -514,35 +514,6 @@ void Command_Line_Test_Flag( void )
    }
 }
 
-/* /X command line option */
-void Command_Line_X( void )
-{
-   int index;
-
-   /* Ask the user if FAT32 is desired. */
-   /*if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
-      Ask_User_About_FAT32_Support();
-   }*/
-
-   flags.use_extended_int_13 = FALSE;
-   index = 0;
-   do {
-      part_table[index].ext_int_13 = FALSE;
-      index++;
-   } while ( index < MAX_DISKS );
-
-   if ( Read_Partition_Tables() != 0 ) {
-      /* NLS:Error reading partition tables. */
-      con_print( svarlang_str( 255, 0 ) );
-      exit( 1 );
-   }
-   /*if ( flags.maximum_drive_number == 0 ) {
-      Color_Print( "\n    No fixed disks present.\n" );
-      exit( 6 );
-   }
-
-   Interactive_User_Interface();*/
-}
 
 /* Get the command line options */
 int Get_Options( char *argv[], int argc )

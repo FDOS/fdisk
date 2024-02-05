@@ -45,7 +45,6 @@ void Command_Line_Status( void );
 void Command_Line_Move( void );
 void Command_Line_Swap( void );
 void Command_Line_Test_Flag( void );
-void Command_Line_X( void );
 void Shift_Command_Line_Options( int number_of_places );
 
 #endif /* CMD_H */

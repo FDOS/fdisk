@@ -243,7 +243,7 @@ static int Get_Environment_Settings( char *environment[] )
 }
 
 /* Initialize flags, variables, load fdisk.ini, load part.ini, etc. */
-static void Initialization( char *environment[] )
+static void InitOptions( char *environment[] )
 {
    int index;
 
@@ -258,6 +258,7 @@ static void Initialization( char *environment[] )
    flags.use_iui = TRUE;
    flags.using_default_drive_number = TRUE;
    flags.version = COMP_W95B;
+   flags.use_extended_int_13 = TRUE;
 
    /* Clear the user_defined_chs_settings structure */
    index = 0;
@@ -284,20 +285,20 @@ static void Initialization( char *environment[] )
    /* monochrome mode, if it is desired. */
    con_enable_attr( !flags.monochrome );
 
+   /* If the version is W95B or later then default to FAT32 support.  */
+   if ( flags.version >= COMP_W95B ) {
+      flags.fat32 = TRUE;
+   }
+}
+
+static void InitDisks( void )
+{
    /* Check for interrupt 0x13 extensions (If the proper version is set.) */
    if ( flags.version >= COMP_W95 ) {
       Check_For_INT13_Extensions();
    }
 
-   /* If the version is W95B or later then default to FAT32 support.  */
-   if ( flags.version >= COMP_W95B ) {
-      flags.fat32 = TRUE;
-   }
-
-   /* Initialize LBA structures, if necessary. */
-   if ( flags.use_extended_int_13 == TRUE ) {
-      Initialize_LBA_Structures();
-   }
+   Initialize_LBA_Structures();
 
    if ( Read_Partition_Tables() != 0 ) {
       con_puts( svarlang_str(255, 0) );
@@ -307,8 +308,9 @@ static void Initialization( char *environment[] )
    if ( flags.maximum_drive_number == 0 ) {
       con_puts( svarlang_str(255, 1) );
       exit( 6 );
-   }
+   }   
 }
+
 
 /* Reboot the PC */
 void Reboot_PC( void )
@@ -360,6 +362,7 @@ static void Ensure_Drive_Number( void )
 */
 int main( int argc, char *argv[] )
 {
+   char **argp;
    int command_ok;
    int index;
    int location;
@@ -451,9 +454,21 @@ int main( int argc, char *argv[] )
    else {
       path[0] = 0;
    }
+   
+   InitOptions( environ );
+ 
+   /* Check if LBA is forbidden by the user before querying BIOS
+      capabilities, because some BIOS INT13,41h is broken, like
+      XT-IDE 2.03 beta without LBA support */
+   argp = argv+1;
+   while ( *argp ) {
+      if ( !strcmp( *argp, "/x" ) || !strcmp( *argp, "/X" ) ) {
+         flags.use_extended_int_13 = FALSE;
+      }
+      argp++;
+   }
 
-   Initialization( environ );
-
+   InitDisks();
 
    /* New Parsing Routine */
    /* The command line format is:                                            */
@@ -485,11 +500,9 @@ int main( int argc, char *argv[] )
          }
 
          if ( 0 == strcmp( arg[0].choice, "ACTOK" ) ) {
-            /*
-               if ( ( flags.version == W95B ) || ( flags.version == W98 ) ) {
-                  Ask_User_About_FAT32_Support();
-               }
-               */
+            /* ignored */
+            command_ok = TRUE;
+            Shift_Command_Line_Options( 1 );
          }
 
          if ( 0 == strcmp( arg[0].choice, "AUTO" ) ) {
@@ -796,7 +809,8 @@ int main( int argc, char *argv[] )
 #endif
 
          if ( 0 == strcmp( arg[0].choice, "X" ) ) {
-            Command_Line_X();
+            /* handled above, but still have to check to not misdetect
+               it as invalid parameter */
             Shift_Command_Line_Options( 1 );
             command_ok = TRUE;
          }
