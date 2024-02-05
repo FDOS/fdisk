@@ -8,7 +8,7 @@ Bug classification:
  - LOW: Cosmetic bugs, like display issues etc.
 
 
-Version 1.3.14 (2024-02-04)
+Version 1.3.14 (2024-02-05)
 ---------------------------
 Fixes:
  - HIGH: Prevent querying LBA capabilities via INT13,41 if LBA is disabled
