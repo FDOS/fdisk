@@ -12,7 +12,6 @@
 #include "main.h"
 #include "pcompute.h"
 #include "pdiskio.h"
-#include "userint1.h"
 
 static unsigned long Number_Of_Cylinders( unsigned long size );
 

@@ -27,6 +27,7 @@ source/fdisk/bootnorm.c
 source/fdisk/cmd.c
 source/fdisk/compat.c
 source/fdisk/deflang.c
+source/fdisk/display.c
 source/fdisk/fdiskio.c
 source/fdisk/helpscr.c
 source/fdisk/kbdinput.c
@@ -35,9 +36,7 @@ source/fdisk/pcompute.c
 source/fdisk/pdiskio.c
 source/fdisk/printf.c
 source/fdisk/test.c
-source/fdisk/userint0.c
-source/fdisk/userint1.c
-source/fdisk/userint2.c
+source/fdisk/ui.c
 source/fdisk/ansicon.h
 source/fdisk/cmd.h
 source/fdisk/compat.h
