@@ -27,4 +27,3 @@ char *searchpath( char *fn )
 #endif
 
 #endif
-

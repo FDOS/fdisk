@@ -14,9 +14,7 @@
 #include "pdiskio.h"
 #include "userint1.h"
 
-
 static unsigned long Number_Of_Cylinders( unsigned long size );
-
 
 /* Clear the Active Partition */
 int Deactivate_Active_Partition( void )
@@ -365,7 +363,8 @@ int Delete_Primary_Partition( int partition_number )
    return 0;
 }
 
-static void Sort_Primary_Partitions( Partition_Table *pDrive, int drive_order[] )
+static void Sort_Primary_Partitions( Partition_Table *pDrive,
+                                     int drive_order[] )
 {
    int index, sub_index, swap;
 
@@ -423,7 +422,8 @@ static void Determine_Log_Free_Space( Partition_Table *pDrive )
       pDrive->log_free_loc = 0;
 
       if ( ( pDrive->num_of_log_drives > 0 ) &&
-           !(( pDrive->num_of_log_drives == 1 ) && ( pDrive->log_drive[0].num_type == 0 )) ) {
+           !( ( pDrive->num_of_log_drives == 1 ) &&
+              ( pDrive->log_drive[0].num_type == 0 ) ) ) {
          /* If there are logical drives in the extended partition first find  */
          /* the largest free space between the logical drives...if it exists. */
 
@@ -527,7 +527,7 @@ static void Determine_Log_Free_Space( Partition_Table *pDrive )
             pDrive->ext_free_space -= 1;
          }
       }
-   }   
+   }
 }
 
 /* Determine the locations of free space in the partition table */
@@ -551,7 +551,7 @@ void Determine_Free_Space( void )
 
    /* Reset the physical order to default */
    for ( index = 0; index < 4; index++ ) {
-      drive_order[index] = index;      
+      drive_order[index] = index;
    }
 
    /* 1.  Sort the primary partitions based upon starting cylinder and their*/
@@ -747,8 +747,8 @@ unsigned long Max_Log_Part_Size_In_MB( void )
    if ( ( flags.version <= COMP_W95 ) && ( max_size_mb > MAXFAT16NORM ) ) {
       max_size_mb = MAXFAT16NORM;
    }
-   if ( ( flags.version >= COMP_W95B ) &&
-        ( flags.fat32 == FALSE ) && ( max_size_mb > MAXFAT16NORM ) ) {
+   if ( ( flags.version >= COMP_W95B ) && ( flags.fat32 == FALSE ) &&
+        ( max_size_mb > MAXFAT16NORM ) ) {
       max_size_mb = MAXFAT16NORM;
    }
    if ( ( flags.fat32 == FALSE ) && ( flags.allow_4gb_fat16 == TRUE ) &&
@@ -785,8 +785,7 @@ unsigned long Max_Pri_Part_Size_In_MB( int type )
       max_size_mb = MAXFAT16NORM;
    }
 
-   if ( ( type != EXTENDED ) &&
-        ( flags.version >= COMP_W95B ) &&
+   if ( ( type != EXTENDED ) && ( flags.version >= COMP_W95B ) &&
         ( flags.fat32 == FALSE ) && ( max_size_mb > MAXFAT16NORM ) ) {
       max_size_mb = MAXFAT16NORM;
    }
@@ -925,14 +924,12 @@ int Partition_Type_To_Create( unsigned long size_in_mb,
    }
 
    /* FAT 32 */
-   if ( ( size_in_mb > 128 ) &&
-        ( flags.version >= COMP_W95B ) &&
+   if ( ( size_in_mb > 128 ) && ( flags.version >= COMP_W95B ) &&
         ( flags.fat32 == TRUE ) && ( flags.fprmt == TRUE ) ) {
       numeric_type = 0x0b;
    }
 
-   if ( ( size_in_mb > 512 ) &&
-        ( flags.version >= COMP_W95B ) &&
+   if ( ( size_in_mb > 512 ) && ( flags.version >= COMP_W95B ) &&
         ( flags.fat32 == TRUE ) ) {
       numeric_type = 0x0b;
    }

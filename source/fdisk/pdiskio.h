@@ -1,16 +1,16 @@
 #ifndef PDISKIO_H
 #define PDISKIO_H
 
-#define MAX_DISKS 8
+#define MAX_DISKS          8
 #define MAX_LOGICAL_DRIVES 23
 
 #define SECT_SIZE 512
 
-#define OS_UNKNOWN   0
-#define OS_DOS5      5
-#define OS_DOS7      7
-#define OS_WIN_ME    8
-#define OS_WIN_NT    32
+#define OS_UNKNOWN 0
+#define OS_DOS5    5
+#define OS_DOS7    7
+#define OS_WIN_ME  8
+#define OS_WIN_NT  32
 
 extern int os_version;
 extern int os_version_minor;

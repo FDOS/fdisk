@@ -3,16 +3,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ansicon.h"
 #include "cmd.h"
 #include "compat.h"
 #include "fdiskio.h"
 #include "main.h"
 #include "pcompute.h"
 #include "pdiskio.h"
-#include "userint0.h"
-#include "ansicon.h"
 #include "printf.h"
 #include "svarlang/svarlang.h"
+#include "userint0.h"
 
 #ifndef FDISKLITE
 #include "userint1.h"
@@ -494,12 +494,14 @@ void Command_Line_Test_Flag( void )
 
       if ( flag == arg[0].extra_value ) {
          /* NLS:Flag %d is set to %d. */
-         con_printf( svarlang_str( 8, 31 ), arg[0].value, arg[0].extra_value );
+         con_printf( svarlang_str( 8, 31 ), arg[0].value,
+                     arg[0].extra_value );
          exit( 21 );
       }
       else {
          /* NLS:Flag %d is not set to %d. */
-         con_printf( svarlang_str( 8, 32 ), arg[0].value, arg[0].extra_value );
+         con_printf( svarlang_str( 8, 32 ), arg[0].value,
+                     arg[0].extra_value );
          exit( 20 );
       }
    }
@@ -512,7 +514,6 @@ void Command_Line_Test_Flag( void )
       exit( ( 30 + flag ) );
    }
 }
-
 
 /* Get the command line options */
 int Get_Options( char *argv[], int argc )
@@ -550,7 +551,6 @@ int Get_Options( char *argv[], int argc )
          if ( flags.using_default_drive_number ) {
             flags.drive_number = ( argptr[0] - '0' ) + 127;
             flags.using_default_drive_number = FALSE;
-
          }
          else if ( flags.drive_number != ( argptr[0] - '0' ) + 127 ) {
             /* NLS:more than one drive specified; terminated */

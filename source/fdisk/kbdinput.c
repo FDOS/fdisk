@@ -106,7 +106,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
 
    char YESchar = 'Y'; /* char that represents "yes" */
    char yeschar = 'y';
-   char NOchar = 'N';  /* char that represents "no" */
+   char NOchar = 'N'; /* char that represents "no" */
    char nochar = 'n';
 
    if ( x_position == -1 ) {
@@ -117,15 +117,16 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
    }
 
    /* load localized version of "Y/N" if needed */
-   if (type == YN) {
-     const char *YN_str = svarlang_str(250, 0);
-     const char *yn_str = svarlang_str(250, 1);
-     if ((YN_str[0] > 32) && (YN_str[1] > 32) && (yn_str[0] > 32) && (yn_str[1] > 32)) {
-       YESchar = YN_str[0];
-       NOchar = YN_str[1];
-       yeschar = yn_str[0];
-       nochar = yn_str[1];
-     }
+   if ( type == YN ) {
+      const char *YN_str = svarlang_str( 250, 0 );
+      const char *yn_str = svarlang_str( 250, 1 );
+      if ( ( YN_str[0] > 32 ) && ( YN_str[1] > 32 ) && ( yn_str[0] > 32 ) &&
+           ( yn_str[1] > 32 ) ) {
+         YESchar = YN_str[0];
+         NOchar = YN_str[1];
+         yeschar = yn_str[0];
+         nochar = yn_str[1];
+      }
    }
 
    /* Clear line buffer */
@@ -166,7 +167,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
 
    if ( return_message == ESCC ) {
       /* NLS:continue */
-      con_print( svarlang_str( 20, 7) );
+      con_print( svarlang_str( 20, 7 ) );
    }
 
    /* Set the default value for NUM type, if applicable */
@@ -228,8 +229,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       /* has not been pressed, and the default value is pre-entered. */
       if ( ( default_value >= 0 ) && ( type == NUMP ) &&
            ( size_of_field > 1 ) && ( input != 8 ) && ( input != 13 ) &&
-           ( input != 27 ) && ( default_value_preentered == TRUE ) )
-      {
+           ( input != 27 ) && ( default_value_preentered == TRUE ) ) {
          line_buffer_index = 0;
 
          index = 0;
@@ -247,7 +247,6 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       con_set_cursor_xy( 5, 24 );
       con_clreol();
       con_set_cursor_xy( 5, 25 );
-
 
       /* Esc key has been hit */
       if ( input == 27 ) {
@@ -375,7 +374,7 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
          con_set_cursor_xy( 51, 23 );
          con_clreol();
          /* NLS: Input:  %d */
-         con_printf( svarlang_str( 20, 10 ) , input );
+         con_printf( svarlang_str( 20, 10 ), input );
       }
 #endif
 
@@ -419,7 +418,9 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       }
 
       /* Process a legitimate entry if type==NUMYN. */
-      if ((type == NUMYN) && ((input == YESchar) || (input == yeschar) || (input == NOchar) || (input == nochar))) {
+      if ( ( type == NUMYN ) &&
+           ( ( input == YESchar ) || ( input == yeschar ) ||
+             ( input == NOchar ) || ( input == nochar ) ) ) {
          type = YN;
          line_buffer[0] = ' ';
          line_buffer_index = 1;
@@ -525,10 +526,11 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
 
             Position_Cursor( 4, 23 );
             /* NLS:Invalid entry, please enter %c-%c. */
-            Color_Printf( "%s %c-%c.", svarlang_str( 20, 11 ), (char)min_range, (char)max_range );
+            Color_Printf( "%s %c-%c.", svarlang_str( 20, 11 ),
+                          (char)min_range, (char)max_range );
          }
 
-         Position_Cursor( ( x_position + 1 ), y_position );         
+         Position_Cursor( ( x_position + 1 ), y_position );
          Color_Printf( "%c", line_buffer[0] );
       }
 
@@ -544,18 +546,20 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
       }
 
       if ( type == YN ) {
-        if ((input == YESchar) || (input == yeschar)) {
-          line_buffer[0] = YESchar;
-          data = TRUE;
-        } else if ((input == NOchar) || (input == nochar)) {
-          line_buffer[0] = NOchar;
-          data = FALSE;
-        } else {
-          proper_input_given = FALSE;
-          line_buffer[0] = ' ';
-          data = 99;
-          Color_Print_At(4, 23, svarlang_str(250, 2) );
-        }
+         if ( ( input == YESchar ) || ( input == yeschar ) ) {
+            line_buffer[0] = YESchar;
+            data = TRUE;
+         }
+         else if ( ( input == NOchar ) || ( input == nochar ) ) {
+            line_buffer[0] = NOchar;
+            data = FALSE;
+         }
+         else {
+            proper_input_given = FALSE;
+            line_buffer[0] = ' ';
+            data = 99;
+            Color_Print_At( 4, 23, svarlang_str( 250, 2 ) );
+         }
 
          Position_Cursor( ( x_position + 1 ), y_position );
          Color_Printf( "%c", line_buffer[0] );
@@ -594,8 +598,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                  ( input > 9 ) ) {
                proper_input_given = FALSE;
 
-               Color_Print_At( 4, 23, "%s %lu-%lu.",
-                               svarlang_str( 20, 11 ), min_range, max_range );
+               Color_Print_At( 4, 23, "%s %lu-%lu.", svarlang_str( 20, 11 ),
+                               min_range, max_range );
                invalid_input = TRUE;
             }
 
@@ -605,8 +609,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                proper_input_given = FALSE;
 
                /* NLS:is not a choice, please enter */
-               Color_Print_At( 4, 23, "%d %s %lu-%lu.",
-                               input, svarlang_str( 20, 12 ), min_range, max_range );
+               Color_Print_At( 4, 23, "%d %s %lu-%lu.", input,
+                               svarlang_str( 20, 12 ), min_range, max_range );
                invalid_input = TRUE;
             }
 
@@ -713,8 +717,8 @@ unsigned long Input( int size_of_field, int x_position, int y_position,
                proper_input_given = FALSE;
 
                /* NLS:is not a choice, please enter */
-               Color_Print_At( 4, 23, "%d %s %lu-%lu.",
-                               input, svarlang_str( 20, 12 ), min_range, max_range );
+               Color_Print_At( 4, 23, "%d %s %lu-%lu.", input,
+                               svarlang_str( 20, 12 ), min_range, max_range );
                invalid_input = TRUE;
             }
 

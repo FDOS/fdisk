@@ -20,8 +20,8 @@
 #include "pdiskio.h"
 #include "userint0.h"
 
-#include "helpscr.h"
 #include "ansicon.h"
+#include "helpscr.h"
 #include "printf.h"
 
 #include "svarlang/svarlang.h"
@@ -53,24 +53,30 @@ void Display_Help_Screen( void )
    con_printf( "%-30s                   %30s\n", name, version );
 
    /* dump the entire help on screen */
-   linestopause = screenh - 1;    /* number of lines before screen is full */
-   for (i = 0; i < 250; i++) {
-     const char *s = svarlang_strid(i);
+   linestopause = screenh - 1; /* number of lines before screen is full */
+   for ( i = 0; i < 250; i++ ) {
+      const char *s = svarlang_strid( i );
 #ifdef FDISKLITE
-     if (i == 1) continue; /* skip msg "no arg = launch interactive mode" */
+      if ( i == 1 ) {
+         continue; /* skip msg "no arg = launch interactive mode" */
+      }
 #endif
-     if (*s == 0) continue;
-     if (i == 200) {   /* special case: COPYLEFT needs to be inserted */
-       con_printf(s, COPYLEFT);
-       con_putc('\n');
-     } else {
-       con_puts(s);
-     }
+      if ( *s == 0 ) {
+         continue;
+      }
+      if ( i == 200 ) { /* special case: COPYLEFT needs to be inserted */
+         con_printf( s, COPYLEFT );
+         con_putc( '\n' );
+      }
+      else {
+         con_puts( s );
+      }
 
-     /* is it time for a pause? */
-     if ((flags.do_not_pause_help_information == FALSE) && (--linestopause <= 2)) {
-       linestopause = screenh;
-       Pause();
-     }
+      /* is it time for a pause? */
+      if ( ( flags.do_not_pause_help_information == FALSE ) &&
+           ( --linestopause <= 2 ) ) {
+         linestopause = screenh;
+         Pause();
+      }
    }
 }

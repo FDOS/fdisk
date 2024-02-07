@@ -1,7 +1,7 @@
 #ifdef FDISKLITE
-  #define FD_NAME "Free FDISK (command line only)"
+#define FD_NAME "Free FDISK (command line only)"
 #else
-  #define FD_NAME "Free FDISK"
+#define FD_NAME "Free FDISK"
 #endif
 
 #define VERSION  "1.3.14"
@@ -178,7 +178,6 @@ typedef struct flags_structure {
    unsigned char screen_color;
 } Flags;
 
-
 /* User Defined C/H/S Settings Structure */
 typedef struct user_defined_chs_settings_structure {
    int defined;
@@ -194,4 +193,3 @@ MEXTERN User_Defined_CHS_Settings user_defined_chs_settings[MAX_DISKS];
 int Get_Options( char *arguments[], int number_of_arguments );
 
 void Reboot_PC( void );
-

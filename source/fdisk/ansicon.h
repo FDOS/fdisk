@@ -25,7 +25,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-
 /* This library supports the interpretation of a minimal subset of ANSI
  * escape sequences for display output. The supported sequences as of now are:
 
@@ -130,15 +129,14 @@
      47            White backgound         (ISO 6429 standard)
  */
 
-
 /* some ESC strings as preprocessor definition */
-#define ESC_ATTR_OFF     "\33[0m"
-#define ESC_BOLD_ON      "\33[1m"
-#define ESC_BOLD_OFF     "\33[22m"
+#define ESC_ATTR_OFF "\33[0m"
+#define ESC_BOLD_ON  "\33[1m"
+#define ESC_BOLD_OFF "\33[22m"
 #define ESC_BLINK_ON
 #define ESC_BLINK_OFF
-#define ESC_CLRSCR       "\33[2J"
-#define ESC_CLREOL       "\33[K"
+#define ESC_CLRSCR "\33[2J"
+#define ESC_CLREOL "\33[K"
 
 #ifdef __cplusplus
 extern "C" {
@@ -147,7 +145,6 @@ extern "C" {
 /* con_error variable is non-zero if escape interpreter encountered an error.
  * Variable must be reset to zero by user of the lib */
 extern int con_error;
-
 
 /* Initialize the console output routines.
  * interpret_esc = 0 : interpretation of escape sequences disabled
@@ -164,10 +161,10 @@ int con_readkey( void );
 
 /* Display output routines. The functions interpret ANSI escape sequences
  * if enabled via con_init(). */
-void con_putc( char c ); 
+void con_putc( char c );
 void con_print( const char *s );
 void con_print_at( int x, int y, const char *s );
-void con_puts( const char *s );  /* like con_print with trailing new-line */
+void con_puts( const char *s ); /* like con_print with trailing new-line */
 
 /* Clear screen and move cursor to home position. */
 void con_clrscr( void );

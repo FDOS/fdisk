@@ -7,20 +7,18 @@
 #ifdef __GNUC__
 #include <libi86/string.h>
 #endif
+#include "ansicon.h"
 #include "compat.h"
 #include "fdiskio.h"
 #include "main.h"
 #include "pcompute.h"
 #include "pdiskio.h"
-#include "ansicon.h"
 #include "printf.h"
 #include "svarlang/svarlang.h"
-
 
 /* bootloader pointers */
 /*extern char booteasy_code[];*/
 extern char bootnormal_code[];
-
 
 /* Automatically partition the selected hard drive */
 int Automatically_Partition_Hard_Drive( void )
@@ -235,7 +233,6 @@ static int Create_BootNormal_MBR( void )
    return Write_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
 }
 
-
 #ifdef SMART_MBR
 /* Create Normal MBR */
 extern void __cdecl __far BootSmart_code();
@@ -245,8 +242,7 @@ int Create_BootSmart_IPL( void )
    int error_code;
 
    /* NLS:Creating Drive Smart MBR for disk %d */
-   con_printf( svarlang_str( 7, 6 ),
-           flags.drive_number - 0x7F );
+   con_printf( svarlang_str( 7, 6 ), flags.drive_number - 0x7F );
 
    error_code = Read_Physical_Sectors( flags.drive_number, 0, 0, 1, 1 );
    if ( error_code != 0 ) {
@@ -298,7 +294,6 @@ int Create_MBR_If_Not_Present( void )
 }
 */
 
-
 /* parse bool_text for "ON" or "OFF" and set integer var accordingly */
 int bool_string_to_int( int *var, const char *bool_text )
 {
@@ -313,7 +308,6 @@ int bool_string_to_int( int *var, const char *bool_text )
 
    return 0;
 }
-
 
 /* Read and process the fdisk.ini file */
 void Process_Fdiskini_File( void )
@@ -360,7 +354,7 @@ void Process_Fdiskini_File( void )
               ( end_of_file_marker_encountered == FALSE ) ) {
 
             /* Clear the command_buffer and setting_buffer */
-            for (index = 0; index < 20; index++) {
+            for ( index = 0; index < 20; index++ ) {
                command_buffer[index] = 0x00;
                setting_buffer[index] = 0x00;
             }
@@ -441,36 +435,44 @@ void Process_Fdiskini_File( void )
 
             /* Align partitions to 4k */
             if ( 0 == stricmp( command_buffer, "ALIGN_4K" ) ) {
-               if ( !bool_string_to_int( &flags.align_4k, setting_buffer) )
+               if ( !bool_string_to_int( &flags.align_4k, setting_buffer ) ) {
                   goto parse_error;
+               }
                command_ok = TRUE;
             }
 
             /* Check for the ALLOW_4GB_FAT16 statement */
             if ( 0 == stricmp( command_buffer, "ALLOW_4GB_FAT16" ) ) {
-               if ( !bool_string_to_int( &flags.allow_4gb_fat16, setting_buffer) )
+               if ( !bool_string_to_int( &flags.allow_4gb_fat16,
+                                         setting_buffer ) ) {
                   goto parse_error;
+               }
                command_ok = TRUE;
             }
 
             /* Check for the ALLOW_ABORT statement */
             if ( 0 == stricmp( command_buffer, "ALLOW_ABORT" ) ) {
-               if ( !bool_string_to_int( &flags.allow_abort, setting_buffer) )
+               if ( !bool_string_to_int( &flags.allow_abort,
+                                         setting_buffer ) ) {
                   goto parse_error;
+               }
                command_ok = TRUE;
             }
 
             /* Check for the AMBR statement */
             if ( 0 == stricmp( command_buffer, "AMBR" ) ) {
-               if ( !bool_string_to_int( &flags.use_ambr, setting_buffer) )
+               if ( !bool_string_to_int( &flags.use_ambr, setting_buffer ) ) {
                   goto parse_error;
+               }
                command_ok = TRUE;
             }
 
             /* Check for the CHECKEXTRA statement */
             if ( 0 == stricmp( command_buffer, "CHECKEXTRA" ) ) {
-               if ( !bool_string_to_int( &flags.check_for_extra_cylinder, setting_buffer) )
+               if ( !bool_string_to_int( &flags.check_for_extra_cylinder,
+                                         setting_buffer ) ) {
                   goto parse_error;
+               }
                command_ok = TRUE;
             }
 
@@ -481,14 +483,18 @@ void Process_Fdiskini_File( void )
                if ( ( number >= 0 ) && ( number <= 127 ) ) {
                   flags.screen_color = number;
                }
-               else goto parse_error;
+               else {
+                  goto parse_error;
+               }
                command_ok = TRUE;
             }
 
             /* Check for the DEL_ND_LOG statement */
             if ( 0 == stricmp( command_buffer, "DEL_ND_LOG" ) ) {
-               if ( !bool_string_to_int( &flags.del_non_dos_log_drives, setting_buffer) )
+               if ( !bool_string_to_int( &flags.del_non_dos_log_drives,
+                                         setting_buffer ) ) {
                   goto parse_error;
+               }
                command_ok = TRUE;
             }
 
@@ -547,7 +553,9 @@ void Process_Fdiskini_File( void )
                else if ( number == 256 ) {
                   flags.flag_sector = part_table[0].total_sect;
                }
-               else goto parse_error;
+               else {
+                  goto parse_error;
+               }
                command_ok = TRUE;
             }
 
@@ -558,29 +566,36 @@ void Process_Fdiskini_File( void )
 
             /* Check for the LBA_MARKER statement */
             if ( 0 == stricmp( command_buffer, "LBA_MARKER" ) ) {
-               if ( !bool_string_to_int( &flags.lba_marker, setting_buffer) )
+               if ( !bool_string_to_int( &flags.lba_marker,
+                                         setting_buffer ) ) {
                   goto parse_error;
+               }
                command_ok = TRUE;
             }
 
             /* Check for the MONO statement */
             if ( 0 == stricmp( command_buffer, "MONO" ) ) {
-               if ( !bool_string_to_int( &flags.monochrome, setting_buffer) )
+               if ( !bool_string_to_int( &flags.monochrome,
+                                         setting_buffer ) ) {
                   goto parse_error;
+               }
                command_ok = TRUE;
             }
 
             /* Check for the REBOOT statement */
             if ( 0 == stricmp( command_buffer, "REBOOT" ) ) {
-               if ( !bool_string_to_int( &flags.reboot, setting_buffer) )
+               if ( !bool_string_to_int( &flags.reboot, setting_buffer ) ) {
                   goto parse_error;
+               }
                command_ok = TRUE;
             }
 
             /* Check for the SET_ANY_ACT statement */
             if ( 0 == stricmp( command_buffer, "SET_ANY_ACT" ) ) {
-               if ( !bool_string_to_int( &flags.set_any_pri_part_active, setting_buffer) )
+               if ( !bool_string_to_int( &flags.set_any_pri_part_active,
+                                         setting_buffer ) ) {
                   goto parse_error;
+               }
                command_ok = TRUE;
             }
 
@@ -607,18 +622,24 @@ void Process_Fdiskini_File( void )
                else if ( 0 == stricmp( setting_buffer, "FD" ) ) {
                   flags.version = COMP_FD;
                }
-               else goto parse_error;
+               else {
+                  goto parse_error;
+               }
                command_ok = TRUE;
             }
 
             /* Check for the XO statement */
             if ( 0 == stricmp( command_buffer, "XO" ) ) {
-               if ( !bool_string_to_int( &flags.extended_options_flag, setting_buffer) )
+               if ( !bool_string_to_int( &flags.extended_options_flag,
+                                         setting_buffer ) ) {
                   goto parse_error;
+               }
                command_ok = TRUE;
             }
 
-            if ( command_ok == FALSE ) goto parse_error;
+            if ( command_ok == FALSE ) {
+               goto parse_error;
+            }
          }
 
          if ( ( 0 == strncmp( line_buffer, "999", 3 ) ) &&

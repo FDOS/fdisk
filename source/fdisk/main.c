@@ -34,7 +34,6 @@ static int Get_Environment_Settings( char *environment[] );
 static void Initialization( char *environment[] );
 /*void Re_Initialization( void );*/
 
-
 #ifndef FDISKLITE
 
 #endif
@@ -149,7 +148,8 @@ static int Get_Environment_Settings( char *environment[] )
 
       /* Check for the CHECKEXTRA statement */
       if ( 0 == strcmp( command_buffer, "FFD_CHECKEXTRA" ) ) {
-         bool_string_to_int( &flags.check_for_extra_cylinder, setting_buffer );
+         bool_string_to_int( &flags.check_for_extra_cylinder,
+                             setting_buffer );
       }
 
       /* Check for the COLORS statement */
@@ -300,26 +300,24 @@ static void InitDisks( void )
    Initialize_LBA_Structures();
 
    if ( Read_Partition_Tables() != 0 ) {
-      con_puts( svarlang_str(255, 0) );
+      con_puts( svarlang_str( 255, 0 ) );
       exit( 1 );
    }
 
    if ( flags.maximum_drive_number == 0 ) {
-      con_puts( svarlang_str(255, 1) );
+      con_puts( svarlang_str( 255, 1 ) );
       exit( 6 );
-   }   
+   }
 }
-
 
 /* Reboot the PC */
 void Reboot_PC( void )
 {
    /* Note:  Reboot is a cold start. */
-   void __far ( *fp )(void) = MK_FP( 0xffff, 0 );
+   void __far ( *fp )( void ) = MK_FP( 0xffff, 0 );
    *(int __far *)( MK_FP( 0x0040, 0x0072 ) ) = 0;
-   (*fp)();
+   ( *fp )();
 }
-
 
 /*
 	if the C: drive has not been formatted, and fdisk
@@ -330,8 +328,8 @@ void Reboot_PC( void )
 */
 
 const unsigned char __far int24_handler[3] = {
-   0x31, 0xc0,    /* xor ax,ax    */
-   0xcf           /* iret         */
+   0x31, 0xc0, /* xor ax,ax    */
+   0xcf        /* iret         */
 };
 
 void __interrupt __far ( *old_int24 )( void );
@@ -342,14 +340,14 @@ static void int24_init( void )
 {
 
    old_int24 = _dos_getvect( 0x24 );
-   _dos_setvect( 0x24, (void __interrupt __far (*)())int24_handler );
+   _dos_setvect( 0x24, (void __interrupt __far ( * )())int24_handler );
    atexit( restore_int24 );
 }
 
 static void Ensure_Drive_Number( void )
 {
    if ( flags.using_default_drive_number == TRUE ) {
-      con_puts( svarlang_str( 255, 2) );
+      con_puts( svarlang_str( 255, 2 ) );
       exit( 9 );
    }
 }
@@ -379,10 +377,11 @@ int main( int argc, char *argv[] )
     * first try to load strings from the same directory where FDISK.EXE
     * resides, and if this fails then try to load them from within the
     * FreeDOS-style %NLSPATH% directory. */
-   if (svarlang_autoload_exepath( argv[0], getenv("LANG") ) != 0) {
+   if ( svarlang_autoload_exepath( argv[0], getenv( "LANG" ) ) != 0 ) {
       /* if this fails as well it is no big deal, svarlang is still
        * operational and will fall back to its default strings */
-      svarlang_autoload_pathlist( "FDISK", getenv("NLSPATH"), getenv("LANG") );
+      svarlang_autoload_pathlist( "FDISK", getenv( "NLSPATH" ),
+                                  getenv( "LANG" ) );
    }
 
    Determine_DOS_Version();
@@ -453,12 +452,12 @@ int main( int argc, char *argv[] )
    else {
       path[0] = 0;
    }
-   
+
    InitOptions( environ );
- 
+
    /* Check if LBA is forbidden by the user before trying to query LBA BIOS
       capabilities. Some 8088 BIOSes crash otherwise. */
-   argp = argv+1;
+   argp = argv + 1;
    while ( *argp ) {
       if ( !strcmp( *argp, "/x" ) || !strcmp( *argp, "/X" ) ) {
          flags.use_extended_int_13 = FALSE;
@@ -478,390 +477,389 @@ int main( int argc, char *argv[] )
    /* If "FDISK" is typed without any options */
    number_of_command_line_options = Get_Options( &*argv, argc );
 
-      while ( number_of_command_line_options > 0 ) {
-         command_ok = FALSE;
+   while ( number_of_command_line_options > 0 ) {
+      command_ok = FALSE;
 
-         if ( 0 == strcmp( arg[0].choice, "ACTIVATE" ) ||
-              0 == strcmp( arg[0].choice, "ACT" ) ) {
-            flags.use_iui = FALSE;
-            if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
-               con_puts( svarlang_str(255, 3) );
-               exit( 9 );
-            }
-
-            if ( !Set_Active_Partition( (int)( arg[0].value - 1 ) ) ) {
-               con_puts( svarlang_str(255, 4) );
-               exit( 9 );
-            }
-            command_ok = TRUE;
-            Shift_Command_Line_Options( 1 );
+      if ( 0 == strcmp( arg[0].choice, "ACTIVATE" ) ||
+           0 == strcmp( arg[0].choice, "ACT" ) ) {
+         flags.use_iui = FALSE;
+         if ( ( arg[0].value < 1 ) || ( arg[0].value > 4 ) ) {
+            con_puts( svarlang_str( 255, 3 ) );
+            exit( 9 );
          }
 
-         if ( 0 == strcmp( arg[0].choice, "ACTOK" ) ) {
-            /* ignored */
-            command_ok = TRUE;
-            Shift_Command_Line_Options( 1 );
+         if ( !Set_Active_Partition( (int)( arg[0].value - 1 ) ) ) {
+            con_puts( svarlang_str( 255, 4 ) );
+            exit( 9 );
          }
+         command_ok = TRUE;
+         Shift_Command_Line_Options( 1 );
+      }
 
-         if ( 0 == strcmp( arg[0].choice, "AUTO" ) ) {
-            flags.use_iui = FALSE;
-            if ( Automatically_Partition_Hard_Drive() ) {
-               con_puts( svarlang_str(255, 5) );
-               exit( 9 );
-            }
-            command_ok = TRUE;
-            Shift_Command_Line_Options( 1 );
+      if ( 0 == strcmp( arg[0].choice, "ACTOK" ) ) {
+         /* ignored */
+         command_ok = TRUE;
+         Shift_Command_Line_Options( 1 );
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "AUTO" ) ) {
+         flags.use_iui = FALSE;
+         if ( Automatically_Partition_Hard_Drive() ) {
+            con_puts( svarlang_str( 255, 5 ) );
+            exit( 9 );
          }
+         command_ok = TRUE;
+         Shift_Command_Line_Options( 1 );
+      }
 
-         if ( 0 == strcmp( arg[0].choice, "CLEARMBR" ) ||
-              0 == strcmp( arg[0].choice, "CLEARALL" ) ) {
-            flags.use_iui = FALSE;
-            Ensure_Drive_Number();
+      if ( 0 == strcmp( arg[0].choice, "CLEARMBR" ) ||
+           0 == strcmp( arg[0].choice, "CLEARALL" ) ) {
+         flags.use_iui = FALSE;
+         Ensure_Drive_Number();
 
-            if ( Clear_Entire_Sector_Zero() != 0 ) {
-               con_puts( svarlang_str(255,6) );
-               exit( 8 );
-            }
-            command_ok = TRUE;
-            Read_Partition_Tables();
-            Shift_Command_Line_Options( 1 );
+         if ( Clear_Entire_Sector_Zero() != 0 ) {
+            con_puts( svarlang_str( 255, 6 ) );
+            exit( 8 );
          }
+         command_ok = TRUE;
+         Read_Partition_Tables();
+         Shift_Command_Line_Options( 1 );
+      }
 
-         if ( 0 == strcmp( arg[0].choice, "CLEARFLAG" ) ) {
-            flags.use_iui = FALSE;
-            Command_Line_Clear_Flag();
-            command_ok = TRUE;
+      if ( 0 == strcmp( arg[0].choice, "CLEARFLAG" ) ) {
+         flags.use_iui = FALSE;
+         Command_Line_Clear_Flag();
+         command_ok = TRUE;
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "CLEARIPL" ) ) {
+         flags.use_iui = FALSE;
+         Ensure_Drive_Number();
+
+         if ( Remove_IPL() != 0 ) {
+            con_puts( svarlang_str( 255, 7 ) );
+            exit( 8 );
          }
+         command_ok = TRUE;
 
-         if ( 0 == strcmp( arg[0].choice, "CLEARIPL" ) ) {
-            flags.use_iui = FALSE;
-            Ensure_Drive_Number();
+         Shift_Command_Line_Options( 1 );
+      }
 
-            if ( Remove_IPL() != 0 ) {
-               con_puts( svarlang_str(255, 7) );
-               exit( 8 );
-            }
-            command_ok = TRUE;
-
-            Shift_Command_Line_Options( 1 );
+      if ( 0 == strcmp( arg[0].choice, "CMBR" ) ) {
+         flags.use_iui = FALSE;
+         if ( Create_MBR() != 0 ) {
+            con_puts( svarlang_str( 255, 11 ) );
+            exit( 8 );
          }
+         command_ok = TRUE;
+         Shift_Command_Line_Options( 1 );
+      }
 
-         if ( 0 == strcmp( arg[0].choice, "CMBR" ) ) {
-            flags.use_iui = FALSE;
-            if ( Create_MBR() != 0 ) {
-               con_puts( svarlang_str(255, 11) );
-               exit( 8 );
-            }
-            command_ok = TRUE;
-            Shift_Command_Line_Options( 1 );
+      if ( 0 == strcmp( arg[0].choice, "DEACTIVATE" ) ||
+           0 == strcmp( arg[0].choice, "DEACT" ) ) {
+         flags.use_iui = FALSE;
+         if ( Deactivate_Active_Partition() != 0 ||
+              Write_Partition_Tables() != 0 ) {
+            con_puts( svarlang_str( 255, 9 ) );
+            exit( 9 );
          }
+         command_ok = TRUE;
+         Shift_Command_Line_Options( 1 );
+      }
 
-         if ( 0 == strcmp( arg[0].choice, "DEACTIVATE" ) ||
-              0 == strcmp( arg[0].choice, "DEACT" ) ) {
-            flags.use_iui = FALSE;
-            if ( Deactivate_Active_Partition() != 0 ||
-                 Write_Partition_Tables() != 0 ) {
-               con_puts( svarlang_str(255, 9) );
-               exit( 9 );
-            }
-            command_ok = TRUE;
-            Shift_Command_Line_Options( 1 );
+      if ( 0 == strcmp( arg[0].choice, "DELETE" ) ||
+           0 == strcmp( arg[0].choice, "DEL" ) ) {
+         flags.use_iui = FALSE;
+         Ensure_Drive_Number();
+
+         Command_Line_Delete();
+         command_ok = TRUE;
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "DELETEALL" ) ||
+           0 == strcmp( arg[0].choice, "DELALL" ) ||
+           0 == strcmp( arg[0].choice, "CLEAR" ) ) {
+         flags.use_iui = FALSE;
+         Ensure_Drive_Number();
+
+         if ( Clear_Partition_Table() != 0 ) {
+            con_puts( svarlang_str( 255, 10 ) );
+            exit( 9 );
          }
+         command_ok = TRUE;
+         Read_Partition_Tables();
+         Shift_Command_Line_Options( 1 );
+      }
 
-         if ( 0 == strcmp( arg[0].choice, "DELETE" ) ||
-              0 == strcmp( arg[0].choice, "DEL" ) ) {
-            flags.use_iui = FALSE;
-            Ensure_Drive_Number();
+      if ( 0 == strcmp( arg[0].choice, "DUMP" ) ) {
+         flags.use_iui = FALSE;
+         Dump_Partition_Information();
+         command_ok = TRUE;
 
-            Command_Line_Delete();
-            command_ok = TRUE;
+         Shift_Command_Line_Options( 1 );
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "EXT" ) ) {
+         flags.use_iui = FALSE;
+         Command_Line_Create_Extended_Partition();
+         command_ok = TRUE;
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "FPRMT" ) ) {
+         if ( flags.version >= COMP_W95B ) {
+            flags.fprmt = TRUE;
          }
+      }
 
-         if ( 0 == strcmp( arg[0].choice, "DELETEALL" ) ||
-              0 == strcmp( arg[0].choice, "DELALL" ) ||
-              0 == strcmp( arg[0].choice, "CLEAR" ) ) {
-            flags.use_iui = FALSE;
-            Ensure_Drive_Number();
-
-            if ( Clear_Partition_Table() != 0 ) {
-               con_puts( svarlang_str(255, 10) );
-               exit( 9 );
-            }
-            command_ok = TRUE;
-            Read_Partition_Tables();
-            Shift_Command_Line_Options( 1 );
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "DUMP" ) ) {
-            flags.use_iui = FALSE;
-            Dump_Partition_Information();
-            command_ok = TRUE;
-
-            Shift_Command_Line_Options( 1 );
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "EXT" ) ) {
-            flags.use_iui = FALSE;
-            Command_Line_Create_Extended_Partition();
-            command_ok = TRUE;
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "FPRMT" ) ) {
-            if ( flags.version >= COMP_W95B ) {
-               flags.fprmt = TRUE;
-            }
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "IFEMPTY" ) ) {
-            /* only execute the following commands if part tbl is empty */
-            if ( !Is_Pri_Tbl_Empty() ) {
-               exit( 0 );
-            }
-            Shift_Command_Line_Options( 1 );
-            command_ok = TRUE;
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "INFO" ) ) {
-            flags.use_iui = FALSE;
-            Command_Line_Info();
-            command_ok = TRUE;
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "IPL" ) ) {
-            flags.use_iui = FALSE;
-            Ensure_Drive_Number();
-
-            if ( Create_MBR() != 0 ) {
-               con_puts( svarlang_str(255, 11) );
-               exit( 8 );
-            }
-            command_ok = TRUE;
-            Shift_Command_Line_Options( 1 );
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "LOADIPL" ) ||
-              0 == strcmp( arg[0].choice, "AMBR" ) ) {
-            flags.use_iui = FALSE;
-            Ensure_Drive_Number();
-
-            if ( Load_MBR( 1 ) != 0 ) {
-               con_puts( svarlang_str(255, 12) );
-               exit( 8 );
-            }
-            command_ok = TRUE;
-            Shift_Command_Line_Options( 1 );
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "LOADMBR" ) ) {
-            flags.use_iui = FALSE;
-            Ensure_Drive_Number();
-
-            if ( Load_MBR( 0 ) != 0 ) {
-               con_puts( svarlang_str(255,13) );
-               exit( 8 );
-            }
-            command_ok = TRUE;
-            Shift_Command_Line_Options( 1 );
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "LOG" ) ) {
-            flags.use_iui = FALSE;
-            Command_Line_Create_Logical_DOS_Drive();
-            command_ok = TRUE;
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "LOGO" ) ) {
-            flags.use_iui = FALSE;
-            fat32_temp = flags.fat32;
-            flags.fat32 = FALSE;
-            Command_Line_Create_Logical_DOS_Drive();
-            flags.fat32 = fat32_temp;
-            command_ok = TRUE;
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "MBR" ) ) {
-            flags.use_iui = FALSE;
-            if ( Create_MBR() != 0 ) {
-               con_puts( svarlang_str(255, 14) );
-               exit( 8 );
-            }
-            command_ok = TRUE;
-
-            Shift_Command_Line_Options( 1 );
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "MODIFY" ) ) {
-            flags.use_iui = FALSE;
-            Command_Line_Modify();
-            command_ok = TRUE;
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "MONO" ) ) {
-            flags.monochrome = TRUE;
-            con_enable_attr( !flags.monochrome );
-            command_ok = TRUE;
-
-            Shift_Command_Line_Options( 1 );
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "MOVE" ) ) {
-            flags.use_iui = FALSE;
-            Command_Line_Move();
-            command_ok = TRUE;
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "PRI" ) ) {
-            flags.use_iui = FALSE;
-            Command_Line_Create_Primary_Partition();
-            command_ok = TRUE;
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "PRIO" ) ) {
-            flags.use_iui = FALSE;
-            fat32_temp = flags.fat32;
-            flags.fat32 = FALSE;
-            Command_Line_Create_Primary_Partition();
-            flags.fat32 = fat32_temp;
-            command_ok = TRUE;
-         }
-
-#ifndef FDISKLITE
-         if ( 0 == strcmp( arg[0].choice, "Q" ) ) {
-            flags.reboot = FALSE;
-
-            if ( flags.version >= COMP_W95B ) {
-               Ask_User_About_FAT32_Support();
-            }
-         }
-#endif
-
-         if ( 0 == strcmp( arg[0].choice, "REBOOT" ) ) {
-            flags.use_iui = FALSE;
-            if ( Write_Partition_Tables() != 0 ) {
-               con_puts( svarlang_str(255, 15) );
-               exit( 8 );
-            }
-            Reboot_PC();
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "SETFLAG" ) ) {
-            flags.use_iui = FALSE;
-            Command_Line_Set_Flag();
-            command_ok = TRUE;
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "SAVEMBR" ) || 
-              0 == strcmp( arg[0].choice, "SMBR" ) ) {
-            flags.use_iui = FALSE;
-            Ensure_Drive_Number();
-
-            if ( Save_MBR() != 0 ) {
-               con_puts( svarlang_str(255, 16) );
-               exit( 8 );
-            }
-            command_ok = TRUE;
-
-            Shift_Command_Line_Options( 1 );
-         }
-
-#ifdef SMART_MBR
-         if ( 0 == strcmp( arg[0].choice, "SMARTIPL" ) ) {
-            flags.use_iui = FALSE;
-            Ensure_Drive_Number();
-
-            if ( Create_BootSmart_IPL() != 0 ) {
-               con_puts( svarlang_str(255, 17) );
-               exit( 8 );
-            }
-            command_ok = TRUE;
-
-            Shift_Command_Line_Options( 1 );
-         }
-#endif
-
-         if ( 0 == strcmp( arg[0].choice, "STATUS" ) ) {
-            flags.use_iui = FALSE;
-            Command_Line_Status();
-            command_ok = TRUE;
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "SWAP" ) ) {
-            flags.use_iui = FALSE;
-            Command_Line_Swap();
-            command_ok = TRUE;
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "TESTFLAG" ) ) {
-            flags.use_iui = FALSE;
-            Command_Line_Test_Flag();
-            command_ok = TRUE;
-         }
-
-#ifndef FDISKLITE
-         if ( 0 == strcmp( arg[0].choice, "UI" ) ) {
-            flags.use_iui = TRUE;
-            command_ok = TRUE;
-
-            Shift_Command_Line_Options( 1 );
-         }
-#endif
-
-         if ( 0 == strcmp( arg[0].choice, "X" ) ) {
-            /* handled above, but still have to check to not misdetect
-               it as invalid parameter */
-            Shift_Command_Line_Options( 1 );
-            command_ok = TRUE;
-         }
-
-         if ( 0 == strcmp( arg[0].choice, "XO" ) ) {
-            flags.extended_options_flag = TRUE;
-            flags.allow_abort = TRUE;
-            flags.del_non_dos_log_drives = TRUE;
-            flags.set_any_pri_part_active = TRUE;
-            command_ok = TRUE;
-            Shift_Command_Line_Options( 1 );
-         }
-
-         if ( arg[0].choice[0] == '?' ) {
-            flags.use_iui = FALSE;
-            if ( strcmp( arg[1].choice, "NOPAUSE" ) ) {
-               flags.do_not_pause_help_information = TRUE;
-               Shift_Command_Line_Options( 1 );
-            }
-            Display_Help_Screen();
-            command_ok = TRUE;
-
+      if ( 0 == strcmp( arg[0].choice, "IFEMPTY" ) ) {
+         /* only execute the following commands if part tbl is empty */
+         if ( !Is_Pri_Tbl_Empty() ) {
             exit( 0 );
          }
+         Shift_Command_Line_Options( 1 );
+         command_ok = TRUE;
+      }
 
-         if ( command_ok == FALSE ) {
-            con_puts(svarlang_str(255, 18) );
-            exit( 1 );
+      if ( 0 == strcmp( arg[0].choice, "INFO" ) ) {
+         flags.use_iui = FALSE;
+         Command_Line_Info();
+         command_ok = TRUE;
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "IPL" ) ) {
+         flags.use_iui = FALSE;
+         Ensure_Drive_Number();
+
+         if ( Create_MBR() != 0 ) {
+            con_puts( svarlang_str( 255, 11 ) );
+            exit( 8 );
          }
+         command_ok = TRUE;
+         Shift_Command_Line_Options( 1 );
+      }
 
+      if ( 0 == strcmp( arg[0].choice, "LOADIPL" ) ||
+           0 == strcmp( arg[0].choice, "AMBR" ) ) {
+         flags.use_iui = FALSE;
+         Ensure_Drive_Number();
+
+         if ( Load_MBR( 1 ) != 0 ) {
+            con_puts( svarlang_str( 255, 12 ) );
+            exit( 8 );
+         }
+         command_ok = TRUE;
+         Shift_Command_Line_Options( 1 );
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "LOADMBR" ) ) {
+         flags.use_iui = FALSE;
+         Ensure_Drive_Number();
+
+         if ( Load_MBR( 0 ) != 0 ) {
+            con_puts( svarlang_str( 255, 13 ) );
+            exit( 8 );
+         }
+         command_ok = TRUE;
+         Shift_Command_Line_Options( 1 );
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "LOG" ) ) {
+         flags.use_iui = FALSE;
+         Command_Line_Create_Logical_DOS_Drive();
+         command_ok = TRUE;
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "LOGO" ) ) {
+         flags.use_iui = FALSE;
+         fat32_temp = flags.fat32;
+         flags.fat32 = FALSE;
+         Command_Line_Create_Logical_DOS_Drive();
+         flags.fat32 = fat32_temp;
+         command_ok = TRUE;
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "MBR" ) ) {
+         flags.use_iui = FALSE;
+         if ( Create_MBR() != 0 ) {
+            con_puts( svarlang_str( 255, 14 ) );
+            exit( 8 );
+         }
+         command_ok = TRUE;
+
+         Shift_Command_Line_Options( 1 );
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "MODIFY" ) ) {
+         flags.use_iui = FALSE;
+         Command_Line_Modify();
+         command_ok = TRUE;
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "MONO" ) ) {
+         flags.monochrome = TRUE;
+         con_enable_attr( !flags.monochrome );
+         command_ok = TRUE;
+
+         Shift_Command_Line_Options( 1 );
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "MOVE" ) ) {
+         flags.use_iui = FALSE;
+         Command_Line_Move();
+         command_ok = TRUE;
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "PRI" ) ) {
+         flags.use_iui = FALSE;
+         Command_Line_Create_Primary_Partition();
+         command_ok = TRUE;
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "PRIO" ) ) {
+         flags.use_iui = FALSE;
+         fat32_temp = flags.fat32;
+         flags.fat32 = FALSE;
+         Command_Line_Create_Primary_Partition();
+         flags.fat32 = fat32_temp;
+         command_ok = TRUE;
       }
 
 #ifndef FDISKLITE
-      if ( flags.use_iui == TRUE ) {
-         Interactive_User_Interface();
-      }
-#else
-      if ( argc == 1 ) {
-         Display_Help_Screen();
+      if ( 0 == strcmp( arg[0].choice, "Q" ) ) {
+         flags.reboot = FALSE;
+
+         if ( flags.version >= COMP_W95B ) {
+            Ask_User_About_FAT32_Support();
+         }
       }
 #endif
 
-      result = Write_Partition_Tables();
-      if ( result != 0 ) {
-         con_print( svarlang_str( 255, 15 ) );
-         con_print( "\n" );
-         exit( 8 );
+      if ( 0 == strcmp( arg[0].choice, "REBOOT" ) ) {
+         flags.use_iui = FALSE;
+         if ( Write_Partition_Tables() != 0 ) {
+            con_puts( svarlang_str( 255, 15 ) );
+            exit( 8 );
+         }
+         Reboot_PC();
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "SETFLAG" ) ) {
+         flags.use_iui = FALSE;
+         Command_Line_Set_Flag();
+         command_ok = TRUE;
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "SAVEMBR" ) ||
+           0 == strcmp( arg[0].choice, "SMBR" ) ) {
+         flags.use_iui = FALSE;
+         Ensure_Drive_Number();
+
+         if ( Save_MBR() != 0 ) {
+            con_puts( svarlang_str( 255, 16 ) );
+            exit( 8 );
+         }
+         command_ok = TRUE;
+
+         Shift_Command_Line_Options( 1 );
+      }
+
+#ifdef SMART_MBR
+      if ( 0 == strcmp( arg[0].choice, "SMARTIPL" ) ) {
+         flags.use_iui = FALSE;
+         Ensure_Drive_Number();
+
+         if ( Create_BootSmart_IPL() != 0 ) {
+            con_puts( svarlang_str( 255, 17 ) );
+            exit( 8 );
+         }
+         command_ok = TRUE;
+
+         Shift_Command_Line_Options( 1 );
+      }
+#endif
+
+      if ( 0 == strcmp( arg[0].choice, "STATUS" ) ) {
+         flags.use_iui = FALSE;
+         Command_Line_Status();
+         command_ok = TRUE;
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "SWAP" ) ) {
+         flags.use_iui = FALSE;
+         Command_Line_Swap();
+         command_ok = TRUE;
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "TESTFLAG" ) ) {
+         flags.use_iui = FALSE;
+         Command_Line_Test_Flag();
+         command_ok = TRUE;
       }
 
 #ifndef FDISKLITE
-      if ( flags.use_iui == TRUE ) {
-         Exit_Screen();
+      if ( 0 == strcmp( arg[0].choice, "UI" ) ) {
+         flags.use_iui = TRUE;
+         command_ok = TRUE;
+
+         Shift_Command_Line_Options( 1 );
       }
+#endif
+
+      if ( 0 == strcmp( arg[0].choice, "X" ) ) {
+         /* handled above, but still have to check to not misdetect
+               it as invalid parameter */
+         Shift_Command_Line_Options( 1 );
+         command_ok = TRUE;
+      }
+
+      if ( 0 == strcmp( arg[0].choice, "XO" ) ) {
+         flags.extended_options_flag = TRUE;
+         flags.allow_abort = TRUE;
+         flags.del_non_dos_log_drives = TRUE;
+         flags.set_any_pri_part_active = TRUE;
+         command_ok = TRUE;
+         Shift_Command_Line_Options( 1 );
+      }
+
+      if ( arg[0].choice[0] == '?' ) {
+         flags.use_iui = FALSE;
+         if ( strcmp( arg[1].choice, "NOPAUSE" ) ) {
+            flags.do_not_pause_help_information = TRUE;
+            Shift_Command_Line_Options( 1 );
+         }
+         Display_Help_Screen();
+         command_ok = TRUE;
+
+         exit( 0 );
+      }
+
+      if ( command_ok == FALSE ) {
+         con_puts( svarlang_str( 255, 18 ) );
+         exit( 1 );
+      }
+   }
+
+#ifndef FDISKLITE
+   if ( flags.use_iui == TRUE ) {
+      Interactive_User_Interface();
+   }
+#else
+   if ( argc == 1 ) {
+      Display_Help_Screen();
+   }
+#endif
+
+   result = Write_Partition_Tables();
+   if ( result != 0 ) {
+      con_print( svarlang_str( 255, 15 ) );
+      con_print( "\n" );
+      exit( 8 );
+   }
+
+#ifndef FDISKLITE
+   if ( flags.use_iui == TRUE ) {
+      Exit_Screen();
+   }
 #endif
 
    return 0;

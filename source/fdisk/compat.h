@@ -13,13 +13,12 @@ char *searchpath( char *fn );
 
 #if defined( __GNUC__ )
 
-extern char *_searchpath (const char *__file);
+extern char *_searchpath( const char *__file );
 #define searchpath _searchpath
 
 #ifndef stricmp
 #define stricmp strcasecmp
 #endif
-
 
 extern char **environ;
 

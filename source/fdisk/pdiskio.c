@@ -9,9 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ansicon.h"
 #include "compat.h"
 #include "pdiskio.h"
-#include "ansicon.h"
 #include "printf.h"
 
 #define MAX_RETRIES 3
@@ -51,7 +51,7 @@ static int Read_Primary_Table( int drive, Partition_Table *pDrive,
 static int Read_Extended_Table( int drive, Partition_Table *pDrive );
 static void Clear_Partition_Tables( Partition_Table *pDrive );
 static int Clear_Boot_Sector( int drive, unsigned long cylinder,
-                               unsigned long head, unsigned long sector );
+                              unsigned long head, unsigned long sector );
 static unsigned long combine_cs( unsigned long cylinder,
                                  unsigned long sector );
 static void extract_chs( unsigned char *p, unsigned long *cyl,
@@ -67,7 +67,6 @@ extern void Pause( void );
 int os_version = 0;
 int os_version_minor = 0;
 int os_gui_running = 0;
-
 
 void Determine_DOS_Version( void )
 {
@@ -99,7 +98,6 @@ void Determine_DOS_Version( void )
    }
 }
 
-
 /* Check for interrupt 0x13 extensions */
 void Check_For_INT13_Extensions( void )
 {
@@ -109,7 +107,7 @@ void Check_For_INT13_Extensions( void )
 
    pDrive = part_table;
 
-   memset( &r, 0, sizeof(r) );
+   memset( &r, 0, sizeof( r ) );
    for ( drive = 0x80; drive < 0x88; drive++, pDrive++ ) {
       pDrive->ext_int_13 = FALSE;
       pDrive->ext_int_13_version = 0;
@@ -119,10 +117,10 @@ void Check_For_INT13_Extensions( void )
          r.w.bx = 0x55aa;
          r.h.dl = drive;
          intr( 0x13, &r );
-   
+
          if ( ( ( r.w.flags & INTR_CF ) == 0 ) && ( r.w.bx == 0xaa55 ) ) {
             pDrive->ext_int_13_version = r.h.ah;
-   
+
             if ( ( r.w.cx & 1 ) == 1 ) {
                /* ext INT 13 functions 42, 43 and 48 actually usable? */
                pDrive->ext_int_13 = TRUE;
@@ -143,8 +141,7 @@ int Is_Dos_Part( int num_type )
 int Is_Supp_Ext_Part( int num_type )
 {
    return ( num_type == 5 ) ||
-          ( num_type == 0x0f &&
-            ( flags.version >= COMP_W95 ) );
+          ( num_type == 0x0f && ( flags.version >= COMP_W95 ) );
 }
 
 int Is_Pri_Tbl_Empty( void )
@@ -192,22 +189,23 @@ int Lock_Unlock_Drive( int drive_num, int lock )
    union REGPACK r;
 
    /* do not try to lock drive when running under plain DOS */
-   if ( ( !os_gui_running ) || (os_version < OS_DOS7) ) return 1;
+   if ( ( !os_gui_running ) || ( os_version < OS_DOS7 ) ) {
+      return 1;
+   }
 
    r.w.ax = 0x440d;
-   r.w.cx = ( lock ) ? 0x084b : 0x086b;  /* lock / unlock physical device */
+   r.w.cx = ( lock ) ? 0x084b : 0x086b; /* lock / unlock physical device */
    r.h.bl = drive_num;
-   r.h.bh = 1;       /* lock level */
+   r.h.bh = 1; /* lock level */
    r.w.dx = 0;
    intr( 0x21, &r );
 
-   return (r.w.flags & INTR_CF) == 0;
+   return ( r.w.flags & INTR_CF ) == 0;
 }
-
 
 /* Clear the Boot Sector of a partition */
 int Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head,
-                        unsigned long sector )
+                       unsigned long sector )
 {
    unsigned char stored_sector_buffer[SECT_SIZE];
    long index;
@@ -220,7 +218,8 @@ int Clear_Boot_Sector( int drive, unsigned long cylinder, unsigned long head,
    memset( sector_buffer, 0xf6, SECT_SIZE );
 
    for ( index = 0; index < 16; index++ ) {
-      error_code = Write_Physical_Sectors( drive, cylinder, head, ( sector + index ), 1 );
+      error_code = Write_Physical_Sectors( drive, cylinder, head,
+                                           ( sector + index ), 1 );
 
       if ( error_code != 0 ) {
          return error_code;
@@ -249,7 +248,7 @@ static unsigned long combine_cs( unsigned long cylinder,
    unsigned short c = cylinder;
    unsigned short s = sector;
 
-   return (s & 0x3f) | ((c & 0x0300) >> 2) | ((c & 0xff) << 8);
+   return ( s & 0x3f ) | ( ( c & 0x0300 ) >> 2 ) | ( ( c & 0xff ) << 8 );
 }
 
 int Num_Ext_Part( Partition_Table *pDrive )
@@ -286,9 +285,8 @@ int Determine_Drive_Letters( void )
    /* Set all active_part_found[] values to 0. */
    memset( active_part_found, 0, sizeof( active_part_found ) );
 
-
    /* assign up to one drive letter to an active or non-active partition
-      per disk */      
+      per disk */
    for ( index = 0; index < MAX_DISKS; index++ ) {
       Partition_Table *pDrive = &part_table[index];
       if ( !pDrive->usable ) {
@@ -311,13 +309,13 @@ int Determine_Drive_Letters( void )
       if ( !active_part_found[index] ) {
          for ( sub_index = 0; sub_index < 4; sub_index++ ) {
             if ( drive_lettering_buffer[index][sub_index] == 0 &&
-               ( IsRecognizedFatPartition(
+                 ( IsRecognizedFatPartition(
                     brief_partition_table[index][sub_index] ) ) ) {
                drive_lettering_buffer[index][sub_index] = current_letter;
                current_letter++;
                break;
             }
-         }        
+         }
       }
    }
 
@@ -366,7 +364,7 @@ int Determine_Drive_Letters( void )
       pDrive->num_of_non_dos_log_drives = 0;
       non_dos_partition_counter = '1';
 
-      for  (sub_index = 4; sub_index < 27; sub_index++ ) {
+      for ( sub_index = 4; sub_index < 27; sub_index++ ) {
          if ( brief_partition_table[index][sub_index] > 0 ) {
             non_dos_partition = TRUE;
 
@@ -388,7 +386,6 @@ int Determine_Drive_Letters( void )
 
    return ( current_letter - 1 );
 }
-
 
 void Clear_Partition( Partition *p )
 {
@@ -484,7 +481,7 @@ static int Get_Hard_Drive_Parameters( int physical_drive )
    total_number_hard_disks = r.h.dl;
    total_heads = r.h.dh;
    total_sectors = r.h.cl & 0x3f;
-   total_cylinders = r.h.ch | ( (r.h.cl & 0xc0 ) << 2 );
+   total_cylinders = r.h.ch | ( ( r.h.cl & 0xc0 ) << 2 );
 
    if ( flags.total_number_hard_disks == 255 ) {
       flags.total_number_hard_disks = total_number_hard_disks;
@@ -527,7 +524,9 @@ static int Get_Hard_Drive_Parameters( int physical_drive )
          error_code = 0;
       }
 
-      if ( error_code > 0 ) return ( error_code );
+      if ( error_code > 0 ) {
+         return ( error_code );
+      }
 
       /* Compute the total number of logical cylinders based upon the number */
       /* of physical sectors returned from service 0x48.                     */
@@ -625,8 +624,8 @@ static void Get_Partition_Information( void )
 
             if ( flags.verbose ) {
                con_printf( "primary %d sect %lu label %11.11s\n", partnum,
-                       pDrive->pri_part[partnum].rel_sect,
-                       sector_buffer + label_offset );
+                           pDrive->pri_part[partnum].rel_sect,
+                           sector_buffer + label_offset );
             }
 
             if ( sector_buffer[label_offset + 10] >= 32 &&
@@ -881,9 +880,8 @@ static void Read_Table_Entry( unsigned char *buf, Partition_Table *pDrive,
       p->end_cyl = pDrive->total_cyl;
    }
 
-   p->size_in_MB =
-      Convert_Sect_To_MB( p->num_sect );
-      /*Convert_Cyl_To_MB( p->end_cyl - p->start_cyl + 1,
+   p->size_in_MB = Convert_Sect_To_MB( p->num_sect );
+   /*Convert_Cyl_To_MB( p->end_cyl - p->start_cyl + 1,
                          pDrive->total_head + 1, pDrive->total_sect );*/
 }
 
@@ -1078,9 +1076,9 @@ void Clear_Extended_Partition_Table( Partition_Table *pDrive )
 static void Reset_Drive( int drive )
 {
    union REGPACK r;
-   memset( &r, 0, sizeof(union REGPACK) );
+   memset( &r, 0, sizeof( union REGPACK ) );
    r.h.dl = drive;
-   intr( 0x13, &r );   
+   intr( 0x13, &r );
 }
 
 /* Read_Physical_Sector */
@@ -1117,17 +1115,19 @@ static int Read_Physical_Sectors_CHS( int drive, long cylinder, long head,
    }
    if ( number_of_sectors == 1 ) {
       do {
-         memset( &r, 0, sizeof(union REGPACK) );
+         memset( &r, 0, sizeof( union REGPACK ) );
          r.w.ax = 0x0201;
          r.h.dh = head;
          r.h.dl = drive;
          r.h.ch = cylinder;
-         r.h.cl = sector | ((cylinder >> 2) & 0xC0);
+         r.h.cl = sector | ( ( cylinder >> 2 ) & 0xC0 );
          r.w.bx = FP_OFF( sector_buffer );
          r.w.es = FP_SEG( sector_buffer );
          intr( 0x13, &r );
-         error_code = ( r.w.flags & INTR_CF ) ? r.h.ah : 0; 
-         if ( error_code ) Reset_Drive( drive );
+         error_code = ( r.w.flags & INTR_CF ) ? r.h.ah : 0;
+         if ( error_code ) {
+            Reset_Drive( drive );
+         }
       } while ( error_code && ++try < MAX_RETRIES );
    }
    else {
@@ -1160,14 +1160,14 @@ static int Read_Physical_Sectors_LBA_only( int drive, ulong LBA_address,
 
       /* Transfer LBA_address to disk_address_packet */
       *(_u32 *)( disk_address_packet + 8 ) = LBA_address;
-   
-      memset( &r, 0, sizeof(union REGPACK) );
+
+      memset( &r, 0, sizeof( union REGPACK ) );
       r.w.ax = 0x4200;
       r.h.dl = drive;
       r.w.si = FP_OFF( disk_address_packet );
       r.w.ds = FP_SEG( disk_address_packet );
       intr( 0x13, &r );
-   
+
       if ( r.w.flags & INTR_CF ) {
          error_code = ( r.h.ah ) ? r.h.ah : 1;
          Reset_Drive( drive );
@@ -1179,7 +1179,6 @@ static int Read_Physical_Sectors_LBA_only( int drive, ulong LBA_address,
 
    return ( error_code );
 }
-
 
 /* Read a physical sector using LBA values */
 static int Read_Physical_Sectors_LBA( int drive, long cylinder, long head,
@@ -1222,7 +1221,7 @@ int Write_Partition_Tables( void )
       Partition_Table *pDrive = &part_table[drive_index];
 
       error_code = 0;
-      
+
       if ( ( pDrive->part_values_changed != TRUE &&
              flags.partitions_have_changed != TRUE ) ||
            !pDrive->usable ) {
@@ -1252,10 +1251,10 @@ int Write_Partition_Tables( void )
       for ( index = 0; index < 4; index++ ) {
          /* If this partition was just created, clear its boot sector. */
          if ( pDrive->pri_part_created[index] == TRUE ) {
-            error_code = Clear_Boot_Sector( ( drive_index + 128 ),
-                               pDrive->pri_part[index].start_cyl,
-                               pDrive->pri_part[index].start_head,
-                               pDrive->pri_part[index].start_sect );
+            error_code = Clear_Boot_Sector(
+               ( drive_index + 128 ), pDrive->pri_part[index].start_cyl,
+               pDrive->pri_part[index].start_head,
+               pDrive->pri_part[index].start_sect );
             if ( error_code != 0 ) {
                goto drive_error;
             }
@@ -1296,10 +1295,10 @@ int Write_Partition_Tables( void )
                   Pause();
                }
 
-               error_code = Clear_Boot_Sector( ( drive_index + 0x80 ),
-                                  pDrive->log_drive[index].start_cyl,
-                                  pDrive->log_drive[index].start_head,
-                                  pDrive->log_drive[index].start_sect );
+               error_code = Clear_Boot_Sector(
+                  ( drive_index + 0x80 ), pDrive->log_drive[index].start_cyl,
+                  pDrive->log_drive[index].start_head,
+                  pDrive->log_drive[index].start_sect );
                if ( error_code != 0 ) {
                   goto drive_error;
                }
@@ -1380,18 +1379,20 @@ static int Write_Physical_Sectors_CHS( int drive, long cylinder, long head,
 
    if ( number_of_sectors == 1 ) {
       do {
-         memset( &r, 0, sizeof(union REGPACK) );
+         memset( &r, 0, sizeof( union REGPACK ) );
          r.w.ax = 0x0301;
          r.h.dh = head;
          r.h.dl = drive;
          r.h.ch = cylinder;
-         r.h.cl = sector | ((cylinder >> 2) & 0xC0);
+         r.h.cl = sector | ( ( cylinder >> 2 ) & 0xC0 );
          r.w.bx = FP_OFF( sector_buffer );
          r.w.es = FP_SEG( sector_buffer );
          intr( 0x13, &r );
          error_code = ( r.w.flags & INTR_CF ) ? r.h.ah : 0;
-         if ( error_code ) Reset_Drive( drive );
-      } while (error_code && ++try < MAX_RETRIES);
+         if ( error_code ) {
+            Reset_Drive( drive );
+         }
+      } while ( error_code && ++try < MAX_RETRIES );
    }
    else {
       con_print( "sector != 1\n" );
@@ -1413,7 +1414,6 @@ static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
    unsigned long LBA_address =
       chs_to_lba( &part_table[drive - 128], cylinder, head, sector );
 
-
    /* Determine the location of sector_buffer[512]             */
    /* and place the address of sector_buffer[512] into the DAP */
 
@@ -1428,17 +1428,17 @@ static int Write_Physical_Sectors_LBA( int drive, long cylinder, long head,
    do {
       /* Add number_of_sectors to disk_address_packet */
       disk_address_packet[2] = number_of_sectors;
-   
+
       /* Transfer LBA_address to disk_address_packet */
       *(_u32 *)( disk_address_packet + 8 ) = LBA_address;
-   
-      memset( &r, 0, sizeof(union REGPACK) );
+
+      memset( &r, 0, sizeof( union REGPACK ) );
       r.w.ax = 0x4300;
       r.h.dl = drive;
       r.w.si = FP_OFF( disk_address_packet );
       r.w.ds = FP_SEG( disk_address_packet );
       intr( 0x13, &r );
-   
+
       if ( r.w.flags & INTR_CF ) {
          error_code = ( r.h.ah ) ? r.h.ah : 1;
          Reset_Drive( drive );
@@ -1487,7 +1487,6 @@ static void StorePartitionInSectorBuffer( unsigned char *sector_buffer,
    *(_u32 *)( sector_buffer + 0x08 ) = pPart->rel_sect;
    *(_u32 *)( sector_buffer + 0x0c ) = pPart->num_sect;
 }
-
 
 /* convert cylinder count to MB and do overflow checking */
 unsigned long Convert_Cyl_To_MB( unsigned long num_cyl,

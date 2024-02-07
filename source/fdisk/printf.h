@@ -11,10 +11,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,7 +36,6 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -49,8 +48,7 @@ extern "C" {
  * \param format A string that specifies the format of the output
  * \return The number of characters that are written into the array, not counting the terminating null character
  */
-int con_printf(const char* format, ...);
-
+int con_printf( const char *format, ... );
 
 /**
  * Tiny sprintf implementation
@@ -59,8 +57,7 @@ int con_printf(const char* format, ...);
  * \param format A string that specifies the format of the output
  * \return The number of characters that are WRITTEN into the buffer, not counting the terminating null character
  */
-int con_sprintf(char* buffer, const char* format, ...);
-
+int con_sprintf( char *buffer, const char *format, ... );
 
 /**
  * Tiny snprintf/vsnprintf implementation
@@ -72,9 +69,9 @@ int con_sprintf(char* buffer, const char* format, ...);
  *         null character. A value equal or larger than count indicates truncation. Only when the returned value
  *         is non-negative and less than count, the string has been completely written.
  */
-int  con_snprintf(char* buffer, size_t count, const char* format, ...);
-int con_vsnprintf(char* buffer, size_t count, const char* format, va_list va);
-
+int con_snprintf( char *buffer, size_t count, const char *format, ... );
+int con_vsnprintf( char *buffer, size_t count, const char *format,
+                   va_list va );
 
 /**
  * Tiny vprintf implementation
@@ -82,11 +79,10 @@ int con_vsnprintf(char* buffer, size_t count, const char* format, va_list va);
  * \param va A value identifying a variable arguments list
  * \return The number of characters that are WRITTEN into the buffer, not counting the terminating null character
  */
-int con_vprintf(const char* format, va_list va);
+int con_vprintf( const char *format, va_list va );
 
 #ifdef __cplusplus
 }
 #endif
 
-
-#endif  // _PRINTF_H_
+#endif // _PRINTF_H_

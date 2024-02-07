@@ -5,25 +5,24 @@
 #include <dir.h>
 #endif
 #include <dos.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 
+#include "ansicon.h"
 #include "compat.h"
 #include "fdiskio.h"
 #include "kbdinput.h"
 #include "main.h"
 #include "pcompute.h"
 #include "pdiskio.h"
+#include "printf.h"
 #include "userint0.h"
 #include "userint1.h"
 #include "userint2.h"
-#include "ansicon.h"
-#include "printf.h"
 
 #include "svarlang/svarlang.h"
-
 
 void Clear_Screen( int type )
 {
@@ -36,9 +35,9 @@ void Clear_Screen( int type )
 void Color_Print( const char *text )
 {
    int was_bold = con_get_bold();
-   con_set_bold(1);
-   con_print(text);
-   con_set_bold(was_bold);
+   con_set_bold( 1 );
+   con_print( text );
+   con_set_bold( was_bold );
 }
 
 void Color_Printf( const char *format, ... )
@@ -46,15 +45,14 @@ void Color_Printf( const char *format, ... )
    va_list arglist;
 
    int was_bold = con_get_bold();
-   con_set_bold(1);
+   con_set_bold( 1 );
 
    va_start( arglist, format );
    con_vprintf( format, arglist );
    va_end( arglist );
 
-   con_set_bold(was_bold);
+   con_set_bold( was_bold );
 }
-
 
 void Print_At( int column, int row, const char *format, ... )
 {
@@ -121,15 +119,22 @@ void Exit_Screen( void )
 {
    if ( flags.partitions_have_changed == TRUE ) {
       if ( flags.reboot == FALSE ) {
-         Print_At(4, 11, svarlang_str(2,0)); /* You must restart your system */
-         Print_At(4, 12, svarlang_str(2,1)); /* Any drives created must be formatted AFTER restart */
+         Print_At( 4, 11,
+                   svarlang_str( 2, 0 ) ); /* You must restart your system */
+         Print_At(
+            4, 12,
+            svarlang_str(
+               2,
+               1 ) ); /* Any drives created must be formatted AFTER restart */
 
          Input( 0, 0, 0, ESC, 0, 0, ESCE, 0, 0, '\0', '\0' );
          Clear_Screen( NOEXTRAS );
       }
       else {
-         Color_Print_At(4, 13, svarlang_str(2,2)); /* System will now restart */
-         Print_At(4, 15, svarlang_str(2,3)); /* Press key when ready... */
+         Color_Print_At( 4, 13,
+                         svarlang_str( 2, 2 ) ); /* System will now restart */
+         Print_At( 4, 15,
+                   svarlang_str( 2, 3 ) ); /* Press key when ready... */
 
          /* Wait for a keypress. */
          con_readkey();
@@ -146,7 +151,7 @@ void Warn_Incompatible_Ext( void )
 {
    Clear_Screen( NOEXTRAS );
 
-   Color_Print_At( 38, 4, svarlang_str(250, 4)); /* ERROR */
+   Color_Print_At( 38, 4, svarlang_str( 250, 4 ) ); /* ERROR */
 
    Position_Cursor( 0, 7 );
    con_print( svarlang_str( 30, 20 ) );
@@ -431,15 +436,12 @@ void Interactive_User_Interface( void )
          }
 
          if ( !file_pointer ) {
-            Color_Print_At(
-               4, 22,
-               svarlang_str( 11, 0 ) );
+            Color_Print_At( 4, 22, svarlang_str( 11, 0 ) );
          }
          else {
-            fclose(file_pointer);
+            fclose( file_pointer );
             Load_MBR( 0 );
-            Color_Print_At( 4, 22,
-                            svarlang_str( 11, 1 ) );
+            Color_Print_At( 4, 22, svarlang_str( 11, 1 ) );
             Read_Partition_Tables();
          }
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
@@ -476,7 +478,6 @@ ret:
    Position_Cursor( 0, 0 );
 }
 
-
 /* Standard Menu Routine */
 /* Displays the menus laid out in a standard format and returns the */
 /* selection chosen by the user.                                    */
@@ -505,34 +506,41 @@ int Standard_Menu( int menu )
 
       if ( menu == MM ) {
          maximum_number_of_options = 4;
-         title = svarlang_str(3, 0); /* "FDISK Options" */
-         option_1 = svarlang_str(3, 1); /* "Create DOS part or Logical Drive" */
-         option_2 = svarlang_str(3, 2); /* Set Active partition */
-         option_3 = svarlang_str(3, 3); /* Del part or Logical DOS Drive */
+         title = svarlang_str( 3, 0 ); /* "FDISK Options" */
+         option_1 =
+            svarlang_str( 3, 1 ); /* "Create DOS part or Logical Drive" */
+         option_2 = svarlang_str( 3, 2 ); /* Set Active partition */
+         option_3 = svarlang_str( 3, 3 ); /* Del part or Logical DOS Drive */
 
-         if (flags.extended_options_flag == FALSE) {
-            option_4 = svarlang_str(3,4); /* Display partition information */
-         } else {
-            option_4 = svarlang_str(3,5); /* Display/Modify partition info */
+         if ( flags.extended_options_flag == FALSE ) {
+            option_4 =
+               svarlang_str( 3, 4 ); /* Display partition information */
+         }
+         else {
+            option_4 =
+               svarlang_str( 3, 5 ); /* Display/Modify partition info */
          }
       }
 
       if ( menu == CP ) {
          maximum_number_of_options = 3;
-         title = svarlang_str(4, 0); /* Create DOS Partition or Logical DOS Drive */
-         option_1 = svarlang_str(4, 1); /* Create Primary DOS Partition */
-         option_2 = svarlang_str(4, 2); /* Create Extended DOS Partition */
-         option_3 = svarlang_str(4, 3); /* Create Log DOS Drive in Ext Part */
+         title = svarlang_str(
+            4, 0 ); /* Create DOS Partition or Logical DOS Drive */
+         option_1 = svarlang_str( 4, 1 ); /* Create Primary DOS Partition */
+         option_2 = svarlang_str( 4, 2 ); /* Create Extended DOS Partition */
+         option_3 =
+            svarlang_str( 4, 3 ); /* Create Log DOS Drive in Ext Part */
          option_4 = "";
       }
 
       if ( menu == DP ) {
          maximum_number_of_options = 4;
-         title = svarlang_str(5, 0); /* Del DOS Part or Logical DOS Drive */
-         option_1 = svarlang_str(5, 1); /* Delete Primary DOS Partition */
-         option_2 = svarlang_str(5, 2); /* Delete Extended DOS Partition */
-         option_3 = svarlang_str(5, 3); /* Del Log DOS Drive in Ext DOS Part */
-         option_4 = svarlang_str(5, 4); /* Delete Non-DOS Partition */
+         title = svarlang_str( 5, 0 ); /* Del DOS Part or Logical DOS Drive */
+         option_1 = svarlang_str( 5, 1 ); /* Delete Primary DOS Partition */
+         option_2 = svarlang_str( 5, 2 ); /* Delete Extended DOS Partition */
+         option_3 =
+            svarlang_str( 5, 3 ); /* Del Log DOS Drive in Ext DOS Part */
+         option_4 = svarlang_str( 5, 4 ); /* Delete Non-DOS Partition */
          if ( flags.version == COMP_FOUR ) {
             maximum_number_of_options = 3;
          }
@@ -540,15 +548,15 @@ int Standard_Menu( int menu )
 
       if ( menu == MBR ) {
          maximum_number_of_options = 4;
-         title = svarlang_str(6, 0); /* MBR Maintenance */
-         option_1 = svarlang_str(6, 1); /* Create BootEasy MBR (disabled) */
-         option_2 = svarlang_str(6, 2); /* Load MBR from saved file */
-         option_3 = svarlang_str(6, 3); /* Save MBR to a file */
-         option_4 = svarlang_str(6, 4); /* Remove boot code from the MBR */
+         title = svarlang_str( 6, 0 );    /* MBR Maintenance */
+         option_1 = svarlang_str( 6, 1 ); /* Create BootEasy MBR (disabled) */
+         option_2 = svarlang_str( 6, 2 ); /* Load MBR from saved file */
+         option_3 = svarlang_str( 6, 3 ); /* Save MBR to a file */
+         option_4 = svarlang_str( 6, 4 ); /* Remove boot code from the MBR */
       }
 
       /* Display Program Name and Copyright Information */
-      Clear_Screen(0);
+      Clear_Screen( 0 );
 
       if ( ( flags.extended_options_flag == TRUE ) && ( menu == MM ) ) {
          /* */
@@ -564,14 +572,15 @@ int Standard_Menu( int menu )
       flags.display_name_description_copyright = FALSE;
 
       /* Display Menu Title(s) */
-      Print_Centered(4, title, BOLD);
+      Print_Centered( 4, title, BOLD );
 
       /* NLS:Current fixed disk drive: */
       Print_At( 4, 6, svarlang_str( 9, 0 ) );
       Color_Printf( " %d", ( flags.drive_number - 127 ) );
 
       if ( part_table[flags.drive_number - 128].usable ) {
-         con_printf( svarlang_str( 9, 23 ), part_table[flags.drive_number - 128].disk_size_mb);
+         con_printf( svarlang_str( 9, 23 ),
+                     part_table[flags.drive_number - 128].disk_size_mb );
       }
       else {
          con_putc( ' ' );
@@ -608,27 +617,28 @@ int Standard_Menu( int menu )
 
       if ( minimum_option <= 1 ) {
          Color_Print_At( 4, 10, "1.  " );
-         con_print(option_1);
+         con_print( option_1 );
       }
       if ( maximum_number_of_options > 1 && minimum_option <= 2 ) {
          Color_Print_At( 4, 11, "2.  " );
-         con_print(option_2);
+         con_print( option_2 );
       }
 
       if ( maximum_number_of_options > 2 && minimum_option <= 3 ) {
          Color_Print_At( 4, 12, "3.  " );
-         con_print(option_3);
+         con_print( option_3 );
       }
 
       if ( maximum_number_of_options > 3 && minimum_option <= 4 ) {
          Color_Print_At( 4, 13, "4.  " );
-         con_print(option_4);
+         con_print( option_4 );
       }
 
       if ( ( menu == MM ) && ( flags.more_than_one_drive == TRUE ) ) {
          maximum_number_of_options = 5;
          Color_Print_At( 4, 14, "5.  " );
-         con_print(svarlang_str(3, 6)); /* Change current fixed disk drive */
+         con_print(
+            svarlang_str( 3, 6 ) ); /* Change current fixed disk drive */
       }
 
       if ( menu == MM && flags.extended_options_flag == TRUE &&
@@ -671,7 +681,7 @@ int Standard_Menu( int menu )
 
       /* NLS:Enter choice: */
       Print_At( 4, 17, svarlang_str( 9, 1 ) );
-      con_print("  ");
+      con_print( "  " );
 
       if ( menu == MM ) {
          input = (int)Input( 1, -1, -1, NUM, minimum_option,

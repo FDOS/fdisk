@@ -9,19 +9,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ansicon.h"
 #include "compat.h"
 #include "fdiskio.h"
 #include "kbdinput.h"
 #include "main.h"
 #include "pcompute.h"
 #include "pdiskio.h"
+#include "printf.h"
+#include "svarlang/svarlang.h"
 #include "userint0.h"
 #include "userint1.h"
 #include "userint2.h"
-#include "ansicon.h"
-#include "printf.h"
-#include "svarlang/svarlang.h"
-
 
 /* Ask user if they want to use large disk support (FAT 32) */
 void Ask_User_About_FAT32_Support( void )
@@ -35,17 +34,17 @@ void Ask_User_About_FAT32_Support( void )
 
    con_clrscr();
 
-   con_puts( svarlang_str(1, 0) );
-   con_puts( svarlang_str(1, 1) );
-   con_puts( svarlang_str(1, 2) );
-   con_puts( svarlang_str(1, 3) );
-   con_puts("");
-   con_puts( svarlang_str(1, 4) );
-   con_puts( svarlang_str(1, 5) );
-   con_puts( svarlang_str(1, 6) );
+   con_puts( svarlang_str( 1, 0 ) );
+   con_puts( svarlang_str( 1, 1 ) );
+   con_puts( svarlang_str( 1, 2 ) );
+   con_puts( svarlang_str( 1, 3 ) );
+   con_puts( "" );
+   con_puts( svarlang_str( 1, 4 ) );
+   con_puts( svarlang_str( 1, 5 ) );
+   con_puts( svarlang_str( 1, 6 ) );
 
    /* "do you want to use large disk (FAT32) support (Y/N)...?" */
-   con_print( svarlang_str(1, 7) );
+   con_print( svarlang_str( 1, 7 ) );
    con_print( "  " );
    flags.fat32 = (int)Input( 1, -1, -1, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
 }
@@ -87,7 +86,7 @@ void Change_Current_Fixed_Disk_Drive( void )
 
    con_set_cursor_xy( 5, 22 );
    con_printf( svarlang_str( 10, 190 ),
-             ( flags.maximum_drive_number - 127 ) );
+               ( flags.maximum_drive_number - 127 ) );
    con_print( " " );
    new_drive_number =
       (int)Input( 1, -1, -1, NUM, 1, ( flags.maximum_drive_number - 127 ),
@@ -129,12 +128,10 @@ int Create_DOS_Partition_Interface( int type )
 
       /* ask, if all space should be reserverd */
       if ( ( flags.drive_number - 128 ) == 0 ) {
-         Print_At(
-            4, 8, svarlang_str( 10, 60 ) );
+         Print_At( 4, 8, svarlang_str( 10, 60 ) );
       }
       else {
-         Print_At(
-            4, 8, svarlang_str( 10, 61 ) );
+         Print_At( 4, 8, svarlang_str( 10, 61 ) );
       }
       con_print( " " );
 
@@ -258,7 +255,6 @@ int Create_DOS_Partition_Interface( int type )
       Print_Centered( 4, svarlang_str( 4, 2 ), BOLD );
    }
 
-
    /* NLS:Current fixed disk drive: */
    Print_At( 4, 6, svarlang_str( 9, 0 ) );
    Color_Printf( " %d", ( flags.drive_number - 127 ) );
@@ -323,9 +319,7 @@ int Create_Logical_Drive_Interface( void )
       con_print( svarlang_str( 30, 11 ) );
       con_print( svarlang_str( 30, 12 ) );
 
-      Print_At(
-         4, 21,
-         svarlang_str( 30, 13) );
+      Print_At( 4, 21, svarlang_str( 30, 13 ) );
       con_print( " " );
       yn = (int)Input( 1, -1, -1, YN, 0, 0, NONE, 1, 0, 0, 0 );
       if ( yn ) {
@@ -361,8 +355,7 @@ int Create_Logical_Drive_Interface( void )
             con_clreol();
 
             /* maximum number of Logical DOS Drives installed */
-            Color_Print_At(
-               4, 22, svarlang_str( 10, 71 ) );
+            Color_Print_At( 4, 22, svarlang_str( 10, 71 ) );
             Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
             if ( flags.fprmt == TRUE ) {
                flags.fat32 = FALSE;
@@ -377,7 +370,8 @@ int Create_Logical_Drive_Interface( void )
          Print_At( 4, 17, svarlang_str( 10, 6 ), pDrive->ext_size_mb );
 
          /* print maximum partition size */
-         Print_At( 4, 18, svarlang_str( 10, 63 ), maximum_partition_size_in_MB );
+         Print_At( 4, 18, svarlang_str( 10, 63 ),
+                   maximum_partition_size_in_MB );
 
          maximum_possible_percentage = (int)Convert_To_Percentage(
             maximum_partition_size_in_MB, pDrive->ext_size_mb );
@@ -385,9 +379,7 @@ int Create_Logical_Drive_Interface( void )
          con_printf( " (\33[1m%d%%\33[22m)", maximum_possible_percentage );
 
          /* enter partition size */
-         Print_At(
-            4, 20,
-            svarlang_str( 10, 72 ) );
+         Print_At( 4, 20, svarlang_str( 10, 72 ) );
          con_print( " " );
 
          flags.esc = FALSE;
@@ -411,14 +403,14 @@ int Create_Logical_Drive_Interface( void )
             return ( 1 );
          }
 
-         if ( input == 0 ) continue;
+         if ( input == 0 ) {
+            continue;
+         }
 
          if ( ( flags.fprmt == TRUE ) && ( input >= 128 ) &&
               ( input <= 2048 ) ) {
             /* switch th FAT-16? */
-            Print_At(
-               4, 21,
-               svarlang_str( 10, 62 ) );
+            Print_At( 4, 21, svarlang_str( 10, 62 ) );
             con_print( " " );
             flags.fat32 =
                !Input( 1, -1, -1, YN, 0, 0, NONE, 1, 0, '\0', '\0' );
@@ -504,7 +496,7 @@ int Delete_Logical_Drive_Interface( void )
    Clear_Screen( 0 );
 
    /* NLS:Delete Logical DOS Drive[...] */
-   Print_Centered( 1, svarlang_str( 5, 3 ) , BOLD );
+   Print_Centered( 1, svarlang_str( 5, 3 ), BOLD );
 
    Display_Extended_Partition_Information_SS();
 
@@ -518,7 +510,7 @@ int Delete_Logical_Drive_Interface( void )
    do {
       con_set_cursor_xy( 5, 20 );
       /* NLS:WARNING! Data in a deleted Logical[...] */
-      con_print(  svarlang_str( 10, 30 ) );
+      con_print( svarlang_str( 10, 30 ) );
       con_print( " " );
 
       flags.esc = FALSE;
@@ -571,7 +563,7 @@ int Delete_Logical_Drive_Interface( void )
    drive_to_delete = input;
 
    /* NLS:Are you sure (Y/N)? */
-   Normal_Print_At( 4, 22, svarlang_str( 10, 200) );
+   Normal_Print_At( 4, 22, svarlang_str( 10, 200 ) );
    con_print( " " );
    flags.esc = FALSE;
    input = (int)Input( 1, -1, -1, YN, 0, 0, ESCR, 0, 0, '\0', '\0' );
@@ -607,7 +599,7 @@ void Delete_N_DOS_Partition_Interface( void )
 
    Clear_Screen( 0 );
    /* NLS:Delete Non-DOS Partition */
-   Print_Centered( 4, svarlang_str( 5, 4 ) , BOLD );
+   Print_Centered( 4, svarlang_str( 5, 4 ), BOLD );
 
    Display_Primary_Partition_Information_SS();
 
@@ -632,7 +624,7 @@ void Delete_N_DOS_Partition_Interface( void )
       if ( p->num_type == 0 ) {
          /* NLS:Not a partition! */
          Display_Primary_Partition_Information_SS();
-         Color_Print_At( 4, 21, svarlang_str( 10, 1 ) );         
+         Color_Print_At( 4, 21, svarlang_str( 10, 1 ) );
       }
       else if ( Is_Dos_Part( p->num_type ) ) {
          /* NLS:Refusing to delete DOS partition! */
@@ -641,9 +633,9 @@ void Delete_N_DOS_Partition_Interface( void )
       }
       else {
          error_code = Delete_Primary_Partition( input - 1 );
-   
+
          Display_Primary_Partition_Information_SS();
-   
+
          if ( !error_code ) {
             /* NLS:Non-DOS Partition deleted */
             Color_Print_At( 4, 21, svarlang_str( 10, 3 ) );
@@ -679,7 +671,7 @@ void Delete_Primary_DOS_Partition_Interface( void )
    Display_Primary_Partition_Information_SS();
 
    con_set_cursor_xy( 5, 20 );
-   /* NLS:WARNING! Data in the deleted [...] */ 
+   /* NLS:WARNING! Data in the deleted [...] */
    con_printf( svarlang_str( 10, 40 ) );
    con_print( " " );
 
@@ -734,7 +726,6 @@ void Delete_Primary_DOS_Partition_Interface( void )
       }
    }
 }
-
 
 /* Display Extended Partition Information Sub Screen */
 void Display_Extended_Partition_Information_SS( void )
@@ -797,11 +788,11 @@ void Display_Extended_Partition_Information_SS( void )
 
             /* Display file system type */
             Print_At( column_index + 25, print_index, "%-9s",
-                      part_type_descr_short(p->num_type) );
+                      part_type_descr_short( p->num_type ) );
 
             /* Display usage in % */
-            usage = Convert_To_Percentage(
-               p->num_sect, pDrive->ext_num_sect );
+            usage =
+               Convert_To_Percentage( p->num_sect, pDrive->ext_num_sect );
 
             Print_At( column_index + 35, print_index, "%3lu%%", usage );
             print_index++;
@@ -817,8 +808,8 @@ void Display_Extended_Partition_Information_SS( void )
    con_set_cursor_xy( 5, 18 );
    con_clreol();
    /* NLS:Total Extended Partition size is [...] */
-   con_printf( svarlang_str( 10, 6 ), part_table[flags.drive_number - 128].ext_size_mb );
-
+   con_printf( svarlang_str( 10, 6 ),
+               part_table[flags.drive_number - 128].ext_size_mb );
 }
 
 /* Display Or Modify Logical Drive Information in the extended partition */
@@ -847,10 +838,8 @@ Beginning:
       Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
    else {
-      Print_At(
-         4, 18,
-         svarlang_str( 10, 84 ) );
-      con_print( " ");
+      Print_At( 4, 18, svarlang_str( 10, 84 ) );
+      con_print( " " );
 
       Determine_Drive_Letters();
 
@@ -929,8 +918,7 @@ Beginning:
       con_print( " " );
       con_save_cursor_xy();
       if ( flags.extended_options_flag == TRUE ) {
-         Print_At(
-            4, 20, svarlang_str( 10, 81 ) );
+         Print_At( 4, 20, svarlang_str( 10, 81 ) );
 
          con_restore_cursor_xy();
          input = (int)Input( 1, -1, -1, YN, 0, 0, ESCR, 1, 0, '1', '4' );
@@ -956,9 +944,7 @@ Beginning:
          Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
       }
       else {
-         Print_At(
-            4, 18,
-            svarlang_str( 10, 82 ) );
+         Print_At( 4, 18, svarlang_str( 10, 82 ) );
          con_print( " " );
 
          flags.esc = FALSE;
@@ -1002,8 +988,7 @@ void Display_Primary_Partition_Information_SS( void )
             if ( p->num_type > 0 ) {
                /* Drive Letter of Partition */
 
-               if ( IsRecognizedFatPartition(
-                       p->num_type ) ) {
+               if ( IsRecognizedFatPartition( p->num_type ) ) {
                   Print_At( 5, ( cursor_offset + 9 ), "%c:",
                             drive_lettering_buffer[( flags.drive_number -
                                                      128 )][index] );
@@ -1015,13 +1000,13 @@ void Display_Primary_Partition_Information_SS( void )
 
                /* Status */
                if ( p->active_status > 0 ) {
-                  Print_At( 15, ( cursor_offset + 9 ), svarlang_str( 250, 6 ) );
+                  Print_At( 15, ( cursor_offset + 9 ),
+                            svarlang_str( 250, 6 ) );
                }
 
                /* Type */
                type = "Non-DOS";
-               if ( IsRecognizedFatPartition(
-                       p->num_type ) ) {
+               if ( IsRecognizedFatPartition( p->num_type ) ) {
                   type = "PRI DOS";
                }
                else if ( p->num_type == 5 ) {
@@ -1041,13 +1026,12 @@ void Display_Primary_Partition_Information_SS( void )
                Print_UL( p->size_in_MB );
 
                /* System */
-               Print_At(
-                  55, ( cursor_offset + 9 ), "%-15s  ",
-                  part_type_descr(p->num_type) );
+               Print_At( 55, ( cursor_offset + 9 ), "%-15s  ",
+                         part_type_descr( p->num_type ) );
 
                /* Usage */
-               usage = Convert_To_Percentage(
-                  p->size_in_MB, pDrive->disk_size_mb );
+               usage = Convert_To_Percentage( p->size_in_MB,
+                                              pDrive->disk_size_mb );
 
                con_printf( "%3d%%", usage );
 
@@ -1057,14 +1041,13 @@ void Display_Primary_Partition_Information_SS( void )
       }
       else {
          /* NLS:Partition   Status   Mbytes    Description    Usage  Start Cyl  End Cyl*/
-         Print_At(4, 8, svarlang_str( 10, 11 ) );
+         Print_At( 4, 8, svarlang_str( 10, 11 ) );
 
          for ( index = 0; index < 4; index++ ) {
             p = &pDrive->pri_part[index];
             if ( p->num_type > 0 ) {
                /* Drive Letter of Partition */
-               if ( IsRecognizedFatPartition(
-                       p->num_type ) ) {
+               if ( IsRecognizedFatPartition( p->num_type ) ) {
                   Print_At( 5, ( cursor_offset + 9 ), "%c:",
                             drive_lettering_buffer[flags.drive_number - 128]
                                                   [index] );
@@ -1074,8 +1057,7 @@ void Display_Primary_Partition_Information_SS( void )
                Color_Print_At( 8, ( cursor_offset + 9 ), "%d", index + 1 );
 
                /* Partition Type */
-               Print_At( 10, ( cursor_offset + 9 ), "%3d",
-                         p->num_type );
+               Print_At( 10, ( cursor_offset + 9 ), "%3d", p->num_type );
 
                /* Status */
                if ( p->active_status > 0 ) {
@@ -1087,23 +1069,20 @@ void Display_Primary_Partition_Information_SS( void )
                Print_UL( p->size_in_MB );
 
                /* Description */
-               Print_At(
-                  33, ( cursor_offset + 9 ), "%-15s",
-                  part_type_descr( p->num_type ) );
+               Print_At( 33, ( cursor_offset + 9 ), "%-15s",
+                         part_type_descr( p->num_type ) );
 
                /* Usage */
-               usage = Convert_To_Percentage(
-                  p->size_in_MB, pDrive->disk_size_mb );
+               usage = Convert_To_Percentage( p->size_in_MB,
+                                              pDrive->disk_size_mb );
 
                Print_At( 51, ( cursor_offset + 9 ), "%3d%%", usage );
 
                /* Starting Cylinder */
-               Print_At( 60, ( cursor_offset + 9 ), "%6lu",
-                         p->start_cyl );
+               Print_At( 60, ( cursor_offset + 9 ), "%6lu", p->start_cyl );
 
                /* Ending Cylinder */
-               Print_At( 69, ( cursor_offset + 9 ), "%6lu",
-                         p->end_cyl );
+               Print_At( 69, ( cursor_offset + 9 ), "%6lu", p->end_cyl );
 
                cursor_offset++;
             }
@@ -1120,7 +1099,6 @@ void Display_Primary_Partition_Information_SS( void )
    con_set_cursor_xy( 5, 15 );
    con_clreol();
    con_printf( svarlang_str( 10, 8 ), pDrive->disk_size_mb );
-
 }
 
 /* List the Partition Types */
@@ -1133,7 +1111,7 @@ void List_Partition_Types( void )
       if ( ( index == 0 ) || ( index == 64 ) || ( index == 128 ) ||
            ( index == 192 ) ) {
          Clear_Screen( 0 );
-         Print_Centered( 1, svarlang_str( 10, 90) , BOLD );
+         Print_Centered( 1, svarlang_str( 10, 90 ), BOLD );
          row = 4;
          column = 0;
       }
@@ -1144,7 +1122,7 @@ void List_Partition_Types( void )
       }
 
       Color_Print_At( column, row, "%3d ", index );
-      con_printf( "%s", part_type_descr(index) );
+      con_printf( "%s", part_type_descr( index ) );
 
       if ( ( index == 63 ) || ( index == 127 ) || ( index == 191 ) ||
            ( index == 255 ) ) {
@@ -1179,13 +1157,10 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
       Print_At( 4, 6, svarlang_str( 9, 0 ) );
       Color_Printf( " %d", ( flags.drive_number - 127 ) );
 
-      Print_At(
-         4, 8,
-         svarlang_str( 10, 101 ) );
+      Print_At( 4, 8, svarlang_str( 10, 101 ) );
 
       /* Drive Letter of Partition */
-      if ( IsRecognizedFatPartition(
-              p->num_type ) ) {
+      if ( IsRecognizedFatPartition( p->num_type ) ) {
          Color_Print_At(
             5, 9, "%c:",
             drive_lettering_buffer[( flags.drive_number - 128 )]
@@ -1196,30 +1171,25 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
       Print_At( 8, 9, "%d", ( logical_drive_number + 1 ) );
 
       /* Partition Type */
-      Print_At( 10, 9, "%3d",
-                ( p->num_type ) );
+      Print_At( 10, 9, "%3d", ( p->num_type ) );
 
       /* Mbytes */
       Position_Cursor( 24, 9 );
       Print_UL( p->size_in_MB );
 
       /* Description */
-      Print_At( 33, 9, "%-15s", part_type_descr(p->num_type) );
+      Print_At( 33, 9, "%-15s", part_type_descr( p->num_type ) );
 
       /* Usage */
-      usage = Convert_To_Percentage(
-         p->size_in_MB,
-         pDrive->ext_size_mb );
+      usage = Convert_To_Percentage( p->size_in_MB, pDrive->ext_size_mb );
 
       Print_At( 51, 9, "%3d%%", usage );
 
       /* Starting Cylinder */
-      Print_At( 60, 9, "%6lu",
-                p->start_cyl );
+      Print_At( 60, 9, "%6lu", p->start_cyl );
 
       /* Ending Cylinder */
-      Print_At( 69, 9, "%6lu",
-                p->end_cyl );
+      Print_At( 69, 9, "%6lu", p->end_cyl );
 
       /* NLS:"Choose one of the following: */
       Print_At( 4, 12, svarlang_str( 9, 2 ) );
@@ -1236,7 +1206,7 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
 */
       /* NLS:Enter choice: */
       Print_At( 4, 18, svarlang_str( 9, 1 ) );
-      con_print("  ");
+      con_print( "  " );
 
       flags.esc = FALSE;
       input = (int)Input( 1, -1, -1, NUM, 1, 3, ESCC, -1, 0, '\0', '\0' );
@@ -1247,9 +1217,7 @@ void Modify_Extended_Partition_Information( int logical_drive_number )
 
       if ( input == 1 ) {
          /* Change partition type */
-         Print_At(
-            4, 20,
-            svarlang_str( 10, 105 ) );
+         Print_At( 4, 20, svarlang_str( 10, 105 ) );
 
          con_print( " " );
          flags.esc = FALSE;
@@ -1312,13 +1280,10 @@ void Modify_Primary_Partition_Information( int partition_number )
       Print_At( 4, 6, svarlang_str( 9, 0 ) );
       Color_Printf( " %d", ( flags.drive_number - 127 ) );
 
-      Print_At(
-         4, 8,
-         svarlang_str( 10, 11 ) );
+      Print_At( 4, 8, svarlang_str( 10, 11 ) );
 
       /* Drive Letter of Partition */
-      if ( IsRecognizedFatPartition(
-              p->num_type == 1 ) ) {
+      if ( IsRecognizedFatPartition( p->num_type == 1 ) ) {
          Print_At( 5, 9, "%c:",
                    drive_lettering_buffer[( flags.drive_number - 128 )]
                                          [partition_number] );
@@ -1328,8 +1293,7 @@ void Modify_Primary_Partition_Information( int partition_number )
       Color_Print_At( 8, 9, "%d", ( partition_number + 1 ) );
 
       /* Partition Type */
-      Print_At( 10, 9, "%3d",
-                ( p->num_type ) );
+      Print_At( 10, 9, "%3d", ( p->num_type ) );
 
       /* Status */
       if ( p->active_status > 0 ) {
@@ -1341,14 +1305,10 @@ void Modify_Primary_Partition_Information( int partition_number )
       Print_UL( p->size_in_MB );
 
       /* Description */
-      Print_At(
-         33, 9, "%-15s",
-         part_type_descr(p->num_type) );
+      Print_At( 33, 9, "%-15s", part_type_descr( p->num_type ) );
 
       /* Usage */
-      usage =
-         Convert_To_Percentage( p->size_in_MB,
-                                pDrive->disk_size_mb );
+      usage = Convert_To_Percentage( p->size_in_MB, pDrive->disk_size_mb );
 
       Print_At( 51, 9, "%3d%%", usage );
 
@@ -1372,7 +1332,7 @@ void Modify_Primary_Partition_Information( int partition_number )
 
       /* NLS:Enter choice: */
       Print_At( 4, 19, svarlang_str( 9, 1 ) );
-      con_print("  ");
+      con_print( "  " );
 
       flags.esc = FALSE;
       input = (int)Input( 1, -1, -1, NUM, 1, 4, ESCC, -1, 0, '\0', '\0' );
@@ -1383,9 +1343,7 @@ void Modify_Primary_Partition_Information( int partition_number )
 
       if ( input == 1 ) {
          /* Change partition type */
-         Print_At(
-            4, 19,
-            svarlang_str( 10, 105 ) );
+         Print_At( 4, 19, svarlang_str( 10, 105 ) );
 
          flags.esc = FALSE;
          input =
@@ -1453,7 +1411,7 @@ int Set_Active_Partition_Interface( void )
          partition_settable[index] = TRUE;
       }
       else if ( ( p->num_type > 0 ) &&
-           ( flags.set_any_pri_part_active == TRUE ) ) {
+                ( flags.set_any_pri_part_active == TRUE ) ) {
          available_partition_counter++;
          if ( ( available_partition_counter == 1 ) &&
               ( p->active_status == 0x80 ) ) {
@@ -1476,7 +1434,7 @@ int Set_Active_Partition_Interface( void )
 
    if ( available_partition_counter == 0 ) {
       /* NLS:No partitions to make active.*/
-      Color_Print_At( 4, 22, svarlang_str(10, 50) );
+      Color_Print_At( 4, 22, svarlang_str( 10, 50 ) );
 
       Input( 0, 0, 0, ESC, 0, 0, ESCC, 0, 0, '\0', '\0' );
    }
@@ -1485,7 +1443,7 @@ int Set_Active_Partition_Interface( void )
         ( available_partition_counter > 0 ) ) {
       con_set_cursor_xy( 5, 17 );
       /*NLS:Enter the number of the partition you want to make active */
-      con_print( svarlang_str( 10, 51 ));
+      con_print( svarlang_str( 10, 51 ) );
       con_print( " " );
       con_save_cursor_xy();
 
