@@ -10,18 +10,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ansicon.h"
 #include "compat.h"
+#include "display.h"
+#include "kbdinput.h"
 #include "main.h"
 #include "pdiskio.h"
-#include "userint0.h"
-#include "userint1.h"
-
-#include "kbdinput.h"
-
-#include "ansicon.h"
 #include "printf.h"
-
 #include "svarlang/svarlang.h"
+#include "ui.h"
 
 /* Get input from keyboard */
 unsigned long Input( int size_of_field, int x_position, int y_position,

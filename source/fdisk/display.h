@@ -1,7 +1,7 @@
 /* contains UI calls that required by command-line operations */
 
-#ifndef USERINT3_H
-#define USERINT3_H
+#ifndef DISPLAY_H
+#define DISPLAY_H
 
 void Display_Information( void );
 void Dump_Partition_Information( void );

@@ -41,6 +41,7 @@ source/fdisk/userint2.c
 source/fdisk/ansicon.h
 source/fdisk/cmd.h
 source/fdisk/compat.h
+source/fdisk/display.h
 source/fdisk/fdiskio.h
 source/fdisk/helpscr.h
 source/fdisk/kbdinput.h
@@ -48,8 +49,7 @@ source/fdisk/main.h
 source/fdisk/pcompute.h
 source/fdisk/pdiskio.h
 source/fdisk/printf.h
-source/fdisk/userint0.h
-source/fdisk/userint1.h
+source/fdisk/ui.h
 source/fdisk/userint2.h
 source/fdisk/bootnorm.asm
 source/fdisk/smartmbr.asm

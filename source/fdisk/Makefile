@@ -61,12 +61,12 @@ CFLAGS += -DRELEASE=$(RELEASE)
 !endif
 
 objs  = main.obj cmd.obj fdiskio.obj pdiskio.obj pcompute.obj compat.obj
-objs += helpscr.obj userint0.obj
+objs += helpscr.obj display.obj
 objs +=
 !ifdef LITE
 CFLAGS += -DFDISKLITE=1
 !else
-objs += userint1.obj userint2.obj kbdinput.obj 
+objs += ui.obj kbdinput.obj 
 !endif
 objs += ansicon.obj printf.obj bootnorm.obj
 objs += svarlang.obj auto_exe.obj auto_nls.obj deflang.obj

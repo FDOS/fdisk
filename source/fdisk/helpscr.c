@@ -16,14 +16,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "ansicon.h"
+#include "display.h"
+#include "helpscr.h"
 #include "main.h"
 #include "pdiskio.h"
-#include "userint0.h"
-
-#include "ansicon.h"
-#include "helpscr.h"
 #include "printf.h"
-
 #include "svarlang/svarlang.h"
 
 /*

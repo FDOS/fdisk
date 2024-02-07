@@ -3,15 +3,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "ansicon.h"
 #include "compat.h"
+#include "display.h"
 #include "main.h"
 #include "pcompute.h"
-
-#include "ansicon.h"
 #include "printf.h"
 #include "svarlang/svarlang.h"
-
-#include "userint0.h"
 
 /* Pause Routine */
 void Pause( void )

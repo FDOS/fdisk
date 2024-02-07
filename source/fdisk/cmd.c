@@ -6,17 +6,16 @@
 #include "ansicon.h"
 #include "cmd.h"
 #include "compat.h"
+#include "display.h"
 #include "fdiskio.h"
 #include "main.h"
 #include "pcompute.h"
 #include "pdiskio.h"
 #include "printf.h"
 #include "svarlang/svarlang.h"
-#include "userint0.h"
 
 #ifndef FDISKLITE
-#include "userint1.h"
-#include "userint2.h"
+#include "ui.h"
 #endif
 
 /* /CLEARFLAG command line option */
