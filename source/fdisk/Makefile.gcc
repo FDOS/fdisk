@@ -12,7 +12,7 @@ NASM=nasm
 CP=cp
 
 FDISK_OBJS = main.o cmd.o helpscr.o compat.o pdiskio.o fdiskio.o pcompute.o \
-             userint0.o userint1.o userint2.o kbdinput.o ansicon.o printf.o \
+             display.o ui.o kbdinput.o ansicon.o printf.o \
              svarlang/svarlang.o svarlang/auto_exe.o svarlang/auto_nls.o \
              deflang.o bootnorm.o
 
