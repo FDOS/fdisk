@@ -113,14 +113,20 @@ fdisk.lnk : Makefile
 
 ../../fdisk.svp : fdisk.exe
 	cd ../..
-	$(MV) appinfo appinfo.tmp
-	mkdir appinfo
-	$(CP) appinfo.tmp$(SEP)fdisk.lsm appinfo
-	zip -9rkDX fdisk.svp appinfo bin doc nls
-	rm -f appinfo/fdisk.lsm
-	rmdir appinfo
-	$(MV) appinfo.tmp appinfo
-	cd source/fdisk
+	mkdir svardos
+	mkdir svardos$(SEP)bin
+	mkdir svardos$(SEP)appinfo
+	mkdir svardos$(SEP)doc
+	mkdir svardos$(SEP)doc$(SEP)fdisk
+	$(CP) appinfo$(SEP)fdisk.lsm svardos$(SEP)appinfo$(SEP)fdisk.lsm
+	$(CP) bin$(SEP)fdisk.exe svardos$(SEP)bin
+	$(CP) nls$(SEP)fdisk.lng svardos$(SEP)bin
+	$(CP) doc$(SEP)fdisk$(SEP)CHANGES.md svardos$(SEP)doc$(SEP)fdisk$(SEP)CHANGES.MD
+	$(CP) doc$(SEP)fdisk$(SEP)contrib.txt svardos$(SEP)doc$(SEP)fdisk$(SEP)CONTRIB.TXT
+	$(CP) LICENSE svardos$(SEP)doc$(SEP)fdisk$(SEP)LICENSE
+	cd svardos
+	zip -9rkDX ..$(SEP)fdisk.svp bin$(SEP)fdisk.exe bin$(SEP)fdisk.lng appinfo doc 
+	cd ../source/fdisk
 
 # --- SVARLANG --------------------------------------------------------------
 
