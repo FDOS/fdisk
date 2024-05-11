@@ -56,6 +56,7 @@ static char con_is_device;
 static char con_is_monochrome;
 static char cursor_sync_disabled;
 
+static unsigned char vid_page;
 static unsigned short __far *vid_mem;
 
 static void con_get_hw_cursor( int *x, int *y );
@@ -84,6 +85,7 @@ void con_init( int interpret_esc )
    r.h.ah = 0xf;
    intr( 0x10, &r );
    con_is_monochrome = ( r.h.al == 7 );
+   vid_page = r.h.bh;
    vid_mem = ( con_is_monochrome ) ? MK_FP( 0xb000, 0 ) : MK_FP( 0xb800, 0 );
 
    /* screen size ? */
@@ -199,8 +201,9 @@ static void con_get_hw_cursor( int *x, int *y )
 {
    union REGPACK r;
 
-   r.x.ax = 0x0300;
-   r.x.bx = 0;
+   memset( &r, 0, sizeof( union REGPACK ) );
+   r.h.ah = 0x03;
+   r.h.bh = vid_page;
    intr( 0x10, &r );
 
    *x = r.h.dl + 1;
@@ -216,8 +219,8 @@ static void con_set_hw_cursor( int x, int y )
    }
 
    memset( &r, 0, sizeof( union REGPACK ) );
-   r.w.ax = 0x0200;
-   r.w.bx = 0;
+   r.h.ah = 0x02;
+   r.h.bh = vid_page;
    r.h.dl = x - 1;
    r.h.dh = y - 1;
    intr( 0x10, &r );
