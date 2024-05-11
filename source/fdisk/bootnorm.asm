@@ -105,9 +105,14 @@ dap:
 
 read_boot_sector:
   .check_lba:
-	mov bx, 0x55aa		; magic value changed after call
-	mov ah, 0x41
-	int 0x13		; test for ext. INT13 LBA support
+  	push ds			; temporarly set DS to 0x40 (BIOS data area)
+  	mov ax, 0x40		; to work around a BIOS bug
+  	mov ds, ax		; https://github.com/FDOS/kernel/issues/156
+	mov bx, 0x55aa		; magic value shoud be changed after call
+	mov ah, 0x41		; query INT 13h LBA capabilities
+	stc
+	int 0x13
+	pop ds
 	jc  .read_chs		; no support if carry set
 	cmp bx, 0xaa55		; no support if 55aa not swapped      
 	jne .read_chs
@@ -118,8 +123,9 @@ read_boot_sector:
 	mov [dap.lba_low], ax
 	mov ax, [di + 10]
 	mov [dap.lba_high], ax
-	mov ax, 0x4200
+	mov ax, 0x4200		; LBA read function
 	mov si, dap
+	stc
 	int 0x13
 	ret
   .read_chs:
@@ -127,6 +133,7 @@ read_boot_sector:
 	mov bx, 0x7c00		; to 0:7c00
 	mov cx, [di + 2]
 	mov dh, [di + 1]
+	stc
 	int 0x13
 	ret	
 
