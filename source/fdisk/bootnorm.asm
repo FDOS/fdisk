@@ -175,7 +175,7 @@ dap:
 %endif
 
 
-reserved times 6 db 0		; bytes 0x440-0x446 may contain operating
+reserved times 6 db 0		; bytes 0x440-0x445 may contain operating
 				; system specific data
 parttbl:
 	times PARTTBL_SIZE db 0	; space for partition table
@@ -188,4 +188,4 @@ signature:
 
 
 absolute RELOCATED_OFFSET
-driveno resb 1  ; used as byte to store boot drive  
+driveno resb 1  ; BIOS drive number to boot from
