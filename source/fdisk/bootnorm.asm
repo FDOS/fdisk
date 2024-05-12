@@ -10,91 +10,74 @@
 ;
 ;-----------------------------------------------------------------------
 
-	RELOC_SEG	 equ 0x80
+	TOP_OF_STACK	 equ 0x7be0 ; right below original boot code
+				    ; with 0x20 bytes of safety margin
+	BOOTSECT_OFFSET	 equ 0x7c00
+	RELOCATED_OFFSET equ 0x0600
+	PARTTBL_SIZE	 equ 64
 	PARTTBL_OFFSET	 equ 0x1be
-	SIGNATURE_OFFSET equ 0x1fe
 
-
-org 0x7c00
+org RELOCATED_OFFSET
 
 start:     
 	cli
 	xor ax, ax
 	mov ss, ax		; initialize stack
-	mov sp, start - 0x20	; SS:SP = 0:7be0
+	mov sp, TOP_OF_STACK	; SS:SP = 0:7be0
 	sti
 	cld
-	mov bp, start
-	mov ds, ax		; DS = 0
+	mov ds, ax		; do not trust BIOS to have the segment
+	mov es, ax		; registers initialized to zero
 	  ; move MBR code out of the way to make room for volume boot record
 relocate:	
-	mov ax, RELOC_SEG
-	mov es, ax
-	mov si, bp
-	mov di, bp
+	mov si, BOOTSECT_OFFSET
+	mov di, RELOCATED_OFFSET
 	mov cx, 0x0100
 	rep movsw
-	jmp word RELOC_SEG:.cs_changed
-	  ; From now on, the code is located 0x800 bytes above 0x7c00
-	  ; at absolute address 0x8400, or more accurate 80:7c000.
-.cs_changed:
-	mov ds, ax		; DS = RELOC_SEG
-	xor ax, ax
-	mov es, ax		; ES = 0
+	jmp 0:.relocated	; far jump to be sure we get CS right
+.relocated:
 
 fix_bootdrive:
 	test dl, dl		; is boot drive in DL given by BIOS zero?
 	jnz .dl_good		; if yes this can be considered a BIOS bug,
 	mov dl, 0x80		; because we know we boot from HD		
-.dl_good:
+  .dl_good:
+  	mov [driveno], dl	; save driveno in case BIOS destroys DL
 
-	  ; Test if one of the four primary partitions is active by checkung
+	  ; Test if one of the four primary partitions is active by checking
 	  ; for value 0x80 in the first byte of the entries.
 scan_for_active_partition:
-	lea di, [bp + PARTTBL_OFFSET]		; start of partition table
-  .l:	test byte [di], 0x80
+	mov di, parttbl				; start of partition table
+  .l:	test byte [di], 0x80			; is partition active?
 	jnz chainload_bootsect
 	add di, 0x10                    	; next table entry
-	cmp di, start + SIGNATURE_OFFSET	; scanned beyond end of table?
+	cmp di, signature			; scanned beyond end of table?
 	jb .l
   .no_active:
-	call print
+	call fatal				; does not return
 	db 'no active partition found', 0
-	jmp $
 
 	  ; We found an active partition. Load its boot sector to 0:7c00,
 	  ; test the signature and far jump to 0:7c00
 chainload_bootsect:
-	call read_boot_sector                    	
-	jc .read_error		
-	cmp word [es:start + SIGNATURE_OFFSET], 0xaa55
-	jne .invalid_partition_code	
-;-----------------------------------------------------------------------------
-	jmp word 0x0:0x7c00        	; jump to volume boot code
-;-----------------------------------------------------------------------------
-  .read_error:
-	call print
-	db 'read error while reading drive', 0
-	jmp $
-  .invalid_partition_code:
-	call print
-	db 'partition signature != 55AA', 0	
-	jmp $
-
+	push di				; save parttbl entry (restore to SI)
+	call read_boot_sector		; reads one sector                    	
+	jnc .check_signature		; no read error occured?
+	call fatal			; does not return
+	db 'read error while reading drive', 0		
+  .check_signature:
+	cmp word [signature], 0xaa55
+	je handoff_to_volume_bootrecord
+	call fatal				; does not return
+	db 'partition signature != 55AA', 0
 
 ;-----------------------------------------------------------------------------
-; BIOS disk access packet used by ext. INT13 LBA read function
-
-dap:
-  .packet_size	db 0x10
-  .reserved1	db 0
-  .sector_count db 1
-  .reserved2	db 0
-  .buf_off	dw 0x7c00
-  .buf_seg	dw 0x0000
-  .lba_low  	dw 0
-  .lba_high 	dw 0
-		dw 0,0
+handoff_to_volume_bootrecord:
+	pop si				; restore parttbl entry to SI, to
+					; comply with lDOS boot protocol
+	mov dl, [driveno]
+	jmp 0:0x7c00        		; far jump to volume boot code
+;-----------------------------------------------------------------------------
 
 
 ;-----------------------------------------------------------------------------
@@ -116,43 +99,83 @@ read_boot_sector:
 	jc  .read_chs		; no support if carry set
 	cmp bx, 0xaa55		; no support if 55aa not swapped      
 	jne .read_chs
-	test cl, 1		; no support if LBA flag not set
-	jz .read_chs
+	shr cl, 1		; no support if LBA flag not set
+	jnc .read_chs
   .read_lba:
 	mov ax, [di + 8]	; copy start sector of partition to DAP
 	mov [dap.lba_low], ax
 	mov ax, [di + 10]
 	mov [dap.lba_high], ax
-	mov ax, 0x4200		; LBA read function
+	mov ah, 0x42		; LBA read function
 	mov si, dap
-	stc
-	int 0x13
-	ret
+	jmp short .intcall
   .read_chs:
 	mov ax, 0x0201		; read one sector
 	mov bx, 0x7c00		; to 0:7c00
 	mov cx, [di + 2]
 	mov dh, [di + 1]
+  .intcall:
 	stc
 	int 0x13
 	ret	
 
 
 ;-----------------------------------------------------------------------------
-; prints text after call to this function.
+; Fatal error handler. Displays error message and waits forever
+; IN: CS:IP = ASCIIZ with error message to print
 
-print_1char:        
+__fatal_print_char:        
 	xor bx, bx               ; video page 0
 	mov ah, 0x0E             ; else print it
 	int 0x10                 ; via TTY mode
-print:	pop si                   ; this is the first character
+fatal:	pop si                   ; this is the first character
 	lodsb                    ; get token
 	push si                  ; stack up potential return address
 	cmp al, 0                ; end of string?
-	jne print_1char          ; until done
-	ret                      ; and jump to it
+	jne __fatal_print_char   ; until done
+  .wait_forever:
+	jmp short .wait_forever
 
 
-; zero-fill rest of sector and put signature into place
-	times	0x1fe - $ + $$ db 0
-	db 0x55, 0xaa
+driveno db 0x0
+
+;-----------------------------------------------------------------------------
+; Padding bytes, BIOS disk access packet used by ext. INT13 LBA read function,
+; reserved space for partition table and BIOS signature
+
+DAP_PACKET_SIZE equ 16
+PADDING_BYTES   equ PARTTBL_OFFSET - DAP_PACKET_SIZE - ($ - $$)
+
+%if PADDING_BYTES < 0
+  ; Not strictly needed, because this is catched by the times
+  ; directive below. But this gives a more meaningful error message.
+  %error "bootsector too large, try decreasing code size"
+%endif
+
+; padding bytes to ensure bootsector is 512 bytes in size
+	times PADDING_BYTES nop
+
+; By prepending the disk access packet to the partition table it is ensured
+; that it is word-aligned.
+dap:
+  .packet_size	db 0x10
+  .reserved1	db 0
+  .sector_count db 1
+  .reserved2	db 0
+  .buf_off	dw 0x7c00
+  .buf_seg	dw 0x0000
+  .lba_low  	dw 0
+  .lba_high 	dw 0
+  		dd 0
+.end:
+
+%if dap.end - dap != DAP_PACKET_SIZE
+  ; Be sure to get DAP_PACKET_SIZE right. We defined it manually above because
+  ; times directive needs a defined expression value.
+  %error "Wrong DAP size"
+%endif
+
+parttbl:
+	times PARTTBL_SIZE db 0	; space for partition table
+signature:
+	db 0x55, 0xaa		; BIOS signature
