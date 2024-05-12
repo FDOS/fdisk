@@ -16,10 +16,11 @@
 	RELOCATED_OFFSET equ 0x0600
 	PARTTBL_SIZE	 equ 64
 	PARTTBL_OFFSET	 equ 0x1be
+	CODE_SIZE	 equ 440
 
 org RELOCATED_OFFSET
 
-start:     
+start:
 	cli
 	xor ax, ax
 	mov ss, ax		; initialize stack
@@ -137,19 +138,17 @@ fatal:	pop si                   ; this is the first character
 	jmp short .wait_forever
 
 
-driveno db 0x0
-
 ;-----------------------------------------------------------------------------
 ; Padding bytes, BIOS disk access packet used by ext. INT13 LBA read function,
 ; reserved space for partition table and BIOS signature
 
 DAP_PACKET_SIZE equ 16
-PADDING_BYTES   equ PARTTBL_OFFSET - DAP_PACKET_SIZE - ($ - $$)
+PADDING_BYTES   equ CODE_SIZE - DAP_PACKET_SIZE - ($ - $$)
 
 %if PADDING_BYTES < 0
   ; Not strictly needed, because this is catched by the times
   ; directive below. But this gives a more meaningful error message.
-  %error "bootsector too large, try decreasing code size"
+  %error "code too large, try to decrease size"
 %endif
 
 ; padding bytes to ensure bootsector is 512 bytes in size
@@ -175,7 +174,18 @@ dap:
   %error "Wrong DAP size"
 %endif
 
+
+reserved times 6 db 0		; bytes 0x440-0x446 may contain operating
+				; system specific data
 parttbl:
 	times PARTTBL_SIZE db 0	; space for partition table
 signature:
 	db 0x55, 0xaa		; BIOS signature
+
+%if $ - $$ != 512
+  %error "wrong bootsector size"
+%endif
+
+
+absolute RELOCATED_OFFSET
+driveno resb 1  ; used as byte to store boot drive  
