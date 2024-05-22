@@ -809,7 +809,7 @@ int Modify_Partition_Type( int partition_number, int type_number )
 {
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
-   if ( pDrive->usable ) {
+   if ( !pDrive->usable ) {
       return 99;
    }
 

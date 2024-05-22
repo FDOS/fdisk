@@ -1640,7 +1640,7 @@ Beginning:
          input = (int)Input( 1, -1, -1, YN, 0, 0, ESCR, 1, 0, '1', '4' );
 
          if ( ( ( input - 48 ) >= 1 ) && ( ( input - 48 ) <= 4 ) ) {
-            Modify_Primary_Partition_Information( ( input - 48 ) );
+            Modify_Primary_Partition_Information( input - 48 );
             goto Beginning;
          }
       }
@@ -1982,9 +1982,10 @@ void Modify_Primary_Partition_Information( int partition_number )
 
    unsigned long usage;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
-   Partition *p = &pDrive->pri_part[partition_number];
+   Partition *p = NULL;
 
    partition_number--; /* Adjust partition number to start with 0. */
+   p = &pDrive->pri_part[partition_number];
 
    do {
       Clear_Screen( 0 );
@@ -1999,7 +2000,7 @@ void Modify_Primary_Partition_Information( int partition_number )
       Print_At( 4, 8, svarlang_str( 10, 11 ) );
 
       /* Drive Letter of Partition */
-      if ( IsRecognizedFatPartition( p->num_type == 1 ) ) {
+      if ( IsRecognizedFatPartition( p->num_type ) ) {
          Print_At( 5, 9, "%c:",
                    drive_lettering_buffer[( flags.drive_number - 128 )]
                                          [partition_number] );

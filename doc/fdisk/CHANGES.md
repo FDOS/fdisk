@@ -8,6 +8,22 @@ Bug classification:
  - LOW: Cosmetic bugs, like display issues etc.
 
 
+Version 1.3.15 (2024-??-??)
+---------------------------
+Fixes:
+ - HIGH: Fix FDISK not modifying partition type via command line /MODIFY
+     and via UI if FDISK is started in extended options mode /XO.
+ - HIGH: respect selected video page instead of hardcoding it to zero when
+     calling INT 10 routines.
+
+Changes:
+ - FDISK provided MBR bootloader does not require more than 128k of RAM
+   anymore. In fact it should run with as low as 64k of RAM (untested).
+ - Work around Xi8088 and Book8088 BIOS bug (bootloader and FDISK itself).
+ - Assume BIOS drive number of 0x80 to boot from if BIOS tells us it is
+     unit 0. This should be an error, because we boot from hard disk.
+
+
 Version 1.3.14 (2024-02-05)
 ---------------------------
 Fixes:
