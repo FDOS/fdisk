@@ -8,7 +8,7 @@ Bug classification:
  - LOW: Cosmetic bugs, like display issues etc.
 
 
-Version 1.3.15 (2024-??-??)
+Version 1.3.15 (2024-05-26)
 ---------------------------
 Fixes:
  - HIGH: Fix FDISK not modifying partition type via command line /MODIFY

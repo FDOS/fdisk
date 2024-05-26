@@ -4,7 +4,7 @@
 #define FD_NAME "Free FDISK"
 #endif
 
-#define VERSION  "1.3.14"
+#define VERSION  "1.3.15"
 #define COPYLEFT "1998 - 2024"
 
 #define SIZE_OF_IPL ( 512 - 4 * 16 - 2 - 6 )

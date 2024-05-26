@@ -174,10 +174,6 @@ int IsRecognizedFatPartition( unsigned partitiontype )
       }
       break;
    case 0x0b:
-      if ( flags.version >= COMP_W95B ) {
-         return TRUE;
-      }
-      break;
    case 0x0c:
       if ( flags.version >= COMP_W95B ) {
          return TRUE;
