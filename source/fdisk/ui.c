@@ -586,6 +586,15 @@ int Standard_Menu( int menu )
          minimum_option = 5;
       }
 
+      if ( flags.extended_options_flag ) {
+         if ( pDrive->ext_int_13 ) {
+            con_printf( " (LBA)" );
+         }
+         else {
+            con_printf(" (CHS)" );
+         }
+      }
+
       if ( menu == DP ) {
          /* Ensure that primary partitions are available to delete. */
          counter = 0;
