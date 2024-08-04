@@ -113,7 +113,7 @@ fdisk.lnk : Makefile
 	zip -9rkDX fdisk.zip -@ < source/fdisk/zipfiles.txt
 	cd source/fdisk
 
-../../fdisk.svp : fdisk.exe
+../../fdisk.svp : ../../fdisk.zip
 	cd ../..
 	mkdir svardos
 	mkdir svardos$(SEP)bin
