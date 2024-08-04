@@ -152,6 +152,7 @@ typedef struct flags_structure {
    int using_default_drive_number;
    int check_for_extra_cylinder;
    int do_not_pause_help_information;
+   int dla;
    int drive_number;
    int esc;
    int extended_options_flag;

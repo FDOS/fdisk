@@ -67,6 +67,9 @@ void Display_Information( void )
          con_print( "FAT32" );
       }
 
+      con_set_cursor_xy( 68, 1 );
+      con_printf("DLA%u", flags.dla );
+
       if ( flags.use_ambr == TRUE ) {
          con_set_cursor_xy( 73, 1 );
          con_print( "AMBR" );

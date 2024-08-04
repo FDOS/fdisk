@@ -66,6 +66,7 @@ extern void Pause( void );
 
 int os_version = 0;
 int os_version_minor = 0;
+int os_oem = 0;
 int os_gui_running = 0;
 
 void Determine_DOS_Version( void )
@@ -75,9 +76,24 @@ void Determine_DOS_Version( void )
    /* check for DOS <5 */
    r.w.ax = 0x3000;
    intr( 0x21, &r );
-   if ( r.h.al < 5 ) {
-      os_version = r.h.al;
-      os_version_minor = r.h.ah;
+   os_version = r.h.al;
+   os_version_minor = r.h.ah;
+   os_oem = r.h.bh;
+
+   if ( os_oem == OEM_IBM ) {
+      /* Is it DR-DOS pretending to be PC-DOS? */
+      r.w.ax = 0x4452;
+      intr( 0x21, &r );
+      if ( !( r.w.flags & INTR_CF ) ) {
+         os_oem = OEM_DRDOS;
+      }
+   }
+   if ( os_oem == OEM_NOVELL ) {
+      /* treat Novell DR-DOS as all other DR-DOS versions */
+      os_oem = OEM_DRDOS;
+   }
+
+   if ( os_version < 5 ) {
       return;
    }
 
@@ -262,24 +278,44 @@ int Num_Ext_Part( Partition_Table *pDrive )
    return num_ext;
 }
 
+void dla_msdos(  int *cl  );
+void dla_drdos(  int *cl  );
+void dla_nondos( void );
+
 /* Determine drive letters */
 int Determine_Drive_Letters( void )
 /* Returns last used drive letter as ASCII number. */
 {
-   //  int active_found=FALSE;
    int current_letter = 'C';
-   //  int drive_found=FALSE;
-   int index = 0;
-   int non_dos_partition;
-   int non_dos_partition_counter;
-   int sub_index = 0;
-
-   int active_part_found[MAX_DISKS];
 
    Load_Brief_Partition_Table();
 
    /* Clear drive_lettering_buffer[8] [27] */
    memset( drive_lettering_buffer, 0, sizeof( drive_lettering_buffer ) );
+
+   if ( flags.dla == DLA_MSDOS ) {
+      dla_msdos( &current_letter );
+   }
+   else {
+      /* DR-DOS drive letter assignment puts all primaries of all drives 
+         first, in order of partition table, then all logicals, drive by
+         drive. */
+      dla_drdos( &current_letter );
+   }
+
+   /* assign numbers to non-DOS partitions */
+   dla_nondos();
+
+   return current_letter - 1;
+}
+
+
+void dla_msdos( int *cl )
+{
+   int current_letter = *cl;
+   int index = 0;
+   int sub_index = 0;
+   int active_part_found[MAX_DISKS];
 
    /* Set all active_part_found[] values to 0. */
    memset( active_part_found, 0, sizeof( active_part_found ) );
@@ -352,6 +388,60 @@ int Determine_Drive_Letters( void )
          }
       }
    }
+   *cl = current_letter;
+}
+
+
+void dla_drdos( int *cl )
+{
+   int current_letter = *cl;
+   int index = 0;
+   int sub_index = 0;
+
+   /* assign up to one drive letter to an active or non-active partition
+      per disk */
+   for ( index = 0; index < MAX_DISKS; index++ ) {
+      Partition_Table *pDrive = &part_table[index];
+      if ( !pDrive->usable ) {
+         continue;
+      }
+
+      /* find active partition for drive */
+      for ( sub_index = 0; sub_index < 4; sub_index++ ) {
+         if ( ( IsRecognizedFatPartition(
+                 brief_partition_table[index][sub_index] ) ) ) {
+            drive_lettering_buffer[index][sub_index] = current_letter;
+            current_letter++;
+         }
+      }
+   }
+
+   /* Next assign drive letters to applicable extended partitions... */
+   for ( index = 0; index < MAX_DISKS; index++ ) {
+      Partition_Table *pDrive = &part_table[index];
+      if ( !pDrive->usable ) {
+         continue;
+      }
+
+      for ( sub_index = 4; sub_index < 27; sub_index++ ) {
+         if ( IsRecognizedFatPartition(
+                 brief_partition_table[index][sub_index] ) ) {
+            drive_lettering_buffer[index][sub_index] = current_letter;
+            current_letter++;
+         }
+      }
+   }
+
+   *cl = current_letter;
+}
+
+
+void dla_nondos( void )
+{
+   int index = 0;
+   int sub_index = 0;
+   int non_dos_partition;
+   int non_dos_partition_counter;
 
    /* Find the Non-DOS Logical Drives in the Extended Partition Table */
    for ( index = 0; index < MAX_DISKS; index++ ) {
@@ -381,10 +471,9 @@ int Determine_Drive_Letters( void )
             }
          }
       }
-   }
-
-   return ( current_letter - 1 );
+   }   
 }
+
 
 void Clear_Partition( Partition *p )
 {

@@ -22,7 +22,7 @@ TOOL_CC     = wcc386
 
 CC       = wcc
 CFLAGS   = -q -0 -bt=dos -wx -we
-!ifdef __LINUX__
+!ifdef __UNIX__
 CFLAGS   += -i=$(%WATCOM)/h
 !endif
 
@@ -30,7 +30,7 @@ AS       = nasm
 ASFLAGS  = -t -f obj
 LD       = wlink
 LDFLAGS  =
-!ifdef __LINUX__
+!ifdef __UNIX__
 SEP=/
 CP = cp
 MV = mv
@@ -75,6 +75,8 @@ objs += svarlang.obj auto_exe.obj auto_nls.obj deflang.obj
 CFLAGS += -DSMART_MBR=1
 objs += smartmbr.obj
 !endif
+
+.erase
 
 all : fdisk.exe
 dist : ../../fdisk.zip

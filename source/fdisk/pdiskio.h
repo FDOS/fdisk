@@ -12,8 +12,19 @@
 #define OS_WIN_ME  8
 #define OS_WIN_NT  32
 
+#define OEM_IBM     0x00
+#define OEM_DRDOS   0xee
+#define OEM_NOVELL  0xef
+#define OEM_FRERDOS 0xfd
+
+#define DLA_AUTO  0
+#define DLA_MSDOS 1
+#define DLA_DRDOS 2  /* all primary partitions first, then logicals */
+
 extern int os_version;
 extern int os_version_minor;
+extern int os_oem;
+
 extern int os_gui_running;
 
 /* Buffers */

@@ -165,6 +165,15 @@ static int Get_Environment_Settings( char *environment[] )
          bool_string_to_int( &flags.del_non_dos_log_drives, setting_buffer );
       }
 
+      /* Check for drive letter ordering */
+      if ( 0 == strcmp( command_buffer, "FFD_DLA" ) ) {
+         number = atoi( setting_buffer );
+
+         if ( ( number >= 0 ) && ( number <= 2 ) ) {
+            flags.dla = number;
+         }
+      }
+
       /* Check for the FLAG_SECTOR statement */
       if ( 0 == strcmp( command_buffer, "FFD_FLAG_SECTOR" ) ) {
          number = atoi( setting_buffer );
@@ -247,6 +256,7 @@ static void InitOptions( char *environment[] )
 
    /* initialize flags, the ones not set here default to FALSE */
    flags.display_name_description_copyright = TRUE;
+   flags.dla = 0;    /* drive letter assignment based on OS */
    flags.drive_number = 128;
    flags.flag_sector = 2;
    flags.lba_marker = TRUE;
@@ -287,7 +297,17 @@ static void InitOptions( char *environment[] )
    if ( flags.version >= COMP_W95B ) {
       flags.fat32 = TRUE;
    }
+
+   if ( flags.dla == DLA_AUTO ) {
+      if ( os_oem == OEM_DRDOS ) {
+         flags.dla = DLA_DRDOS;
+      }
+      else {
+         flags.dla = DLA_MSDOS;
+      }
+   }
 }
+
 
 static void InitDisks( void )
 {

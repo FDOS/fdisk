@@ -489,6 +489,19 @@ void Process_Fdiskini_File( void )
                command_ok = TRUE;
             }
 
+            /* Check for the COLORS statement */
+            if ( 0 == stricmp( command_buffer, "DLA" ) ) {
+               number = atoi( setting_buffer );
+
+               if ( ( number >= 0 ) && ( number <= 2 ) ) {
+                  flags.dla = number;
+               }
+               else {
+                  goto parse_error;
+               }
+               command_ok = TRUE;
+            }
+
             /* Check for the DEL_ND_LOG statement */
             if ( 0 == stricmp( command_buffer, "DEL_ND_LOG" ) ) {
                if ( !bool_string_to_int( &flags.del_non_dos_log_drives,
