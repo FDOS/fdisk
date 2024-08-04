@@ -15,7 +15,7 @@
 #define OEM_IBM     0x00
 #define OEM_DRDOS   0xee
 #define OEM_NOVELL  0xef
-#define OEM_FRERDOS 0xfd
+#define OEM_FREEDOS 0xfd
 
 #define DLA_AUTO  0
 #define DLA_MSDOS 1
