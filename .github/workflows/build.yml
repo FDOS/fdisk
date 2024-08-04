@@ -42,7 +42,7 @@ jobs:
     runs-on: [self-hosted, ia16-gcc]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Build with IA16-GCC and GNU Make
       run: |
