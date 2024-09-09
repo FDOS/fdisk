@@ -1,0 +1,411 @@
+#
+# FDISK IN FRENCH
+#
+
+
+##############################################################################
+# HELP SCREEN                                                                #
+##############################################################################
+
+0.0:Syntaxe : FDISK [<lecteur#>] [commandes]...
+0.1:  aucun argument    S'exécute en mode interactif
+0.2:  /INFO             Affiche les informations de partition du <lecteur#>
+0.3:  /REBOOT           Redémarre l'ordinateur
+0.4:\t
+0.10:Commandes pour créer et effacer des partitions :
+0.11: <taille> est un nombre pour mégaoctets ou MAX pour la taille maximale
+0.12:           ou <nombre>,100 pour <nombre> qui doit être en pourcentage
+0.13: <type#> est le type numérique de partition ou FAT-12/16/32 si /SPEC absent
+0.14:\t
+0.20:  /PRI:<taille> [/SPEC:<type#>]      Crée une partition primaire
+0.21:  /EXT:<taille>                      Crée une partition DOS étendue
+0.22:  /LOG:<taille> [/SPEC:<type#>]      Crée un lecteur logique
+0.23:  /PRIO,/EXTO,/LOGO                  identique à ci-dessus mais évite FAT32
+0.24:  /AUTO                              Partitionne le disque automatiquement
+0.26:  /DELETE {/PRI[:#] | /EXT | /LOG:<part#>  Efface une partition
+0.27:           | /NUM:<part#>}     ...les lecteurs logiques commencent à /NUM=5
+0.29:  /DELETEALL                     Efface toutes les partitions du <lecteur#>
+0.30:\t
+0.31:Définition des partitions actives :
+0.32:  /ACTIVATE:<partition#>             Définit la <partition#> active
+0.33:  /DEACTIVATE                        Désactive toutes les partitions
+0.34:\t
+0.40:Gestion MBR (Master Boot Record) :
+0.41:  /CLEARMBR   Efface toutes les partitions et le code d'amorçage
+0.42:  /LOADMBR    Charge la table des part. et le code de "boot.mbr" dans MBR
+0.43:  /SAVEMBR    Sauvegarde la table des partitions et le code dans "boot.mbr"
+0.44:\t
+0.50:Modifications de code MBR laissant les partitions intactes :
+0.51:  /IPL        Installe le code d'amorçage standard dans le MBR <lecteur#>
+0.52:              ...identique à  /MBR et /CMBR pour la compatibilité
+0.53:  /SMARTIPL   Installe DriveSmart IPL dans le MBR <lecteur#>
+0.54:  /LOADIPL    Écrit 440 octets de code depuis \"boot.mbr\" dans le MBR
+0.55:\t
+0.60:Modification de la table des partitions avancée :
+0.61:  /MODIFY:<part#>,<type#>        Modifie le type de partition en <type#>
+0.62:                                 ...les lecteurs logiques démarrent à "5"
+0.63:  /MOVE:<srcpart#>,<destpart#>   Déplace les partitions primaires
+0.64:  /SWAP:<1erepart#>,<2ndepart#>  Échange les partitions primaires
+0.65:\t
+0.70:Pour gérer les indicateurs sur un disque dur :
+0.71:  /CLEARFLAG[{:<indicateur#>} | /ALL}] Réinitialise <indicateur#> ou all pour\n   tout sur <lecteur#>
+0.72:  /SETFLAG:<indicateur#>[,<valeur>] Définit <indicateur#> sur 1 ou <valeur>
+0.73:  /TESTFLAG:<indicateur#>[,<valeur>] Teste <indicateur#> pour 1 ou <valeur>
+0.74:\t
+0.80:Pour obtenir des informations sur les disques durs :
+0.81:  /STATUS       Affiche le schéma de partition actuel.
+0.82:  /DUMP         Décharge les infos de partition de tous les DD (débogage)
+0.83:\t
+0.90:Options de l'interface utilisateur interactive :
+0.91:  /UI        Toujours démarre l'IU si donné en tant que dernier argument.
+0.92:  /MONO      Désactive les attributs de texte (texte clair et clignotant).
+0.93:  /FPRMT     Affiche une invite pour FAT32/FAT16 en mode interactif.
+0.94:  /XO        Active les options étendues.
+0.95:\t
+0.100:Options de compatibilité :
+0.101:  /X            Désactive ext. INT 13 et LBA pour les commandes suivantes
+0.102:\t
+0.200:Ce programme est sous Copyright %s de Brian E. Reifsnyder et de la
+0.201:communauté FreeDOS selon les termes de la licence publique générale GNU,
+0.202:version 2.
+0.203:\t
+0.204:Ce programme est fourni en tant que tel, sans aucune garantie. L'auteur de
+0.205:ce logiciel ne prend aucune responsabilité concernant l'utilisation ou la
+0.206:mauvaise utilisation de ce logiciel. En utilisant ce logiciel, il est
+0.207:entendu que l'opérateur accepte les termes qui précédent.
+
+
+##############################################################################
+# FAT32 SUPPORT SCREEN                                                       #
+##############################################################################
+
+1.0:\e[5;5HFDISK est capable d'utiliser le support de grands disques pour vous
+1.1:    permettre de créer des partitions supérieures à 2,048 Mo en utilisant des
+1.2:    partitions FAT32. Si vous activez ce support, toutes les partitions ou
+1.3:    lecteurs logiques supérieurs à 512 Mo seront créés en utilisant FAT32.
+1.4:    IMPORTANT : si vous activez le support des grands disques, certains OS
+1.5:    seront incapables d'accéder aux partitions et aux lecteurs logiques qui
+1.6:    sont supérieurs à 512 Mo en taille.
+1.7:\e[5;18HVoulez-vous utiliser le support des grands disques (FAT32) (O/N) ?
+
+
+##############################################################################
+# EXIT SCREEN                                                                #
+##############################################################################
+
+2.0:Vous \e[1mDEVEZ\e[22m redémarrer votre système pour que les modifications prennent\n    effet.
+
+2.1:Tout lecteur que vous avez créé ou modifié doit être formaté \e[1mAPRÈS\e[22m\n    redémarrage.
+
+2.2:Le système va maintenant redémarrer
+2.3:Appuyez sur une touche lorsque vous serez prêt . . .
+
+
+
+##############################################################################
+# MAIN MENU                                                                  #
+##############################################################################
+
+3.0:Options FDISK
+3.1:Créer une partition DOS ou bien un lecteur logique DOS
+3.2:Définir la partition active
+3.3:Effacer la partition ou le lecteur logique DOS
+3.4:Afficher les informations de partition
+3.5:Afficher/Modifier les informations de partition
+3.6:Modifier le lecteur de disque fixe actuel
+3.7:Maintenance MBR
+3.8:Annuler les modifications et quitter
+
+
+##############################################################################
+# CREATE PARTITION MENU                                                      #
+##############################################################################
+
+4.0:Créer une partition DOS ou bien un lecteur logique DOS
+4.1:Créer une partition DOS primaire
+4.2:Créer une partition DOS étendue
+4.3:Créer des lecteurs logiques DOS dans la partition DOS étendue
+
+
+##############################################################################
+# DELETE PARTITION MENU                                                      #
+##############################################################################
+
+5.0:Effacer la partition DOS ou bien le lecteur logique DOS
+5.1:Effacer la partition DOS primaire
+5.2:Effacer la partition DOS étendue
+5.3:Effacer les lecteurs logiques DOS dans la partition DOS étendue
+5.4:Effacer des partitions non DOS
+
+
+##############################################################################
+# MBR MAINTENANCE MENU (EXTENDED OPTION)                                     #
+##############################################################################
+
+6.0:Maintenance MBR
+6.1:Créer un MBR BootEasy (désactivé)
+6.2:Charger le MBR (partitions et code) depuis un fichier sauvegardé
+6.3:Sauvegarder le MBR (partitions et code) sur un fichier
+6.4:Enlever le code d'amorçage du MBR
+
+
+##############################################################################
+# FDISKIO.C                                                                  #
+##############################################################################
+
+7.0:\nLe disque dur a déjà été partitionné.\n
+7.1:\nLe fichier "boot.mbr" n'a pu être trouvé.\n
+7.3:Erreur survenue sur la ligne %d du fichier "fdisk.ini".\n
+7.4:\nErreur lors de la lecture du secteur.\n
+7.5:\nLes fonctions de marquage des secteurs ont été désactivées.\n
+7.6:Création de Drive Smart MBR pour le disque %d\n
+
+
+##############################################################################
+# CMD.C                                                                      #
+##############################################################################
+
+8.0:\nEreur de syntaxe\n\nProgramme terminé\n
+8.1:\nErreur lors de l'effacement du marquage.\n
+8.2:\nLe marquage %d a été effacé.\n
+8.3:\nTaille de partition invalide spécifiée.\n
+8.4:\nLa partition étendue existe déjà.\n
+8.5:\nErreur lors de la création de la partition étendue.\n
+8.7:\nAucune partition étendue utilisable n'a pu être trouvée.\n
+8.8:\nErreur lors de la création du lecteur logique.\n
+8.10:\nErreur lors de la création de la partition primaire.\n
+8.11:\nla partition primaire # (%ld) doit être 1..4.\n
+8.12:\nAucune partition à effacer n'a pu être trouvée.\n
+8.13:\n%d partitions primaires trouvées, vous devez spécifier le numéro à effacer.\n
+8.14:\nErreur lors de l'effacement de la partition primaire.\n
+8.15:\nErreur lors de l'effacement de la partition étendue.\n
+8.16:\nLe numéro du lecteur logique %d est hors de la plage.\n
+8.17:\nLe numéro de partition est hors de la plage.\n
+8.18:\nArgument d'effacement invalide.\n
+8.19:\nErreur lors de l'effacement du lecteur logique.\n
+8.20:\nLe type de nouvelle partition est hors de la plage.\n
+8.21:\nErreur lors de la modification du type de partition.\n
+8.22:\nLe numéro de la partition source est hors de la plage.\n
+8.23:\nLe numéro de la partition de destination est hors de la plage.\n
+8.24:\nErreur lors du déplacement du créneau de partition.\n
+8.25:\nNuméro de marquage invalide.\n
+8.26:\nLa valeur du marquage est hors de la plage.\n
+8.27:\nErreur lors du réglage du marquage.\n
+8.28:\nLe marquage %d a été réglé sur %d.\n
+8.29:État du lecteur de disque fixe
+8.30:\nErreur lors de l'échange des partitions.\n
+8.31:\nLe marquage %d est réglé sur %d.\n
+8.32:\nLe marquage %d n'est pas réglé sur %d.\n
+8.34:\n<%s> devrait être un chiffre ; terminé\n
+8.35:\nplus d'un lecteur ont été spécifiés ; terminé\n
+8.36:\n<%s> devrait démarrer avec '-' ou bien '/' ; terminé\n
+8.37:\n<%s> ':' attendu ; terminé\n
+8.38:\n<%s> ',' attendu ; terminé\n
+8.39:\n<%s> attendait une fin de chaîne ; terminé\n
+8.40:\nDésignation de lecteur invalide.\n
+8.41:\nTous les marquages ont été effacés.\n
+
+
+##############################################################################
+# USERINT0.C, USERINT1.C                                                     #
+##############################################################################
+
+9.0:Lecteur de disque fixe actuel :
+9.1:Entrer un choix :
+9.2:Choisissez l'un des éléments suivants :
+9.3:secteurs, géométrie
+9.4:Aucune partition définie.
+9.5:\nLe plus grand espace libre continu pour la partition primaire = %lu Mo\n
+9.6:\nContenus de la partition DOS étendue :\n
+9.7:\nLe plus grand espace libre continu pour la partition étendue = %lu Mo\n
+9.8:    -------- inutilisable ---------
+9.9:(1 Mo=1048576 octets)
+
+# The following are table headers, must stay adjusted as is
+9.10:\n\nPartition   État         Mo   Système        Utilisé    Début CHS       Fin CHS\n
+9.11:Étiquette volume      Mo  Système       Utilisé    Début CHS       Fin CHS\n
+9.12:Disque  Lect     Mo   Libre  Utilisé
+
+9.13:Pas d'espace pour créer une partition DOS.
+9.14:La partition DOS étendue existe déjà.
+9.15:Impossible de créer un lecteur logique DOS sans\n    une partition DOS étendue sur le lecteur actuel.
+9.16:Aucune partition primaire DOS à effacer.
+9.17:Aucune partition DOS étendue à effacer.
+9.18:Aucun lecteur logique DOS à effacer.
+9.19:Aucune partition non-DOS à effacer.
+9.20:est inutilisable !
+9.21:Aucune partition à effacer.
+9.22:\e[1mAVERTISSEMENT !\e[22m Aucune partition n'est définie comme active - \n   le disque 1 n'est pas démarrable sauf si une partition est définie comme active
+9.23:  \e[1m%lu\e[22m Mo
+
+
+##############################################################################
+# USERINT2.C                                                                 #
+##############################################################################
+
+# Delete logical partition
+10.0:Les données dans la partition non-DOS qui sera effacée\n    seront perdues. Quelle partition non-DOS souhaitez-vous effacer ?
+10.1:Pas une partition !
+10.2:Refus de la suppression de la partition DOS !
+10.3:La partition non-DOS a été effacée.
+10.4:Erreur lors de la suppression de la partition non-DOS !
+
+# Display extended partition
+10.5:Aucun lecteur logique n'a été défini.
+10.6:La taille totale de la partition étendue est de %lu Mo\n    (1 Mo=1048576 octets)
+
+# Display primary partitions
+10.7:Aucune partition n'a été définie.
+10.8:La taille totale de l'espace disque est de %lu Mo\n    (1 Mo=1048576 octets)
+
+# Table headers
+10.10:Partition  État    Type     Étiquette volume   Mo  Système       Utilisé
+10.11:Partition   État         Mo  Description    Utilisé  Cyl début  Cyl fin
+10.12:Étiquette Volume     Mo Système Utilisé
+
+# Delete extended partition
+10.20:\e[1;5mAVERTISSEMENT !\e[22;25m Les données dans la partition DOS étendue effacée et ses\n    partition logiques seront perdues. Continuer (O/N)...?
+10.21:La partition DOS étendue a été effacée
+
+# Delete logical drives
+10.30:\e[1;5mAVERTISSEMENT !\e[22;25m Les données DOS effacé seront\n    perdues. Quel lecteur souhaitez-vous effacer...?
+10.31:Le lecteur logique a été effacé
+10.32:Erreur lors de la suppression du lecteur logique !
+
+# Delete primary partition
+10.40:\e[1;5mAVERTISSEMENT !\e[22;25m Les données dans une partition primaire DOS effacée seront\n    perdues. Quelle partition primaire souhaitez vous effacer...?
+10.41:La partition primaire DOS a été effacée
+10.42:Erreur lors de la suppression de la partition primaire DOS !
+10.43:Refus de la suppression de la partition étendue !
+10.44:Pas une partition DOS !
+
+# Set active partition
+10.50:Aucune partition à rendre active.
+10.51:Entrez le numéro de la partition que vous souhaitez rendre active:
+10.52:%d n'est pas un choix. Veuillez entrer un choix valide.
+10.53:L'unique partition démarrable sur le lecteur %d est déjà marquée comme active
+10.54:La partition %d a été activée.
+
+# Create partition
+10.60:Souhaitez-vous utiliser la taille maximale disponible pour une partition\n    DOS primaire et rendre la partition active (O/N) ?
+10.61:Souhaitez-vous utiliser la taille maximale disponible pour une partition\n    DOS primaire (O/N) ?
+10.62:Ce lecteur est un FAT32 par défaut, basculer en FAT16 (O/N) ?
+10.63:La taille maximale disponible pour la partition est de \e[1m%lu\e[22m Mo
+10.64:Entrez la taille de la partition en Mo ou en pourcentage de l'espace\n    disque (%%) pour créer une partition DOS primaire :
+10.65:Entrez la taille de la partition en Mo ou en pourcentage de l'espace\n    disque (%%) pour créer une partition DOS étendue :
+10.66:La partition primaire DOS a été créée.
+10.67:La partition étendue DOS a été créée.
+
+# Create logical partition
+10.70:Lecteur logique DOS créé, les lettres de lecteur ont été modifiées\n    ou ajoutées
+10.71:Le nombre maximal de lecteurs logiques DOS installés
+10.72:Entrez la taille du lecteur logique en Mo ou en pourcentage (%%) de\n    la taille de partition étendue :
+10.73:Tout l'espace disponible dans la partition étendue DOS\n    est attribué aux lecteurs logiques.
+
+# Display partition info
+10.80:La partition étendue DOS contient des lecteurs logiques DOS.\n    Souhaitez-vous afficher les informations des lecteurs logiques (O/N) ?
+10.81:Optionnel : Tapez le numéro de la partition à modifier.
+10.82:Entrez le numéro de la partition que vous souhaitez modifier (1-4) ?
+10.83:Afficher les informations des lecteurs logiques DOS
+10.84:Entrez la lettre du lecteur logique que vous souhaitez modifier ?
+
+# List partition types
+10.90:Lister les types de partition
+10.91:Appuyez sur une touche quelconque pour continuer . . .
+
+# Display / modify partition
+10.100:Afficher/Modifier les informations du lecteur logique
+10.101:Partition            Mo       Type            Utilisé  Cyl début  Cyl fin
+10.102:Modifier le type de partition
+10.104:Cacher / Révéler la partition
+10.105:Entrez le type de la nouvelle partition (1-255) :
+10.106:Enlever l'état actif
+
+
+10.190:Entrez le numéro de lecteur de disque fixe (1-%d) :
+10.200:Êtes-vous certain (O/N ?
+
+# Error strings
+10.250:Lettre de lecteur illégale
+
+
+11.0:\nImpossible de trouver le fichier \"boot.mbr\"... Le MBR n'a pas été chargé.\n
+11.1:MBR a été écrit au moyen de \"boot.mbr\"
+11.2:MBR a été sauvegardé sur \"boot.mbr\"
+11.3:Le code d'amorçage a été enlevé du MBR.
+
+
+##############################################################################
+# KBDINPUT.C                                                                 #
+##############################################################################
+
+20.5:Appuyez sur \e[1mÉchap\e[22m pour revenir aux options de FDISK
+20.6:Appuyez sur \e[1mÉchap\e[22m pour quitter FDISK
+20.7:Appuyez sur \e[1mÉchap\e[22m pour continuer
+20.8:La taille de partition requise dépasse la taille maximale disponible
+20.9:Entrée de l'utilisateur :  %d
+20.10:Entrée :  %d
+20.11:Entrée invalide, veuillez entrer
+20.12:n'est pas un choix, veuillez entrer
+20.13:Entrée invalide.
+
+
+##############################################################################
+# WARNING SCREENS                                                            #
+##############################################################################
+30.1:Vous avez au moins un disque de taille supérieure à 2,097,152 Mo. FDISK ne\n    peut PAS gérer les partitions dépassant cette limite !\n\n
+30.2:    Vous pouvez continuer mais vous risquez une perte de données, \n   particulièrement s'il existe déjà des partitions créées avec d'autres outils dépassant cette limite.\n\n
+30.3:    Cela devrait être OK si FDISK libre est le seul outil de partitionnement\n    que vous utilisez, mais nous conseillons d'utiliser un autre utilitaire de disque pour gérer ce type\n    de disque.
+30.4:Êtes-vous certain de vouloir continuer (O/N) ?
+
+30.10:FDISK est actuellement en mode d'alignement de cylindres, mais la\n    partition étendue ne démarre pas sur une limite de cylindre !\n\n
+30.11:    Bien que peu probable, cela PEUT entraîner des problèmes de compatibilité.\n\n
+30.12:Si votre système dépend d'un alignement de cylindres correct vous devriez\n    considérer recréer la partition étendue.
+30.13:Créer un lecteur logique dans une partition étendue non alignée ?
+
+30.20:    Un schéma  non compatible de partition étendue a été détectée sur\n
+30.21:    ce disque. Les actions suivantes sont désactivées :\n\n
+30.22:      - la création de lecteurs logiques\n
+30.23:      - l'effacement de lecteurs logiques\n\n
+30.24:    Vous pouvez recréer la partition étendue pour activer l'édition ou\n
+30.25:    utiliser un autre utilitaire de disque pour partitionner ce disque.\n
+
+
+##############################################################################
+# GLOBAL STRINGS                                                             #
+##############################################################################
+
+# Yes-No letters, as used to answer "Yes/No" questions (upper- and lower-case)
+250.0:ON
+250.1:on
+250.2:Entrée invalide, veuillez entrer O-N
+250.3:Appuyez sur une touche pour continuer
+250.4:ERREUR
+250.5:AVERTISSEMENT !
+250.6:ACTIF
+250.250:Programme de configuration de disque fixe
+
+
+##############################################################################
+# ERROR MESSAGES                                                             #
+##############################################################################
+
+255.0:\n    Erreur lors de la lecture des tables de partition.
+255.1:\n    Aucun disque fixe présent.
+255.2:\nAucun numéro de lecteur n'a été entré.
+255.3:\nLe numéro de partition est hors de la plage (1-4).
+255.4:\nImpossible d'activer la partition.
+255.5:\nErreur lors de la partition automatique du disque dur.
+255.6:\nErreur lors du nettoyage du secteur MBR.
+255.7:\nErreur lors de l'effacement de l'IPL.
+255.9:\nErreur lors de la désactivation de la partition.
+255.10:\nErreur lors du nettoyage de la table des partitions.
+255.11:\nErreur lors de l'écriture de l'IPL.
+255.12:\nErreur lors de l'installation de l'IPL depuis le fichier.
+255.13:\nErreur lors de l'installation du MBR depuis le fichier.
+255.14:\nErreur lors de l'écriture du MBR.
+255.15:\nErreur lors de l'écriture des tables de partition.
+255.16:\nErreur lors de la sauvegarde du MBR.
+255.17:\nErreur lors de l'écriture de Smart IPL.
+255.18:\nCommande invalide ou erreur de syntaxe. Invoquez FDISK /? pour l'aide.
+255.19:\nSystème d'exploitation non pris en charge.\n
