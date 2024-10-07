@@ -58,7 +58,7 @@
 0.83:\t
 0.90:Etkileşimli kullanıcı arayüzü ayarları:
 0.91:  /UI           Arayüzü sanki son argümanla verilmiş gibi her zaman başlat
-0.92:  /MONO         Arayüzü iki renkli kipte çalışmaya zorla
+0.92:  /MONO         Metin niteliklerini devre dışı bırakır (parlak, yanıp sönen)
 0.93:  /FPRMT        Etkileşimli kipte FAT32/FAT16 için sor
 0.94:  /XO           Genişletilmiş seçenekleri etkinleştir
 0.95:\t
