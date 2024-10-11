@@ -30,8 +30,6 @@
 #include "svarlang/svarlang.h"
 
 static int Get_Environment_Settings( char *environment[] );
-static void Initialization( char *environment[] );
-/*void Re_Initialization( void );*/
 
 #ifndef FDISKLITE
 
