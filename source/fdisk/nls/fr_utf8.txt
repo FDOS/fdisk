@@ -58,7 +58,7 @@
 0.83:\t
 0.90:Options de l'interface utilisateur interactive :
 0.91:  /UI        Toujours démarre l'IU si donné en tant que dernier argument.
-0.92:  /MONO      Force l'interface utilisateur à se lancer en mode monochrome.
+0.92:  /MONO      Désactive les attributs de texte (texte clair et clignotant).
 0.93:  /FPRMT     Affiche une invite pour FAT32/FAT16 en mode interactif.
 0.94:  /XO        Active les options étendues.
 0.95:\t
