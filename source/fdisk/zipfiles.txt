@@ -58,12 +58,14 @@ source/fdisk/zipfiles.txt
 source/fdisk/bintoc/bintoc.c
 source/fdisk/svarlang/auto_exe.c
 source/fdisk/svarlang/auto_nls.c
+source/fdisk/svarlang/history.txt
+source/fdisk/svarlang/makefile
 source/fdisk/svarlang/svarlang.c
-source/fdisk/svarlang/tlumacz.c
-source/fdisk/svarlang/version.c
 source/fdisk/svarlang/svarlang.h
+source/fdisk/svarlang/svarlang.txt
+source/fdisk/svarlang/version.c
+source/fdisk/svarlang/tlumacz.c
 source/fdisk/utf8tocp/utf8tocp.c
-source/fdisk/nls/regen.bat
 source/fdisk/nls/de_utf8.txt
 source/fdisk/nls/en_utf8.txt
 source/fdisk/nls/es_utf8.txt
