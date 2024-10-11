@@ -1,0 +1,33 @@
+
+utf8tocp history
+
+
+20240918
+ - conversion is written to a file to avoid platform-specific CR/LF changes
+ - versioning scheme changed from vx.x.x to date-based YYYYMMDD
+ - DOS version is compiled with OpenWatcom 1.9 instead of Turbo C 2.01
+ - relicensed from BSD 2-clause to MIT
+
+v0.9.5 [10 Dec 2020]
+ - added the '-d' action
+
+v0.9.4 [13 Dec 2016]
+ - fixed CP866 (glyphs 224..239 were corrupted)
+
+v0.9.3 [15 Aug 2016]
+ - added support for codepage CP857 ('MS-DOS Turkish')
+ - fixed CP858 (euro sign was misplaced)
+
+v0.9.2 [20 Feb 2016]
+ - UTF-8 BOM markers are handled properly (that is, ignored)
+
+v0.9.1 [10 May 2015]
+ - added support for codepage CP1250
+ - relicensed utf8tocp from GNU GPL to the BSD '2-clause' license
+
+v0.9 [22 Dec 2013]
+ - added the -r (reverse operation) feature
+ - added support for new codepages: CP775, CP808, CP852, CP858, CP866
+
+v0.8 [15 Dec 2013]
+ - first public release

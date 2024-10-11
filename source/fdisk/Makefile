@@ -164,25 +164,25 @@ deflang.c : nls/out.lng
 	$(CP) nls$(SEP)deflang.c deflang.c
 
 nls/en.txt : nls/en_utf8.txt utf8tocp/utf8tocp.exe
-	$(UTF8TOCP) 437 $[@ >$^@
+	$(UTF8TOCP) 437 $[@ $^@
 
 nls/es.txt : nls/es_utf8.txt utf8tocp/utf8tocp.exe
-	$(UTF8TOCP) 850 $[@ >$^@
+	$(UTF8TOCP) 850 $[@ $^@
 
 nls/de.txt : nls/de_utf8.txt utf8tocp/utf8tocp.exe
-	$(UTF8TOCP) 850 $[@ >$^@
+	$(UTF8TOCP) 850 $[@ $^@
 
 nls/fr.txt : nls/fr_utf8.txt utf8tocp/utf8tocp.exe
-	$(UTF8TOCP) 850 $[@ >$^@
+	$(UTF8TOCP) 850 $[@ $^@
 
 nls/it.txt : nls/it_utf8.txt utf8tocp/utf8tocp.exe
-	$(UTF8TOCP) 850 $[@ >$^@
+	$(UTF8TOCP) 850 $[@ $^@
 
 nls/pl.txt : nls/pl_utf8.txt utf8tocp/utf8tocp.exe
-	$(UTF8TOCP) maz $[@ >$^@
+	$(UTF8TOCP) maz $[@ $^@
 
 nls/tr.txt : nls/tr_utf8.txt utf8tocp/utf8tocp.exe
-	$(UTF8TOCP) 857 $[@ >$^@
+	$(UTF8TOCP) 857 $[@ $^@
 
 
 # --- TOOLS -----------------------------------------------------------------

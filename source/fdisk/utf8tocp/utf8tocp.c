@@ -1,23 +1,32 @@
 /*
- * utf8tocp Copyright (C) 2013-2020 Mateusz Viste
- * converts UTF-8 text files to other codepages, as well as the other way around.
+ * UTF8TOCP Copyright (C) 2013-2024 Mateusz Viste ; MIT license
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * See the license.txt file for all licensing details.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
+#include <errno.h>
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
-#define pVer "0.9.5"
-#define pDate "2013-2020"
+#define pVer "20240918"
+#define pDate "2013-2024"
 
 
 /* returns 0 if s1 and s2 strings are equal, non-zero otherwise */
@@ -50,10 +59,10 @@ static void cplist(void) {
 
 
 static void about(void) {
-  puts("utf8tocp v" pVer " Copyright (C) " pDate " Mateusz Viste\n"
-       "utf8tocp converts text files between UTF-8 and other codepages, both ways.\n"
+  puts("utf8tocp ver " pVer " Copyright (C) " pDate " Mateusz Viste\n"
+       "converts text files between UTF-8 and other codepages, both ways.\n"
        "\n"
-       "Usage: utf8tocp [-r] encid file.txt\n"
+       "Usage: utf8tocp [-r] encid infile.txt outfile.txt\n"
        "       utf8tocp -d encid outfile.bin\n"
        "       utf8tocp -l\n"
        "");
@@ -63,8 +72,8 @@ static void about(void) {
        "     range 128..255\n"
        " -l  displays the list of supported codepages\n"
        "\n"
-       "This program is distributed under the terms of the BSD '2-clause' license.\n"
-       "Read license.txt for details.   |   homepage: http://utf8tocp.sourceforge.net");
+       "This program is distributed under the terms of the MIT license.\n"
+       "homepage: https://utf8tocp.sourceforge.io");
 }
 
 
@@ -555,16 +564,16 @@ static int loadlookuptable(char *cpname, unsigned short *lookuptable) {
 }
 
 
-static int codepagelookup(long codepoint, unsigned short *lookuptable) {
-  int x;
+/* returns the 8-bit id where unicode codepoint is in the codepage pointed by
+ * lookuptable. returns '?' if codepoint is not present in the codepage. */
+static unsigned char codepagelookup(unsigned short codepoint, unsigned short *lookuptable) {
+  unsigned char x;
   /* if the codepoint is 7bit, don't look further, since it's valid ASCII already */
-  if (codepoint < 128) return((int)codepoint);
+  if (codepoint < 128) return((unsigned char)codepoint);
   /* values higher than 127 must be mapped */
   for (x = 0; x < 128; x++) {
     if (lookuptable[x] == codepoint) return(x + 128);
   }
-  /* ignore BOM markers */
-  if (codepoint == 0xFEFFl) return(-1);
   /* if the codepoint is not present in the codepage, return a fallback character */
   return('?');
 }
@@ -578,12 +587,16 @@ static unsigned short unicodelookup(int bytecode, unsigned short *lookuptable) {
 }
 
 
-static long getNextUnicodeTokenFromFile(FILE *fd) {
+/* returns 0xffff on EOF, but be careful because 0xffff could as well be a
+ * valid unicode codepoint */
+static unsigned short getNextUnicodeTokenFromFile(FILE *fd) {
   int tmpbyte, bytelen, x;
-  long result = 0;
+  unsigned short result = 0;
   /* read the 1st byte - this will tell us how many bytes follow */
   result = fgetc(fd);
-  if (result == EOF) return(EOF);
+
+  if (result == 0xffff) return(0xffff);
+
   if ((result & 0x80) == 0) {              /* 0xxxxxxx (1 byte) */
     bytelen = 1;
   } else if ((result & 0xE0) == 0xC0) {  /* 110xxxxx (2 bytes) */
@@ -592,11 +605,12 @@ static long getNextUnicodeTokenFromFile(FILE *fd) {
   } else if ((result & 0xF0) == 0xE0) {  /* 1110xxxx (3 bytes) */
     bytelen = 3;
     result &= 0xF;
-  } else if ((result & 0xF8) == 0xF0) {  /* 11110xxx (4 bytes) */
+  /* 11110xxx (4 bytes) */
+/*  } else if ((result & 0xF8) == 0xF0) {
     bytelen = 4;
-    result &= 0x7;
+    result &= 0x7; */
   } else { /* invalid UTF-8 byte */
-    return('?');
+    return(0xFFFD); /* unicode replacement character <?> */
   }
   /* read all following bytes */
   for (x = 1; x < bytelen; x++) {
@@ -609,16 +623,16 @@ static long getNextUnicodeTokenFromFile(FILE *fd) {
 }
 
 
-static void outputUnicodeToken(unsigned short codepoint) {
-  if (codepoint < 0x80) {              /* single byte, same as ASCII */
-    putchar(codepoint);
-  } else if (codepoint < 0x800l) {    /* two bytes */
-    putchar(0xC0 | ((codepoint >> 6) & 0x1F));   /* 110xxxxx */
-    putchar(0x80 | (codepoint & 0x3F));          /* 10xxxxxx */
-  } else {  /* three bytes */
-    putchar(0xE0 | ((codepoint >> 12) & 0xF));   /* 1110xxxx */
-    putchar(0x80 | ((codepoint >> 6) & 0x3F));   /* 10xxxxxx */
-    putchar(0x80 | (codepoint & 0x3F));          /* 10xxxxxx */
+static void outputUnicodeToken(FILE *fd, unsigned short codepoint) {
+  if (codepoint < 0x80) {                        /* single byte (ASCII) */
+    fputc(codepoint, fd);
+  } else if (codepoint < 0x800l) {               /* two bytes */
+    fputc(0xC0 | ((codepoint >> 6) & 0x1F), fd); /* 110xxxxx */
+    fputc(0x80 | (codepoint & 0x3F), fd);        /* 10xxxxxx */
+  } else {                                       /* three bytes */
+    fputc(0xE0 | ((codepoint >> 12) & 0xF), fd); /* 1110xxxx */
+    fputc(0x80 | ((codepoint >> 6) & 0x3F), fd); /* 10xxxxxx */
+    fputc(0x80 | (codepoint & 0x3F), fd);        /* 10xxxxxx */
   }
 }
 
@@ -629,37 +643,48 @@ static void outputUnicodeToken(unsigned short codepoint) {
 
 int main(int argc, char **argv) {
   /* lookuptable is preloaded with CP437 at start */
-  unsigned short lookuptable[128] = {0x00C7,0x00FC,0x00E9,0x00E2,0x00E4,0x00E0,0x00E5,0x00E7,0x00EA,0x00EB,0x00E8,0x00EF,0x00EE,0x00EC,0x00C4,0x00C5,
-                           0x00C9,0x00E6,0x00C6,0x00F4,0x00F6,0x00F2,0x00FB,0x00F9,0x00FF,0x00D6,0x00DC,0x00A2,0x00A3,0x00A5,0x20A7,0x0192,
-                           0x00E1,0x00ED,0x00F3,0x00FA,0x00F1,0x00D1,0x00AA,0x00BA,0x00BF,0x2310,0x00AC,0x00BD,0x00BC,0x00A1,0x00AB,0x00BB,
-                           0x2591,0x2592,0x2593,0x2502,0x2524,0x2561,0x2562,0x2556,0x2555,0x2563,0x2551,0x2557,0x255D,0x255C,0x255B,0x2510,
-                           0x2514,0x2534,0x252C,0x251C,0x2500,0x253C,0x255E,0x255F,0x255A,0x2554,0x2569,0x2566,0x2560,0x2550,0x256C,0x2567,
-                           0x2568,0x2564,0x2565,0x2559,0x2558,0x2552,0x2553,0x256B,0x256A,0x2518,0x250C,0x2588,0x2584,0x258C,0x2590,0x2580,
-                           0x03B1,0x00DF,0x0393,0x03C0,0x03A3,0x03C3,0x00B5,0x03C4,0x03A6,0x0398,0x03A9,0x03B4,0x221E,0x03C6,0x03B5,0x2229,
-                           0x2261,0x00B1,0x2265,0x2264,0x2320,0x2321,0x00F7,0x2248,0x00B0,0x2219,0x00B7,0x221A,0x207F,0x00B2,0x25A0,0x00A0};
-  char *filename;
+  static unsigned short lookuptable[128] = {
+    0x00C7,0x00FC,0x00E9,0x00E2,0x00E4,0x00E0,0x00E5,0x00E7,0x00EA,0x00EB,0x00E8,0x00EF,0x00EE,0x00EC,0x00C4,0x00C5,
+    0x00C9,0x00E6,0x00C6,0x00F4,0x00F6,0x00F2,0x00FB,0x00F9,0x00FF,0x00D6,0x00DC,0x00A2,0x00A3,0x00A5,0x20A7,0x0192,
+    0x00E1,0x00ED,0x00F3,0x00FA,0x00F1,0x00D1,0x00AA,0x00BA,0x00BF,0x2310,0x00AC,0x00BD,0x00BC,0x00A1,0x00AB,0x00BB,
+    0x2591,0x2592,0x2593,0x2502,0x2524,0x2561,0x2562,0x2556,0x2555,0x2563,0x2551,0x2557,0x255D,0x255C,0x255B,0x2510,
+    0x2514,0x2534,0x252C,0x251C,0x2500,0x253C,0x255E,0x255F,0x255A,0x2554,0x2569,0x2566,0x2560,0x2550,0x256C,0x2567,
+    0x2568,0x2564,0x2565,0x2559,0x2558,0x2552,0x2553,0x256B,0x256A,0x2518,0x250C,0x2588,0x2584,0x258C,0x2590,0x2580,
+    0x03B1,0x00DF,0x0393,0x03C0,0x03A3,0x03C3,0x00B5,0x03C4,0x03A6,0x0398,0x03A9,0x03B4,0x221E,0x03C6,0x03B5,0x2229,
+    0x2261,0x00B1,0x2265,0x2264,0x2320,0x2321,0x00F7,0x2248,0x00B0,0x2219,0x00B7,0x221A,0x207F,0x00B2,0x25A0,0x00A0};
+  char *filename = NULL, *filename2 = NULL;
   char *cpname;
   int action = ACTION_ENCODE;
-  FILE *fd;
+  FILE *fdin = NULL, *fdout = NULL;
+  int exitcode = 0;
 
-  /* I expect the program to be called with exactly two or three arguments */
-  if (argc == 3) {
-    cpname = argv[1];
-    filename = argv[2];
-  } else if (argc == 4) {
-    if (striseq(argv[1], "-r") == 0) {
-      action = ACTION_DECODE;
-    } else if (striseq(argv[1], "-d") == 0) {
-      action = ACTION_DUMP;
-    } else {
-      puts("ERROR: Unknown option.");
-      return(3);
-    }
+  /* I expect the program to be called with exactly two or four arguments */
+
+  /* utf8tocp -r enc ifile ofile */
+  if ((argc == 5) && (striseq(argv[1], "-r") == 0)) {
+    action = ACTION_DECODE;
     cpname = argv[2];
     filename = argv[3];
+    filename2 = argv[4];
+
+  /* utf8tocp -d enc ofile */
+  } else if ((argc == 4) && (striseq(argv[1], "-d") == 0)) {
+    action = ACTION_DUMP;
+    cpname = argv[2];
+    filename2 = argv[3];
+
+  /* utf8tocp enc ifile ofile */
+  } else if (argc == 4) {
+    action = ACTION_ENCODE;
+    cpname = argv[1];
+    filename = argv[2];
+    filename2 = argv[3];
+
+  /* utf8tocp -l */
   } else if ((argc == 2) && (striseq(argv[1], "-l") == 0)) {
     cplist();
     return(0);
+
   } else {
     about();
     return(0);
@@ -668,66 +693,90 @@ int main(int argc, char **argv) {
   /* resolve the codepage name to a numerical id */
   if (loadlookuptable(cpname, lookuptable) != 0) {
     puts("ERROR: Unknown target encoding.");
-    return(1);
+    exitcode = 1;
+    goto GAMEOVER;
+  }
+
+  /* abort if output file exists */
+  if (filename2 != NULL) {
+    fdout = fopen(filename2, "rb");
+    if (fdout != NULL) {
+      puts("ERROR: output file already exists.");
+      exitcode = 1;
+      goto GAMEOVER;
+    }
   }
 
   /* is this about dumping the codepage map? */
   if (action == ACTION_DUMP) {
     size_t i;
-    /* abort if output file exists */
-    fd = fopen(filename, "rb");
-    if (fd != NULL) {
-      fclose(fd);
-      puts("ERROR: output file already exists.");
-      return(1);
-    }
     /* create output file */
-    fd = fopen(filename, "wb");
-    if (fd == NULL) {
-      puts("ERROR: output file could not be created.");
-      return(1);
+    fdout = fopen(filename2, "wb");
+    if (fdout == NULL) {
+      fputs("ERROR: Failed to create the output file - ", stdout);
+      puts(strerror(errno));
+      exitcode = 1;
+      goto GAMEOVER;
     }
     /* dump the conversion table (little-endian format) */
     for (i = 0; i < 128; i++) {
       unsigned char c;
       c = lookuptable[i] & 0xff;
-      fwrite(&c, 1, 1, fd);
+      fputc(c, fdout);
       c = lookuptable[i] >> 8;
-      fwrite(&c, 1, 1, fd);
+      fputc(c, fdout);
     }
-    fclose(fd);
+    fclose(fdout);
     return(0);
   }
 
   /* open the input file */
-  fd = fopen(filename, "rb");
-  if (fd == NULL) {
+  fdin = fopen(filename, "rb");
+  if (fdin == NULL) {
     puts("ERROR: Failed to open input file.");
-    return(2);
+    exitcode = 2;
+    goto GAMEOVER;
   }
 
-  /* Start converting the file */
+  /* open the output file */
+  fdout = fopen(filename2, "wb");
+  if (fdout == NULL) {
+    fputs("ERROR: Failed to create the output file - ", stdout);
+    puts(strerror(errno));
+    exitcode = 2;
+    goto GAMEOVER;
+  }
+
+  /* start converting the file */
   if (action == ACTION_ENCODE) {
-    long unicodeToken;
-    int cpbyte;
+    unsigned short unicodeToken;
+    unsigned char cpbyte;
+
     for (;;) {
-      unicodeToken = getNextUnicodeTokenFromFile(fd);
-      if (unicodeToken == EOF) break;
+      unicodeToken = getNextUnicodeTokenFromFile(fdin);
+
+      /* 0xffff is likely an EOF (BUT could be a valid codepoint, too) */
+      if ((unicodeToken == 0xffff) && (feof(fdin))) break;
+
+      /* some markers must be ignored */
+      if (unicodeToken == 0xFEFF) continue; /* BOM markers */
+
       cpbyte = codepagelookup(unicodeToken, lookuptable);
-      if (cpbyte < 0) continue; /* some markers must be ignored */
-      putchar(cpbyte);
+      fputc(cpbyte, fdout);
     }
+
   } else { /* reverse operation: codepage -> utf8 */
     int bytebuff;
     for (;;) {
-      bytebuff = getc(fd);
+      bytebuff = fgetc(fdin);
       if (bytebuff == EOF) break;
-      outputUnicodeToken(unicodelookup(bytebuff, lookuptable));
+      outputUnicodeToken(fdout, unicodelookup(bytebuff, lookuptable));
     }
   }
 
-  /* close the input file */
-  fclose(fd);
+  GAMEOVER:
+  if (fdin != NULL) fclose(fdin);
+  if (fdout != NULL) fclose(fdout);
 
-  return(0);
+  return(exitcode);
 }
