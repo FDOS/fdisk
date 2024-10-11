@@ -1,7 +1,10 @@
 # distribution files
 fdisk.zip
+fdisk.svp
+source.zip
 bin/fdisk.exe
 nls/fdisk.lng
+svardos
 
 # generated files
 source/fdisk/*.exe
@@ -13,6 +16,7 @@ source/fdisk/utf8tocp/*.exe
 source/fdisk/utf8tocp/utf8tocp
 source/fdisk/deflang.c
 source/fdisk/bootnorm.bin
+source/fdisk/bootnorm.c
 source/fdisk/fdisk.lng
 source/fdisk/svarlang/*.lib
 source/fdisk/nls/??.txt
