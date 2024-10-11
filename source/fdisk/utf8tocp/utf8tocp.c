@@ -155,7 +155,7 @@ static int loadlookuptable(char *cpname, unsigned short *lookuptable) {
     return(0);
   } else if (striseq(cpname, "808") == 0) {  /* CP808 - like 866, but with Euro sign at 0xFD */
     loadlookuptable("866", lookuptable);  /* load CP866 first */
-    lookuptable[128 - 253] = 0x20AC;      /* add the euro sign */
+    lookuptable[253 - 128] = 0x20AC;      /* add the euro sign */
     return(0);
   } else if (striseq(cpname, "850") == 0) {  /* 850 codepage */
     lookuptable[155 - 128] = 0x00F8;

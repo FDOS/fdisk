@@ -2,6 +2,9 @@
 utf8tocp history
 
 
+xxxxxxxx
+ - fixed Euro sign placement in CP808
+
 20240918
  - conversion is written to a file to avoid platform-specific CR/LF changes
  - versioning scheme changed from vx.x.x to date-based YYYYMMDD
