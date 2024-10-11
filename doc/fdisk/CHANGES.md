@@ -8,6 +8,19 @@ Bug classification:
  - LOW: Cosmetic bugs, like display issues etc.
 
 
+Version 1.3.17 (2024-??-??)
+---------------------------
+Changes:
+ - Import latest SvarLANG and make use of compressed language file to
+   safe ~50K disk space.
+
+
+Version 1.3.16 (2024-08-04)
+---------------------------
+Changes:
+ - Use DR-DOS drive letter assignment if running under (E)DR-DOS kernel.
+
+
 Version 1.3.15 (2024-05-26)
 ---------------------------
 Fixes:
