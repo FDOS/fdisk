@@ -1,12 +1,37 @@
 /*
- * Copyright (C) 2021-2023 Mateusz Viste
+ * Copyright (C) 2021-2024 Mateusz Viste
  *
  * Dictionary-based lookups contributed by Bernd Boeckmann, 2023
  *
  * usage: tlumacz en fr pl etc
  *
- * computes an out.lng file that contains all language resources.
+ * computes:
+ * OUT.LNG -> contains all language resources.
+ * OUTC.LNG -> same as OUT.LNG but with compressed strings (slower to load).
  *
+ * === COMPRESSION ===========================================================
+ * The compression scheme is very simple. It is applied only to strings (ie.
+ * not the dictionnary) and it is basically a stream of 16-bit words (tokens).
+ *
+ * Token format is LLLL OOOO OOOO OOOO, where:
+ * OOOO OOOO OOOO is the back reference offset (number of bytes-1 to rewind)
+ * LLLL is the number of bytes (-1) that have to be copied from the offset.
+ *
+ * However, if LLLL is zero then the token's format is different:
+ * 0000 RRRR BBBB BBBB
+ *
+ * The above form occurs when uncompressible data is encountered:
+ * BBBB BBBB is the literal value of a byte to be copied
+ * RRRR is the number of RAW (uncompressible) WORDS that follow (possibly 0)
+ *
+ * where each WORD value contains the following bits "LLLL OOOO OOOO OOOO":
+ *
+ * OOOO OOOO OOOO = a backreference offset ("look that many bytes back")
+ * LLLL = the number of bytes to copy from the backreference
+ *
+ * To recognize a compressed lang block one has to look at the id of the block
+ * (16-bit language id). If its highest bit is set (0x8000) then the lang block
+ * is compressed.
  */
 
 
@@ -19,6 +44,14 @@
 
 #define STRINGS_CAP 65000   /* string storage size in characters */
 #define DICT_CAP    10000   /* dictionary size in elements */
+
+enum {                      /* DEFLANG output format */
+  C_OUTPUT,
+  NO_OUTPUT,
+  ASM_OUTPUT,
+  NASM_OUTPUT
+};
+
 
 /* read a single line from fd and fills it into dst, returns line length
  * ending CR/LF is trimmed, as well as any trailing spaces */
@@ -239,7 +272,7 @@ static unsigned short svl_lang_from_cats_file(struct svl_lang *l, struct svl_lan
   char fname[] = "xx.txt";
   static char linebuf[8192];
   const char *ptr;
-  unsigned short id, maxid=0, maxid_line=0, linecount;
+  unsigned short id, maxid=0, maxid_line, linecount;
   int i;
 
   fname[strlen(fname) - 6] = (char)tolower( l->id[0] );
@@ -247,7 +280,7 @@ static unsigned short svl_lang_from_cats_file(struct svl_lang *l, struct svl_lan
 
   fd = fopen(fname, "rb");
   if (fd == NULL) {
-    printf("ERROR: FAILED TO OPEN '%s'\r\n", fname);
+    printf("ERROR: FAILED TO OPEN '%s'\n", fname);
     return(0);
   }
 
@@ -264,27 +297,27 @@ static unsigned short svl_lang_from_cats_file(struct svl_lang *l, struct svl_lan
 
     /* handle malformed lines */
     if (ptr == NULL) {
-      printf("WARNING: %s[#%u] is malformed (linelen = %u):\r\n", fname, linecount, linelen);
+      printf("WARNING: %s[#%u] is malformed (linelen = %u):\n", fname, linecount, linelen);
       puts(linebuf);
       continue;
     }
 
     /* ignore empty strings (but emit a warning) */
     if (ptr[0] == 0) {
-      printf("WARNING: %s[#%u] ignoring empty string %u.%u\r\n", fname, linecount, id >> 8, id & 0xff);
+      printf("WARNING: %s[#%u] ignoring empty string %u.%u\n", fname, linecount, id >> 8, id & 0xff);
       continue;
     }
 
     /* warn about dirty lines */
     if (linebuf[0] == '?') {
-      printf("WARNING: %s[#%u] string id %u.%u is flagged as 'dirty'\r\n", fname, linecount, id >> 8, id & 0xff);
+      printf("WARNING: %s[#%u] string id %u.%u is flagged as 'dirty'\n", fname, linecount, id >> 8, id & 0xff);
     }
 
     /* add the string contained in current line, if conditions are met */
     if (!svl_find(l, id)) {
       if ((refl == NULL) || (svl_find(refl, id))) {
         if (!svl_add_str(l, id, ptr)) {
-          printf("ERROR: %s[#%u] output size limit exceeded\r\n", fname, linecount);
+          fprintf(stderr, "ERROR: %s[#%u] output size limit exceeded\r\n", fname, linecount);
           fclose(fd);
           return(0);
         }
@@ -292,13 +325,13 @@ static unsigned short svl_lang_from_cats_file(struct svl_lang *l, struct svl_lan
           maxid = id;
           maxid_line = linecount;
         } else {
-          printf("WARNING:%s[#%u] file unsorted - line %u has higher id %u.%u\r\n", fname, linecount, maxid_line, maxid >> 8, maxid & 0xff);
+          printf("WARNING:%s[#%u] file unsorted - line %u has higher id %u.%u\n", fname, linecount, maxid_line, maxid >> 8, maxid & 0xff);
         }
       } else {
-        printf("WARNING: %s[#%u] has an invalid id (%u.%u not present in ref lang)\r\n", fname, linecount, id >> 8, id & 0xff);
+        printf("WARNING: %s[#%u] has an invalid id (%u.%u not present in ref lang)\n", fname, linecount, id >> 8, id & 0xff);
       }
     } else {
-      printf("WARNING: %s[#%u] has a duplicated id (%u.%u)\r\n", fname, linecount, id >> 8, id & 0xff);
+      printf("WARNING: %s[#%u] has a duplicated id (%u.%u)\n", fname, linecount, id >> 8, id & 0xff);
     }
   }
 
@@ -309,9 +342,9 @@ static unsigned short svl_lang_from_cats_file(struct svl_lang *l, struct svl_lan
     for (i = 0; i < refl->num_strings; i++) {
       id = refl->dict[i].id;
       if (!svl_find(l, id)) {
-        printf("WARNING: %s is missing string %u.%u (pulled from ref lang)\r\n", fname, id >> 8, id & 0xff);
+        printf("WARNING: %s is missing string %u.%u (pulled from ref lang)\n", fname, id >> 8, id & 0xff);
         if (!svl_add_str(l, id, refl->strings + refl->dict[i].offset)) {
-          printf("ERROR: %s[#%u] output size limit exceeded\r\n", fname, linecount);
+          fprintf(stderr, "ERROR: %s[#%u] output size limit exceeded\r\n", fname, linecount);
           return(0);
         }
       }
@@ -327,13 +360,193 @@ static int svl_write_header(unsigned short num_strings, FILE *fd) {
 }
 
 
-static int svl_write_lang(const struct svl_lang *l, FILE *fd) {
-  unsigned short strings_bytes = svl_strings_bytes(l);
 
-  return((fwrite(&l->id, 1, 2, fd) == 2) &&
+/* write qlen literal bytes into dst, returns amount of "compressed" bytes */
+static unsigned short mvcomp_litqueue_dump(unsigned short **dst, const unsigned char *q, unsigned short qlen) {
+  unsigned short complen = 0;
+
+  AGAIN:
+
+  /* are we done? (also take care of guys calling me in for jokes) */
+  if (qlen == 0) return(complen);
+
+  qlen--; /* now it's between 0 and 30 */
+  /* write the length and first char */
+  **dst = (unsigned short)((qlen / 2) << 8) | q[0];
+  *dst += 1;
+  q++;
+  complen += 2;
+
+  /* anything left? */
+  if (qlen == 0) return(complen);
+
+  /* write the pending words */
+  if (qlen > 1) {
+    memcpy(*dst, q, (qlen/2)*2);
+    *dst += qlen / 2;
+    q += (qlen / 2) * 2;
+    complen += (qlen / 2) * 2;
+    qlen -= (qlen / 2) * 2;
+  }
+
+  /* one byte might still be left if it did not fit inside a word */
+  goto AGAIN;
+}
+
+
+/* compare up to n bytes of locations s1 and s2, returns the amount of same bytes (0..n) */
+static unsigned short comparemem(const unsigned char *s1, const unsigned char *s2, unsigned short n) {
+  unsigned short i;
+  for (i = 0; (i < n) && (s1[i] == s2[i]); i++);
+  return(i);
+}
+
+
+/* mvcomp applies the MV-COMPRESSION algorithm to data and returns the compressed size
+ * updates len with the number of input bytes left unprocessed */
+static unsigned short mvcomp(void *dstbuf, size_t dstbufsz, const unsigned char *src, size_t *len, unsigned short *maxbytesahead) {
+  unsigned short complen = 0;
+  unsigned short *dst = dstbuf;
+  unsigned short bytesprocessed = 0;
+  unsigned char litqueue[32];
+  unsigned char litqueuelen = 0;
+
+  *maxbytesahead = 0;
+
+  /* read src byte by byte, len times, each time look for a match of 15,14,13..2 chars in the back buffer */
+  while (*len > 0) {
+    unsigned short matchlen;
+    unsigned short minmatch;
+    unsigned short offset;
+    matchlen = 16;
+    if (*len < matchlen) matchlen = (unsigned short)(*len);
+
+    /* monitor the amount of bytes that the compressed stream is "ahead" of
+     * uncompressed data, this is an information used later to size a proper
+     * buffer for in-place depacking */
+    if (complen + litqueuelen + 2 > bytesprocessed) {
+      unsigned short mvstreamlen = complen + litqueuelen + 2;
+      if (*maxbytesahead < (mvstreamlen - bytesprocessed)) *maxbytesahead = mvstreamlen - bytesprocessed;
+    }
+
+    /* abort if no space in output buffer, but do NOT break a literal queue */
+    if ((complen >= dstbufsz - 32) && (litqueuelen == 0)) return(complen);
+
+    /* look for a minimum match of 2 bytes, unless I have some pending literal bytes
+     * awaiting, in which case I am going through a new data pattern and it is more
+     * efficient to wait for a longer match before breaking the literal string */
+    if (litqueuelen & 1) {
+      minmatch = 3; /* breaking an uneven queue is less expensive */
+    } else if (litqueuelen > 0) {
+      goto NOMATCH; /* breaking an even-sized literal queue is never a good idea */
+    } else {
+      minmatch = 2;
+    }
+
+    if (matchlen >= minmatch) {
+      /* start at -1 and try to match something moving backward. note that
+       * matching a string longer than the offset is perfectly valid, this
+       * allows for encoding self-duplicating strings (see MVCOMP.TXT) */
+      unsigned short maxoffset = 4096;
+      unsigned short longestmatch = 0;
+      unsigned short longestmatchoffset = 0;
+      if (maxoffset > bytesprocessed) maxoffset = bytesprocessed;
+
+      for (offset = 1; offset <= maxoffset; offset++) {
+        unsigned short matchingbytes;
+        /* quick skip if first two bytes to not match (never interested in 1-byte matches) */
+        if (*((const unsigned short *)src) != *(const unsigned short *)(src - offset)) continue;
+        /* compute the exact number of bytes that match */
+        matchingbytes = comparemem(src, src - offset, matchlen);
+        if (matchingbytes == matchlen) {
+          //printf("Found match of %u bytes at offset -%u: '%c%c%c...'\n", matchlen, offset, src[0], src[1], src[2]);
+          goto FOUND;
+        }
+        if (matchingbytes > longestmatch) {
+          longestmatch = matchingbytes;
+          longestmatchoffset = offset ;
+        }
+      }
+      /* is the longest match interesting? */
+      if (longestmatch >= minmatch) {
+        matchlen = longestmatch;
+        offset = longestmatchoffset;
+        goto FOUND;
+      }
+    }
+
+    NOMATCH:
+
+    /* if here: no match found, write a literal byte to queue */
+    litqueue[litqueuelen++] = *src;
+    src++;
+    bytesprocessed++;
+    *len -= 1;
+
+    /* dump literal queue to dst if max length reached */
+    if (litqueuelen == 31) {
+      complen += mvcomp_litqueue_dump(&dst, litqueue, litqueuelen);
+      litqueuelen = 0;
+    }
+    continue;
+
+    FOUND: /* found a match of matchlen bytes at -offset */
+
+    /* dump awaiting literal queue to dst first */
+    if (litqueuelen != 0) {
+      complen += mvcomp_litqueue_dump(&dst, litqueue, litqueuelen);
+      litqueuelen = 0;
+    }
+
+    *dst = (unsigned short)((matchlen - 1) << 12) | (offset - 1);
+    dst++;
+    src += matchlen;
+    bytesprocessed += matchlen;
+    *len -= matchlen;
+    complen += 2;
+  }
+
+  /* dump awaiting literal queue to dst first */
+  if (litqueuelen != 0) {
+    complen += mvcomp_litqueue_dump(&dst, litqueue, litqueuelen);
+    litqueuelen = 0;
+  }
+
+  return(complen);
+}
+
+
+/* write the language block (id, dict, strings) into the LNG file.
+ * strings are compressed if compflag != 0 */
+static int svl_write_lang(const struct svl_lang *l, FILE *fd, int compflag, unsigned short *buffrequired) {
+  unsigned short strings_bytes = svl_strings_bytes(l);
+  unsigned short langid = *((unsigned short *)(&l->id));
+  const char *stringsptr = l->strings;
+
+  /* if compressed then do the magic */
+  if (compflag) {
+    static char compstrings[65000];
+    unsigned short comp_bytes;
+    size_t stringslen = strings_bytes;
+    unsigned short mvcompbytesahead;
+    comp_bytes = mvcomp(compstrings, sizeof(compstrings), l->strings, &stringslen, &mvcompbytesahead);
+    if (mvcompbytesahead + stringslen > *buffrequired) {
+      *buffrequired = mvcompbytesahead + stringslen;
+    }
+    if (comp_bytes < strings_bytes) {
+      printf("lang %c%c mvcomp-ressed (%u bytes -> %u bytes) mvcomp stream at most %u bytes ahead of raw data (%u bytes needed for in-place decomp)\n", l->id[0], l->id[1], strings_bytes, comp_bytes, mvcompbytesahead, strings_bytes + mvcompbytesahead);
+      langid |= 0x8000; /* LNG langblock flag that means "this lang is compressed" */
+      strings_bytes = comp_bytes;
+      stringsptr = compstrings;
+    } else {
+      printf("lang %c%c left UNCOMPRESSED (uncomp=%u bytes ; mvcomp=%u bytes)\n", l->id[0], l->id[1], strings_bytes, comp_bytes);
+    }
+  }
+
+  return((fwrite(&langid, 1, 2, fd) == 2) &&
          (fwrite(&strings_bytes, 1, 2, fd) == 2) &&
          (fwrite(l->dict, 1, svl_dict_bytes(l), fd) == svl_dict_bytes(l)) &&
-         (fwrite(l->strings, 1, svl_strings_bytes(l), fd) == svl_strings_bytes(l)));
+         (fwrite(stringsptr, 1, strings_bytes, fd) == strings_bytes));
 }
 
 
@@ -346,7 +559,6 @@ static int svl_write_c_source(const struct svl_lang *l, const char *fn, unsigned
 
   fd = fopen(fn, "wb");
   if (fd == NULL) {
-    puts("ERROR: FAILED TO OPEN OR CREATE DEFLANG.C");
     return(0);
   }
 
@@ -389,25 +601,94 @@ static int svl_write_c_source(const struct svl_lang *l, const char *fn, unsigned
 }
 
 
+static int svl_write_asm_source(const struct svl_lang *l, const char *fn, unsigned short biggest_langsz, int format) {
+  FILE *fd;
+  int i;
+  unsigned short strings_bytes = svl_strings_bytes(l);
+  unsigned short nextnlat = 0;
+  unsigned short allocsz;
+
+  const char *public = (format == ASM_OUTPUT) ? "public" : "global";
+
+  fd = fopen(fn, "wb");
+  if (fd == NULL) {
+    return(0);
+  }
+
+  allocsz = biggest_langsz + (biggest_langsz / 20);
+  printf("biggest lang block is %u bytes -> allocating a %u bytes buffer (5%% safety margin)\n", biggest_langsz, allocsz);
+  fprintf(fd, "; THIS FILE HAS BEEN GENERATED BY TLUMACZ (PART OF THE SVARLANG LIBRARY)\r\n");
+  fprintf(fd, "%s svarlang_memsz\r\n", public);
+  fprintf(fd, "svarlang_memsz dw %u\r\n", allocsz);
+  fprintf(fd, "%s svarlang_string_count\r\n", public);
+  fprintf(fd, "svarlang_string_count dw %u\r\n\r\n", l->num_strings);
+  fprintf(fd, "%s svarlang_mem\r\n", public);
+  fprintf(fd, "svarlang_mem:\r\n");
+
+  if (strings_bytes > 0) fprintf(fd, "db ");
+
+  for (i = 0; i < strings_bytes; i++) {
+    if (!fprintf(fd, "%u", l->strings[i])) {
+      fclose(fd);
+      return(0);
+    }
+
+    nextnlat++;
+    if (l->strings[i] == '\0' || nextnlat == 16) {
+      fprintf(fd, "\r\n");
+      if (i + 1 < strings_bytes ) fprintf(fd, "db ");
+      nextnlat = 0;
+    }
+    else {
+      fprintf(fd, ",");
+    }
+  }
+
+  fprintf(fd, "\r\n%s svarlang_dict\r\n", public);
+  fprintf(fd, "svarlang_dict:\r\n");
+  for (i = 0; i < l->num_strings; i++) {
+    if (!fprintf(fd, "dw %u,%u\r\n", l->dict[i].id, l->dict[i].offset)) {
+      fclose(fd);
+      return(0);
+    }
+  }
+
+  fclose(fd);
+
+  return(1);
+}
+
+
 int main(int argc, char **argv) {
   FILE *fd;
   int ecode = 0;
-  int i;
+  int i, output_format = C_OUTPUT;
+  int mvcomp_enabled = 1;
+  int excref = 0;
   unsigned short biggest_langsz = 0;
-  struct svl_lang *lang, *reflang = NULL;
+  struct svl_lang *lang = NULL, *reflang = NULL;
 
   if (argc < 2) {
     puts("tlumacz ver " SVARLANGVER " - this tool is part of the SvarLANG project.");
     puts("converts a set of CATS-style translations in files EN.TXT, PL.TXT, etc");
-    puts("into a single resource file (OUT.LNG).");
+    puts("into a single resource file (OUT.LNG). Also generates a deflang source");
+    puts("file that contains a properly sized buffer pre-filled with the first");
+    puts("(reference) language.");
     puts("");
-    puts("usage: tlumacz en fr pl ...");
+    puts("usage: tlumacz [/c|/asm|/nasm|/nodef] [/nocomp] [/excref] en fr pl ...");
+    puts("");
+    puts("/c        generates deflang.c (default)");
+    puts("/asm      deflang ASM output");
+    puts("/nasm     deflang NASM output");
+    puts("/nodef    does NOT generate a deflang source file (only an LNG file)");
+    puts("/nocomp   disables the MVCOMP compression of strings in the LNG file");
+    puts("/excref   excludes ref lang from the LNG file (inserted to deflang only)");
     return(1);
   }
 
   fd = fopen("out.lng", "wb");
   if (fd == NULL) {
-    puts("ERR: failed to open or create OUT.LNG");
+    fprintf(stderr, "ERROR: FAILED TO CREATE OR OPEN OUT.LNG");
     return(1);
   }
 
@@ -416,25 +697,46 @@ int main(int argc, char **argv) {
     unsigned short sz;
     char id[3];
 
+    if (!strcmp(argv[i], "/c")) {
+      output_format = C_OUTPUT;
+      continue;
+    } else if (!strcmp(argv[i], "/asm")) {
+      output_format = ASM_OUTPUT;
+      continue;
+    } else if(!strcmp(argv[i], "/nasm")) {
+      output_format = NASM_OUTPUT;
+      continue;
+    } else if(!strcmp(argv[i], "/nocomp")) {
+      mvcomp_enabled = 0;
+      continue;
+    } else if(!strcmp(argv[i], "/nodef")) {
+      output_format = NO_OUTPUT;
+      continue;
+    } else if(!strcmp(argv[i], "/excref")) {
+      excref = 1;
+      continue;
+    }
+
     if (strlen(argv[i]) != 2) {
-      printf("INVALID LANG SPECIFIED: %s\r\n", argv[i]);
+      fprintf(stderr, "INVALID LANG SPECIFIED: %s\r\n", argv[i]);
       ecode = 1;
-      break;
+      goto exit_main;
     }
     id[0] = argv[i][0];
     id[1] = argv[i][1];
     id[2] = 0;
 
     if ((lang = svl_lang_new(id, DICT_CAP, STRINGS_CAP)) == NULL) {
-      printf("OUT OF MEMORY\r\n");
-      return(1);
+      fprintf(stderr, "OUT OF MEMORY\r\n");
+      ecode = 1;
+      goto exit_main;
     }
 
     sz = svl_lang_from_cats_file(lang, reflang);
     if (sz == 0) {
-      printf("ERROR COMPUTING LANG '%s'\r\n", id);
+      fprintf(stderr, "ERROR COMPUTING LANG '%s'\r\n", id);
       ecode = 1;
-      break;
+      goto exit_main;
     } else {
       printf("computed %s lang block of %u bytes\r\n", id, sz);
       if (sz > biggest_langsz) biggest_langsz = sz;
@@ -442,24 +744,31 @@ int main(int argc, char **argv) {
     svl_compact_lang(lang);
 
     /* write header if first (reference) language */
-    if (i == 1) {
+    if (!reflang) {
       if (!svl_write_header(lang->num_strings, fd)) {
-        printf("ERROR WRITING TO OUTPUT FILE\r\n");
+        fprintf(stderr, "ERROR WRITING TO OUTPUT FILE\r\n");
         ecode = 1;
-        break;
+        goto exit_main;
       }
     }
 
     /* write lang ID to file, followed string table size, and then
-       the dictionary and string table for current language */
-    if (!svl_write_lang(lang, fd)) {
-      printf("ERROR WRITING TO OUTPUT FILE\r\n");
-      ecode = 1;
-      break;
+       the dictionary and string table for current language
+       skip this for reference language if /excref given */
+    if ((reflang != NULL) || (excref == 0)) {
+      /* also updates the biggest_langsz variable to accomodate enough space
+       * for in-place decompression of mvcomp-compressed lang blocks */
+      if (!svl_write_lang(lang, fd, mvcomp_enabled, &biggest_langsz)) {
+        fprintf(stderr, "ERROR WRITING TO OUTPUT FILE\r\n");
+        ecode = 1;
+        goto exit_main;
+      }
+    } else {
+      puts("ref language NOT saved in the LNG file (/excref)");
     }
 
     /* remember reference data for other languages */
-    if (i == 1) {
+    if (!reflang) {
       reflang = lang;
     } else {
       svl_lang_free(lang);
@@ -467,17 +776,36 @@ int main(int argc, char **argv) {
     }
   }
 
-  /* compute the deflang.c file containing a dump of the reference block */
-  if (!svl_write_c_source(reflang, "deflang.c", biggest_langsz)) {
-    puts("ERROR: FAILED TO OPEN OR CREATE DEFLANG.C");
+  if (!reflang) {
+    fprintf(stderr, "ERROR: NO LANGUAGE GIVEN\r\n");
     ecode = 1;
+    goto exit_main;
   }
 
-  /* clean up */
+  /* compute the deflang file containing a dump of the reference lang block */
+  if (output_format == C_OUTPUT) {
+    if (!svl_write_c_source(reflang, "deflang.c", biggest_langsz)) {
+      fprintf(stderr, "ERROR: FAILED TO OPEN OR CREATE DEFLANG.C\r\n");
+      ecode = 1;
+    }
+  } else if ((output_format == ASM_OUTPUT) || (output_format == NASM_OUTPUT)) {
+    if (!svl_write_asm_source(reflang, "deflang.inc", biggest_langsz, output_format)) {
+      fprintf(stderr, "ERROR: FAILED TO OPEN OR CREATE DEFLANG.INC\r\n");
+      ecode = 1;
+    }
+  }
+
+exit_main:
+  if (lang && (lang != reflang)) {
+    svl_lang_free(lang);
+  }
   if (reflang) {
     svl_lang_free(reflang);
     reflang = NULL;
+    lang = NULL;
   }
+
+  fclose(fd);
 
   return(ecode);
 }

@@ -1,3 +1,19 @@
+20241010
+- improved the MVCOMP compression algorithm (ca. 5% more efficient on text)
+- added /nodef to TLUMACZ (skips deflang generation)
+- MVCOMP-packed data is loaded to RAM before unpacking (60x faster on an 8086)
+- assembly version of the MVCOMP depacker used by default (saves 27 bytes)
+
+20240929
+- LNG strings may be optionally MVCOMP-compressed (disabled with /nocomp)
+- reference language can be excluded from the LNG file (/excref)
+
+20240915
+- fixed svarlang_strid() when id=0 and string does not exist (Bernd Boeckmann)
+
+20240227
+- replaced inline _asm by pragma aux (more compact code, open watcom only)
+
 20230730
 - dropped svarlang_autoload() (replaced by more specialized functions below)
 - added svarlang_autoload_exepath() and svarlang_autoload_nlspath()

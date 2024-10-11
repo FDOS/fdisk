@@ -152,9 +152,9 @@ bootnorm.c : bintoc/bintoc.exe bootnorm.bin
 
 # --- NLS -------------------------------------------------------------------
 
-nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/es.txt nls/de.txt nls/fr.txt nls/it.txt nls/pl.txt nls/tr.txt
+nls/out.lng : svarlang/tlumacz.exe nls/en.txt nls/de.txt nls/es.txt nls/fr.txt nls/it.txt nls/pl.txt nls/tr.txt
 	@cd nls
-	$(TLUMACZ) en es de fr it pl tr
+	$(TLUMACZ) /excref en de es fr it pl tr
 	@cd ..
 
 fdisk.lng : nls/out.lng
