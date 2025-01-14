@@ -416,6 +416,7 @@ static void Determine_Log_Free_Space( Partition_Table *pDrive )
 {
    int index = 0;
    int last_used_partition = UNUSED;
+   unsigned long ext_free_space;
 
    /* Determine the location and size of the largest free space in the */
    /* extended partition, if it exists.                                */
@@ -443,20 +444,25 @@ static void Determine_Log_Free_Space( Partition_Table *pDrive )
                last_used_partition = index;
             }
 
-            if ( ( pDrive->log_drive[index + 1].num_type > 0 ) &&
+            if ( ( index < MAX_LOGICAL_DRIVES - 1 ) &&
+                 ( pDrive->log_drive[index + 1].num_type > 0 ) &&
                  ( pDrive->log_drive[index + 1].start_cyl >
                    pDrive->log_drive[index].end_cyl + 1 ) ) {
-               pDrive->ext_free_space =
+
+               ext_free_space =
                   ( pDrive->log_drive[index + 1].start_cyl -
                     pDrive->log_drive[index].end_cyl - 1 );
-               pDrive->log_start_cyl = pDrive->log_drive[index].end_cyl + 1;
-               pDrive->log_end_cyl =
-                  pDrive->log_drive[index + 1].start_cyl - 1;
-               pDrive->log_free_loc = index + 1;
+
+               if ( ext_free_space >= pDrive->ext_free_space ) {
+                  pDrive->ext_free_space = ext_free_space;
+                  pDrive->log_start_cyl = pDrive->log_drive[index].end_cyl + 1;
+                  pDrive->log_end_cyl = pDrive->log_drive[index + 1].start_cyl - 1;
+                  pDrive->log_free_loc = index + 1;
+               }
             }
 
             index++;
-         } while ( index < MAX_LOGICAL_DRIVES - 1 );
+         } while ( index < MAX_LOGICAL_DRIVES );
 
          /* Determine if there is any free space before the first logical  */
          /* drive in the extended partition.                               */
