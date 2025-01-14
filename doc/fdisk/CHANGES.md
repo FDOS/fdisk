@@ -8,8 +8,13 @@ Bug classification:
  - LOW: Cosmetic bugs, like display issues etc.
 
 
-Version 1.3.17 (2024-??-??)
+Version 1.4.0 (2025-01-16)
 ---------------------------
+Fixes:
+ - CRITICAL: FDISK would wipe the disk if a logical other the first is
+     deleted while there are 23 logical partitions defined for the disk.
+ - HIGH: If there are multiple gaps between the partitions, FDISK would
+     not find the largest free space but the first.
 Changes:
  - Import latest SvarLANG and make use of compressed language file to
    safe ~50K disk space.
