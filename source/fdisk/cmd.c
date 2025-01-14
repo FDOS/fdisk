@@ -254,11 +254,31 @@ void Command_Line_Create_Primary_Partition( void )
    Shift_Command_Line_Options( option_count );
 }
 
+static int Nth_Log_Part_Defined( Partition_Table *pDrive, int num )
+{
+   int i, valid_parts = 0;
+
+   for ( i = 0; i < MAX_LOGICAL_DRIVES; i++ ) {
+      if ( pDrive->log_drive[i].num_type == 0 ) {
+         continue;
+      }
+
+      if ( valid_parts == num ) {
+         return i;
+      }
+
+      valid_parts++;
+   }
+
+   return i;
+}
+
 /* /DELETE command line option */
 void Command_Line_Delete( void )
 {
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
    int error_code = 0;
+   int part_num;
 
    /* Delete the primary partition */
    if ( 0 == strcmp( arg[1].choice, "PRI" ) ) {
@@ -315,8 +335,9 @@ void Command_Line_Delete( void )
 
    /* Delete a Logical DOS Drive */
    else if ( 0 == strcmp( arg[1].choice, "LOG" ) ) {
-      if ( ( arg[1].value >= 1 ) && ( arg[1].value <= 23 ) ) {
-         error_code = Delete_Logical_Drive( (int)( arg[1].value - 1 ) );
+      if ( ( arg[1].value >= 1 ) && ( arg[1].value <= MAX_LOGICAL_DRIVES ) &&
+           ( ( part_num = Nth_Log_Part_Defined( pDrive, arg[1].value - 1  ) ) < MAX_LOGICAL_DRIVES ) ) {
+         error_code = Delete_Logical_Drive( part_num );
       }
       else {
          /* NLS:Logical drive number %d is out of range. */
@@ -330,8 +351,9 @@ void Command_Line_Delete( void )
       if ( ( arg[1].value >= 1 ) && ( arg[1].value <= 4 ) ) {
          error_code = Delete_Primary_Partition( (int)( arg[1].value - 1 ) );
       }
-      else if ( ( arg[1].value >= 5 ) && ( arg[1].value <= 28 ) ) {
-         error_code = Delete_Logical_Drive( (int)( arg[1].value - 5 ) );
+      else if ( ( arg[1].value >= 5 ) && ( arg[1].value <= 28 ) &&
+              ( ( part_num = Nth_Log_Part_Defined( pDrive, arg[1].value - 5  ) ) < MAX_LOGICAL_DRIVES ) ) {
+         error_code = Delete_Logical_Drive( (int)( part_num ) );
       }
       else {
          /* NLS:Partition number is out of range. */

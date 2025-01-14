@@ -315,7 +315,6 @@ int Delete_Logical_Drive( int logical_drive_number )
    if ( !pDrive->usable || !pDrive->ext_usable ) {
       return 99;
    }
-
    return Delete_EMBR_Chain_Node( pDrive, logical_drive_number );
 }
 

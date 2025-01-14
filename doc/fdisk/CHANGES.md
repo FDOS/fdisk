@@ -13,6 +13,10 @@ Version 1.4.0 (2025-01-16)
 Fixes:
  - CRITICAL: FDISK would wipe the disk if a logical other the first is
      deleted while there are 23 logical partitions defined for the disk.
+ - CRITICAL: The number n for the command line operations
+     /del /log:n and /del /num:n did not always reflect the n-th
+     logical partition shown to the user via /info. This could lead the
+     user to delete wrong partitions.
  - HIGH: If there are multiple gaps between the partitions, FDISK would
      not find the largest free space but the first.
 Changes:
