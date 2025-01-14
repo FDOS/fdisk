@@ -72,6 +72,11 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
 
    int free_space_loc = pDrive->log_free_loc;
 
+   if ( ( (pDrive->num_of_log_drives >= MAX_LOGICAL_DRIVES ) && ( free_space_loc != 0 ) ) ||
+        ( (pDrive->num_of_log_drives > MAX_LOGICAL_DRIVES ) && ( free_space_loc == 0 ) ) ) {
+      /* ran out of data table space */
+      return 99;
+   }
    if ( !pDrive->usable || !pDrive->ext_usable ) {
       return 99;
    }

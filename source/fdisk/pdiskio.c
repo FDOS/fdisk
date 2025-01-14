@@ -835,6 +835,7 @@ int Delete_EMBR_Chain_Node( Partition_Table *pDrive,
       Clear_Partition( &pDrive->next_ext[MAX_LOGICAL_DRIVES - 1] );
       pDrive->log_drive_created[MAX_LOGICAL_DRIVES - 1] = FALSE;
       pDrive->next_ext_exists[MAX_LOGICAL_DRIVES - 1] = FALSE;
+      pDrive->next_ext_exists[MAX_LOGICAL_DRIVES - 2] = FALSE;
       pDrive->num_of_log_drives--;
    }
    else {
