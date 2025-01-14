@@ -210,6 +210,7 @@ utf8tocp/utf8tocp.exe : utf8tocp/utf8tocp.obj
 
 clean : .SYMBOLIC
 	rm -f *.obj
+	rm -f fdisk.lnk
 
 clobber : .SYMBOLIC
 	rm -f *.bak
