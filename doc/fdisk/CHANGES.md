@@ -24,6 +24,7 @@ Fixes:
      not find the largest free space but the first.
  - HIGH: Prevent the user from creating more drives than drive letters
      available.
+
 Changes:
  - Import latest SvarLANG and make use of compressed language file to
    safe ~50K disk space.
