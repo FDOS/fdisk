@@ -11,14 +11,19 @@ Bug classification:
 Version 1.4.0 (2025-01-16)
 ---------------------------
 Fixes:
- - CRITICAL: FDISK would wipe the disk if a logical other the first is
+ - CRITICAL: FDISK would wipe the disk if a logical other than the first is
      deleted while there are 23 logical partitions defined for the disk.
- - CRITICAL: The number n for the command line operations
+ - CRITICAL: The number n for command line operations
      /del /log:n and /del /num:n did not always reflect the n-th
-     logical partition shown to the user via /info. This could lead the
-     user to delete wrong partitions.
+     logical partition shown to the user via /info. This could foul the
+     user into deleting wrong partitions.
+ - CRITICAL: Avoid data loss on logical partition creation if there are
+     already 22 partitions on a single disk and the 23th to be inserted
+     is not going into the last partition slot.
  - HIGH: If there are multiple gaps between the partitions, FDISK would
      not find the largest free space but the first.
+ - HIGH: Prevent the user from creating more drives than drive letters
+     available.
 Changes:
  - Import latest SvarLANG and make use of compressed language file to
    safe ~50K disk space.
