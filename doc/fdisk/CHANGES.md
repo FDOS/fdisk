@@ -15,7 +15,7 @@ Fixes:
      deleted while there are 23 logical partitions defined for the disk.
  - CRITICAL: The number n for command line operations
      /del /log:n and /del /num:n did not always reflect the n-th
-     logical partition shown to the user via /info. This could foul the
+     logical partition shown to the user via /info. This could trick the
      user into deleting wrong partitions.
  - CRITICAL: Avoid data loss on logical partition creation if there are
      already 22 partitions on a single disk and the 23th to be inserted
