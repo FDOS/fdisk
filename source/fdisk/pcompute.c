@@ -101,7 +101,7 @@ int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )
    /* Make space in the part_table structure, if necessary. */
    if ( free_space_loc < pDrive->num_of_log_drives && free_space_loc > 0 ) {
 
-      for ( index = pDrive->num_of_log_drives + 1; index >= free_space_loc;
+      for ( index = pDrive->num_of_log_drives; index >= free_space_loc;
             index-- ) {
          Copy_Partition( &pDrive->log_drive[index],
                          &pDrive->log_drive[index - 1] );
