@@ -49,7 +49,6 @@ source/fdisk/pcompute.h
 source/fdisk/pdiskio.h
 source/fdisk/printf.h
 source/fdisk/ui.h
-source/fdisk/userint2.h
 source/fdisk/bootnorm.asm
 source/fdisk/smartmbr.asm
 source/fdisk/Makefile
