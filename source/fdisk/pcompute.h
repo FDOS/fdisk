@@ -20,6 +20,7 @@ unsigned long Max_Log_Free_Space_In_MB( void );
 unsigned long Max_Log_Part_Size_In_MB( void );
 unsigned long Max_Pri_Part_Size_In_MB( int type );
 
+int Nth_Log_Part_Defined( Partition_Table *pDrive, int num );
 int Deactivate_Active_Partition( void );
 int Delete_Logical_Drive( int logical_drive_number );
 int Delete_Extended_Partition( void );

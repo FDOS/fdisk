@@ -48,6 +48,25 @@ static unsigned long align_up( unsigned long sect )
    return ( ( sect & 7 ) == 0 ) ? sect : ( sect & 0xfffffff8ul ) + 8;
 }
 
+int Nth_Log_Part_Defined( Partition_Table *pDrive, int num )
+{
+   int i, valid_parts = 0;
+
+   for ( i = 0; i < MAX_LOGICAL_DRIVES; i++ ) {
+      if ( pDrive->log_drive[i].num_type == 0 ) {
+         continue;
+      }
+
+      if ( valid_parts == num ) {
+         return i;
+      }
+
+      valid_parts++;
+   }
+
+   return i;
+}
+
 /* Create Logical Drive */
 /* Returns a 0 if successful and a 1 if unsuccessful */
 int Create_Logical_Drive( int numeric_type, unsigned long size_in_MB )

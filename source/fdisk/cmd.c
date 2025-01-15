@@ -254,25 +254,6 @@ void Command_Line_Create_Primary_Partition( void )
    Shift_Command_Line_Options( option_count );
 }
 
-static int Nth_Log_Part_Defined( Partition_Table *pDrive, int num )
-{
-   int i, valid_parts = 0;
-
-   for ( i = 0; i < MAX_LOGICAL_DRIVES; i++ ) {
-      if ( pDrive->log_drive[i].num_type == 0 ) {
-         continue;
-      }
-
-      if ( valid_parts == num ) {
-         return i;
-      }
-
-      valid_parts++;
-   }
-
-   return i;
-}
-
 /* /DELETE command line option */
 void Command_Line_Delete( void )
 {
