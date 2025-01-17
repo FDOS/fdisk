@@ -259,7 +259,6 @@ void Command_Line_Create_Primary_Partition( void )
       con_print( svarlang_str( 8, 10 ) );
       exit( 9 );
    }
-   Set_Active_Partition_If_None_Is_Active( part_no );
 
    Shift_Command_Line_Options( option_count );
 }
