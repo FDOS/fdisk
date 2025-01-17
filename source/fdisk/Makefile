@@ -209,6 +209,7 @@ utf8tocp/utf8tocp.exe : utf8tocp/utf8tocp.obj
 # --- CLEANUP ---------------------------------------------------------------
 
 clean : .SYMBOLIC
+	rm -f bootnorm.c
 	rm -f *.obj
 	rm -f fdisk.lnk
 

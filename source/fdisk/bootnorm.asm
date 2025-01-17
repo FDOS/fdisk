@@ -16,6 +16,7 @@
 	RELOCATED_OFFSET equ 0x0600
 	PARTTBL_SIZE	 equ 64
 	PARTTBL_OFFSET	 equ 0x1be
+	MAGIC_OFFSET	 equ 0x1fe
 	CODE_SIZE	 equ 440
 
 org RELOCATED_OFFSET
@@ -67,7 +68,7 @@ chainload_bootsect:
 	call fatal			; does not return
 	db 'read error while reading drive', 0		
   .check_signature:
-	cmp word [signature], 0xaa55
+	cmp word [BOOTSECT_OFFSET+MAGIC_OFFSET], 0xaa55
 	je handoff_to_volume_bootrecord
 	call fatal				; does not return
 	db 'partition signature != 55AA', 0
