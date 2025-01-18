@@ -156,7 +156,7 @@ print:
 	jmp print
   .r:	ret
 
-read_error_msg:	     db 'Read error', 0		
+read_error_msg:	     db 'Read error', 0
 no_active_msg:       db 'No active partition', 0
 invalid_vbr_sig_msg: db 'VBR has illegal signature', 0
 try_next_dev_msg:    db '. Trying next boot device...', 13, 10, 0
