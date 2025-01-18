@@ -1379,7 +1379,7 @@ int Write_Partition_Tables( void )
 
       /* Write the Extended Partition Table, if applicable. */
 
-      if ( pDrive->ptr_ext_part ) {
+      if ( pDrive->ptr_ext_part && pDrive->ext_usable ) {
          for ( index = 0; index < MAX_LOGICAL_DRIVES; index++ ) {
             /* If this logical drive was just created, clear its boot sector. */
             if ( pDrive->log_drive_created[index] == TRUE ) {
