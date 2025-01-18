@@ -189,10 +189,6 @@ void Interactive_User_Interface( void )
       Ask_User_About_FAT32_Support();
    }
 
-   //  Create_MBR_If_Not_Present();     DO NOT AUTOMATICALLY CREATE THE MBR.
-   //                                   THIS FEATURE WAS REQUESTED TO BE
-   //                                   DISABLED.
-
    do {
 
       menu = Standard_Menu( menu );

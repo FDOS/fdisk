@@ -275,25 +275,6 @@ int Create_MBR( void )
    }
 }
 
-/* Create Master Boot Code if it is not present */
-/* currently unused
-int Create_MBR_If_Not_Present( void )
-{
-   int error_code;
-
-   error_code = Read_Physical_Sectors( 0x80, 0, 0, 1, 1 );
-   if ( error_code != 0 ) {
-      return error_code;
-   }
-   if ( ( sector_buffer[0x1fe] != 0x55 ) ||
-        ( sector_buffer[0x1ff] != 0xaa ) ) {
-      return Create_MBR();
-   }
-
-   return 0;
-}
-*/
-
 /* parse bool_text for "ON" or "OFF" and set integer var accordingly */
 int bool_string_to_int( int *var, const char *bool_text )
 {
