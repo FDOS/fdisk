@@ -1043,6 +1043,12 @@ static int Read_Extended_Table( int drive, Partition_Table *pDrive )
    p = pDrive->log_drive;
 
    do {
+      if ( num_drives == MAX_LOGICAL_DRIVES ) {
+         /* make sure we bail out if we cannot handle the number of
+            logical partitions */
+         return 1;
+      }
+
       error_code = Read_Physical_Sectors(
          drive + 0x80, nep->start_cyl, nep->start_head, nep->start_sect, 1 );
       if ( error_code != 0 ) {
