@@ -726,6 +726,13 @@ int main( int argc, char *argv[] )
          command_ok = TRUE;
       }
 
+      if ( 0 == strcmp( arg[0].choice, "NOIPL" ) ) {
+         /* prevent writing IPL upon MBR initialisation */
+         flags.no_ipl = TRUE;
+         Shift_Command_Line_Options( 1 );
+         command_ok = TRUE;
+      }
+
       if ( 0 == strcmp( arg[0].choice, "PRI" ) ) {
          flags.use_iui = FALSE;
          Command_Line_Create_Primary_Partition();

@@ -163,6 +163,7 @@ typedef struct flags_structure {
    int monochrome;
    int maximum_drive_number;
    int more_than_one_drive;
+   int no_ipl;
    int partitions_have_changed;
    int partition_type_lookup_table;
    int reboot;

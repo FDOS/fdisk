@@ -1330,7 +1330,8 @@ int Write_Partition_Tables( void )
          goto drive_error;
       }
 
-      if ( *(unsigned short *)( sector_buffer + 510 ) != 0xAA55 ) {
+      if ( ( *(unsigned short *)( sector_buffer + 510 ) != 0xAA55 ) &&
+           ( flags.no_ipl != TRUE ) ) {
          /* install MBR code if we install a new MBR */
          memcpy( sector_buffer, bootnormal_code, SIZE_OF_IPL );
       }
