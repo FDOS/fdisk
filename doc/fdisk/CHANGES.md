@@ -11,7 +11,11 @@ Bug classification:
 Version 1.4.1 (2025-01-18)
 ---------------------------
 Fixes:
- - MEDIUM: fix bootloader trying to boot from an active partition
+ - CRITICAL: Prevent FDISK from accessing modifying partitions with more
+     than 23 logicals defined, as it may terminate the EMBR chain after the
+     23th logical when writing the tables back or otherwise operate in an
+     unexpected way.
+ - MEDIUM: Fix bootloader trying to boot from an active partition
      not containing a valid volume boot record instead of showing an
      error message.
 
@@ -28,6 +32,12 @@ Changes:
  - Add undocumented /NOIPL command line argument which prevents FDISK
    from writing boot code into an implicitly created MBR. IPL area is
    filled with zero instead.
+ - Do not list logical drives via /info for inaccessible extended
+   partitions and inform user about the fact that access is disabled
+   to create or delete logicals on an inaccessible extended.
+ - Tell user if an extended partition is inaccessible when entering
+   the delete logical drive UI screen instead of givin a generic
+   failure message.
 
 
 Version 1.4.0 (2025-01-16)
