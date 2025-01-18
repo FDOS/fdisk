@@ -18,6 +18,7 @@
 	PARTTBL_OFFSET	 equ 0x1be
 	MAGIC_OFFSET	 equ 0x1fe
 	CODE_SIZE	 equ 440
+	WAIT_TICKS	 equ 54    ; ~3sec on 18.2 ticks per second
 
 org RELOCATED_OFFSET
 
@@ -56,8 +57,8 @@ scan_for_active_partition:
 	cmp di, signature			; scanned beyond end of table?
 	jb .l
   .no_active:
-	call fatal				; does not return
-	db 'no active partition found', 0
+  	mov si, no_active_msg
+	jmp fatal				; does not return
 
 	  ; We found an active partition. Load its boot sector to 0:7c00,
 	  ; test the signature and far jump to 0:7c00
@@ -65,13 +66,13 @@ chainload_bootsect:
 	push di				; save parttbl entry (restore to SI)
 	call read_boot_sector		; reads one sector                    	
 	jnc .check_signature		; no read error occured?
-	call fatal			; does not return
-	db 'read error while reading drive', 0		
+	mov si, read_error_msg
+	jmp fatal			; does not return
   .check_signature:
 	cmp word [BOOTSECT_OFFSET+MAGIC_OFFSET], 0xaa55
 	je handoff_to_volume_bootrecord
-	call fatal				; does not return
-	db 'partition signature != 55AA', 0
+	mov si, invalid_vbr_sig_msg
+	jmp fatal			; does not return
 
 ;-----------------------------------------------------------------------------
 handoff_to_volume_bootrecord:
@@ -123,20 +124,42 @@ read_boot_sector:
 
 
 ;-----------------------------------------------------------------------------
-; Fatal error handler. Displays error message and waits forever
-; IN: CS:IP = ASCIIZ with error message to print
+; Fatal error handler. Displays error message, waits ~3 seconds,
+; issues INT18 to give BIOS a change to recover, then
+; waits forever in case INT18 returns
+; IN: DS:SI = ASCIIZ with error message to print
 
-__fatal_print_char:        
+fatal:
+	call print		; print error message given in si
+	mov si, try_next_dev_msg
+	call print		; and print "try next" message
+	xor ah, ah
+	int 1ah			; get system time
+	mov bx, dx		; store lower word in bx
+  .wait_few_seconds:
+	int 1ah
+	sub dx, bx
+	cmp dx, WAIT_TICKS	; wait a few seconds to ensure user sees
+	jb .wait_few_seconds	;  the message
+  .next_boot_device:
+	int 0x18		; give BIOS chance to deal with boot failure
+  .wait_forever:		; we should not land here!
+	jmp short .wait_forever ; loop forever in case INT 18 returns
+
+print:
+	lodsb
+	test al, al
+	jz .r
 	xor bx, bx               ; video page 0
-	mov ah, 0x0E             ; else print it
-	int 0x10                 ; via TTY mode
-fatal:	pop si                   ; this is the first character
-	lodsb                    ; get token
-	push si                  ; stack up potential return address
-	cmp al, 0                ; end of string?
-	jne __fatal_print_char   ; until done
-  .wait_forever:
-	jmp short .wait_forever
+	mov ah, 0x0E             ; print it via TTY mode
+	int 0x10
+	jmp print
+  .r:	ret
+
+read_error_msg:	     db 'Read error', 0		
+no_active_msg:       db 'No active partition', 0
+invalid_vbr_sig_msg: db 'VBR has illegal signature', 0
+try_next_dev_msg:    db '. Trying next boot device...', 0
 
 
 ;-----------------------------------------------------------------------------
