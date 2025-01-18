@@ -11,7 +11,7 @@ Bug classification:
 Version 1.4.1 (2025-01-18)
 ---------------------------
 Fixes:
- - CRITICAL: Prevent FDISK from accessing modifying partitions with more
+ - CRITICAL: Prevent FDISK from accessing and modifying partitions with more
      than 23 logicals defined, as it may terminate the EMBR chain after the
      23th logical when writing the tables back or otherwise operate in an
      unexpected way.
