@@ -328,7 +328,7 @@ void Command_Line_Delete( void )
       if ( ( arg[1].value >= 1 ) && ( arg[1].value <= MAX_LOGICAL_DRIVES ) &&
            ( ( part_num = Nth_Log_Part_Defined( pDrive, arg[1].value - 1  ) ) < MAX_LOGICAL_DRIVES ) ) {
       
-         if ( !pDrive->ext_usable ) {
+         if ( pDrive->ptr_ext_part && !pDrive->ext_usable ) {
             /* NLS:No usable extended partition found. */
             con_print( svarlang_str( 8, 7 ) );
             exit( 9 );
@@ -350,7 +350,7 @@ void Command_Line_Delete( void )
       else if ( ( arg[1].value >= 5 ) && ( arg[1].value <= 28 ) &&
               ( ( part_num = Nth_Log_Part_Defined( pDrive, arg[1].value - 5  ) ) < MAX_LOGICAL_DRIVES ) ) {
 
-         if ( !pDrive->ext_usable ) {
+         if ( pDrive->ptr_ext_part && !pDrive->ext_usable ) {
             /* NLS:No usable extended partition found. */
             con_print( svarlang_str( 8, 7 ) );
             exit( 9 );

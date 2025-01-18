@@ -300,7 +300,7 @@ void Interactive_User_Interface( void )
       }
 
       if ( menu == CLDD ) {
-         if ( !pDrive->ext_usable ) {
+         if ( pDrive->ptr_ext_part && !pDrive->ext_usable ) {
             Warn_Incompatible_Ext();
          }
          else if ( pDrive->ptr_ext_part == NULL ) {
@@ -363,7 +363,7 @@ void Interactive_User_Interface( void )
       }
 
       if ( menu == DLDD ) {
-         if ( !pDrive->ext_usable ) {
+         if ( pDrive->ptr_ext_part && !pDrive->ext_usable ) {
             Warn_Incompatible_Ext();
          }
          else if ( ( pDrive->num_of_log_drives == 0 ) ||

@@ -8,6 +8,14 @@ Bug classification:
  - LOW: Cosmetic bugs, like display issues etc.
 
 
+Version 1.4.2 (2025-01-18)
+---------------------------
+Fixes:
+ - LOW: When displaying or editing logical partitions, only complain about
+   an unusable extended partition if there is any defined, not when there
+   is no extended at all (introduced with 1.4.1).
+
+
 Version 1.4.1 (2025-01-18)
 ---------------------------
 Fixes:
