@@ -8,6 +8,28 @@ Bug classification:
  - LOW: Cosmetic bugs, like display issues etc.
 
 
+Version 1.4.1 (2025-01-18)
+---------------------------
+Fixes:
+ - MEDIUM: fix bootloader trying to boot from an active partition
+     not containing a valid volume boot record instead of showing an
+     error message.
+
+Changes:
+ - Do not automatically activate a created primary partition when
+   it is created via command line and no other partition is active, as
+   this turned out to be a backwards incompatible change to FDISK 1.3.4
+   shipped with FreeDOS 1.3, breaking the installation process if the
+   BIOS is configured to boot from hard disk first.
+ - Change boot code installed via /IPL to issue an INT 18 if there is
+   no bootable partition, either because none is active, or the active
+   one does not contain a valid BIOS signature. There is a message and
+   a three second delay before issueing the INT 18.
+ - Add undocumented /NOIPL command line argument which prevents FDISK
+   from writing boot code into an implicitly created MBR. IPL area is
+   filled with zero instead.
+
+
 Version 1.4.0 (2025-01-16)
 ---------------------------
 Fixes:

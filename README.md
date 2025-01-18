@@ -49,7 +49,7 @@ installer.
 
 ## Copyright
 
-This program is Copyright 1998 - 2023 by Brian E. Reifsnyder and The FreeDOS
+This program is Copyright 1998 - 2025 by Brian E. Reifsnyder and The FreeDOS
 Project under the terms of the GNU General Public License, version 2 or later.
 
 This program comes as-is and without warranty of any kind. The author of
