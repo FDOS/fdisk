@@ -225,7 +225,7 @@ void Display_CL_Partition_Table( void )
    /* NLS:Largest continious free space for primary partition */
    con_printf( svarlang_str( 9, 5 ), Max_Pri_Free_Space_In_MB() );
 
-   if ( !pDrive->ext_usable ) {
+   if ( pDrive->ptr_ext_part && !pDrive->ext_usable ) {
       /* NLS:No usable extended partition found. */
       con_print( svarlang_str( 8, 7 ) );
       return;
