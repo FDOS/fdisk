@@ -150,7 +150,7 @@ print:
 	lodsb
 	test al, al
 	jz .r
-	xor bx, bx               ; video page 0
+	mov bx, 0x7              ; video page 0, default color
 	mov ah, 0x0E             ; print it via TTY mode
 	int 0x10
 	jmp print
@@ -159,7 +159,7 @@ print:
 read_error_msg:	     db 'Read error', 0		
 no_active_msg:       db 'No active partition', 0
 invalid_vbr_sig_msg: db 'VBR has illegal signature', 0
-try_next_dev_msg:    db '. Trying next boot device...', 0
+try_next_dev_msg:    db '. Trying next boot device...', 13, 10, 0
 
 
 ;-----------------------------------------------------------------------------
