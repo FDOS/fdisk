@@ -300,7 +300,10 @@ void Interactive_User_Interface( void )
       }
 
       if ( menu == CLDD ) {
-         if ( pDrive->ptr_ext_part == NULL ) {
+         if ( !pDrive->ext_usable ) {
+            Warn_Incompatible_Ext();
+         }
+         else if ( pDrive->ptr_ext_part == NULL ) {
             con_set_cursor_xy( 5, 23 );
             Color_Print( svarlang_str( 9, 15 ) );
             con_set_cursor_xy( 5, 25 );
@@ -360,7 +363,10 @@ void Interactive_User_Interface( void )
       }
 
       if ( menu == DLDD ) {
-         if ( ( pDrive->num_of_log_drives == 0 ) ||
+         if ( !pDrive->ext_usable ) {
+            Warn_Incompatible_Ext();
+         }
+         else if ( ( pDrive->num_of_log_drives == 0 ) ||
               ( pDrive->ptr_ext_part == NULL ) ) {
             /* NLS:No Logical DOS Drive(s) to delete. */
             Color_Print_At( 4, 22, svarlang_str( 9, 18 ) );
@@ -1017,11 +1023,6 @@ int Create_Logical_Drive_Interface( void )
 
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
 
-   if ( !pDrive->ext_usable ) {
-      Warn_Incompatible_Ext();
-      return 1;
-   }
-
    Determine_Free_Space();
 
    /* size and position calculation for logical drives is flawed if the
@@ -1208,11 +1209,6 @@ int Delete_Logical_Drive_Interface( void )
    int input_ok;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
    int error_code;
-
-   if ( !pDrive->ext_usable ) {
-      Warn_Incompatible_Ext();
-      return 1;
-   }
 
    Clear_Screen( 0 );
 
