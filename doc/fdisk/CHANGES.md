@@ -33,10 +33,9 @@ Changes:
    from writing boot code into an implicitly created MBR. IPL area is
    filled with zero instead.
  - Do not list logical drives via /info for inaccessible extended
-   partitions and inform user about the fact that access is disabled
-   to create or delete logicals on an inaccessible extended.
+   partitions.
  - Tell user if an extended partition is inaccessible when entering
-   the delete logical drive UI screen instead of givin a generic
+   the delete logical drive UI screen instead of giving a generic
    failure message.
 
 
