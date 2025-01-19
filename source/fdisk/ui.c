@@ -1494,8 +1494,7 @@ void Display_Extended_Partition_Information_SS( void )
                if ( flags.del_non_dos_log_drives == TRUE ) {
                   /* Display drive number */
                   Color_Print_At( column_index + 0, print_index, "%c",
-                                  drive_lettering_buffer[(
-                                     flags.drive_number - 128 )][index] );
+                     drive_letter_or_questionmark( drive_lettering_buffer[(flags.drive_number - 128 )][index] ) );
                }
             }
 
@@ -1707,8 +1706,7 @@ void Display_Primary_Partition_Information_SS( void )
 
                if ( IsRecognizedFatPartition( p->num_type ) ) {
                   Print_At( 5, ( cursor_offset + 9 ), "%c:",
-                            drive_lettering_buffer[( flags.drive_number -
-                                                     128 )][index] );
+                     drive_letter_or_questionmark( drive_lettering_buffer[( flags.drive_number - 128 )][index] ) );
                }
 
                /* Partition Number */

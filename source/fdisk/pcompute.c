@@ -1004,3 +1004,13 @@ void Set_Active_Partition_If_None_Is_Active( int partition_number )
    }
    Set_Active_Partition( partition_number );
 }
+
+char drive_letter_or_questionmark( char drive_letter )
+{
+   if ( drive_letter ) {
+      return drive_letter;
+   }
+   else {
+      return '?';
+   }
+}

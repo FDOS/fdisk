@@ -34,4 +34,6 @@ int Primary_Partition_Slot_Transfer( int transfer_type, int source,
 int Set_Active_Partition( int partition_number );
 void Set_Active_Partition_If_None_Is_Active( int partition_number );
 
+char drive_letter_or_questionmark( char drive_letter );
+
 #endif /* PCOMPUTE_H */

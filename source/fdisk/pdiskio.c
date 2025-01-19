@@ -329,7 +329,7 @@ void dla_msdos( int *cl )
       }
 
       /* find active partition for drive */
-      for ( sub_index = 0; sub_index < 4; sub_index++ ) {
+      for ( sub_index = 0; ( sub_index < 4 ) && ( current_letter <= 'Z' ); sub_index++ ) {
          if ( ( IsRecognizedFatPartition(
                  brief_partition_table[index][sub_index] ) ) &&
               ( pDrive->pri_part[sub_index].active_status == 0x80 ) ) {
@@ -342,7 +342,7 @@ void dla_msdos( int *cl )
 
       /* no active partition, try to find one non-active primary */
       if ( !active_part_found[index] ) {
-         for ( sub_index = 0; sub_index < 4; sub_index++ ) {
+         for ( sub_index = 0; ( sub_index < 4 ) && ( current_letter <= 'Z' ); sub_index++ ) {
             if ( drive_lettering_buffer[index][sub_index] == 0 &&
                  ( IsRecognizedFatPartition(
                     brief_partition_table[index][sub_index] ) ) ) {
@@ -361,7 +361,7 @@ void dla_msdos( int *cl )
          continue;
       }
 
-      for ( sub_index = 4; sub_index < 27; sub_index++ ) {
+      for ( sub_index = 4; ( sub_index < 27 ) && ( current_letter <= 'Z' ); sub_index++ ) {
          if ( IsRecognizedFatPartition(
                  brief_partition_table[index][sub_index] ) ) {
             drive_lettering_buffer[index][sub_index] = current_letter;
@@ -378,7 +378,7 @@ void dla_msdos( int *cl )
          continue;
       }
 
-      for ( sub_index = 0; sub_index < 4; sub_index++ ) {
+      for ( sub_index = 0; ( sub_index < 4 ) && ( current_letter <= 'Z' ); sub_index++ ) {
          if ( drive_lettering_buffer[index][sub_index] == 0 ) {
             if ( IsRecognizedFatPartition(
                     brief_partition_table[index][sub_index] ) ) {
@@ -407,7 +407,7 @@ void dla_drdos( int *cl )
       }
 
       /* find active partition for drive */
-      for ( sub_index = 0; sub_index < 4; sub_index++ ) {
+      for ( sub_index = 0; ( sub_index < 4 ) && ( current_letter <= 'Z' ); sub_index++ ) {
          if ( ( IsRecognizedFatPartition(
                  brief_partition_table[index][sub_index] ) ) ) {
             drive_lettering_buffer[index][sub_index] = current_letter;
@@ -423,7 +423,7 @@ void dla_drdos( int *cl )
          continue;
       }
 
-      for ( sub_index = 4; sub_index < 27; sub_index++ ) {
+      for ( sub_index = 4; ( sub_index < 27 ) && ( current_letter <= 'Z' ); sub_index++ ) {
          if ( IsRecognizedFatPartition(
                  brief_partition_table[index][sub_index] ) ) {
             drive_lettering_buffer[index][sub_index] = current_letter;

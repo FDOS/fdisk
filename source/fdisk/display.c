@@ -144,7 +144,6 @@ void Dump_Partition_Information( void )
 void Display_CL_Partition_Table( void )
 {
    int index = 0;
-
    unsigned long usage = 0;
    Partition_Table *pDrive = &part_table[flags.drive_number - 0x80];
    Partition *p;
@@ -176,9 +175,7 @@ void Display_CL_Partition_Table( void )
       if ( p->num_type > 0 ) {
          /* Drive Letter of Partition */
          if ( IsRecognizedFatPartition( p->num_type ) ) {
-            con_printf(
-               " %1c:",
-               drive_lettering_buffer[( flags.drive_number - 128 )][index] );
+            con_printf( " %1c:", drive_letter_or_questionmark( drive_lettering_buffer[( flags.drive_number - 128 )][index] ) );
          }
          else {
             con_print( "   " );
@@ -248,8 +245,7 @@ void Display_CL_Partition_Table( void )
             if ( IsRecognizedFatPartition( brief_partition_table[(
                     flags.drive_number - 128 )][index] ) ) {
                /* Display drive letter */
-               con_printf( " %1c:", drive_lettering_buffer[(
-                                       flags.drive_number - 128 )][index] );
+               con_printf( " %1c:", drive_letter_or_questionmark( drive_lettering_buffer[(flags.drive_number - 128 )][index] ) );
 
                /* Display volume label */
                con_printf( " %11s", p->vol_label );
