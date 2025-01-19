@@ -8,6 +8,16 @@ Bug classification:
  - LOW: Cosmetic bugs, like display issues etc.
 
 
+Version 1.4.3 (2025-01-19)
+---------------------------
+Fixes:
+ - LOW: Do not show drive "letters" beyond Z:. This was a display issue
+     without affecting the actual functionality.
+
+Changes:
+ - Allow creation of primary partition despite being out of drive letters,
+   as the primary might actually get one when created.
+
 Version 1.4.2 (2025-01-18)
 ---------------------------
 Fixes:
