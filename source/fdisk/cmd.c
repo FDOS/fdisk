@@ -212,14 +212,6 @@ void Command_Line_Create_Primary_Partition( void )
 
    Determine_Free_Space();
 
-   if ( Determine_Drive_Letters() >= 'Z' ) {
-      /* maximum number of Logical DOS Drives installed */
-      con_puts( "" );
-      con_print( svarlang_str( 10, 71 ) );
-      con_puts( "" );
-      exit( 9 );
-   }
-
    maximum_partition_size_in_MB = Max_Pri_Part_Size_In_MB( PRIMARY );
 
    maximum_possible_percentage = Convert_To_Percentage(
