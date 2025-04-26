@@ -8,6 +8,13 @@ Bug classification:
  - LOW: Cosmetic bugs, like display issues etc.
 
 
+Version 1.4.4 (2025-04-27)
+---------------------------
+Fixes:
+ - MEDIUM: FAT-16 LBA (partition type 0x0e) were incorrectly displayed as
+     FAT-32 LBA when displaying logical partitions via the menu.
+
+
 Version 1.4.3 (2025-01-19)
 ---------------------------
 Fixes:
@@ -17,6 +24,7 @@ Fixes:
 Changes:
  - Allow creation of primary partition despite being out of drive letters,
    as the primary might actually get one when created.
+
 
 Version 1.4.2 (2025-01-18)
 ---------------------------
