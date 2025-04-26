@@ -453,7 +453,7 @@ static struct {
                  { 0x07, "NTFS / HPFS", "NTFS" },
                  { 0x0b, "FAT-32", "FAT32" },
                  { 0x0c, "FAT-32 LBA", "FAT32 LBA" },
-                 { 0x0e, "FAT-16 LBA", "FAT32 LBA" },
+                 { 0x0e, "FAT-16 LBA", "FAT16 LBA" },
                  { 0x0f, "Extended LBA", "Ext LBA" },
 
                  { 0x11, "Hid. FAT-12", "H FAT12" },
