@@ -58,7 +58,7 @@ nls/it.txt : nls/it_utf8.txt utf8tocp/utf8tocp
 	utf8tocp/utf8tocp 858 $< $@
 
 nls/pl.txt : nls/pl_utf8.txt utf8tocp/utf8tocp
-	utf8tocp/utf8tocp maz $< $@
+	utf8tocp/utf8tocp 852 $< $@
 
 nls/tr.txt : nls/tr_utf8.txt utf8tocp/utf8tocp
 	utf8tocp/utf8tocp 857 $< $@
