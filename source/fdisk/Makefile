@@ -179,7 +179,7 @@ nls/it.txt : nls/it_utf8.txt utf8tocp/utf8tocp.exe
 	$(UTF8TOCP) 850 $[@ $^@
 
 nls/pl.txt : nls/pl_utf8.txt utf8tocp/utf8tocp.exe
-	$(UTF8TOCP) maz $[@ $^@
+	$(UTF8TOCP) 852 $[@ $^@
 
 nls/tr.txt : nls/tr_utf8.txt utf8tocp/utf8tocp.exe
 	$(UTF8TOCP) 857 $[@ $^@
