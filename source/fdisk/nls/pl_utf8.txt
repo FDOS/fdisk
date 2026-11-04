@@ -18,7 +18,7 @@
 0.13:    <typ#> to numer typu partycji lub FAT-12/16/32, jeśli nie podano /SPEC
 0.14:\t
 0.20:  /PRI:<rozm> [/SPEC:<typ#>]               Tworzy partycję podstawową
-0.21:  /EXT:<rozm>                              Tworzy partycję rozszerzoną
+0.21:  /EXT:<rozm>                              Tworzy partycję rozszerzoną DOS
 0.22:  /LOG:<rozm> [/SPEC:<typ#>]               Tworzy dysk logiczny
 0.23:  /PRIO,/EXTO,/LOGO                        jak wyżej, ale bez FAT32
 0.24:  /AUTO                                    Automatycznie tworzy partycje
@@ -30,7 +30,7 @@
 0.32:  /ACTIVATE:<part#>                        Aktywuje partycję <part#>
 0.33:  /DEACTIVATE                              Usuwa status aktywnej partycji
 0.34:\t
-0.40:Zarządzanie MBR (Master Boot Record):
+0.40:Zarządzanie MBR (główny rekord rozruchowy):
 0.41:  /CLEARMBR                Usuwa wszystkie partycje i kod rozruchowy
 0.42:  /LOADMBR                 Wczytuje tablicę partycji i kod z "boot.mbr" do MBR
 0.43:  /SAVEMBR                 Zapisuje tablicę partycji i kod do pliku "boot.mbr"
