@@ -7,10 +7,12 @@
 #  - NASM (tested with version 2.0.15)
 #
 # Build with:
-#  wmake -f makefile.wat
+#  wmake
 #
 # To create a ZIP distribution:
-#  wmake -f makefile.wat dist
+#  wmake dist
+# 
+# Define SVARDOS=1 to build Polish translation with MAZ code page
 
 TOOL_CFLAGS = -q -ox -wx
 !ifdef __MSDOS__
@@ -179,7 +181,13 @@ nls/it.txt : nls/it_utf8.txt utf8tocp/utf8tocp.exe
 	$(UTF8TOCP) 850 $[@ $^@
 
 nls/pl.txt : nls/pl_utf8.txt utf8tocp/utf8tocp.exe
+!ifdef SVARDOS
 	$(UTF8TOCP) maz $[@ $^@
+!else
+	$(UTF8TOCP) 852 $[@ $^@
+!endif
+
+nls/pl.txt : nls/pl_utf8.txt utf8tocp/utf8tocp.exe
 
 nls/tr.txt : nls/tr_utf8.txt utf8tocp/utf8tocp.exe
 	$(UTF8TOCP) 857 $[@ $^@
@@ -239,7 +247,6 @@ clobber : .SYMBOLIC
 	rm -f utf8tocp/*.exe
 	rm -f utf8tocp/*.obj
 	rm -f utf8tocp/*.o
-
 # language files
 	rm -f deflang.c
 	rm -f fdisk.lng

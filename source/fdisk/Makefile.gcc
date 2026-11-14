@@ -1,4 +1,5 @@
-# This Makefile is for Free FDISK and I16-GCC, Mac (probably Linux as well)
+# This Makefile is for Free FDISK and I16-GCC (Mac and Linux hosts)
+# Define SVARDOS=1 to build Polish translation with MAZ code page
 
 HOST_CC=cc
 HOST_CFLAGS=-Wall -pedantic -O2
@@ -58,7 +59,11 @@ nls/it.txt : nls/it_utf8.txt utf8tocp/utf8tocp
 	utf8tocp/utf8tocp 858 $< $@
 
 nls/pl.txt : nls/pl_utf8.txt utf8tocp/utf8tocp
+ifdef SVARDOS
 	utf8tocp/utf8tocp maz $< $@
+else
+	utf8tocp/utf8tocp 852 $< $@
+endif
 
 nls/tr.txt : nls/tr_utf8.txt utf8tocp/utf8tocp
 	utf8tocp/utf8tocp 857 $< $@
@@ -81,8 +86,8 @@ clean:
 	rm -f *.o *.obj *.OBJ *.bin *.BIN
 	rm -f *.exe
 	rm -f *.map *.MAP
-	rm -f fdisk.lng out.lng
-	rm -f nls/en.txt nls/de.txt nls/out.lng nls/DEFLANG.C
+	rm -f fdisk.lng out.lng deflang.c
+	rm -f nls/??.txt nls/out.lng nls/deflang.c nls/DEFLANG.C
 	rm -f bintoc/bintoc bintoc/*.o
 	rm -f bintoc/*.exe bintoc/*.obj
 	rm -f bintoc/*.EXE bintoc/*.OBJ

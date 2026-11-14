@@ -272,7 +272,7 @@ static unsigned short svl_lang_from_cats_file(struct svl_lang *l, struct svl_lan
   char fname[] = "xx.txt";
   static char linebuf[8192];
   const char *ptr;
-  unsigned short id, maxid=0, maxid_line, linecount;
+  unsigned short id, maxid=0, maxid_line=0, linecount;
   int i;
 
   fname[strlen(fname) - 6] = (char)tolower( l->id[0] );
@@ -529,7 +529,7 @@ static int svl_write_lang(const struct svl_lang *l, FILE *fd, int compflag, unsi
     unsigned short comp_bytes;
     size_t stringslen = strings_bytes;
     unsigned short mvcompbytesahead;
-    comp_bytes = mvcomp(compstrings, sizeof(compstrings), l->strings, &stringslen, &mvcompbytesahead);
+    comp_bytes = mvcomp(compstrings, sizeof(compstrings), (unsigned char *)l->strings, &stringslen, &mvcompbytesahead);
     if (mvcompbytesahead + stringslen > *buffrequired) {
       *buffrequired = mvcompbytesahead + stringslen;
     }
