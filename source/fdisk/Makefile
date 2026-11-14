@@ -187,8 +187,6 @@ nls/pl.txt : nls/pl_utf8.txt utf8tocp/utf8tocp.exe
 	$(UTF8TOCP) 852 $[@ $^@
 !endif
 
-nls/pl.txt : nls/pl_utf8.txt utf8tocp/utf8tocp.exe
-
 nls/tr.txt : nls/tr_utf8.txt utf8tocp/utf8tocp.exe
 	$(UTF8TOCP) 857 $[@ $^@
 
